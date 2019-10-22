@@ -45,7 +45,7 @@ class EventoFilter extends InputType
                 'type' => Type::id(),
             ],
             'nota_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'estado' => [
                 'type' => GraphQL::type('EventoEstadoFilter'),

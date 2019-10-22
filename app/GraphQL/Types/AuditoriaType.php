@@ -49,15 +49,15 @@ class AuditoriaType extends GraphQLType
                 'description' => 'Identificador da auditoria',
             ],
             'permissao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a permissão concedida ou utilizada que permitiu a realização da operação',
             ],
             'prestador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Prestador que exerceu a atividade',
             ],
             'autorizador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Prestador que autorizou o acesso ao recurso descrito',
             ],
             'tipo' => [

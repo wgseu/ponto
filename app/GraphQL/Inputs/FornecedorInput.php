@@ -42,7 +42,7 @@ class FornecedorInput extends InputType
     {
         return [
             'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Empresa do fornecedor',
             ],
             'prazo_pagamento' => [

@@ -52,15 +52,15 @@ class TributacaoInput extends InputType
                 'rules' => ['max:20'],
             ],
             'origem_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Origem do produto',
             ],
             'operacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'CFOP do produto',
             ],
             'imposto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Imposto do produto',
             ],
         ];

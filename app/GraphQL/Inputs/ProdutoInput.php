@@ -48,23 +48,23 @@ class ProdutoInput extends InputType
                 'rules' => ['max:100'],
             ],
             'categoria_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Categoria do produto, permite a rápida localização ao utilizar tablets',
             ],
             'unidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a unidade do produtos, Ex.: Grama, Litro.',
             ],
             'setor_estoque_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa de qual setor o produto será retirado após a venda',
             ],
             'setor_preparo_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa em qual setor de preparo será enviado o ticket de preparo ou autorização, se nenhum for informado nada será impresso',
             ],
             'tributacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informações de tributação do produto',
             ],
             'descricao' => [

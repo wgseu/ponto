@@ -42,11 +42,11 @@ class AcessoInput extends InputType
     {
         return [
             'funcao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Função a que a permissão se aplica',
             ],
             'permissao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Permissão liberada para a função',
             ],
         ];

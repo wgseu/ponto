@@ -45,19 +45,19 @@ class PacoteFilter extends InputType
                 'type' => Type::id(),
             ],
             'pacote_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'grupo_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'propriedade_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'associacao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'quantidade_minima' => [
                 'type' => GraphQL::type('NumberFilter'),

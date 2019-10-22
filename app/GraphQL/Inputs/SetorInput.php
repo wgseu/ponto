@@ -42,7 +42,7 @@ class SetorInput extends InputType
     {
         return [
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o setor que abrange esse subsetor',
             ],
             'nome' => [

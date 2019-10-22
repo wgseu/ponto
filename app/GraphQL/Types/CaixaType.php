@@ -49,7 +49,7 @@ class CaixaType extends GraphQLType
                 'description' => 'Identificador do caixa',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'null',
             ],
             'descricao' => [

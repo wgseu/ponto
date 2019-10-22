@@ -59,7 +59,7 @@ class NotaInput extends InputType
                 'description' => 'Estado da nota',
             ],
             'ultimo_evento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Último evento da nota',
             ],
             'serie' => [
@@ -94,7 +94,7 @@ class NotaInput extends InputType
                 'rules' => ['max:80'],
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pedido da nota',
             ],
             'motivo' => [

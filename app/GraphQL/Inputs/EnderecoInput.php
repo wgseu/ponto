@@ -42,11 +42,11 @@ class EnderecoInput extends InputType
     {
         return [
             'cidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cidade a qual o endereço pertence',
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Bairro a qual o endereço está localizado',
             ],
             'logradouro' => [

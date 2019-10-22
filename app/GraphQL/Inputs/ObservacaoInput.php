@@ -42,7 +42,7 @@ class ObservacaoInput extends InputType
     {
         return [
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o produto que pode conter essa observação',
             ],
             'grupo' => [

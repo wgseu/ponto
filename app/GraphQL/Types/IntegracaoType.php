@@ -81,7 +81,7 @@ class IntegracaoType extends GraphQLType
                 'description' => 'Informa de o módulo de integração está habilitado',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização dos dados do módulo de integração',
             ],
         ];

@@ -45,10 +45,10 @@ class ContagemFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'quantidade' => [
                 'type' => GraphQL::type('NumberFilter'),

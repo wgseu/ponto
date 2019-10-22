@@ -48,7 +48,7 @@ class EstadoType extends GraphQLType
                 'description' => 'Identificador do estado',
             ],
             'pais_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'País a qual esse estado pertence',
             ],
             'nome' => [

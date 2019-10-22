@@ -126,8 +126,10 @@ $[table.end]
         'Date' => 'App\GraphQL\Types\DateType',
         'DateTime' => 'App\GraphQL\Types\DateTimeType',
 
+        'IdFilter' => 'App\GraphQL\Filters\IdFilter',
         'StringFilter' => 'App\GraphQL\Filters\StringFilter',
         'NumberFilter' => 'App\GraphQL\Filters\NumberFilter',
+        'NumberRangeFilter' => 'App\GraphQL\Filters\NumberRangeFilter',
         'DateFilter' => 'App\GraphQL\Filters\DateFilter',
         'DateRangeFilter' => 'App\GraphQL\Filters\DateRangeFilter',
 

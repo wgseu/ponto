@@ -48,11 +48,11 @@ class CartaoType extends GraphQLType
                 'description' => 'Identificador do cartão',
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Forma de pagamento associada à esse cartão ou vale',
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Carteira de entrada de valores no caixa',
             ],
             'bandeira' => [

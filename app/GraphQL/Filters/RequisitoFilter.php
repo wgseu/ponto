@@ -45,16 +45,16 @@ class RequisitoFilter extends InputType
                 'type' => Type::id(),
             ],
             'lista_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'compra_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'quantidade' => [
                 'type' => GraphQL::type('NumberFilter'),

@@ -48,19 +48,19 @@ class ProdutoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'categoria_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'unidade_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'setor_estoque_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'setor_preparo_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'tributacao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

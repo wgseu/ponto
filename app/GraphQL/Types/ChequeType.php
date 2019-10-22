@@ -49,11 +49,11 @@ class ChequeType extends GraphQLType
                 'description' => 'Identificador da folha de cheque',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cliente que emitiu o cheque',
             ],
             'banco_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Banco do cheque',
             ],
             'agencia' => [

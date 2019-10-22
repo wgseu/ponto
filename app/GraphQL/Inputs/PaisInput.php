@@ -57,7 +57,7 @@ class PaisInput extends InputType
                 'rules' => ['max:10'],
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a moeda principal do país',
             ],
             'idioma' => [

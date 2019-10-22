@@ -60,7 +60,7 @@ class PaisType extends GraphQLType
                 'description' => 'Código do país com 2 letras',
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a moeda principal do país',
             ],
             'idioma' => [

@@ -45,7 +45,7 @@ class GrupoFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

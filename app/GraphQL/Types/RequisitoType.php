@@ -49,19 +49,19 @@ class RequisitoType extends GraphQLType
                 'description' => 'Identificador do produto da lista',
             ],
             'lista_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Lista de compra desse produto',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que deve ser comprado',
             ],
             'compra_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa em qual fornecedor foi realizado a compra desse produto',
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Fornecedor em que deve ser consultado ou realizado as compras dos produtos, pode ser alterado no momento da compra',
             ],
             'quantidade' => [

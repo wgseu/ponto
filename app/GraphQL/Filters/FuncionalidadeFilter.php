@@ -45,10 +45,10 @@ class FuncionalidadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'modulo_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'funcionalidade_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

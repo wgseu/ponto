@@ -51,13 +51,13 @@ class TributacaoFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'origem_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'operacao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'imposto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
         ];
     }

@@ -49,11 +49,11 @@ class PatrimonioType extends GraphQLType
                 'description' => 'Identificador do bem',
             ],
             'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Empresa a que esse bem pertence',
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Fornecedor do bem',
             ],
             'numero' => [
@@ -101,7 +101,7 @@ class PatrimonioType extends GraphQLType
                 'description' => 'Caminho relativo da foto do bem',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização das informações do bem',
             ],
         ];

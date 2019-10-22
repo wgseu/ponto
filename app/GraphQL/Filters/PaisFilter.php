@@ -54,7 +54,7 @@ class PaisFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'moeda_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'idioma' => [
                 'type' => GraphQL::type('StringFilter'),

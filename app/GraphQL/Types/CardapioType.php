@@ -49,11 +49,11 @@ class CardapioType extends GraphQLType
                 'description' => 'Identificador do cardápio',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que faz parte desse cardápio',
             ],
             'integracao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite exibir o cardápio somente nessa integração',
             ],
             'local' => [

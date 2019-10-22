@@ -49,31 +49,31 @@ class PromocaoType extends GraphQLType
                 'description' => 'Identificador da promoção',
             ],
             'promocao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a promoção será o resgate e somente pontos gerados por ela poderão ser usados',
             ],
             'categoria_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite fazer promoção para qualquer produto dessa categoria',
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa qual o produto participará da promoção de desconto ou terá acréscimo',
             ],
             'servico_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se essa promoção será aplicada nesse serviço',
             ],
             'bairro_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Bairro que essa promoção se aplica, somente serviços',
             ],
             'zona_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Zona que essa promoção se aplica, somente serviços',
             ],
             'integracao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite alterar o preço do produto para cada integração',
             ],
             'local' => [

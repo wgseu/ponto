@@ -28,13 +28,12 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\Propriedade;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
-use Illuminate\Support\Facades\Auth;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -44,11 +43,6 @@ class PropriedadeQuery extends Query
     protected $attributes = [
         'name' => 'propriedades',
     ];
-
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('propriedade:view');
-    }
 
     public function type(): Type
     {
@@ -69,9 +63,10 @@ class PropriedadeQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Propriedade::with($fields->getRelations())
-            ->select($fields->getSelect())
-            ->where(Filter::map($args['filter'] ?? []));
+        $query = Filter::apply(
+            $args['filter'] ?? [],
+            Propriedade::with($fields->getRelations())->select($fields->getSelect())
+        );
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

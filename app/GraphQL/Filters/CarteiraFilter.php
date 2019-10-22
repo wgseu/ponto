@@ -48,10 +48,10 @@ class CarteiraFilter extends InputType
                 'type' => GraphQL::type('CarteiraTipoFilter'),
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'banco_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

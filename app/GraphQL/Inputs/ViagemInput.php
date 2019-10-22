@@ -29,8 +29,8 @@ declare(strict_types=1);
 namespace App\GraphQL\Inputs;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
+use Rebing\GraphQL\Support\InputType;
 
 class ViagemInput extends InputType
 {
@@ -43,7 +43,7 @@ class ViagemInput extends InputType
     {
         return [
             'responsavel_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Responsável pela entrega ou compra',
             ],
             'latitude' => [

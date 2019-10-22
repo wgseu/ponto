@@ -48,7 +48,7 @@ class PermissaoType extends GraphQLType
                 'description' => 'Identificador da permissão',
             ],
             'funcionalidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Categoriza um grupo de permissões',
             ],
             'nome' => [

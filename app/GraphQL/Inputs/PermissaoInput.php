@@ -42,7 +42,7 @@ class PermissaoInput extends InputType
     {
         return [
             'funcionalidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Categoriza um grupo de permissões',
             ],
             'nome' => [

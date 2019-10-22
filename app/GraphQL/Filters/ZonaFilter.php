@@ -45,7 +45,7 @@ class ZonaFilter extends InputType
                 'type' => Type::id(),
             ],
             'bairro_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

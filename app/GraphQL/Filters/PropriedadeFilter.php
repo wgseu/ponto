@@ -45,7 +45,7 @@ class PropriedadeFilter extends InputType
                 'type' => Type::id(),
             ],
             'grupo_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

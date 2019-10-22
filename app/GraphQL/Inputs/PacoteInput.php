@@ -42,23 +42,23 @@ class PacoteInput extends InputType
     {
         return [
             'pacote_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Pacote a qual pertence as informações de formação do produto final',
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Grupo de formação, Ex.: Tamanho, Sabores e Complementos.',
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Produto selecionável do grupo. Não pode conter propriedade.',
             ],
             'propriedade_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Propriedade selecionável do grupo. Não pode conter produto.',
             ],
             'associacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde Tamanho é pai de Sabor',
             ],
             'quantidade_minima' => [

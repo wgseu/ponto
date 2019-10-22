@@ -48,7 +48,7 @@ class FormaFilter extends InputType
                 'type' => GraphQL::type('FormaTipoFilter'),
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

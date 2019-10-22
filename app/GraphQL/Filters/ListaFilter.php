@@ -51,10 +51,10 @@ class ListaFilter extends InputType
                 'type' => GraphQL::type('ListaEstadoFilter'),
             ],
             'encarregado_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'viagem_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'data_viagem' => [
                 'type' => GraphQL::type('DateFilter'),

@@ -43,31 +43,31 @@ class EstoqueInput extends InputType
     {
         return [
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que entrou no estoque',
             ],
             'requisito_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa de qual compra originou essa entrada em estoque',
             ],
             'transacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Identificador do item que gerou a saída desse produto do estoque',
             ],
             'entrada_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite estoque FIFO',
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Fornecedor do produto',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Setor de onde o produto foi inserido ou retirado',
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Prestador que inseriu/retirou o produto do estoque',
             ],
             'quantidade' => [

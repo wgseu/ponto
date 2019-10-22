@@ -52,11 +52,11 @@ class ListaInput extends InputType
                 'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os itens foram comprados',
             ],
             'encarregado_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o funcionário encarregado de fazer as compras',
             ],
             'viagem_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informações da viagem para realizar as compras',
             ],
             'data_viagem' => [

@@ -49,11 +49,11 @@ class EmitenteType extends GraphQLType
                 'description' => 'Identificador do emitente, sempre 1',
             ],
             'contador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Contador responsável pela contabilidade da empresa',
             ],
             'regime_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Regime tributário da empresa',
             ],
             'ambiente' => [

@@ -69,9 +69,10 @@ class AssociacaoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Associacao::with($fields->getRelations())
-            ->select($fields->getSelect())
-            ->where(Filter::map($args['filter'] ?? []));
+        $query = Filter::apply(
+            $args['filter'] ?? [],
+            Associacao::with($fields->getRelations())->select($fields->getSelect())
+        );
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

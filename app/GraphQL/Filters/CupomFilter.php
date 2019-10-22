@@ -45,13 +45,13 @@ class CupomFilter extends InputType
                 'type' => Type::id(),
             ],
             'cupom_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'codigo' => [
                 'type' => GraphQL::type('StringFilter'),

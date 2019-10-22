@@ -42,7 +42,7 @@ class ZonaInput extends InputType
     {
         return [
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Bairro em que essa zona está localizada',
             ],
             'nome' => [

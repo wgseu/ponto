@@ -53,7 +53,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se esse cliente faz parte da empresa informada',
             ],
             'login' => [
@@ -100,6 +100,10 @@ class ClienteType extends GraphQLType
                 'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
                 'description' => 'Informa o estado da conta do cliente',
             ],
+            'secreto' => [
+                'type' => Type::string(),
+                'description' => 'Código secreto para recuperar a conta do cliente',
+            ],
             'limite_compra' => [
                 'type' => Type::float(),
                 'description' => 'Limite de compra utilizando a forma de pagamento Conta',
@@ -129,7 +133,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização das informações do cliente',
             ],
             'data_cadastro' => [

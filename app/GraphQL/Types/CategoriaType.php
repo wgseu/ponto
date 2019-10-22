@@ -49,7 +49,7 @@ class CategoriaType extends GraphQLType
                 'description' => 'Identificador da categoria',
             ],
             'categoria_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria',
             ],
             'descricao' => [
@@ -69,7 +69,7 @@ class CategoriaType extends GraphQLType
                 'description' => 'Informa a ordem de exibição das categorias nas vendas',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização das informações da categoria',
             ],
             'data_arquivado' => [

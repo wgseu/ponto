@@ -49,7 +49,7 @@ class ViagemType extends GraphQLType
                 'description' => 'Identificador da viagem',
             ],
             'responsavel_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Responsável pela entrega ou compra',
             ],
             'latitude' => [

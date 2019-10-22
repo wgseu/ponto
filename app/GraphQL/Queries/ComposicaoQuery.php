@@ -45,11 +45,6 @@ class ComposicaoQuery extends Query
         'name' => 'composicoes',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('composicao:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Composicao');
@@ -69,9 +64,10 @@ class ComposicaoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Composicao::with($fields->getRelations())
-            ->select($fields->getSelect())
-            ->where(Filter::map($args['filter'] ?? []));
+        $query = Filter::apply(
+            $args['filter'] ?? [],
+            Composicao::with($fields->getRelations())->select($fields->getSelect())
+        );
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

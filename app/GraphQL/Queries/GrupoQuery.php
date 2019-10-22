@@ -45,11 +45,6 @@ class GrupoQuery extends Query
         'name' => 'grupos',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('grupo:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Grupo');
@@ -69,9 +64,10 @@ class GrupoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Grupo::with($fields->getRelations())
-            ->select($fields->getSelect())
-            ->where(Filter::map($args['filter'] ?? []));
+        $query = Filter::apply(
+            $args['filter'] ?? [],
+            Grupo::with($fields->getRelations())->select($fields->getSelect())
+        );
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

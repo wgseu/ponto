@@ -42,7 +42,7 @@ class CidadeInput extends InputType
     {
         return [
             'estado_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a qual estado a cidade pertence',
             ],
             'nome' => [

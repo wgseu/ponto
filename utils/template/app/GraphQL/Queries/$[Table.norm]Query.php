@@ -27,11 +27,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\$[Table.norm];
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;

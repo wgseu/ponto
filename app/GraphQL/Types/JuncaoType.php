@@ -49,11 +49,11 @@ class JuncaoType extends GraphQLType
                 'description' => 'Identificador da junção',
             ],
             'mesa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Mesa que está junta ao pedido',
             ],
             'pedido_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
             ],
             'estado' => [

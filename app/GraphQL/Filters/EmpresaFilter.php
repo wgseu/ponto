@@ -45,13 +45,13 @@ class EmpresaFilter extends InputType
                 'type' => Type::id(),
             ],
             'pais_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'parceiro_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'opcoes' => [
                 'type' => GraphQL::type('StringFilter'),

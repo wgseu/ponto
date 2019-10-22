@@ -65,7 +65,7 @@ class NotaType extends GraphQLType
                 'description' => 'Estado da nota',
             ],
             'ultimo_evento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Último evento da nota',
             ],
             'serie' => [
@@ -97,7 +97,7 @@ class NotaType extends GraphQLType
                 'description' => 'Protocolo de autorização da nota fiscal',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pedido da nota',
             ],
             'motivo' => [

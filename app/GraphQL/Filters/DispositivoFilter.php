@@ -45,10 +45,10 @@ class DispositivoFilter extends InputType
                 'type' => Type::id(),
             ],
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'caixa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -49,19 +49,19 @@ class PontuacaoType extends GraphQLType
                 'description' => 'Identificador da pontuação',
             ],
             'promocao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a promoção que originou os pontos ou que descontou os pontos',
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Cliente que possui esses pontos, não informar quando tiver travado por pedido',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se essa pontuação será usada apenas nesse pedido',
             ],
             'item_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa qual venda originou esses pontos, tanto saída como entrada',
             ],
             'quantidade' => [

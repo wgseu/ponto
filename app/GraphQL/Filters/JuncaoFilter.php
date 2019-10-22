@@ -45,10 +45,10 @@ class JuncaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'mesa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'estado' => [
                 'type' => GraphQL::type('JuncaoEstadoFilter'),

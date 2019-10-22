@@ -45,13 +45,13 @@ class AuditoriaFilter extends InputType
                 'type' => Type::id(),
             ],
             'permissao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'autorizador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'tipo' => [
                 'type' => GraphQL::type('AuditoriaTipoFilter'),

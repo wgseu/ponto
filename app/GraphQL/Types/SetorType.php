@@ -48,7 +48,7 @@ class SetorType extends GraphQLType
                 'description' => 'Identificador do setor',
             ],
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o setor que abrange esse subsetor',
             ],
             'nome' => [

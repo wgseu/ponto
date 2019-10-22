@@ -45,10 +45,10 @@ class ComposicaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'composicao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'tipo' => [
                 'type' => GraphQL::type('ComposicaoTipoFilter'),

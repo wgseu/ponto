@@ -49,19 +49,19 @@ class AvaliacaoType extends GraphQLType
                 'description' => 'Identificador da avaliação',
             ],
             'metrica_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Métrica de avaliação',
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando for avaliação de produto',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pedido que foi avaliado, quando nulo o produto deve ser informado',
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Produto que foi avaliado',
             ],
             'estrelas' => [

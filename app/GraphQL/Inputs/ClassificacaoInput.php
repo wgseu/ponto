@@ -42,7 +42,7 @@ class ClassificacaoInput extends InputType
     {
         return [
             'classificacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Classificação superior, quando informado, esta classificação será uma subclassificação',
             ],
             'descricao' => [

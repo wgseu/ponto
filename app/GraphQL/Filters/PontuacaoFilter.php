@@ -45,16 +45,16 @@ class PontuacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'promocao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'item_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'quantidade' => [
                 'type' => GraphQL::type('NumberFilter'),

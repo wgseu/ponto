@@ -45,10 +45,10 @@ class AssociacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'integracao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'entrega_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'codigo' => [
                 'type' => GraphQL::type('StringFilter'),

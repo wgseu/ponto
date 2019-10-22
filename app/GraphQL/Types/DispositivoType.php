@@ -49,11 +49,11 @@ class DispositivoType extends GraphQLType
                 'description' => 'Identificador do dispositivo',
             ],
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Setor em que o dispositivo está instalado/será usado',
             ],
             'caixa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos',
             ],
             'nome' => [

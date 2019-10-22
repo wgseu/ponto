@@ -51,13 +51,13 @@ class PrestadorFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'funcao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'vinculo' => [
                 'type' => GraphQL::type('PrestadorVinculoFilter'),

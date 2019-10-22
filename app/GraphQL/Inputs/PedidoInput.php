@@ -43,39 +43,39 @@ class PedidoInput extends InputType
     {
         return [
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas forem agrupadas',
             ],
             'mesa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Identificador da mesa, único quando o pedido não está fechado',
             ],
             'comanda_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Identificador da comanda, único quando o pedido não está fechado',
             ],
             'sessao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Identificador da sessão de vendas',
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Prestador que criou esse pedido',
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Identificador do cliente do pedido',
             ],
             'localizacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Endereço de entrega do pedido, se não informado na venda entrega, o pedido será para viagem',
             ],
             'entrega_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa em qual entrega esse pedido foi despachado',
             ],
             'associacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se o pedido veio de uma integração e se está associado',
             ],
             'tipo' => [
@@ -142,7 +142,7 @@ class PedidoInput extends InputType
                 'rules' => ['max:255'],
             ],
             'fechador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa quem fechou o pedido e imprimiu a conta',
             ],
             'data_impressao' => [

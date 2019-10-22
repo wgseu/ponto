@@ -43,11 +43,11 @@ class AssociacaoInput extends InputType
     {
         return [
             'integracao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Integração a qual essa associação de pedido deve ser realizada',
             ],
             'entrega_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Entrega que foi realizada',
             ],
             'codigo' => [

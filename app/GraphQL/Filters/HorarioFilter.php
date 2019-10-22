@@ -48,10 +48,10 @@ class HorarioFilter extends InputType
                 'type' => GraphQL::type('HorarioModoFilter'),
             ],
             'funcao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'inicio' => [
                 'type' => GraphQL::type('NumberFilter'),

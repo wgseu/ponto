@@ -46,7 +46,7 @@ $[field.each(all)]
 $[field.if(primary)]
                 'type' => Type::id(),
 $[field.else.if(reference)]
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
 $[field.else.if(date)]
                 'type' => GraphQL::type('DateFilter'),
 $[field.else.if(time)]

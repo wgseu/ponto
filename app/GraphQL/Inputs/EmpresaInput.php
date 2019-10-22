@@ -43,15 +43,15 @@ class EmpresaInput extends InputType
     {
         return [
             'pais_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'País em que a empresa está situada',
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a empresa do cadastro de clientes, a empresa deve ser um cliente do tipo pessoa jurídica',
             ],
             'parceiro_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa quem realiza o suporte do sistema, deve ser um cliente do tipo empresa que possua um acionista como representante',
             ],
             'opcoes' => [

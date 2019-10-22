@@ -45,10 +45,10 @@ class EmitenteFilter extends InputType
                 'type' => Type::id(),
             ],
             'contador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'regime_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'ambiente' => [
                 'type' => GraphQL::type('EmitenteAmbienteFilter'),

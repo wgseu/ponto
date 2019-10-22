@@ -42,7 +42,7 @@ class CategoriaInput extends InputType
     {
         return [
             'categoria_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria',
             ],
             'descricao' => [

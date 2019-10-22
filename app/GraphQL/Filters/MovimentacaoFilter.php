@@ -45,19 +45,19 @@ class MovimentacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'sessao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'caixa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'aberta' => [
                 'type' => Type::boolean(),
             ],
             'iniciador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'fechador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'data_fechamento' => [
                 'type' => GraphQL::type('DateFilter'),

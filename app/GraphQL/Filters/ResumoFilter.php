@@ -45,13 +45,13 @@ class ResumoFilter extends InputType
                 'type' => Type::id(),
             ],
             'movimentacao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'forma_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'cartao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'valor' => [
                 'type' => GraphQL::type('NumberFilter'),

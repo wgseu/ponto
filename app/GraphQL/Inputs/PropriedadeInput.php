@@ -42,7 +42,7 @@ class PropriedadeInput extends InputType
     {
         return [
             'grupo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Grupo que possui essa propriedade como item de um pacote',
             ],
             'nome' => [

@@ -45,7 +45,7 @@ class CreditoFilter extends InputType
                 'type' => Type::id(),
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'valor' => [
                 'type' => GraphQL::type('NumberFilter'),

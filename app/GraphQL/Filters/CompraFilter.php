@@ -48,10 +48,10 @@ class CompraFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'comprador_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'documento_url' => [
                 'type' => GraphQL::type('StringFilter'),

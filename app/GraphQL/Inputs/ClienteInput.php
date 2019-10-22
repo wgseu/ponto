@@ -47,7 +47,7 @@ class ClienteInput extends InputType
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se esse cliente faz parte da empresa informada',
             ],
             'login' => [

@@ -43,15 +43,15 @@ class LocalizacaoInput extends InputType
     {
         return [
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cliente a qual esse endereço pertence',
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Bairro do endereço',
             ],
             'zona_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a zona do bairro',
             ],
             'cep' => [

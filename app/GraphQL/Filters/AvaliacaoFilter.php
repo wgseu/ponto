@@ -45,16 +45,16 @@ class AvaliacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'metrica_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'estrelas' => [
                 'type' => GraphQL::type('NumberFilter'),

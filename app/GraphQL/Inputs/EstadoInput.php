@@ -42,7 +42,7 @@ class EstadoInput extends InputType
     {
         return [
             'pais_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'País a qual esse estado pertence',
             ],
             'nome' => [

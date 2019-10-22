@@ -31,6 +31,7 @@ namespace App\GraphQL\Types;
 use App\Models\Produto;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class ProdutoType extends GraphQLType
@@ -53,23 +54,23 @@ class ProdutoType extends GraphQLType
                 'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único entre todos os produtos',
             ],
             'categoria_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Categoria do produto, permite a rápida localização ao utilizar tablets',
             ],
             'unidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a unidade do produtos, Ex.: Grama, Litro.',
             ],
             'setor_estoque_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa de qual setor o produto será retirado após a venda',
             ],
             'setor_preparo_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa em qual setor de preparo será enviado o ticket de preparo ou autorização, se nenhum for informado nada será impresso',
             ],
             'tributacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informações de tributação do produto',
             ],
             'descricao' => [
@@ -99,6 +100,9 @@ class ProdutoType extends GraphQLType
             'custo_producao' => [
                 'type' => Type::float(),
                 'description' => 'Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('produto:view');
+                },
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('ProdutoTipo')),
@@ -141,7 +145,7 @@ class ProdutoType extends GraphQLType
                 'description' => 'Imagem do produto',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização das informações do produto',
             ],
             'data_arquivado' => [

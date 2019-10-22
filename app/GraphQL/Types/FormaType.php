@@ -53,7 +53,7 @@ class FormaType extends GraphQLType
                 'description' => 'Tipo de pagamento',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Carteira que será usada para entrada de valores no caixa',
             ],
             'descricao' => [

@@ -45,7 +45,7 @@ class ViagemFilter extends InputType
                 'type' => Type::id(),
             ],
             'responsavel_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'latitude' => [
                 'type' => GraphQL::type('NumberFilter'),

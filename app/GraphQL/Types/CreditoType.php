@@ -49,7 +49,7 @@ class CreditoType extends GraphQLType
                 'description' => 'Identificador do crédito',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cliente a qual o crédito pertence',
             ],
             'valor' => [

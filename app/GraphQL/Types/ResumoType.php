@@ -48,15 +48,15 @@ class ResumoType extends GraphQLType
                 'description' => 'Identificador do resumo',
             ],
             'movimentacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Movimentação do caixa referente ao resumo',
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Tipo de pagamento do resumo',
             ],
             'cartao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Cartão da forma de pagamento',
             ],
             'valor' => [

@@ -45,10 +45,10 @@ class EnderecoFilter extends InputType
                 'type' => Type::id(),
             ],
             'cidade_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'bairro_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'logradouro' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -49,55 +49,55 @@ class PagamentoType extends GraphQLType
                 'description' => 'Identificador do pagamento',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Carteira de destino do valor',
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa em qual moeda está o valor informado',
             ],
             'pagamento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o pagamento principal ou primeira parcela, o valor lançado é zero para os pagamentos filhos, restante de antecipação e taxas são filhos do valor antecipado',
             ],
             'agrupamento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite antecipar recebimentos de cartões, um pagamento agrupado é internamente tratado como desativado',
             ],
             'movimentacao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Movimentação do caixa quando for pagamento de pedido ou quando a conta for paga do caixa',
             ],
             'funcionario_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Funcionário que lançou o pagamento no sistema',
             ],
             'forma_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Forma da pagamento do pedido',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pedido que foi pago',
             ],
             'conta_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Conta que foi paga/recebida',
             ],
             'cartao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Cartão em que foi pago, para forma de pagamento em cartão',
             ],
             'cheque_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Cheque em que foi pago',
             ],
             'crediario_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Conta que foi utilizada como pagamento do pedido',
             ],
             'credito_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Crédito que foi utilizado para pagar o pedido',
             ],
             'valor' => [

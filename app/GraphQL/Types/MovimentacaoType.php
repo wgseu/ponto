@@ -49,11 +49,11 @@ class MovimentacaoType extends GraphQLType
                 'description' => 'Código da movimentação do caixa',
             ],
             'sessao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão',
             ],
             'caixa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Caixa a qual pertence essa movimentação',
             ],
             'aberta' => [
@@ -61,11 +61,11 @@ class MovimentacaoType extends GraphQLType
                 'description' => 'Informa se o caixa está aberto',
             ],
             'iniciador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Funcionário que abriu o caixa',
             ],
             'fechador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Funcionário que fechou o caixa',
             ],
             'data_fechamento' => [

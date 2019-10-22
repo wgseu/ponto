@@ -42,11 +42,11 @@ class FuncionalidadeInput extends InputType
     {
         return [
             'modulo_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Módulo que essa funcionalidade pertence',
             ],
             'funcionalidade_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Funcionalidade principal',
             ],
             'nome' => [

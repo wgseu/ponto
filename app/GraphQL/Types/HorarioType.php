@@ -53,11 +53,11 @@ class HorarioType extends GraphQLType
                 'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
             ],
             'funcao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite informar o horário de acesso ao sistema para realizar essa função',
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Permite informar o horário de prestação de serviço para esse prestador',
             ],
             'inicio' => [

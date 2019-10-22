@@ -43,27 +43,27 @@ class ItemInput extends InputType
     {
         return [
             'pedido_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido a qual pertence esse item',
             ],
             'prestador_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Prestador que lançou esse item no pedido',
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Produto vendido',
             ],
             'servico_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Serviço cobrado ou taxa',
             ],
             'item_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pacote em que esse item faz parte',
             ],
             'pagamento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se esse item foi pago e qual foi o lançamento',
             ],
             'descricao' => [

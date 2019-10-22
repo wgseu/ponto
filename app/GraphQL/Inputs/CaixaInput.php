@@ -43,7 +43,7 @@ class CaixaInput extends InputType
     {
         return [
             'carteira_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'null',
             ],
             'descricao' => [

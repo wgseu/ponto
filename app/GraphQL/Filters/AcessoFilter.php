@@ -45,10 +45,10 @@ class AcessoFilter extends InputType
                 'type' => Type::id(),
             ],
             'funcao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'permissao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
         ];
     }

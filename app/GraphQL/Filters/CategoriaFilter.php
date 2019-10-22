@@ -45,7 +45,7 @@ class CategoriaFilter extends InputType
                 'type' => Type::id(),
             ],
             'categoria_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

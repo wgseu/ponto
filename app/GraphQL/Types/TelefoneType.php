@@ -48,11 +48,11 @@ class TelefoneType extends GraphQLType
                 'description' => 'Identificador do telefone',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o cliente que possui esse número de telefone',
             ],
             'pais_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o país desse número de telefone',
             ],
             'numero' => [

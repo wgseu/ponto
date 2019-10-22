@@ -53,11 +53,11 @@ class CarteiraType extends GraphQLType
                 'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a carteira superior, exemplo: Banco e cartões como subcarteira',
             ],
             'banco_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Código local do banco quando a carteira for bancária',
             ],
             'descricao' => [

@@ -45,7 +45,7 @@ class FornecedorFilter extends InputType
                 'type' => Type::id(),
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'prazo_pagamento' => [
                 'type' => GraphQL::type('NumberFilter'),

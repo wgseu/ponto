@@ -29,8 +29,8 @@ declare(strict_types=1);
 namespace App\GraphQL\Inputs;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
+use Rebing\GraphQL\Support\InputType;
 
 class ChequeInput extends InputType
 {
@@ -43,11 +43,11 @@ class ChequeInput extends InputType
     {
         return [
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cliente que emitiu o cheque',
             ],
             'banco_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Banco do cheque',
             ],
             'agencia' => [

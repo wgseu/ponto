@@ -48,7 +48,7 @@ class ClienteFilter extends InputType
                 'type' => GraphQL::type('ClienteTipoFilter'),
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'login' => [
                 'type' => GraphQL::type('StringFilter'),

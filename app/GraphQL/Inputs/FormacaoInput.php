@@ -42,15 +42,15 @@ class FormacaoInput extends InputType
     {
         return [
             'item_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa qual foi o produto vendido para essa formação',
             ],
             'pacote_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa qual pacote foi selecionado no momento da venda',
             ],
             'composicao_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa qual composição foi retirada ou adicionada no momento da venda',
             ],
             'quantidade' => [

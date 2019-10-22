@@ -49,15 +49,15 @@ class CupomType extends GraphQLType
                 'description' => 'Identificador do cupom',
             ],
             'cupom_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa de qual cupom foi usado',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa qual pedido usou este cupom',
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa o cliente que possui e pode usar esse cupom',
             ],
             'codigo' => [

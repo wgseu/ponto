@@ -28,57 +28,73 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Utils;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class Filter
 {
-    public static function map($filter)
+    /**
+     * Add where statement to query builder from filter
+     *
+     * @param array $filter
+     * @param Builder $query
+     * @return Builder
+     */
+    public static function apply($filter, $query)
     {
-        $condition = [];
         foreach ($filter as $key => $stmt) {
             if (!is_array($stmt)) {
-                $condition[] = [$key, '=', $stmt];
+                $query->where($key, '=', $stmt);
                 continue;
             }
             $operator = key($stmt);
             $value = $stmt[$operator];
             switch ($operator) {
                 case 'eq':
-                    $condition[] = [$key, '=', $value];
+                    if (is_null($value)) {
+                        $query->whereNull($key);
+                        break;
+                    }
+                    $query->where($key, '=', $value);
                     break;
                 case 'ne':
-                    $condition[] = [$key, '<>', $value];
+                    if (is_null($value)) {
+                        $query->whereNotNull($key);
+                        break;
+                    }
+                    $query->where($key, '<>', $value);
                     break;
                 case 'after':
                 case 'gt':
-                    $condition[] = [$key, '>', $value];
+                    $query->where($key, '>', $value);
                     break;
                 case 'from':
                 case 'ge':
-                    $condition[] = [$key, '>=', $value];
+                    $query->where($key, '>=', $value);
                     break;
                 case 'before':
                 case 'lt':
-                    $condition[] = [$key, '<', $value];
+                    $query->where($key, '<', $value);
                     break;
                 case 'to':
                 case 'le':
-                    $condition[] = [$key, '<=', $value];
+                    $query->where($key, '<=', $value);
                     break;
                 case 'startsWith':
-                    $condition[] = [$key, 'like', $value . '%'];
+                    $query->where($key, 'like', $value . '%');
                     break;
                 case 'contains':
-                    $condition[] = [$key, 'like', '%' . $value . '%'];
+                    $query->where($key, 'like', '%' . $value . '%');
                     break;
                 case 'between':
                     if (!isset($value['start']) || !isset($value['end'])) {
                         continue;
                     }
-                    $condition[] = [$key, 'between', [$value['start'], $value['end']]];
+                    $query->whereBetween($key, [$value['start'], $value['end']]);
                     break;
                 default:
                     break;
             }
         }
-        return $condition;
+        return $query;
     }
 }

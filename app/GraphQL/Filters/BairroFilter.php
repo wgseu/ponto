@@ -45,7 +45,7 @@ class BairroFilter extends InputType
                 'type' => Type::id(),
             ],
             'cidade_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'nome' => [
                 'type' => GraphQL::type('StringFilter'),

@@ -49,7 +49,7 @@ class PropriedadeType extends GraphQLType
                 'description' => 'Identificador da propriedade',
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Grupo que possui essa propriedade como item de um pacote',
             ],
             'nome' => [
@@ -65,7 +65,7 @@ class PropriedadeType extends GraphQLType
                 'description' => 'Imagem que representa a propriedade',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de atualização dos dados ou da imagem da propriedade',
             ],
         ];

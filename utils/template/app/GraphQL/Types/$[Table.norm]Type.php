@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -50,7 +51,7 @@ $[field.each(all)]
 $[field.if(primary)]
                 'type' => Type::id(),
 $[field.else.if(reference)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::id()$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(date)]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(time)]

@@ -42,11 +42,11 @@ class ContagemInput extends InputType
     {
         return [
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que possui o estoque acumulado nesse setor',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Setor em que o produto está localizado',
             ],
             'quantidade' => [

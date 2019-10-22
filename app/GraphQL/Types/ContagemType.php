@@ -49,11 +49,11 @@ class ContagemType extends GraphQLType
                 'description' => 'Identificador da contagem',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que possui o estoque acumulado nesse setor',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Setor em que o produto está localizado',
             ],
             'quantidade' => [
@@ -61,7 +61,7 @@ class ContagemType extends GraphQLType
                 'description' => 'Quantidade do produto nesse setor',
             ],
             'data_atualizacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que a contagem foi atualizada',
             ],
         ];

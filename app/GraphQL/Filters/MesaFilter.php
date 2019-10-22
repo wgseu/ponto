@@ -45,7 +45,7 @@ class MesaFilter extends InputType
                 'type' => Type::id(),
             ],
             'setor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'numero' => [
                 'type' => GraphQL::type('NumberFilter'),

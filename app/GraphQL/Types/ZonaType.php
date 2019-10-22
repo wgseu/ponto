@@ -48,7 +48,7 @@ class ZonaType extends GraphQLType
                 'description' => 'Identificador da zona',
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Bairro em que essa zona está localizada',
             ],
             'nome' => [

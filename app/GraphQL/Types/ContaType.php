@@ -49,31 +49,31 @@ class ContaType extends GraphQLType
                 'description' => 'Código da conta',
             ],
             'classificacao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Classificação da conta',
             ],
             'funcionario_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Funcionário que lançou a conta',
             ],
             'conta_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a conta principal',
             ],
             'agrupamento_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa se esta conta foi agrupada e não precisa ser mais paga individualmente, uma conta agrupada é tratada internamente como desativada',
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a carteira que essa conta será paga automaticamente ou para informar as contas a pagar dessa carteira',
             ],
             'cliente_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Cliente a qual a conta pertence',
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Pedido da qual essa conta foi gerada',
             ],
             'tipo' => [

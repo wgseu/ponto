@@ -48,7 +48,7 @@ class BairroType extends GraphQLType
                 'description' => 'Identificador do bairro',
             ],
             'cidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cidade a qual o bairro pertence',
             ],
             'nome' => [

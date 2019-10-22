@@ -53,15 +53,15 @@ class PrestadorInput extends InputType
                 'rules' => ['max:200'],
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Função do prestada na empresa',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cliente que representa esse prestador, único no cadastro de prestadores',
             ],
             'empresa_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento',
             ],
             'vinculo' => [

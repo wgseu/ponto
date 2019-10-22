@@ -45,10 +45,10 @@ class CatalogoFilter extends InputType
                 'type' => Type::id(),
             ],
             'produto_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'preco_compra' => [
                 'type' => GraphQL::type('NumberFilter'),

@@ -49,7 +49,7 @@ class GrupoType extends GraphQLType
                 'description' => 'Identificador do grupo',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o pacote base da formação',
             ],
             'nome' => [

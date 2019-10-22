@@ -43,11 +43,11 @@ class ComposicaoInput extends InputType
     {
         return [
             'composicao_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa a qual produto pertence essa composição, deve sempre ser um produto do tipo Composição',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto ou composição que faz parte dessa composição, Obs: Não pode ser um pacote',
             ],
             'tipo' => [

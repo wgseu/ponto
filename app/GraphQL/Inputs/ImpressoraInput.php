@@ -43,11 +43,11 @@ class ImpressoraInput extends InputType
     {
         return [
             'dispositivo_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Dispositivo que contém a impressora',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Setor de impressão',
             ],
             'nome' => [

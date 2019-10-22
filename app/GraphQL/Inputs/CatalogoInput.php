@@ -43,11 +43,11 @@ class CatalogoInput extends InputType
     {
         return [
             'produto_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto consultado',
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Fornecedor que possui o produto à venda',
             ],
             'preco_compra' => [

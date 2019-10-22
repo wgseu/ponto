@@ -45,7 +45,7 @@ class ClassificacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'classificacao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),

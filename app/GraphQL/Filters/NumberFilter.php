@@ -6,6 +6,7 @@ namespace App\GraphQL\Filters;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class NumberFilter extends InputType
 {
@@ -33,6 +34,9 @@ class NumberFilter extends InputType
             ],
             'le' => [
                 'type' => Type::float(),
+            ],
+            'between' => [
+                'type' => GraphQL::type('NumberRangeFilter'),
             ],
         ];
     }

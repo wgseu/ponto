@@ -48,11 +48,11 @@ class CompraInput extends InputType
                 'rules' => ['max:64'],
             ],
             'comprador_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Informa o funcionário que comprou os produtos da lista',
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Fornecedor em que os produtos foram compras',
             ],
             'documento_url' => [

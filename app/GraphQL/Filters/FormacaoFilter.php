@@ -45,13 +45,13 @@ class FormacaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'item_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pacote_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'composicao_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'quantidade' => [
                 'type' => GraphQL::type('NumberFilter'),

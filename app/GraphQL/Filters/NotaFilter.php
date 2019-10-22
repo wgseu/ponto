@@ -57,7 +57,7 @@ class NotaFilter extends InputType
                 'type' => GraphQL::type('NotaEstadoFilter'),
             ],
             'ultimo_evento_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'serie' => [
                 'type' => GraphQL::type('NumberFilter'),
@@ -81,7 +81,7 @@ class NotaFilter extends InputType
                 'type' => GraphQL::type('StringFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'motivo' => [
                 'type' => GraphQL::type('StringFilter'),

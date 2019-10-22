@@ -51,7 +51,7 @@ $[field.each(all)]
 $[field.if(primary)]
 $[field.else.if(reference)]
             '$[field]' => [
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
+                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::id()$[field.if(null)]$[field.else])$[field.end],
                 'description' => '$[Field.comment]',
             ],
 $[field.else.if(date)]

@@ -45,10 +45,10 @@ class CartaoFilter extends InputType
                 'type' => Type::id(),
             ],
             'forma_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'carteira_id' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('IdFilter'),
             ],
             'bandeira' => [
                 'type' => GraphQL::type('StringFilter'),

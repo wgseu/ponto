@@ -43,11 +43,11 @@ class PatrimonioInput extends InputType
     {
         return [
             'empresa_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Empresa a que esse bem pertence',
             ],
             'fornecedor_id' => [
-                'type' => Type::int(),
+                'type' => Type::id(),
                 'description' => 'Fornecedor do bem',
             ],
             'numero' => [

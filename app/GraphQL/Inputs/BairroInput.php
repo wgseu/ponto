@@ -42,7 +42,7 @@ class BairroInput extends InputType
     {
         return [
             'cidade_id' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Cidade a qual o bairro pertence',
             ],
             'nome' => [

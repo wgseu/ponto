@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2018 GrandChef Desenvolvimento de Sistemas Ltda - All Rights Reserved
  *
@@ -7,6 +8,7 @@
  *
  * @author Equipe de Desenvolvimento do GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace MZ\Mail;
 
 use PHPMailer\PHPMailer\PHPMailer;

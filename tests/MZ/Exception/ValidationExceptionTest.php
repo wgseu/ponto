@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
  *
@@ -22,6 +23,7 @@
  *
  * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
  */
+
 namespace MZ\Exception;
 
 class ValidationExceptionTest extends \MZ\Framework\TestCase

@@ -77,13 +77,11 @@ class PagamentoTest extends TestCase
         $this->assertNull($pagamento);
     }
 
-    public function testQueryPagamento()
+    public function testFindPagamento()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Pagamento::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_pagamento', [], $headers);
-        $this->assertEquals(10, $response->json('data.pagamentos.total'));
+        $pagamento = factory(Pagamento::class)->create();
+        $response = $this->graphfl('query_pagamento', [ 'id' => $pagamento->id ], $headers);
+        $this->assertEquals($pagamento->id, $response->json('data.pagamentos.data.0.id'));
     }
 }

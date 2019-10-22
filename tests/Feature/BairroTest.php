@@ -75,13 +75,11 @@ class BairroTest extends TestCase
         $this->assertNull($bairro);
     }
 
-    public function testQueryBairro()
+    public function testFindBairro()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Bairro::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_bairro', [], $headers);
-        $this->assertEquals(10, $response->json('data.bairros.total'));
+        $bairro = factory(Bairro::class)->create();
+        $response = $this->graphfl('query_bairro', [ 'id' => $bairro->id ], $headers);
+        $this->assertEquals($bairro->id, $response->json('data.bairros.data.0.id'));
     }
 }

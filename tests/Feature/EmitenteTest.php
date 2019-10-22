@@ -67,13 +67,11 @@ class EmitenteTest extends TestCase
         $this->assertNull($emitente);
     }
 
-    public function testQueryEmitente()
+    public function testFindEmitente()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Emitente::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_emitente', [], $headers);
-        $this->assertEquals(10, $response->json('data.emitentes.total'));
+        $emitente = factory(Emitente::class)->create();
+        $response = $this->graphfl('query_emitente', [ 'id' => $emitente->id ], $headers);
+        $this->assertEquals($emitente->id, $response->json('data.emitentes.data.0.id'));
     }
 }

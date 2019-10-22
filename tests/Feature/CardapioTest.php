@@ -67,13 +67,11 @@ class CardapioTest extends TestCase
         $this->assertNull($cardapio);
     }
 
-    public function testQueryCardapio()
+    public function testFindCardapio()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cardapio::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cardapio', [], $headers);
-        $this->assertEquals(10, $response->json('data.cardapios.total'));
+        $cardapio = factory(Cardapio::class)->create();
+        $response = $this->graphfl('query_cardapio', [ 'id' => $cardapio->id ], $headers);
+        $this->assertEquals($cardapio->id, $response->json('data.cardapios.data.0.id'));
     }
 }

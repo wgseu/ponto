@@ -1,5 +1,5 @@
-query {
-  modulos {
+query ($id: ID!) {
+  modulos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

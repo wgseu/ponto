@@ -75,13 +75,11 @@ class ZonaTest extends TestCase
         $this->assertNull($zona);
     }
 
-    public function testQueryZona()
+    public function testFindZona()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Zona::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_zona', [], $headers);
-        $this->assertEquals(10, $response->json('data.zonas.total'));
+        $zona = factory(Zona::class)->create();
+        $response = $this->graphfl('query_zona', [ 'id' => $zona->id ], $headers);
+        $this->assertEquals($zona->id, $response->json('data.zonas.data.0.id'));
     }
 }

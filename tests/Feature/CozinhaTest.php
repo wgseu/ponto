@@ -69,13 +69,11 @@ class CozinhaTest extends TestCase
         $this->assertNull($cozinha);
     }
 
-    public function testQueryCozinha()
+    public function testFindCozinha()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cozinha::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cozinha', [], $headers);
-        $this->assertEquals(10, $response->json('data.cozinhas.total'));
+        $cozinha = factory(Cozinha::class)->create();
+        $response = $this->graphfl('query_cozinha', [ 'id' => $cozinha->id ], $headers);
+        $this->assertEquals($cozinha->id, $response->json('data.cozinhas.data.0.id'));
     }
 }

@@ -69,13 +69,11 @@ class AcessoTest extends TestCase
         $this->assertNull($acesso);
     }
 
-    public function testQueryAcesso()
+    public function testFindAcesso()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Acesso::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_acesso', [], $headers);
-        $this->assertEquals(10, $response->json('data.acessos.total'));
+        $acesso = factory(Acesso::class)->create();
+        $response = $this->graphfl('query_acesso', [ 'id' => $acesso->id ], $headers);
+        $this->assertEquals($acesso->id, $response->json('data.acessos.data.0.id'));
     }
 }

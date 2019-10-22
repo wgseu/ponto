@@ -75,13 +75,11 @@ class EstadoTest extends TestCase
         $this->assertNull($estado);
     }
 
-    public function testQueryEstado()
+    public function testFindEstado()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Estado::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_estado', [], $headers);
-        $this->assertEquals(10, $response->json('data.estados.total'));
+        $estado = factory(Estado::class)->create();
+        $response = $this->graphfl('query_estado', [ 'id' => $estado->id ], $headers);
+        $this->assertEquals($estado->id, $response->json('data.estados.data.0.id'));
     }
 }

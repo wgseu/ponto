@@ -87,13 +87,11 @@ class ItemTest extends TestCase
         $this->assertNull($item);
     }
 
-    public function testQueryItem()
+    public function testFindItem()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Item::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_item', [], $headers);
-        $this->assertEquals(10, $response->json('data.itens.total'));
+        $item = factory(Item::class)->create();
+        $response = $this->graphfl('query_item', [ 'id' => $item->id ], $headers);
+        $this->assertEquals($item->id, $response->json('data.itens.data.0.id'));
     }
 }

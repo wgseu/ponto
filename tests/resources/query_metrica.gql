@@ -1,5 +1,5 @@
-query {
-  metricas {
+query ($id: ID!) {
+  metricas (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -1,5 +1,5 @@
-query {
-  funcionalidades {
+query ($id: ID!) {
+  funcionalidades (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -89,13 +89,11 @@ class CupomTest extends TestCase
         $this->assertNull($cupom);
     }
 
-    public function testQueryCupom()
+    public function testFindCupom()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cupom::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cupom', [], $headers);
-        $this->assertEquals(10, $response->json('data.cupons.total'));
+        $cupom = factory(Cupom::class)->create();
+        $response = $this->graphfl('query_cupom', [ 'id' => $cupom->id ], $headers);
+        $this->assertEquals($cupom->id, $response->json('data.cupons.data.0.id'));
     }
 }

@@ -79,13 +79,11 @@ class PatrimonioTest extends TestCase
         $this->assertNull($patrimonio);
     }
 
-    public function testQueryPatrimonio()
+    public function testFindPatrimonio()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Patrimonio::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_patrimonio', [], $headers);
-        $this->assertEquals(10, $response->json('data.patrimonios.total'));
+        $patrimonio = factory(Patrimonio::class)->create();
+        $response = $this->graphfl('query_patrimonio', [ 'id' => $patrimonio->id ], $headers);
+        $this->assertEquals($patrimonio->id, $response->json('data.patrimonios.data.0.id'));
     }
 }

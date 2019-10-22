@@ -73,13 +73,11 @@ class ModuloTest extends TestCase
         $this->assertNull($modulo);
     }
 
-    public function testQueryModulo()
+    public function testFindModulo()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Modulo::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_modulo', [], $headers);
-        $this->assertEquals(10, $response->json('data.modulos.total'));
+        $modulo = factory(Modulo::class)->create();
+        $response = $this->graphfl('query_modulo', [ 'id' => $modulo->id ], $headers);
+        $this->assertEquals($modulo->id, $response->json('data.modulos.data.0.id'));
     }
 }

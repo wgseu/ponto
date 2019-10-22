@@ -85,13 +85,11 @@ class AuditoriaTest extends TestCase
         $this->assertNull($auditoria);
     }
 
-    public function testQueryAuditoria()
+    public function testFindAuditoria()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Auditoria::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_auditoria', [], $headers);
-        $this->assertEquals(10, $response->json('data.auditorias.total'));
+        $auditoria = factory(Auditoria::class)->create();
+        $response = $this->graphfl('query_auditoria', [ 'id' => $auditoria->id ], $headers);
+        $this->assertEquals($auditoria->id, $response->json('data.auditorias.data.0.id'));
     }
 }

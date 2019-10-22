@@ -73,13 +73,11 @@ class FuncionalidadeTest extends TestCase
         $this->assertNull($funcionalidade);
     }
 
-    public function testQueryFuncionalidade()
+    public function testFindFuncionalidade()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Funcionalidade::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_funcionalidade', [], $headers);
-        $this->assertEquals(10, $response->json('data.funcionalidades.total'));
+        $funcionalidade = factory(Funcionalidade::class)->create();
+        $response = $this->graphfl('query_funcionalidade', [ 'id' => $funcionalidade->id ], $headers);
+        $this->assertEquals($funcionalidade->id, $response->json('data.funcionalidades.data.0.id'));
     }
 }

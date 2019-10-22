@@ -1,5 +1,5 @@
-query {
-  estoques {
+query ($id: ID!) {
+  estoques (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

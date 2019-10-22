@@ -1,5 +1,5 @@
-query {
-  permissoes {
+query ($id: ID!) {
+  permissoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

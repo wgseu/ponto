@@ -85,13 +85,11 @@ class MoedaTest extends TestCase
         $this->assertNull($moeda);
     }
 
-    public function testQueryMoeda()
+    public function testFindMoeda()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Moeda::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_moeda', [], $headers);
-        $this->assertEquals(10, $response->json('data.moedas.total'));
+        $moeda = factory(Moeda::class)->create();
+        $response = $this->graphfl('query_moeda', [ 'id' => $moeda->id ], $headers);
+        $this->assertEquals($moeda->id, $response->json('data.moedas.data.0.id'));
     }
 }

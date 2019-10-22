@@ -71,13 +71,11 @@ class CaixaTest extends TestCase
         $this->assertNull($caixa);
     }
 
-    public function testQueryCaixa()
+    public function testFindCaixa()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Caixa::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_caixa', [], $headers);
-        $this->assertEquals(10, $response->json('data.caixas.total'));
+        $caixa = factory(Caixa::class)->create();
+        $response = $this->graphfl('query_caixa', [ 'id' => $caixa->id ], $headers);
+        $this->assertEquals($caixa->id, $response->json('data.caixas.data.0.id'));
     }
 }

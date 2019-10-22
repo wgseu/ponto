@@ -78,13 +78,11 @@ class MetricaTest extends TestCase
         $this->assertNotNull($metrica_to_delete->data_arquivado);
     }
 
-    public function testQueryMetrica()
+    public function testFindMetrica()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Metrica::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_metrica', [], $headers);
-        $this->assertEquals(10, $response->json('data.metricas.total'));
+        $metrica = factory(Metrica::class)->create();
+        $response = $this->graphfl('query_metrica', [ 'id' => $metrica->id ], $headers);
+        $this->assertEquals($metrica->id, $response->json('data.metricas.data.0.id'));
     }
 }

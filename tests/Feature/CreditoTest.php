@@ -75,13 +75,11 @@ class CreditoTest extends TestCase
         $this->assertNull($credito);
     }
 
-    public function testQueryCredito()
+    public function testFindCredito()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Credito::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_credito', [], $headers);
-        $this->assertEquals(10, $response->json('data.creditos.total'));
+        $credito = factory(Credito::class)->create();
+        $response = $this->graphfl('query_credito', [ 'id' => $credito->id ], $headers);
+        $this->assertEquals($credito->id, $response->json('data.creditos.data.0.id'));
     }
 }

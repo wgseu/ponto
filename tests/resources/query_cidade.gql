@@ -1,5 +1,5 @@
-query {
-  cidades {
+query ($id: ID!) {
+  cidades (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

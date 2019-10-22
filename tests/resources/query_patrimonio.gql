@@ -1,5 +1,5 @@
-query {
-  patrimonios {
+query ($id: ID!) {
+  patrimonios (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

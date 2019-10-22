@@ -1,5 +1,5 @@
-query {
-  mesas {
+query ($id: ID!) {
+  mesas (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

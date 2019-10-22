@@ -1,5 +1,5 @@
-query {
-  bairros {
+query ($id: ID!) {
+  bairros (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

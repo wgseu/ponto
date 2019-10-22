@@ -79,13 +79,11 @@ class EventoTest extends TestCase
         $this->assertNull($evento);
     }
 
-    public function testQueryEvento()
+    public function testFindEvento()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Evento::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_evento', [], $headers);
-        $this->assertEquals(10, $response->json('data.eventos.total'));
+        $evento = factory(Evento::class)->create();
+        $response = $this->graphfl('query_evento', [ 'id' => $evento->id ], $headers);
+        $this->assertEquals($evento->id, $response->json('data.eventos.data.0.id'));
     }
 }

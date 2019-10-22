@@ -1,5 +1,5 @@
-query {
-  propriedades {
+query ($id: ID!) {
+  propriedades (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -1,5 +1,5 @@
-query {
-  servicos {
+query ($id: ID!) {
+  servicos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

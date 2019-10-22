@@ -1,5 +1,5 @@
-query {
-  dispositivos {
+query ($id: ID!) {
+  dispositivos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -73,13 +73,11 @@ class FuncaoTest extends TestCase
         $this->assertNull($funcao);
     }
 
-    public function testQueryFuncao()
+    public function testFindFuncao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Funcao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_funcao', [], $headers);
-        $this->assertEquals(10, $response->json('data.funcoes.total'));
+        $funcao = factory(Funcao::class)->create();
+        $response = $this->graphfl('query_funcao', [ 'id' => $funcao->id ], $headers);
+        $this->assertEquals($funcao->id, $response->json('data.funcoes.data.0.id'));
     }
 }

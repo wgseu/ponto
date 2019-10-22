@@ -76,13 +76,11 @@ class GrupoTest extends TestCase
         $this->assertNotNull($grupo_to_delete->data_arquivado);
     }
 
-    public function testQueryGrupo()
+    public function testFindGrupo()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Grupo::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_grupo', [], $headers);
-        $this->assertEquals(10, $response->json('data.grupos.total'));
+        $grupo = factory(Grupo::class)->create();
+        $response = $this->graphfl('query_grupo', [ 'id' => $grupo->id ], $headers);
+        $this->assertEquals($grupo->id, $response->json('data.grupos.data.0.id'));
     }
 }

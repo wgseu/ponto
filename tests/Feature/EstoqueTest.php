@@ -77,13 +77,11 @@ class EstoqueTest extends TestCase
         $this->assertNull($estoque);
     }
 
-    public function testQueryEstoque()
+    public function testFindEstoque()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Estoque::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_estoque', [], $headers);
-        $this->assertEquals(10, $response->json('data.estoques.total'));
+        $estoque = factory(Estoque::class)->create();
+        $response = $this->graphfl('query_estoque', [ 'id' => $estoque->id ], $headers);
+        $this->assertEquals($estoque->id, $response->json('data.estoques.data.0.id'));
     }
 }

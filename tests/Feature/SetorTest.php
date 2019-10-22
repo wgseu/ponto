@@ -69,13 +69,11 @@ class SetorTest extends TestCase
         $this->assertNull($setor);
     }
 
-    public function testQuerySetor()
+    public function testFindSetor()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Setor::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_setor', [], $headers);
-        $this->assertEquals(10, $response->json('data.setores.total'));
+        $setor = factory(Setor::class)->create();
+        $response = $this->graphfl('query_setor', [ 'id' => $setor->id ], $headers);
+        $this->assertEquals($setor->id, $response->json('data.setores.data.0.id'));
     }
 }

@@ -1,5 +1,5 @@
-query {
-  emitentes {
+query ($id: ID!) {
+  emitentes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

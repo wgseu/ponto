@@ -65,13 +65,11 @@ class SistemaTest extends TestCase
         $this->assertNull($sistema);
     }
 
-    public function testQuerySistema()
+    public function testFindSistema()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Sistema::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_sistema', [], $headers);
-        $this->assertEquals(10, $response->json('data.sistemas.total'));
+        $sistema = factory(Sistema::class)->create();
+        $response = $this->graphfl('query_sistema', [ 'id' => $sistema->id ], $headers);
+        $this->assertEquals($sistema->id, $response->json('data.sistemas.data.0.id'));
     }
 }

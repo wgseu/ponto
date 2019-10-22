@@ -74,13 +74,11 @@ class PacoteTest extends TestCase
         $this->assertNotNull($pacote_to_delete->data_arquivado);
     }
 
-    public function testQueryPacote()
+    public function testFindPacote()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Pacote::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_pacote', [], $headers);
-        $this->assertEquals(10, $response->json('data.pacotes.total'));
+        $pacote = factory(Pacote::class)->create();
+        $response = $this->graphfl('query_pacote', [ 'id' => $pacote->id ], $headers);
+        $this->assertEquals($pacote->id, $response->json('data.pacotes.data.0.id'));
     }
 }

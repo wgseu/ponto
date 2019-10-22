@@ -73,13 +73,11 @@ class HorarioTest extends TestCase
         $this->assertNull($horario);
     }
 
-    public function testQueryHorario()
+    public function testFindHorario()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Horario::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_horario', [], $headers);
-        $this->assertEquals(10, $response->json('data.horarios.total'));
+        $horario = factory(Horario::class)->create();
+        $response = $this->graphfl('query_horario', [ 'id' => $horario->id ], $headers);
+        $this->assertEquals($horario->id, $response->json('data.horarios.data.0.id'));
     }
 }

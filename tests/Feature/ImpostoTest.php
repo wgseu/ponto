@@ -85,13 +85,11 @@ class ImpostoTest extends TestCase
         $this->assertNull($imposto);
     }
 
-    public function testQueryImposto()
+    public function testFindImposto()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Imposto::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_imposto', [], $headers);
-        $this->assertEquals(10, $response->json('data.impostos.total'));
+        $imposto = factory(Imposto::class)->create();
+        $response = $this->graphfl('query_imposto', [ 'id' => $imposto->id ], $headers);
+        $this->assertEquals($imposto->id, $response->json('data.impostos.data.0.id'));
     }
 }

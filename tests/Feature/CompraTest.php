@@ -73,13 +73,11 @@ class CompraTest extends TestCase
         $this->assertNull($compra);
     }
 
-    public function testQueryCompra()
+    public function testFindCompra()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Compra::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_compra', [], $headers);
-        $this->assertEquals(10, $response->json('data.compras.total'));
+        $compra = factory(Compra::class)->create();
+        $response = $this->graphfl('query_compra', [ 'id' => $compra->id ], $headers);
+        $this->assertEquals($compra->id, $response->json('data.compras.data.0.id'));
     }
 }

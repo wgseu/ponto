@@ -71,13 +71,11 @@ class PontuacaoTest extends TestCase
         $this->assertNull($pontuacao);
     }
 
-    public function testQueryPontuacao()
+    public function testFindPontuacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Pontuacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_pontuacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.pontuacoes.total'));
+        $pontuacao = factory(Pontuacao::class)->create();
+        $response = $this->graphfl('query_pontuacao', [ 'id' => $pontuacao->id ], $headers);
+        $this->assertEquals($pontuacao->id, $response->json('data.pontuacoes.data.0.id'));
     }
 }

@@ -73,13 +73,11 @@ class OrigemTest extends TestCase
         $this->assertNull($origem);
     }
 
-    public function testQueryOrigem()
+    public function testFindOrigem()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Origem::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_origem', [], $headers);
-        $this->assertEquals(10, $response->json('data.origens.total'));
+        $origem = factory(Origem::class)->create();
+        $response = $this->graphfl('query_origem', [ 'id' => $origem->id ], $headers);
+        $this->assertEquals($origem->id, $response->json('data.origens.data.0.id'));
     }
 }

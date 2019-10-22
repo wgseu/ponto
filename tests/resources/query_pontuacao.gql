@@ -1,5 +1,5 @@
-query {
-  pontuacoes {
+query ($id: ID!) {
+  pontuacoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -75,13 +75,11 @@ class ListaTest extends TestCase
         $this->assertNull($lista);
     }
 
-    public function testQueryLista()
+    public function testFindLista()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Lista::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_lista', [], $headers);
-        $this->assertEquals(10, $response->json('data.listas_de_compras.total'));
+        $lista = factory(Lista::class)->create();
+        $response = $this->graphfl('query_lista', [ 'id' => $lista->id ], $headers);
+        $this->assertEquals($lista->id, $response->json('data.listas_de_compras.data.0.id'));
     }
 }

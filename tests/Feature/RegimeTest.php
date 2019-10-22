@@ -73,13 +73,11 @@ class RegimeTest extends TestCase
         $this->assertNull($regime);
     }
 
-    public function testQueryRegime()
+    public function testFindRegime()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Regime::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_regime', [], $headers);
-        $this->assertEquals(10, $response->json('data.regimes.total'));
+        $regime = factory(Regime::class)->create();
+        $response = $this->graphfl('query_regime', [ 'id' => $regime->id ], $headers);
+        $this->assertEquals($regime->id, $response->json('data.regimes.data.0.id'));
     }
 }

@@ -75,13 +75,11 @@ class TributacaoTest extends TestCase
         $this->assertNull($tributacao);
     }
 
-    public function testQueryTributacao()
+    public function testFindTributacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Tributacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_tributacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.tributacoes.total'));
+        $tributacao = factory(Tributacao::class)->create();
+        $response = $this->graphfl('query_tributacao', [ 'id' => $tributacao->id ], $headers);
+        $this->assertEquals($tributacao->id, $response->json('data.tributacoes.data.0.id'));
     }
 }

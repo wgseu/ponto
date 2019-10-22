@@ -1,5 +1,5 @@
-query {
-  paises {
+query ($id: ID!) {
+  paises (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

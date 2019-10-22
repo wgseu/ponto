@@ -1,5 +1,5 @@
-query {
-  movimentacoes {
+query ($id: ID!) {
+  movimentacoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

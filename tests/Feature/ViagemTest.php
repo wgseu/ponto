@@ -71,13 +71,11 @@ class ViagemTest extends TestCase
         $this->assertNull($viagem);
     }
 
-    public function testQueryViagem()
+    public function testFindViagem()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Viagem::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_viagem', [], $headers);
-        $this->assertEquals(10, $response->json('data.viagens.total'));
+        $viagem = factory(Viagem::class)->create();
+        $response = $this->graphfl('query_viagem', [ 'id' => $viagem->id ], $headers);
+        $this->assertEquals($viagem->id, $response->json('data.viagens.data.0.id'));
     }
 }

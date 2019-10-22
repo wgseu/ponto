@@ -73,13 +73,11 @@ class ComandaTest extends TestCase
         $this->assertNull($comanda);
     }
 
-    public function testQueryComanda()
+    public function testFindComanda()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Comanda::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_comanda', [], $headers);
-        $this->assertEquals(10, $response->json('data.comandas.total'));
+        $comanda = factory(Comanda::class)->create();
+        $response = $this->graphfl('query_comanda', [ 'id' => $comanda->id ], $headers);
+        $this->assertEquals($comanda->id, $response->json('data.comandas.data.0.id'));
     }
 }

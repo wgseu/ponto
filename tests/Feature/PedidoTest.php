@@ -65,13 +65,11 @@ class PedidoTest extends TestCase
         $this->assertNull($pedido);
     }
 
-    public function testQueryPedido()
+    public function testFindPedido()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Pedido::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_pedido', [], $headers);
-        $this->assertEquals(10, $response->json('data.pedidos.total'));
+        $pedido = factory(Pedido::class)->create();
+        $response = $this->graphfl('query_pedido', [ 'id' => $pedido->id ], $headers);
+        $this->assertEquals($pedido->id, $response->json('data.pedidos.data.0.id'));
     }
 }

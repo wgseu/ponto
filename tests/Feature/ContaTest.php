@@ -85,13 +85,11 @@ class ContaTest extends TestCase
         $this->assertNull($conta);
     }
 
-    public function testQueryConta()
+    public function testFindConta()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Conta::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_conta', [], $headers);
-        $this->assertEquals(10, $response->json('data.contas.total'));
+        $conta = factory(Conta::class)->create();
+        $response = $this->graphfl('query_conta', [ 'id' => $conta->id ], $headers);
+        $this->assertEquals($conta->id, $response->json('data.contas.data.0.id'));
     }
 }

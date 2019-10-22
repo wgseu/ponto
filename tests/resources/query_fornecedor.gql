@@ -1,5 +1,5 @@
-query {
-  fornecedores {
+query ($id: ID!) {
+  fornecedores (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

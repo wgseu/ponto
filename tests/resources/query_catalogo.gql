@@ -1,5 +1,5 @@
-query {
-  catalogos {
+query ($id: ID!) {
+  catalogos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

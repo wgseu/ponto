@@ -67,13 +67,11 @@ class FornecedorTest extends TestCase
         $this->assertNull($fornecedor);
     }
 
-    public function testQueryFornecedor()
+    public function testFindFornecedor()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Fornecedor::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_fornecedor', [], $headers);
-        $this->assertEquals(10, $response->json('data.fornecedores.total'));
+        $fornecedor = factory(Fornecedor::class)->create();
+        $response = $this->graphfl('query_fornecedor', [ 'id' => $fornecedor->id ], $headers);
+        $this->assertEquals($fornecedor->id, $response->json('data.fornecedores.data.0.id'));
     }
 }

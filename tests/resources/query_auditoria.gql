@@ -1,5 +1,5 @@
-query {
-  auditorias {
+query ($id: ID!) {
+  auditorias (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

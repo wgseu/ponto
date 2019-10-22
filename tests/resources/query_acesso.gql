@@ -1,5 +1,5 @@
-query {
-  acessos {
+query ($id: ID!) {
+  acessos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

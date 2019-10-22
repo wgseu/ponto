@@ -78,13 +78,11 @@ class LocalizacaoTest extends TestCase
         $this->assertNotNull($localizacao_to_delete->data_arquivado);
     }
 
-    public function testQueryLocalizacao()
+    public function testFindLocalizacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Localizacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_localizacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.localizacoes.total'));
+        $localizacao = factory(Localizacao::class)->create();
+        $response = $this->graphfl('query_localizacao', [ 'id' => $localizacao->id ], $headers);
+        $this->assertEquals($localizacao->id, $response->json('data.localizacoes.data.0.id'));
     }
 }

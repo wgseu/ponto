@@ -71,13 +71,11 @@ class MesaTest extends TestCase
         $this->assertNull($mesa);
     }
 
-    public function testQueryMesa()
+    public function testFindMesa()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Mesa::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_mesa', [], $headers);
-        $this->assertEquals(10, $response->json('data.mesas.total'));
+        $mesa = factory(Mesa::class)->create();
+        $response = $this->graphfl('query_mesa', [ 'id' => $mesa->id ], $headers);
+        $this->assertEquals($mesa->id, $response->json('data.mesas.data.0.id'));
     }
 }

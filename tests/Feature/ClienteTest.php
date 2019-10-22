@@ -69,13 +69,11 @@ class ClienteTest extends TestCase
         $this->assertNull($cliente);
     }
 
-    public function testQueryCliente()
+    public function testFindCliente()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cliente::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cliente', [], $headers);
-        $this->assertEquals(10, $response->json('data.clientes.total'));
+        $cliente = factory(Cliente::class)->create();
+        $response = $this->graphfl('query_cliente', [ 'id' => $cliente->id ], $headers);
+        $this->assertEquals($cliente->id, $response->json('data.clientes.data.0.id'));
     }
 }

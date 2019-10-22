@@ -83,13 +83,11 @@ class PaisTest extends TestCase
         $this->assertNull($pais);
     }
 
-    public function testQueryPais()
+    public function testFindPais()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Pais::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_pais', [], $headers);
-        $this->assertEquals(10, $response->json('data.paises.total'));
+        $pais = factory(Pais::class)->create();
+        $response = $this->graphfl('query_pais', [ 'id' => $pais->id ], $headers);
+        $this->assertEquals($pais->id, $response->json('data.paises.data.0.id'));
     }
 }

@@ -69,13 +69,11 @@ class ClassificacaoTest extends TestCase
         $this->assertNull($classificacao);
     }
 
-    public function testQueryClassificacao()
+    public function testFindClassificacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Classificacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_classificacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.classificacoes.total'));
+        $classificacao = factory(Classificacao::class)->create();
+        $response = $this->graphfl('query_classificacao', [ 'id' => $classificacao->id ], $headers);
+        $this->assertEquals($classificacao->id, $response->json('data.classificacoes.data.0.id'));
     }
 }

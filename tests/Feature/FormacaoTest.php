@@ -67,13 +67,11 @@ class FormacaoTest extends TestCase
         $this->assertNull($formacao);
     }
 
-    public function testQueryFormacao()
+    public function testFindFormacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Formacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_formacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.formacoes.total'));
+        $formacao = factory(Formacao::class)->create();
+        $response = $this->graphfl('query_formacao', [ 'id' => $formacao->id ], $headers);
+        $this->assertEquals($formacao->id, $response->json('data.formacoes.data.0.id'));
     }
 }

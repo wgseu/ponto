@@ -75,13 +75,11 @@ class PermissaoTest extends TestCase
         $this->assertNull($permissao);
     }
 
-    public function testQueryPermissao()
+    public function testFindPermissao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Permissao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_permissao', [], $headers);
-        $this->assertEquals(10, $response->json('data.permissoes.total'));
+        $permissao = factory(Permissao::class)->create();
+        $response = $this->graphfl('query_permissao', [ 'id' => $permissao->id ], $headers);
+        $this->assertEquals($permissao->id, $response->json('data.permissoes.data.0.id'));
     }
 }

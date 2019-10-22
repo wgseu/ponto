@@ -69,13 +69,11 @@ class SessaoTest extends TestCase
         $this->assertNull($sessao);
     }
 
-    public function testQuerySessao()
+    public function testFindSessao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Sessao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_sessao', [], $headers);
-        $this->assertEquals(10, $response->json('data.sessoes.total'));
+        $sessao = factory(Sessao::class)->create();
+        $response = $this->graphfl('query_sessao', [ 'id' => $sessao->id ], $headers);
+        $this->assertEquals($sessao->id, $response->json('data.sessoes.data.0.id'));
     }
 }

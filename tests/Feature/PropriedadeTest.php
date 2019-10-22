@@ -71,13 +71,11 @@ class PropriedadeTest extends TestCase
         $this->assertNull($propriedade);
     }
 
-    public function testQueryPropriedade()
+    public function testFindPropriedade()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Propriedade::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_propriedade', [], $headers);
-        $this->assertEquals(10, $response->json('data.propriedades.total'));
+        $propriedade = factory(Propriedade::class)->create();
+        $response = $this->graphfl('query_propriedade', [ 'id' => $propriedade->id ], $headers);
+        $this->assertEquals($propriedade->id, $response->json('data.propriedades.data.0.id'));
     }
 }

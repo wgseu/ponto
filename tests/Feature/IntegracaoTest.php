@@ -69,13 +69,11 @@ class IntegracaoTest extends TestCase
         $this->assertNull($integracao);
     }
 
-    public function testQueryIntegracao()
+    public function testFindIntegracao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Integracao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_integracao', [], $headers);
-        $this->assertEquals(10, $response->json('data.integracoes.total'));
+        $integracao = factory(Integracao::class)->create();
+        $response = $this->graphfl('query_integracao', [ 'id' => $integracao->id ], $headers);
+        $this->assertEquals($integracao->id, $response->json('data.integracoes.data.0.id'));
     }
 }

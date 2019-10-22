@@ -1,5 +1,5 @@
-query {
-  formas {
+query ($id: ID!) {
+  formas (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

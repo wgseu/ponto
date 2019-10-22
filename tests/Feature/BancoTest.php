@@ -77,13 +77,11 @@ class BancoTest extends TestCase
         $this->assertNull($banco);
     }
 
-    public function testQueryBanco()
+    public function testFindBanco()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Banco::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_banco', [], $headers);
-        $this->assertEquals(10, $response->json('data.bancos.total'));
+        $banco = factory(Banco::class)->create();
+        $response = $this->graphfl('query_banco', [ 'id' => $banco->id ], $headers);
+        $this->assertEquals($banco->id, $response->json('data.bancos.data.0.id'));
     }
 }

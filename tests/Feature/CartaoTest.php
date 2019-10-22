@@ -71,13 +71,11 @@ class CartaoTest extends TestCase
         $this->assertNull($cartao);
     }
 
-    public function testQueryCartao()
+    public function testFindCartao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cartao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cartao', [], $headers);
-        $this->assertEquals(10, $response->json('data.cartoes.total'));
+        $cartao = factory(Cartao::class)->create();
+        $response = $this->graphfl('query_cartao', [ 'id' => $cartao->id ], $headers);
+        $this->assertEquals($cartao->id, $response->json('data.cartoes.data.0.id'));
     }
 }

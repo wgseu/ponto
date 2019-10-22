@@ -73,13 +73,11 @@ class UnidadeTest extends TestCase
         $this->assertNull($unidade);
     }
 
-    public function testQueryUnidade()
+    public function testFindUnidade()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Unidade::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_unidade', [], $headers);
-        $this->assertEquals(10, $response->json('data.unidades.total'));
+        $unidade = factory(Unidade::class)->create();
+        $response = $this->graphfl('query_unidade', [ 'id' => $unidade->id ], $headers);
+        $this->assertEquals($unidade->id, $response->json('data.unidades.data.0.id'));
     }
 }

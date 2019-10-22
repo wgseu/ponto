@@ -1,5 +1,5 @@
-query {
-  grupos {
+query ($id: ID!) {
+  grupos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

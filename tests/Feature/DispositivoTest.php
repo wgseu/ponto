@@ -73,13 +73,11 @@ class DispositivoTest extends TestCase
         $this->assertNull($dispositivo);
     }
 
-    public function testQueryDispositivo()
+    public function testFindDispositivo()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Dispositivo::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_dispositivo', [], $headers);
-        $this->assertEquals(10, $response->json('data.dispositivos.total'));
+        $dispositivo = factory(Dispositivo::class)->create();
+        $response = $this->graphfl('query_dispositivo', [ 'id' => $dispositivo->id ], $headers);
+        $this->assertEquals($dispositivo->id, $response->json('data.dispositivos.data.0.id'));
     }
 }

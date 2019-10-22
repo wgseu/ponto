@@ -209,13 +209,11 @@ $[table.else]
 $[table.end]
     }
 
-    public function testQuery$[Table.norm]()
+    public function testFind$[Table.norm]()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory($[Table.norm]::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_$[table.unix]', [], $headers);
-        $this->assertEquals(10, $response->json('data.$[table.unix.plural].total'));
+        $$[table.unix] = factory($[Table.norm]::class)->create();
+        $response = $this->graphfl('query_$[table.unix]', [ 'id' => $$[table.unix]->id ], $headers);
+        $this->assertEquals($$[table.unix]->id, $response->json('data.$[table.unix.plural].data.id'));
     }
 }

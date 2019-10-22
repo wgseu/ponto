@@ -70,13 +70,11 @@ class CategoriaTest extends TestCase
         $this->assertNotNull($categoria_to_delete->data_arquivado);
     }
 
-    public function testQueryCategoria()
+    public function testFindCategoria()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Categoria::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_categoria', [], $headers);
-        $this->assertEquals(10, $response->json('data.categorias.total'));
+        $categoria = factory(Categoria::class)->create();
+        $response = $this->graphfl('query_categoria', [ 'id' => $categoria->id ], $headers);
+        $this->assertEquals($categoria->id, $response->json('data.categorias.data.0.id'));
     }
 }

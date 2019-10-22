@@ -73,13 +73,11 @@ class ComposicaoTest extends TestCase
         $this->assertNull($composicao);
     }
 
-    public function testQueryComposicao()
+    public function testFindComposicao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Composicao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_composicao', [], $headers);
-        $this->assertEquals(10, $response->json('data.composicoes.total'));
+        $composicao = factory(Composicao::class)->create();
+        $response = $this->graphfl('query_composicao', [ 'id' => $composicao->id ], $headers);
+        $this->assertEquals($composicao->id, $response->json('data.composicoes.data.0.id'));
     }
 }

@@ -1,5 +1,5 @@
-query {
-  origens {
+query ($id: ID!) {
+  origens (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

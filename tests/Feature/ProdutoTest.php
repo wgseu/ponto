@@ -78,13 +78,11 @@ class ProdutoTest extends TestCase
         $this->assertNotNull($produto_to_delete->data_arquivado);
     }
 
-    public function testQueryProduto()
+    public function testFindProduto()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Produto::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_produto', [], $headers);
-        $this->assertEquals(10, $response->json('data.produtos.total'));
+        $produto = factory(Produto::class)->create();
+        $response = $this->graphfl('query_produto', [ 'id' => $produto->id ], $headers);
+        $this->assertEquals($produto->id, $response->json('data.produtos.data.0.id'));
     }
 }

@@ -75,13 +75,11 @@ class FormaTest extends TestCase
         $this->assertNull($forma);
     }
 
-    public function testQueryForma()
+    public function testFindForma()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Forma::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_forma', [], $headers);
-        $this->assertEquals(10, $response->json('data.formas_de_pagamento.total'));
+        $forma = factory(Forma::class)->create();
+        $response = $this->graphfl('query_forma', [ 'id' => $forma->id ], $headers);
+        $this->assertEquals($forma->id, $response->json('data.formas_de_pagamento.data.0.id'));
     }
 }

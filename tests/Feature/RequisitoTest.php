@@ -69,13 +69,11 @@ class RequisitoTest extends TestCase
         $this->assertNull($requisito);
     }
 
-    public function testQueryRequisito()
+    public function testFindRequisito()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Requisito::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_requisito', [], $headers);
-        $this->assertEquals(10, $response->json('data.produtos_das_listas.total'));
+        $requisito = factory(Requisito::class)->create();
+        $response = $this->graphfl('query_requisito', [ 'id' => $requisito->id ], $headers);
+        $this->assertEquals($requisito->id, $response->json('data.produtos_das_listas.data.0.id'));
     }
 }

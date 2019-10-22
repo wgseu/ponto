@@ -75,13 +75,11 @@ class MovimentacaoTest extends TestCase
         $this->assertNull($movimentacao);
     }
 
-    public function testQueryMovimentacao()
+    public function testFindMovimentacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Movimentacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_movimentacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.movimentacoes.total'));
+        $movimentacao = factory(Movimentacao::class)->create();
+        $response = $this->graphfl('query_movimentacao', [ 'id' => $movimentacao->id ], $headers);
+        $this->assertEquals($movimentacao->id, $response->json('data.movimentacoes.data.0.id'));
     }
 }

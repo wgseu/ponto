@@ -1,5 +1,5 @@
-query {
-  creditos {
+query ($id: ID!) {
+  creditos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

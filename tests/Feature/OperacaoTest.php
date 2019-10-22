@@ -73,13 +73,11 @@ class OperacaoTest extends TestCase
         $this->assertNull($operacao);
     }
 
-    public function testQueryOperacao()
+    public function testFindOperacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Operacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_operacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.operacoes.total'));
+        $operacao = factory(Operacao::class)->create();
+        $response = $this->graphfl('query_operacao', [ 'id' => $operacao->id ], $headers);
+        $this->assertEquals($operacao->id, $response->json('data.operacoes.data.0.id'));
     }
 }

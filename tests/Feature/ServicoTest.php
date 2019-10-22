@@ -77,13 +77,11 @@ class ServicoTest extends TestCase
         $this->assertNull($servico);
     }
 
-    public function testQueryServico()
+    public function testFindServico()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Servico::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_servico', [], $headers);
-        $this->assertEquals(10, $response->json('data.servicos.total'));
+        $servico = factory(Servico::class)->create();
+        $response = $this->graphfl('query_servico', [ 'id' => $servico->id ], $headers);
+        $this->assertEquals($servico->id, $response->json('data.servicos.data.0.id'));
     }
 }

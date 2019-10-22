@@ -1,5 +1,5 @@
-query {
-  operacoes {
+query ($id: ID!) {
+  operacoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

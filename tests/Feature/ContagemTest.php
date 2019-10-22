@@ -73,13 +73,11 @@ class ContagemTest extends TestCase
         $this->assertNull($contagem);
     }
 
-    public function testQueryContagem()
+    public function testFindContagem()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Contagem::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_contagem', [], $headers);
-        $this->assertEquals(10, $response->json('data.contagens.total'));
+        $contagem = factory(Contagem::class)->create();
+        $response = $this->graphfl('query_contagem', [ 'id' => $contagem->id ], $headers);
+        $this->assertEquals($contagem->id, $response->json('data.contagens.data.0.id'));
     }
 }

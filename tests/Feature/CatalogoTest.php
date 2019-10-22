@@ -73,13 +73,11 @@ class CatalogoTest extends TestCase
         $this->assertNull($catalogo);
     }
 
-    public function testQueryCatalogo()
+    public function testFindCatalogo()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Catalogo::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_catalogo', [], $headers);
-        $this->assertEquals(10, $response->json('data.catalogos_de_produtos.total'));
+        $catalogo = factory(Catalogo::class)->create();
+        $response = $this->graphfl('query_catalogo', [ 'id' => $catalogo->id ], $headers);
+        $this->assertEquals($catalogo->id, $response->json('data.catalogos_de_produtos.data.0.id'));
     }
 }

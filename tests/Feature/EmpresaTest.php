@@ -65,13 +65,11 @@ class EmpresaTest extends TestCase
         $this->assertNull($empresa);
     }
 
-    public function testQueryEmpresa()
+    public function testFindEmpresa()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Empresa::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_empresa', [], $headers);
-        $this->assertEquals(10, $response->json('data.empresas.total'));
+        $empresa = factory(Empresa::class)->create();
+        $response = $this->graphfl('query_empresa', [ 'id' => $empresa->id ], $headers);
+        $this->assertEquals($empresa->id, $response->json('data.empresas.data.0.id'));
     }
 }

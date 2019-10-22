@@ -75,13 +75,11 @@ class AvaliacaoTest extends TestCase
         $this->assertNull($avaliacao);
     }
 
-    public function testQueryAvaliacao()
+    public function testFindAvaliacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Avaliacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_avaliacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.avaliacoes.total'));
+        $avaliacao = factory(Avaliacao::class)->create();
+        $response = $this->graphfl('query_avaliacao', [ 'id' => $avaliacao->id ], $headers);
+        $this->assertEquals($avaliacao->id, $response->json('data.avaliacoes.data.0.id'));
     }
 }

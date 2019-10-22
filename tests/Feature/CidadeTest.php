@@ -71,13 +71,11 @@ class CidadeTest extends TestCase
         $this->assertNull($cidade);
     }
 
-    public function testQueryCidade()
+    public function testFindCidade()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cidade::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cidade', [], $headers);
-        $this->assertEquals(10, $response->json('data.cidades.total'));
+        $cidade = factory(Cidade::class)->create();
+        $response = $this->graphfl('query_cidade', [ 'id' => $cidade->id ], $headers);
+        $this->assertEquals($cidade->id, $response->json('data.cidades.data.0.id'));
     }
 }

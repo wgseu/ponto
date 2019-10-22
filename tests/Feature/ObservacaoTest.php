@@ -71,13 +71,11 @@ class ObservacaoTest extends TestCase
         $this->assertNull($observacao);
     }
 
-    public function testQueryObservacao()
+    public function testFindObservacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Observacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_observacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.observacoes.total'));
+        $observacao = factory(Observacao::class)->create();
+        $response = $this->graphfl('query_observacao', [ 'id' => $observacao->id ], $headers);
+        $this->assertEquals($observacao->id, $response->json('data.observacoes.data.0.id'));
     }
 }

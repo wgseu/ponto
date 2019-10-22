@@ -73,13 +73,11 @@ class TelefoneTest extends TestCase
         $this->assertNull($telefone);
     }
 
-    public function testQueryTelefone()
+    public function testFindTelefone()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Telefone::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_telefone', [], $headers);
-        $this->assertEquals(10, $response->json('data.telefones.total'));
+        $telefone = factory(Telefone::class)->create();
+        $response = $this->graphfl('query_telefone', [ 'id' => $telefone->id ], $headers);
+        $this->assertEquals($telefone->id, $response->json('data.telefones.data.0.id'));
     }
 }

@@ -119,13 +119,11 @@ class AssociacaoTest extends TestCase
         $this->assertNull($associacao);
     }
 
-    public function testQueryAssociacao()
+    public function testFindAssociacao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Associacao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_associacao', [], $headers);
-        $this->assertEquals(10, $response->json('data.associacoes.total'));
+        $associacao = factory(Associacao::class)->create();
+        $response = $this->graphfl('query_associacao', [ 'id' => $associacao->id ], $headers);
+        $this->assertEquals($associacao->id, $response->json('data.associacoes.data.0.id'));
     }
 }

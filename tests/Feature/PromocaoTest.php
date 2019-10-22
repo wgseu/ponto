@@ -78,13 +78,11 @@ class PromocaoTest extends TestCase
         $this->assertNotNull($promocao_to_delete->data_arquivado);
     }
 
-    public function testQueryPromocao()
+    public function testFindPromocao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Promocao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_promocao', [], $headers);
-        $this->assertEquals(10, $response->json('data.promocoes.total'));
+        $promocao = factory(Promocao::class)->create();
+        $response = $this->graphfl('query_promocao', [ 'id' => $promocao->id ], $headers);
+        $this->assertEquals($promocao->id, $response->json('data.promocoes.data.0.id'));
     }
 }

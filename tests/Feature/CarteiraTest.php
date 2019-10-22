@@ -73,13 +73,11 @@ class CarteiraTest extends TestCase
         $this->assertNull($carteira);
     }
 
-    public function testQueryCarteira()
+    public function testFindCarteira()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Carteira::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_carteira', [], $headers);
-        $this->assertEquals(10, $response->json('data.carteiras.total'));
+        $carteira = factory(Carteira::class)->create();
+        $response = $this->graphfl('query_carteira', [ 'id' => $carteira->id ], $headers);
+        $this->assertEquals($carteira->id, $response->json('data.carteiras.data.0.id'));
     }
 }

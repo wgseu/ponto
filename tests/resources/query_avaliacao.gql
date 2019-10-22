@@ -1,5 +1,5 @@
-query {
-  avaliacoes {
+query ($id: ID!) {
+  avaliacoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

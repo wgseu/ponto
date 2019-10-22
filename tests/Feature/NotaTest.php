@@ -106,13 +106,11 @@ class NotaTest extends TestCase
         $this->assertNotNull($nota_to_delete->data_arquivado);
     }
 
-    public function testQueryNota()
+    public function testFindNota()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Nota::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_nota', [], $headers);
-        $this->assertEquals(10, $response->json('data.notas.total'));
+        $nota = factory(Nota::class)->create();
+        $response = $this->graphfl('query_nota', [ 'id' => $nota->id ], $headers);
+        $this->assertEquals($nota->id, $response->json('data.notas.data.0.id'));
     }
 }

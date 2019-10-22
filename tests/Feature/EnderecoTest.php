@@ -77,13 +77,11 @@ class EnderecoTest extends TestCase
         $this->assertNull($endereco);
     }
 
-    public function testQueryEndereco()
+    public function testFindEndereco()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Endereco::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_endereco', [], $headers);
-        $this->assertEquals(10, $response->json('data.enderecos.total'));
+        $endereco = factory(Endereco::class)->create();
+        $response = $this->graphfl('query_endereco', [ 'id' => $endereco->id ], $headers);
+        $this->assertEquals($endereco->id, $response->json('data.enderecos.data.0.id'));
     }
 }

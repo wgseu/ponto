@@ -89,13 +89,11 @@ class ChequeTest extends TestCase
         $this->assertNull($cheque);
     }
 
-    public function testQueryCheque()
+    public function testFindCheque()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Cheque::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_cheque', [], $headers);
-        $this->assertEquals(10, $response->json('data.cheques.total'));
+        $cheque = factory(Cheque::class)->create();
+        $response = $this->graphfl('query_cheque', [ 'id' => $cheque->id ], $headers);
+        $this->assertEquals($cheque->id, $response->json('data.cheques.data.0.id'));
     }
 }

@@ -73,13 +73,11 @@ class ResumoTest extends TestCase
         $this->assertNull($resumo);
     }
 
-    public function testQueryResumo()
+    public function testFindResumo()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Resumo::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_resumo', [], $headers);
-        $this->assertEquals(10, $response->json('data.resumos.total'));
+        $resumo = factory(Resumo::class)->create();
+        $response = $this->graphfl('query_resumo', [ 'id' => $resumo->id ], $headers);
+        $this->assertEquals($resumo->id, $response->json('data.resumos.data.0.id'));
     }
 }

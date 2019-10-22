@@ -77,13 +77,11 @@ class ImpressoraTest extends TestCase
         $this->assertNull($impressora);
     }
 
-    public function testQueryImpressora()
+    public function testFindImpressora()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Impressora::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_impressora', [], $headers);
-        $this->assertEquals(10, $response->json('data.impressoras.total'));
+        $impressora = factory(Impressora::class)->create();
+        $response = $this->graphfl('query_impressora', [ 'id' => $impressora->id ], $headers);
+        $this->assertEquals($impressora->id, $response->json('data.impressoras.data.0.id'));
     }
 }

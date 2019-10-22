@@ -1,5 +1,5 @@
-query {
-  pagamentos {
+query ($id: ID!) {
+  pagamentos (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

@@ -1,5 +1,5 @@
-query {
-  integracoes {
+query ($id: ID!) {
+  integracoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
     }

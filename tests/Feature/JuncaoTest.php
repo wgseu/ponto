@@ -73,13 +73,11 @@ class JuncaoTest extends TestCase
         $this->assertNull($juncao);
     }
 
-    public function testQueryJuncao()
+    public function testFindJuncao()
     {
-        for ($i=0; $i < 10; $i++) {
-            factory(Juncao::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_juncao', [], $headers);
-        $this->assertEquals(10, $response->json('data.juncoes.total'));
+        $juncao = factory(Juncao::class)->create();
+        $response = $this->graphfl('query_juncao', [ 'id' => $juncao->id ], $headers);
+        $this->assertEquals($juncao->id, $response->json('data.juncoes.data.0.id'));
     }
 }

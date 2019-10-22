@@ -92,15 +92,14 @@ class Credito extends Model implements ValidateInterface
         $saldo = self::where('cliente_id', $this->cliente_id)
                     ->where('cancelado', false)
                     ->sum('valor');
+        $oldCredito = $this->fresh();
         if ($this->exists && !$this->cancelado) {
-            $oldValue = self::find($this->id);
-            $saldo -= $oldValue->valor;
+            $saldo -= $oldCredito->valor;
         }
         if (!$this->cancelado && $this->valor < 0 && ($saldo + $this->valor) < 0) {
             $errors['valor'] = __('messages.saldo_insufficient');
         }
         if ($this->exists) {
-            $oldCredito = self::find($this->id);
             if ($oldCredito->cancelado) {
                 $errors['cancelado'] = __('messages.cancel_cannot_update');
             } elseif ($oldCredito->cliente_id == $this->cliente_id && $this->cancelado && ($saldo - $this->valor) < 0) {

@@ -74,25 +74,39 @@ class Moeda extends Model implements ValidateInterface
     ];
 
     /**
-     * Ainda falta a regra de Moeda atual do país deve ter conversão igual a 1
      * Regras:
-     * Para o país ativo a conversaõ da moeda ver ser igual a 1;
-     * Formato deve conter :value, espaço e simbolo;
+     * Para o país ativo a conversão da moeda ver ser igual a 1;
      * Se a moeda estiver ativa a conversão não pode ser nula;
+     * A conversão não pode ser negativa.
+     * Formato deve conter :value, espaço e simbolo;
+     * A divisao deve conter um valor valido
      */
     public function validate()
     {
         $errors = [];
-        $value = strpos($this->formato, ':value');
+        $formato = strpos($this->formato, ':value');
         $simbolo = explode(' ', $this->formato);
-        $lista = [1,10,100,1000,10000];
+        $divisao = [1, 10, 100, 1000, 10000];
+        $empresa = Empresa::find(1);
+        if (!is_null($empresa)) {
+            $pais = $empresa->pais;
+            if ($pais->moeda_id == $this->id && $this->conversao != 1) {
+                $errors['conversao'] = __('messages.pais_active_conversion_different_1');
+            }
+        }
         if ($this->ativa && is_null($this->conversao)) {
             $errors['conversao'] = __('messages.moeda_active_null_conversion');
         }
-        if (!$value || count($simbolo) > 2) {
+        if ($this->conversao < 0) {
+            $errors['conversao'] = __('messages.moeda_conversion_cannot_negative');
+        }
+        if (count($simbolo) < 2) {
             $errors['formato'] = __('messages.moeda_invalid_format');
         }
-        if (!in_array($this->divisao, $lista)) {
+        if (!$formato) {
+            $errors['formato'] = __('messages.moeda_invalid_format');
+        }
+        if (!in_array($this->divisao, $divisao)) {
             $errors['divisao'] = __('messages.moeda_invalid_divisao');
         }
         if (!empty($errors)) {

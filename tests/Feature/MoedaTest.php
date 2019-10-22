@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Empresa;
 use App\Models\Moeda;
+use App\Models\Pais;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class MoedaTest extends TestCase
@@ -75,7 +78,7 @@ class MoedaTest extends TestCase
     {
         $moeda = factory(Moeda::class)->create();
         $moeda->ativa = true;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $moeda->save();
     }
 
@@ -83,7 +86,15 @@ class MoedaTest extends TestCase
     {
         $moeda = factory(Moeda::class)->create();
         $moeda->formato = 'valor';
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
+        $moeda->save();
+    }
+
+    public function testValidateMoedaFormatoSimboloInvalido()
+    {
+        $moeda = factory(Moeda::class)->create();
+        $moeda->formato = ':value';
+        $this->expectException(ValidationException::class);
         $moeda->save();
     }
 
@@ -91,7 +102,31 @@ class MoedaTest extends TestCase
     {
         $moeda = factory(Moeda::class)->create();
         $moeda->divisao = 5;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
+        $moeda->save();
+    }
+
+    public function testValidateMoedaPaisAtivo()
+    {
+        $moeda = factory(Moeda::class)->create();
+        $pais = factory(Pais::class)->create();
+        $pais->moeda_id = $moeda->id;
+        $pais->save();
+
+        $empresa = factory(Empresa::class)->create();
+        $empresa->pais_id = $pais->id;
+        $empresa->save();
+
+        $moeda->conversao = 8;
+        $this->expectException(ValidationException::class);
+        $moeda->save();
+    }
+
+    public function testValidateMoedaConversaoNegativa()
+    {
+        $moeda = factory(Moeda::class)->create();
+        $moeda->conversao = -5;
+        $this->expectException(ValidationException::class);
         $moeda->save();
     }
 }

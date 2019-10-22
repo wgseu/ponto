@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Zona;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class ZonaTest extends TestCase
@@ -70,12 +71,12 @@ class ZonaTest extends TestCase
         $this->assertNull($zona);
     }
 
-    public function testValidateZonaPrazoEntregaMaximoMaiorMinimo()
+    public function testValidateZonaPrazoEntregaInvalido()
     {
         $zona = factory(Zona::class)->create();
         $zona->entrega_minima = 4;
         $zona->entrega_maxima = 2;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $zona->save();
     }
 
@@ -83,7 +84,7 @@ class ZonaTest extends TestCase
     {
         $zona = factory(Zona::class)->create();
         $zona->adicional_entrega = -5;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $zona->save();
     }
 }

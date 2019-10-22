@@ -93,19 +93,17 @@ class Categoria extends Model implements ValidateInterface
         $errors = [];
         if (!is_null($this->categoria_id)) {
             $categoriapai = $this->categoria;
-            if (is_null($categoriapai)) {
-                $errors['categoriaid'] = __('messagens.categoriapai_not_found');
-            } elseif (!is_null($categoriapai->categoria_id)) {
-                $errors['categoriaid'] = __('messagens.categoriapai_already');
+            if (!is_null($categoriapai->categoria_id)) {
+                $errors['categoria_id'] = __('messagens.categoriapai_already');
             } elseif ($this->id == $this->categoria_id) {
-                $errors['categoriaid'] = __('messagens.categoriapai_some');
+                $errors['categoria_id'] = __('messagens.categoriapai_some');
             }
         }
         if ($this->exists) {
             $categoria = self::where('categoria_id', $this->id);
-            $oldCategoria = self::find($this->id);
+            $oldCategoria = $this->fresh();
             if ($categoria->exists() && $oldCategoria->categoria_id != $this->categoria_id) {
-                $errors['categoriaid'] = __('messagens.categoriapai_invalid_update');
+                $errors['categoria_id'] = __('messagens.categoriapai_invalid_update');
             }
         }
         if (!empty($errors)) {

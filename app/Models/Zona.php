@@ -98,7 +98,7 @@ class Zona extends Model implements ValidateInterface
             }
         }
         if ($this->adicional_entrega < 0) {
-            $errors['value_delivery_negative'] = __('messagens.error_time_delivery');
+            $errors['adicional_entrega'] = __('messagens.error_time_delivery');
         }
         if (!empty($errors)) {
             throw ValidationException::withMessages($errors);

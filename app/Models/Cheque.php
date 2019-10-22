@@ -100,7 +100,7 @@ class Cheque extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $oldCheque = self::find($this->id);
+        $oldCheque = $this->fresh();
         if (!$this->exists) {
             $cheque = self::where('numero', $this->numero)
                 ->where('agencia', $this->agencia)

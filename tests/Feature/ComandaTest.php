@@ -30,6 +30,7 @@ use Tests\TestCase;
 use App\Models\Comanda;
 use App\Models\Pedido;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class ComandaTest extends TestCase
 {
@@ -105,7 +106,7 @@ class ComandaTest extends TestCase
         $pedido->comanda_id = $comanda->id;
         $pedido->save();
         $comanda->ativa = false;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $comanda->save();
     }
 
@@ -114,7 +115,7 @@ class ComandaTest extends TestCase
         $comanda = factory(Comanda::class)->create();
         $comanda->delete();
         $comanda->ativa = false;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $comanda->save();
     }
 }

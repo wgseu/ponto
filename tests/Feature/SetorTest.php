@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Setor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class SetorTest extends TestCase
 {
@@ -93,16 +94,6 @@ class SetorTest extends TestCase
         $this->assertNull($setor);
     }
 
-
-    public function testValidateSetorInvalidSubsetor()
-    {
-        $setor = factory(Setor::class)->create();
-        $setor->delete();
-        $setor->setor_id = 100;
-        $this->expectException('\Exception');
-        $setor->save();
-    }
-
     public function testValidateSetorCreateSubsetor()
     {
         $setorPai = factory(Setor::class)->create();
@@ -112,7 +103,7 @@ class SetorTest extends TestCase
         $setor = factory(Setor::class)->create();
         $setor->delete();
         $setor->setor_id = $subsetor->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $setor->save();
     }
 
@@ -120,7 +111,7 @@ class SetorTest extends TestCase
     {
         $setor = factory(Setor::class)->create();
         $setor->setor_id = $setor->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $setor->save();
     }
 
@@ -132,7 +123,7 @@ class SetorTest extends TestCase
         $subsetor->save();
         $setor = factory(Setor::class)->create();
         $setorPai->setor_id = $setor->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $setorPai->save();
     }
 }

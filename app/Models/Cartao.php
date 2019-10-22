@@ -107,15 +107,15 @@ class Cartao extends Model implements ValidateInterface
         if ($this->taxa < 0) {
             $errors['taxa'] = __('messages.taxa_negative');
         } elseif ($this->dias_repasse < 0) {
-            $errors['diasrepasse'] = __('messages.dias_repasse_negative');
+            $errors['dias_repasse'] = __('messages.dias_repasse_negative');
         } elseif ($this->taxa_antecipacao < 0) {
-            $errors['taxaantecipacao'] = __('messages.taxa_antecipacao_negative');
+            $errors['taxa_antecipacao'] = __('messages.taxa_antecipacao_negative');
         }
         if (!$this->exists && !$this->ativo) {
             $errors['ativo'] = __('messages.create_cartao_desativado');
         }
         if (!empty($errors)) {
-            throw new ValidationException($errors);
+            throw ValidationException::withMessages($errors);
         }
     }
 }

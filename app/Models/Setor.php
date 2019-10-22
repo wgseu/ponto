@@ -81,19 +81,17 @@ class Setor extends Model implements ValidateInterface
         $errors = [];
         if (!is_null($this->setor_id)) {
             $setorpai = $this->setor;
-            if (is_null($setorpai)) {
-                $errors['setorid'] = __('messagens.setorpai_not_found');
-            } elseif (!is_null($setorpai->setor_id)) {
-                $errors['setorid'] = __('messagens.setorpai_already');
+            if (!is_null($setorpai->setor_id)) {
+                $errors['setor_id'] = __('messagens.setorpai_already');
             } elseif ($this->id == $this->setor_id) {
-                $errors['setorid'] = __('messagens.setorpai_some');
+                $errors['setor_id'] = __('messagens.setorpai_some');
             }
         }
         if ($this->exists) {
             $setor = self::where('setor_id', $this->id);
-            $oldSetor = self::find($this->id);
+            $oldSetor = $this->fresh();
             if ($setor->exists() && $oldSetor->setor_id != $this->setor_id) {
-                $errors['setorid'] = __('messagens.setorpai_invalid_update');
+                $errors['setor_id'] = __('messagens.setorpai_invalid_update');
             }
         }
         if (!empty($errors)) {

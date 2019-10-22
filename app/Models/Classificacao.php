@@ -82,19 +82,17 @@ class Classificacao extends Model implements ValidateInterface
         $errors = [];
         if (!is_null($this->classificacao_id)) {
             $classificacaopai = $this->classificacao;
-            if (is_null($classificacaopai)) {
-                $errors['classificacaoid'] = __('messagens.classificacaopai_not_found');
-            } elseif (!is_null($classificacaopai->classificacao_id)) {
-                $errors['classificacaoid'] = __('messagens.classificacaopai_already');
+            if (!is_null($classificacaopai->classificacao_id)) {
+                $errors['classificacao_id'] = __('messagens.classificacaopai_already');
             } elseif ($this->id == $this->classificacao_id) {
-                $errors['classificacaoid'] = __('messagens.classificacaopai_some');
+                $errors['classificacao_id'] = __('messagens.classificacaopai_some');
             }
         }
         if ($this->exists) {
             $classificacao = self::where('classificacao_id', $this->id);
-            $oldClassificacao = self::find($this->id);
+            $oldClassificacao = $this->fresh();
             if ($classificacao->exists() && $oldClassificacao->classificacao_id != $this->classificacao_id) {
-                $errors['classificacaoid'] = __('messagens.classificacao_invalid_update');
+                $errors['classificacao_id'] = __('messagens.classificacao_invalid_update');
             }
         }
         if (!empty($errors)) {

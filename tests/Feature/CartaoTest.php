@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Cartao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class CartaoTest extends TestCase
 {
@@ -95,7 +96,7 @@ class CartaoTest extends TestCase
     {
         $cartao = factory(Cartao::class)->create();
         $cartao->taxa = -4;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cartao->save();
     }
 
@@ -103,7 +104,7 @@ class CartaoTest extends TestCase
     {
         $cartao = factory(Cartao::class)->create();
         $cartao->dias_repasse = -30;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cartao->save();
     }
 
@@ -111,7 +112,7 @@ class CartaoTest extends TestCase
     {
         $cartao = factory(Cartao::class)->create();
         $cartao->taxa_antecipacao = -4;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cartao->save();
     }
 
@@ -120,7 +121,7 @@ class CartaoTest extends TestCase
         $cartao = factory(Cartao::class)->create();
         $cartao->delete();
         $cartao->ativo = false;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cartao->save();
     }
 }

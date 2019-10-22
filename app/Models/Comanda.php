@@ -79,7 +79,7 @@ class Comanda extends Model implements ValidateInterface
      */
     public function validate()
     {
-        $old_comanda = self::find($this->id);
+        $old_comanda = $this->fresh();
         if ($this->exists && $old_comanda->ativa && !$this->ativa) {
             $pedido = Pedido::where('comanda_id', $this->id)
                 ->where('estado', '<>', Pedido::ESTADO_CONCLUIDO)

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Categoria;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class CategoriaTest extends TestCase
@@ -69,15 +70,6 @@ class CategoriaTest extends TestCase
         $this->assertNull($bairro);
     }
 
-    public function testValidateCategoriaInvalidSubcategoria()
-    {
-        $categoria = factory(Categoria::class)->create();
-        $categoria->delete();
-        $categoria->categoria_id = 100;
-        $this->expectException('\Exception');
-        $categoria->save();
-    }
-
     public function testValidateCategoriaCreateSubcategoriaDeSubcategoria()
     {
         $categoriaPai = factory(Categoria::class)->create();
@@ -87,7 +79,7 @@ class CategoriaTest extends TestCase
         $categoria = factory(Categoria::class)->create();
         $categoria->delete();
         $categoria->categoria_id = $subcategoria->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $categoria->save();
     }
 
@@ -95,7 +87,7 @@ class CategoriaTest extends TestCase
     {
         $categoria = factory(Categoria::class)->create();
         $categoria->categoria_id = $categoria->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $categoria->save();
     }
 
@@ -107,7 +99,7 @@ class CategoriaTest extends TestCase
         $subcategoria->save();
         $categoria = factory(Categoria::class)->create();
         $categoriaPai->categoria_id = $categoria->id;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $categoriaPai->save();
     }
 }

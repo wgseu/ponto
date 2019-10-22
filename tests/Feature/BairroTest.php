@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Bairro;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class BairroTest extends TestCase
@@ -57,7 +58,7 @@ class BairroTest extends TestCase
             'input' => [
                 'nome' => 'Jardim 51 Mundial das Palmeiras',
                 'valor_entrega' => 10.2,
-              ]
+            ]
         ], $headers);
         $bairro->refresh();
         $this->assertEquals(
@@ -84,7 +85,7 @@ class BairroTest extends TestCase
         $bairro = factory(Bairro::class)->create();
         $bairro->entrega_minima = 4;
         $bairro->entrega_maxima = 2;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $bairro->save();
     }
 
@@ -92,7 +93,7 @@ class BairroTest extends TestCase
     {
         $bairro = factory(Bairro::class)->create();
         $bairro->valor_entrega = -5;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $bairro->save();
     }
 }

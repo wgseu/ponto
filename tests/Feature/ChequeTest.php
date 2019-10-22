@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Cheque;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class ChequeTest extends TestCase
 {
@@ -125,7 +126,7 @@ class ChequeTest extends TestCase
         $cheque->agencia =  $oldcheque->agencia;
         $cheque->conta =  $oldcheque->conta;
         $cheque->numero =  $oldcheque->numero;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
@@ -133,7 +134,7 @@ class ChequeTest extends TestCase
     {
         $cheque = factory(Cheque::class)->create();
         $cheque->valor =  -100;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
@@ -144,7 +145,7 @@ class ChequeTest extends TestCase
         $cheque->cancelado = true;
         $cheque->save();
         $cheque->valor =  1000;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
@@ -154,7 +155,7 @@ class ChequeTest extends TestCase
         $cheque->recolhimento = '2016-12-28 12:30:00';
         $cheque->save();
         $cheque->valor =  1000;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
@@ -163,7 +164,7 @@ class ChequeTest extends TestCase
         $cheque = factory(Cheque::class)->create();
         $cheque->delete();
         $cheque->cancelado = true;
-        $this->expectException('\Exception');
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 }

@@ -1,0 +1,8 @@
+query funcao ($id: ID!){
+  funcoes(filter: {id: $id}) {
+    data{
+      descricao
+      remuneracao
+    }
+  }
+}

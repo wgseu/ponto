@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
@@ -22,11 +23,13 @@
  *
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
+
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Função ou atribuição de tarefas à um prestador
@@ -59,7 +62,18 @@ class Funcao extends Model implements ValidateInterface
         'remuneracao',
     ];
 
+    /**
+     * Regras:
+     * A remuração não pode ser negativa;
+     */
     public function validate()
     {
+        $errors = [];
+        if ($this->remuneracao < 0) {
+            $errors['remuneracao'] = __('messages.remuneracao_cannot_negative');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

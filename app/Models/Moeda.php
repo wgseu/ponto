@@ -84,7 +84,8 @@ class Moeda extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $formato = strpos($this->formato, ':value');
+        $formato = ' ' . $this->formato . ' ';
+        $formato = strpos($formato, ' :value ');
         $simbolo = explode(' ', $this->formato);
         $divisao = [1, 10, 100, 1000, 10000];
         $empresa = Empresa::find(1);
@@ -103,7 +104,7 @@ class Moeda extends Model implements ValidateInterface
         if (count($simbolo) < 2) {
             $errors['formato'] = __('messages.moeda_invalid_format');
         }
-        if (!$formato) {
+        if ($formato === false) {
             $errors['formato'] = __('messages.moeda_invalid_format');
         }
         if (!in_array($this->divisao, $divisao)) {

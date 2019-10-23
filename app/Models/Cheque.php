@@ -100,12 +100,11 @@ class Cheque extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $oldCheque = $this->fresh();
         if (!$this->exists) {
             $cheque = self::where('numero', $this->numero)
-                ->where('agencia', $this->agencia)
-                ->where('conta', $this->conta)
-                ->where('cancelado', false);
+            ->where('agencia', $this->agencia)
+            ->where('conta', $this->conta)
+            ->where('cancelado', false);
             if ($cheque->exists()) {
                 $errors['numero'] = __('messages.duplicate_cheque');
             }
@@ -113,6 +112,7 @@ class Cheque extends Model implements ValidateInterface
                 $errors['cancelado'] = __('messages.new_canceled');
             }
         } else {
+            $oldCheque = $this->fresh();
             if (!is_null($oldCheque->recolhimento)) {
                 $errors['recolhimento'] = __('messages.recolhido_cannot_update');
             }

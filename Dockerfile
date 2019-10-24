@@ -1,23 +1,46 @@
 FROM composer:1.6.5 as build
 WORKDIR /app
 COPY . /app
-RUN composer install --quiet --optimize-autoloader --no-dev
+RUN composer global require hirak/prestissimo \
+    && composer install --no-interaction --optimize-autoloader --no-dev
+
+FROM node:10 as node_build
+WORKDIR /app
+COPY package.json /app
+COPY yarn.lock /app
+RUN yarn install --prod
 
 FROM nanoninja/php-fpm:7.3.6
 WORKDIR /var/www/html
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y \
+EXPOSE 80
+EXPOSE 3000
+
+RUN apt-get -qq update && apt-get -qq upgrade -y \
+    && apt-get -qq install -y \
     nginx \
-    && apt-get autoremove --purge -y && apt-get autoclean -y && apt-get clean -y \
+    curl \
+    gnupg \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash \
+    && apt-get -qq install -y \
+    nodejs \
+    && apt-get -qq remove -y \
+    curl \
+    gnupg \
+    && apt-get -qq autoremove --purge -y && apt-get -qq autoclean -y && apt-get -qq clean -y \
+    && rm -f  /etc/apt/sources.list.d/nodesource.list \
     && rm -f  /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && rm -f  /etc/nginx/sites-enabled/default \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
 
-EXPOSE 80
 COPY --from=build /app /var/www/html
+COPY --from=build /app/vendor /var/www/html/vendor
+COPY --from=node_build /app/node_modules /var/www/html/node_modules
+
 COPY etc/nginx/default.production.conf /etc/nginx/conf.d/default.conf
 COPY etc/php/php.production.ini /usr/local/etc/php/conf.d/php.ini
+COPY resources/docker/start.sh /usr/local/bin/start
+
 RUN mkdir -p storage/logs \
     && mkdir -p storage/app/cache \
     && mkdir -p storage/app/compiled \
@@ -26,7 +49,6 @@ RUN mkdir -p storage/logs \
     && mkdir -p storage/framework/sessions \
     && mkdir -p storage/framework/testing \
     && chown -R www-data:www-data storage \
-    && php artisan config:cache \
-    && php artisan route:cache
+    && chmod u+x /usr/local/bin/start
 
-CMD service nginx start && php-fpm
+CMD ["/usr/local/bin/start"]

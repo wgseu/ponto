@@ -4,7 +4,10 @@ const SocketIO = require('socket.io')
 const io = SocketIO(server, {
   path: '/ws'
 })
-server.listen(3000)
+
+server.listen(3000, () => {
+  console.log('Socket.IO running at port 3000...');
+})
 
 // Chatroom
 

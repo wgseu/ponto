@@ -1,8 +1,8 @@
-mutation createZona($input: ZonaInput!) {
-  CreateZona(input: $input) {
-    id
-    bairro_id
+mutation zona($input: ZonaInput!)
+{
+  CreateZona(input: $input) 
+  {
+    id 
     nome
-    adicional_entrega
   }
 }

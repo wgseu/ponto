@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Cartao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class CartaoTest extends TestCase
 {
@@ -50,6 +51,24 @@ class CartaoTest extends TestCase
         $this->assertEquals('Teste', $found_cartao->bandeira);
     }
 
+    public function testFindCartao()
+    {
+        $headers = PrestadorTest::auth();
+        $cartao = factory(Cartao::class)->create();
+        $response = $this->graphfl('find_cartao_id', [
+            'id' => $cartao->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $cartao->id,
+            $response->json('data.cartoes.data.0.id')
+        );
+        $this->assertEquals(
+            $cartao->bandeira,
+            $response->json('data.cartoes.data.0.bandeira')
+        );
+    }
+
     public function testUpdateCartao()
     {
         $headers = PrestadorTest::auth();
@@ -57,27 +76,52 @@ class CartaoTest extends TestCase
         $this->graphfl('update_cartao', [
             'id' => $cartao->id,
             'input' => [
-                'bandeira' => 'Atualizou',
+                'bandeira' => 'Visa',
             ]
         ], $headers);
         $cartao->refresh();
-        $this->assertEquals('Atualizou', $cartao->bandeira);
+        $this->assertEquals('Visa', $cartao->bandeira);
     }
 
     public function testDeleteCartao()
     {
         $headers = PrestadorTest::auth();
         $cartao_to_delete = factory(Cartao::class)->create();
-        $cartao_to_delete = $this->graphfl('delete_cartao', ['id' => $cartao_to_delete->id], $headers);
+        $this->graphfl('delete_cartao', ['id' => $cartao_to_delete->id], $headers);
         $cartao = Cartao::find($cartao_to_delete->id);
         $this->assertNull($cartao);
     }
 
-    public function testFindCartao()
+    public function testValidateCartaoTaxaNegativa()
     {
-        $headers = PrestadorTest::auth();
         $cartao = factory(Cartao::class)->create();
-        $response = $this->graphfl('query_cartao', [ 'id' => $cartao->id ], $headers);
-        $this->assertEquals($cartao->id, $response->json('data.cartoes.data.0.id'));
+        $cartao->taxa = -4;
+        $this->expectException(ValidationException::class);
+        $cartao->save();
+    }
+
+    public function testValidateCartaoDiasRepasseNegativo()
+    {
+        $cartao = factory(Cartao::class)->create();
+        $cartao->dias_repasse = -30;
+        $this->expectException(ValidationException::class);
+        $cartao->save();
+    }
+
+    public function testValidateCartaoTaxaAntecipacaoNegativa()
+    {
+        $cartao = factory(Cartao::class)->create();
+        $cartao->taxa_antecipacao = -4;
+        $this->expectException(ValidationException::class);
+        $cartao->save();
+    }
+
+    public function testValidateCartaoCreateDesativado()
+    {
+        $cartao = factory(Cartao::class)->create();
+        $cartao->delete();
+        $cartao->ativo = false;
+        $this->expectException(ValidationException::class);
+        $cartao->save();
     }
 }

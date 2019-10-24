@@ -92,10 +92,9 @@ class Cheque extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * O cheque não pode ter a mesma agencia conta e numero de outro cheque a menos que ele esteje cancelado;
-     * O cheque não pode ser criado já cancelado;
-     * O cheque não pode ser alterado depois de recolhido;
-     * O cheque não pode ser alterado depois de cancelado;
+     * Um cheque não pode ter a mesma agencia conta e numero a mesnos que esteje cancelado;
+     * Um cheque não pode ser criado com status de cancelado;
+     * Depois de recolhido e cancelado um cheque não pode ser alterado;
      * O valor do cheque não pode ser negativo.
      */
     public function validate()

@@ -86,13 +86,13 @@ class Zona extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * Se não nulos o tempo de entrega minimo não pode ser superior ao tempo de entrega maximo;
-     * O valor adicional de entrega não pode ser negativo.
+     * Se não nulas o prazo de  entrega minima não pode ser superior ao prazo de entrega maximo;
+     * O adicional da entrega não pode ser negativo.
      */
     public function validate()
     {
         $errors = [];
-        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima) ) {
+        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima)) {
             if ($this->entrega_minima > $this->entrega_maxima) {
                 $errors['entrega_minima'] = __('messagens.error_time_delivery');
             }

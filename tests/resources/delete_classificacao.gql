@@ -1,5 +1,6 @@
 mutation ($id: ID!) {
   DeleteClassificacao(id: $id) {
     id
+    descricao
   }
 }

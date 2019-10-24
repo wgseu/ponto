@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Lista de compras de produtos
@@ -94,7 +95,23 @@ class Lista extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Viagem', 'viagem_id');
     }
 
+    /**
+     * Regras:
+     * Depois de comprada a lista não pode ser alterada;
+     * A data da viagem não pode ser anterior a data de cadastro.
+     */
     public function validate()
     {
+        $errors = [];
+        $oldLista = $this->fresh();
+        if ($this->data_viagem < $this->data_cadastro) {
+            $errors['data_viagem'] = __('messages.lista_comprada_cannot_update');
+        }
+        if ($this->exists && $oldLista->estado == self::ESTADO_COMPRADA) {
+            $errors['estado'] = __('messages.lista_comprada_cannot_update');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

@@ -73,26 +73,41 @@ class Moeda extends Model implements ValidateInterface
         'ativa' => false,
     ];
 
-        /**
+    /**
      * Regras:
-     * Se a moeda estiver ativa a conversao não pode ser nula,
-     * É obrigatório a presença de {value} em formato e não deve ser o unica caracteristica exemple R$ {value}
-     * É obrigatório conter um dos numeros da lista na divisao para definir a quantidade de casas decimais.
+     * Para o país ativo a conversão da moeda ver ser igual a 1;
+     * Se a moeda estiver ativa a conversão não pode ser nula;
+     * A conversão não pode ser negativa.
+     * Formato deve conter :value, espaço e simbolo;
+     * A divisao deve conter um valor valido
      */
     public function validate()
     {
         $errors = [];
-        $value = strpos($this->formato, '{value}');
-        $lista = [1,10,100,1000,10000];
-        if ($this->ativa == true) {
-            if (is_null($this->conversao)) {
-                $errors['conversao'] = __('messages.moeda_active_null_conversion');
+        $formato = ' ' . $this->formato . ' ';
+        $formato = strpos($formato, ' :value ');
+        $simbolo = explode(' ', $this->formato);
+        $divisao = [1, 10, 100, 1000, 10000];
+        $empresa = Empresa::find(1);
+        if (!is_null($empresa)) {
+            $pais = $empresa->pais;
+            if ($pais->moeda_id == $this->id && $this->conversao != 1) {
+                $errors['conversao'] = __('messages.pais_active_conversion_different_1');
             }
         }
-        if ($value == false || strlen($this->formato) <= 8) {
+        if ($this->ativa && is_null($this->conversao)) {
+            $errors['conversao'] = __('messages.moeda_active_null_conversion');
+        }
+        if ($this->conversao <= 0) {
+            $errors['conversao'] = __('messages.moeda_conversion_cannot_negative_zero');
+        }
+        if (count($simbolo) < 2) {
             $errors['formato'] = __('messages.moeda_invalid_format');
         }
-        if (in_array($this->divisao, $lista) === false) {
+        if ($formato === false) {
+            $errors['formato'] = __('messages.moeda_invalid_format');
+        }
+        if (!in_array($this->divisao, $divisao)) {
             $errors['divisao'] = __('messages.moeda_invalid_divisao');
         }
         if (!empty($errors)) {

@@ -1,5 +1,5 @@
-mutation ($id: ID!) {
+mutation Delete($id: ID!){
   DeleteCategoria(id: $id) {
-    id
+    descricao
   }
 }

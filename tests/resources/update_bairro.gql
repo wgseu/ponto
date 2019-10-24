@@ -1,6 +1,11 @@
-mutation updateBairro($id: ID!, $input: BairroUpdateInput!) {
-  UpdateBairro(id: $id, input: $input) {
+mutation bairro($input: BairroUpdateInput!, $id: ID!)
+{
+  UpdateBairro(input: $input, id: $id) 
+  {
+    cidade_id
     nome
     valor_entrega
+    disponivel
+    mapeado
   }
 }

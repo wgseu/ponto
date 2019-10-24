@@ -1,34 +1,13 @@
 <?php
 
-/**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
- *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
- * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
- * DISPOSIÇÕES GERAIS
- * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
- * ou outros avisos ou restrições de propriedade do GrandChef.
- *
- * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
- * ou descompilação do GrandChef.
- *
- * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
- *
- * GrandChef é a especialidade do desenvolvedor e seus
- * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
- * de leis de propriedade.
- *
- * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
- * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
- *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
- */
-
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Credito;
+use App\Models\Cliente;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
 
 class CreditoTest extends TestCase
 {
@@ -37,19 +16,32 @@ class CreditoTest extends TestCase
     public function testCreateCredito()
     {
         $headers = PrestadorTest::auth();
-        $seed_credito =  factory(Credito::class)->create();
+        $cliente_id = factory(Cliente::class)->create();
         $response = $this->graphfl('create_credito', [
             'input' => [
-                'cliente_id' => $seed_credito->cliente_id,
-                'valor' => 1.50,
-                'detalhes' => 'Teste',
+                'cliente_id' => $cliente_id->id,
+                'valor' => 10,
+                'detalhes' => 'Devolução de mercadorias',
             ]
         ], $headers);
-
         $found_credito = Credito::findOrFail($response->json('data.CreateCredito.id'));
-        $this->assertEquals($seed_credito->cliente_id, $found_credito->cliente_id);
-        $this->assertEquals(1.50, $found_credito->valor);
-        $this->assertEquals('Teste', $found_credito->detalhes);
+        $this->assertEquals($cliente_id->id, $found_credito->cliente_id);
+        $this->assertEquals(10, $found_credito->valor);
+        $this->assertEquals('Devolução de mercadorias', $found_credito->detalhes);
+    }
+
+    public function testFindCredito()
+    {
+        $headers = PrestadorTest::auth();
+        $credito = factory(Credito::class)->create();
+        $response = $this->graphfl('find_credito_id', [
+            'id' => $credito->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $credito->detalhes,
+            $response->json('data.creditos.data.0.detalhes')
+        );
     }
 
     public function testUpdateCredito()
@@ -59,29 +51,121 @@ class CreditoTest extends TestCase
         $this->graphfl('update_credito', [
             'id' => $credito->id,
             'input' => [
-                'valor' => 1.50,
-                'detalhes' => 'Atualizou',
-            ]
+                'cancelado' => true,
+              ]
         ], $headers);
         $credito->refresh();
-        $this->assertEquals(1.50, $credito->valor);
-        $this->assertEquals('Atualizou', $credito->detalhes);
+        $this->assertEquals(
+            true,
+            $credito->cancelado
+        );
     }
-
+    
     public function testDeleteCredito()
     {
         $headers = PrestadorTest::auth();
         $credito_to_delete = factory(Credito::class)->create();
-        $credito_to_delete = $this->graphfl('delete_credito', ['id' => $credito_to_delete->id], $headers);
+        $this->graphfl('delete_credito', ['id' => $credito_to_delete->id], $headers);
         $credito = Credito::find($credito_to_delete->id);
         $this->assertNull($credito);
     }
 
-    public function testFindCredito()
+    public function testValidateCreditoAbatimentoMaiorSaldo()
     {
-        $headers = PrestadorTest::auth();
+        $cliente = factory(Cliente::class)->create();
+        $oldCredito = factory(Credito::class)->create();
+        $oldCredito->valor = 100;
+        $oldCredito->cliente_id = $cliente->id;
+        $oldCredito->save();
+
         $credito = factory(Credito::class)->create();
-        $response = $this->graphfl('query_credito', [ 'id' => $credito->id ], $headers);
-        $this->assertEquals($credito->id, $response->json('data.creditos.data.0.id'));
+        $credito->cliente_id = $cliente->id;
+        $credito->save();
+
+        $credito->valor = -101;
+        $this->expectException(ValidationException::class);
+        $credito->save();
+    }
+
+    public function testValidateCreditoCreateCancelado()
+    {
+        $credito = factory(Credito::class)->create();
+        $credito->delete();
+        $credito->cancelado = true;
+        $this->expectException(ValidationException::class);
+        $credito->save();
+    }
+
+    public function testValidateCreditoCancelamentoMaiorSaldoCredito()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $oldCredito = factory(Credito::class)->create();
+        $oldCredito->valor = 100;
+        $oldCredito->cliente_id = $cliente->id;
+        $oldCredito->save();
+
+        $credito = factory(Credito::class)->create();
+        $credito->cliente_id = $cliente->id;
+        $credito->save();
+
+        $credito->valor = -40;
+        $credito->save();
+
+        $oldCredito->cancelado = true;
+        $this->expectException(ValidationException::class);
+        $oldCredito->save();
+    }
+
+    public function testValidateCreditoTranferirAbatimento()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $oldCredito = factory(Credito::class)->create();
+        $oldCredito->valor = 100;
+        $oldCredito->cliente_id = $cliente->id;
+        $oldCredito->save();
+
+        $credito = factory(Credito::class)->create();
+        $credito->cliente_id = $cliente->id;
+        $credito->save();
+
+        $credito->valor = -40;
+        $credito->save();
+
+        $newCliente = factory(Cliente::class)->create();
+        $credito->cliente_id = $newCliente->id;
+        $this->expectException(ValidationException::class);
+        $credito->save();
+    }
+
+    public function testValidateCreditoTranferefirSaldoNegativo()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $oldCredito = factory(Credito::class)->create();
+        $oldCredito->valor = 100;
+        $oldCredito->cliente_id = $cliente->id;
+        $oldCredito->save();
+
+        $credito = factory(Credito::class)->create();
+        $credito->cliente_id = $cliente->id;
+        $credito->save();
+
+        $credito->cliente_id = $cliente->id;
+        $credito->valor = -40;
+        $credito->save();
+
+        $newCliente = factory(Cliente::class)->create();
+        $oldCredito->cliente_id = $newCliente->id;
+        $this->expectException(ValidationException::class);
+        $oldCredito->save();
+    }
+
+    public function testValidateCreditoUpdateCancelado()
+    {
+        $credito = factory(Credito::class)->create();
+        $credito->cancelado = true;
+        $credito->save();
+        $credito->valor = 15;
+        $this->expectException(ValidationException::class);
+        $credito->save();
     }
 }

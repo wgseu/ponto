@@ -1,34 +1,12 @@
 <?php
 
-/**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
- *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
- * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
- * DISPOSIÇÕES GERAIS
- * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
- * ou outros avisos ou restrições de propriedade do GrandChef.
- *
- * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
- * ou descompilação do GrandChef.
- *
- * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
- *
- * GrandChef é a especialidade do desenvolvedor e seus
- * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
- * de leis de propriedade.
- *
- * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
- * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
- *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
- */
-
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Classificacao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
 
 class ClassificacaoTest extends TestCase
 {
@@ -48,6 +26,21 @@ class ClassificacaoTest extends TestCase
         $this->assertEquals('Teste', $found_classificacao->descricao);
     }
 
+
+    public function testFindClassificacao()
+    {
+        $headers = PrestadorTest::auth();
+        $classificacao = factory(Classificacao::class)->create();
+        $response = $this->graphfl('find_classificacao_id', [
+            'id' => $classificacao->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $classificacao->descricao,
+            $response->json('data.classificacoes.data.0.descricao')
+        );
+    }
+
     public function testUpdateClassificacao()
     {
         $headers = PrestadorTest::auth();
@@ -55,27 +48,55 @@ class ClassificacaoTest extends TestCase
         $this->graphfl('update_classificacao', [
             'id' => $classificacao->id,
             'input' => [
-                'descricao' => 'Atualizou',
+                'descricao' => 'Diárias',
             ]
         ], $headers);
         $classificacao->refresh();
-        $this->assertEquals('Atualizou', $classificacao->descricao);
+        $this->assertEquals(
+            'Diárias',
+            $classificacao->descricao
+        );
     }
-
+    
     public function testDeleteClassificacao()
     {
         $headers = PrestadorTest::auth();
         $classificacao_to_delete = factory(Classificacao::class)->create();
-        $classificacao_to_delete = $this->graphfl('delete_classificacao', ['id' => $classificacao_to_delete->id], $headers);
+        $this->graphfl('delete_classificacao', ['id' => $classificacao_to_delete->id], $headers);
         $classificacao = Classificacao::find($classificacao_to_delete->id);
         $this->assertNull($classificacao);
     }
 
-    public function testFindClassificacao()
+    public function testValidateClassificacaoCreateSubclassificacaoDeSubclassificacao()
     {
-        $headers = PrestadorTest::auth();
+        $classificacaoPai = factory(Classificacao::class)->create();
+        $subclassificacao = factory(Classificacao::class)->create();
+        $subclassificacao->classificacao_id = $classificacaoPai->id;
+        $subclassificacao->save();
         $classificacao = factory(Classificacao::class)->create();
-        $response = $this->graphfl('query_classificacao', [ 'id' => $classificacao->id ], $headers);
-        $this->assertEquals($classificacao->id, $response->json('data.classificacoes.data.0.id'));
+        $classificacao->delete();
+        $classificacao->classificacao_id = $subclassificacao->id;
+        $this->expectException(ValidationException::class);
+        $classificacao->save();
+    }
+
+    public function testValidateClassificacaoUpdateSubclassificacaoElaMesma()
+    {
+        $classificacao = factory(Classificacao::class)->create();
+        $classificacao->classificacao_id = $classificacao->id;
+        $this->expectException(ValidationException::class);
+        $classificacao->save();
+    }
+
+    public function testValidateClassificacaoUpdateClassificacaoPai()
+    {
+        $classificacaoPai = factory(Classificacao::class)->create();
+        $subclassificacao = factory(Classificacao::class)->create();
+        $subclassificacao->classificacao_id = $classificacaoPai->id;
+        $subclassificacao->save();
+        $classificacao = factory(Classificacao::class)->create();
+        $classificacaoPai->classificacao_id = $classificacao->id;
+        $this->expectException(ValidationException::class);
+        $classificacaoPai->save();
     }
 }

@@ -92,39 +92,25 @@ class Credito extends Model implements ValidateInterface
         $saldo = self::where('cliente_id', $this->cliente_id)
                     ->where('cancelado', false)
                     ->sum('valor');
-        if (
-            $this->exists &&
-            !$this->cancelado
-        ) {
-            $oldValue = $this->fresh();
-            $saldo -= $oldValue->valor;
+        $oldCredito = $this->fresh();
+        if ($this->exists && !$this->cancelado) {
+            $saldo -= $oldCredito->valor;
         }
-        if (
-            !$this->cancelado &&
-            $this->valor < 0 &&
-            ($saldo + $this->valor) < 0
-        ) {
+        if (!$this->cancelado && $this->valor < 0 && ($saldo + $this->valor) < 0) {
             $errors['valor'] = __('messages.saldo_insufficient');
         }
         if ($this->exists) {
-            $oldCredito = $this->fresh();
             if ($oldCredito->cancelado) {
                 $errors['cancelado'] = __('messages.cancel_cannot_update');
-            }
-            if (
-                $oldCredito->cliente_id == $this->cliente_id &&
-                $this->cancelado &&
-                ($saldo - $this->valor) < 0
-            ) {
+            } elseif ($oldCredito->cliente_id == $this->cliente_id && $this->cancelado && ($saldo - $this->valor) < 0) {
                 $errors['cancelado'] = __('messages.cancel_cannot_greater');
-            }
-            if ($oldCredito->cliente_id != $this->cliente_id && $this->valor < 0) {
+            } elseif ($oldCredito->cliente_id != $this->cliente_id && $this->valor < 0) {
                 $errors['cliente_id'] = __('messages.cannot_transfer_value_negative');
-            } else {
+            } elseif ($oldCredito->cliente_id != $this->cliente_id) {
                 $oldsaldo = self::where('cliente_id', $oldCredito->cliente_id)
                     ->where('cancelado', false)
                     ->sum('valor');
-                if ($this->valor > $oldsaldo) {
+                if (($oldsaldo - $oldCredito->valor) < 0) {
                     $errors['cliente_id'] = __('messages.saldo_transfer_insufficient');
                 }
             }

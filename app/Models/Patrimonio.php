@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informa detalhadamente um bem da empresa
@@ -108,5 +109,30 @@ class Patrimonio extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if ($this->quantidade < 0) {
+            $errors['quantidade'] = __('messages.quantidade_cannot_negative');
+        }
+        if ($this->altura < 0) {
+            $errors['altura'] = __('messages.altura_cannot_negative');
+        }
+        if ($this->largura < 0) {
+            $errors['largura'] = __('messages.largura_cannot_negative');
+        }
+        if ($this->comprimento < 0) {
+            $errors['comprimento'] = __('messages.comprimento_cannot_negative');
+        }
+        if ($this->custo < 0) {
+            $errors['custo'] = __('messages.custo_cannot_negative');
+        }
+        if ($this->valor < 0) {
+            $errors['valor'] = __('messages.valor_cannot_negative');
+        }
+        if (!$this->ativo && !$this->exists) {
+            $errors['ativo'] = __('messages.cannot_create_disabled');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

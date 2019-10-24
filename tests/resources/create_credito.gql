@@ -1,4 +1,4 @@
-mutation createCredito($input: CreditoInput!) {
+mutation ($input: CreditoInput!) {
   CreateCredito(input: $input) {
     id
     cliente_id

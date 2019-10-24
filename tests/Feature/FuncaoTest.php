@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Funcao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class FuncaoTest extends TestCase
 {
@@ -70,16 +71,29 @@ class FuncaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $funcao_to_delete = factory(Funcao::class)->create();
-        $funcao_to_delete = $this->graphfl('delete_funcao', ['id' => $funcao_to_delete->id], $headers);
+        $this->graphfl('delete_funcao', ['id' => $funcao_to_delete->id], $headers);
         $funcao = Funcao::find($funcao_to_delete->id);
         $this->assertNull($funcao);
     }
-
     public function testFindFuncao()
     {
         $headers = PrestadorTest::auth();
+        $credito = factory(Funcao::class)->create();
+        $response = $this->graphfl('find_funcao_id', [
+            'id' => $credito->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $credito->descricao,
+            $response->json('data.funcoes.data.0.descricao')
+        );
+    }
+
+    public function testValidateFuncaoRemuneracaoNegativa()
+    {
         $funcao = factory(Funcao::class)->create();
-        $response = $this->graphfl('query_funcao', [ 'id' => $funcao->id ], $headers);
-        $this->assertEquals($funcao->id, $response->json('data.funcoes.data.0.id'));
+        $funcao->remuneracao = -50;
+        $this->expectException(ValidationException::class);
+        $funcao->save();
     }
 }

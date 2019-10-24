@@ -1,0 +1,9 @@
+query ($id: ID!){
+  cartoes(filter: {id: $id}) {
+    data{
+      bandeira
+      taxa
+      id
+    }
+  }
+}

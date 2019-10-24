@@ -1,0 +1,8 @@
+query ($id: ID!){
+  categorias(filter: {id: $id}) {
+    data {
+      id
+      descricao
+    }
+  }
+}

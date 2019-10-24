@@ -75,16 +75,14 @@ class Classificacao extends Model implements ValidateInterface
     /**
      * Regras:
      * subclassificação não pode ser referencia para uma uma nova subclassificação.
-     * Depois de usada com referência uma Classificação não pode alterar sua subclassificação.
+     * Depois de usada com referência uma Classificação não pode alterar a subclassificação.
      */
     public function validate()
     {
         $errors = [];
         if (!is_null($this->classificacao_id)) {
-            $classificacaopai = self::find($this->classificacao_id);
-            if (!$classificacaopai->exists()) {
-                $errors['classificacao_id'] = __('messagens.classificacaopai_not_found');
-            } elseif (!is_null($classificacaopai->classificacao_id)) {
+            $classificacaopai = $this->classificacao;
+            if (!is_null($classificacaopai) && !is_null($classificacaopai->classificacao_id)) {
                 $errors['classificacao_id'] = __('messagens.classificacaopai_already');
             } elseif ($this->id == $this->classificacao_id) {
                 $errors['classificacao_id'] = __('messagens.classificacaopai_some');

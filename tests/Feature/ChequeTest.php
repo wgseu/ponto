@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Cheque;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class ChequeTest extends TestCase
 {
@@ -60,6 +61,32 @@ class ChequeTest extends TestCase
         $this->assertEquals('2016-12-25 12:15:00', $found_cheque->vencimento);
     }
 
+    public function testFindCheque()
+    {
+        $headers = PrestadorTest::auth();
+        $cheque = factory(Cheque::class)->create();
+        $response = $this->graphfl('find_cheque_id', [
+            'id' => $cheque->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $cheque->id,
+            $response->json('data.cheques.data.0.id')
+        );
+        $this->assertEquals(
+            $cheque->agencia,
+            $response->json('data.cheques.data.0.agencia')
+        );
+        $this->assertEquals(
+            $cheque->conta,
+            $response->json('data.cheques.data.0.conta')
+        );
+        $this->assertEquals(
+            $cheque->valor,
+            $response->json('data.cheques.data.0.valor')
+        );
+    }
+
     public function testUpdateCheque()
     {
         $headers = PrestadorTest::auth();
@@ -86,16 +113,58 @@ class ChequeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cheque_to_delete = factory(Cheque::class)->create();
-        $cheque_to_delete = $this->graphfl('delete_cheque', ['id' => $cheque_to_delete->id], $headers);
+        $this->graphfl('delete_cheque', ['id' => $cheque_to_delete->id], $headers);
         $cheque = Cheque::find($cheque_to_delete->id);
         $this->assertNull($cheque);
     }
 
-    public function testFindCheque()
+    public function testValidateChequeDuplicado()
     {
-        $headers = PrestadorTest::auth();
+        $oldcheque = factory(Cheque::class)->create();
         $cheque = factory(Cheque::class)->create();
-        $response = $this->graphfl('query_cheque', [ 'id' => $cheque->id ], $headers);
-        $this->assertEquals($cheque->id, $response->json('data.cheques.data.0.id'));
+        $cheque->delete();
+        $cheque->agencia =  $oldcheque->agencia;
+        $cheque->conta =  $oldcheque->conta;
+        $cheque->numero =  $oldcheque->numero;
+        $this->expectException(ValidationException::class);
+        $cheque->save();
+    }
+
+    public function testValidateChequeNegativo()
+    {
+        $cheque = factory(Cheque::class)->create();
+        $cheque->valor =  -100;
+        $this->expectException(ValidationException::class);
+        $cheque->save();
+    }
+
+
+    public function testValidateChequeUpdateCancelado()
+    {
+        $cheque = factory(Cheque::class)->create();
+        $cheque->cancelado = true;
+        $cheque->save();
+        $cheque->valor =  1000;
+        $this->expectException(ValidationException::class);
+        $cheque->save();
+    }
+
+    public function testValidateChequeUpdateRecolhido()
+    {
+        $cheque = factory(Cheque::class)->create();
+        $cheque->recolhimento = '2016-12-28 12:30:00';
+        $cheque->save();
+        $cheque->valor =  1000;
+        $this->expectException(ValidationException::class);
+        $cheque->save();
+    }
+
+    public function testValidateChequeCreateCancelado()
+    {
+        $cheque = factory(Cheque::class)->create();
+        $cheque->delete();
+        $cheque->cancelado = true;
+        $this->expectException(ValidationException::class);
+        $cheque->save();
     }
 }

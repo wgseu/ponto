@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Lista;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class ListaTest extends TestCase
 {
@@ -60,19 +61,17 @@ class ListaTest extends TestCase
             'id' => $lista->id,
             'input' => [
                 'descricao' => 'Atualizou',
-                'data_viagem' => '2016-12-28 12:30:00',
             ]
         ], $headers);
         $lista->refresh();
         $this->assertEquals('Atualizou', $lista->descricao);
-        $this->assertEquals('2016-12-28 12:30:00', $lista->data_viagem);
     }
 
     public function testDeleteLista()
     {
         $headers = PrestadorTest::auth();
         $lista_to_delete = factory(Lista::class)->create();
-        $lista_to_delete = $this->graphfl('delete_lista', ['id' => $lista_to_delete->id], $headers);
+        $this->graphfl('delete_lista', ['id' => $lista_to_delete->id], $headers);
         $lista = Lista::find($lista_to_delete->id);
         $this->assertNull($lista);
     }
@@ -82,6 +81,25 @@ class ListaTest extends TestCase
         $headers = PrestadorTest::auth();
         $lista = factory(Lista::class)->create();
         $response = $this->graphfl('query_lista', [ 'id' => $lista->id ], $headers);
-        $this->assertEquals($lista->id, $response->json('data.listas_de_compras.data.0.id'));
+        $this->assertEquals($lista->id, $response->json('data.listas.data.0.id'));
+        $this->assertEquals($lista->descricao, $response->json('data.listas.data.0.descricao'));
+    }
+
+    public function testValidateListaCompraFinalizada()
+    {
+        $lista = factory(Lista::class)->create();
+        $lista->estado = Lista::ESTADO_COMPRADA;
+        $lista->save();
+        $lista->descricao = 'Mercado';
+        $this->expectException(ValidationException::class);
+        $lista->save();
+    }
+
+    public function testValidateListaDataViagemInvalida()
+    {
+        $lista = factory(Lista::class)->create();
+        $lista->data_viagem = '2016-12-25 12:15:00';
+        $this->expectException(ValidationException::class);
+        $lista->save();
     }
 }

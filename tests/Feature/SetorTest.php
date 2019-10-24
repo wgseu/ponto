@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Setor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class SetorTest extends TestCase
 {
@@ -40,12 +41,34 @@ class SetorTest extends TestCase
         $seed_setor =  factory(Setor::class)->create();
         $response = $this->graphfl('create_setor', [
             'input' => [
-                'nome' => 'Teste',
+                'nome' => 'Cozinha',
             ]
         ], $headers);
 
         $found_setor = Setor::findOrFail($response->json('data.CreateSetor.id'));
-        $this->assertEquals('Teste', $found_setor->nome);
+        $this->assertEquals('Cozinha', $found_setor->nome);
+    }
+
+    public function testFindSetor()
+    {
+        $headers = PrestadorTest::auth();
+        $setor = factory(Setor::class)->create();
+        $response = $this->graphfl('find_setor_id', [
+            'id' => $setor->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $setor->id,
+            $response->json('data.setores.data.0.id')
+        );
+        $this->assertEquals(
+            $setor->nome,
+            $response->json('data.setores.data.0.nome')
+        );
+        $this->assertEquals(
+            $setor->nome,
+            $response->json('data.setores.data.0.nome')
+        );
     }
 
     public function testUpdateSetor()
@@ -66,16 +89,41 @@ class SetorTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $setor_to_delete = factory(Setor::class)->create();
-        $setor_to_delete = $this->graphfl('delete_setor', ['id' => $setor_to_delete->id], $headers);
+        $this->graphfl('delete_setor', ['id' => $setor_to_delete->id], $headers);
         $setor = Setor::find($setor_to_delete->id);
         $this->assertNull($setor);
     }
 
-    public function testFindSetor()
+    public function testValidateSetorCreateSubsetor()
     {
-        $headers = PrestadorTest::auth();
+        $setorPai = factory(Setor::class)->create();
+        $subsetor = factory(Setor::class)->create();
+        $subsetor->setor_id = $setorPai->id;
+        $subsetor->save();
         $setor = factory(Setor::class)->create();
-        $response = $this->graphfl('query_setor', [ 'id' => $setor->id ], $headers);
-        $this->assertEquals($setor->id, $response->json('data.setores.data.0.id'));
+        $setor->delete();
+        $setor->setor_id = $subsetor->id;
+        $this->expectException(ValidationException::class);
+        $setor->save();
+    }
+
+    public function testValidateSetorUpdateSubsetorEleMesmo()
+    {
+        $setor = factory(Setor::class)->create();
+        $setor->setor_id = $setor->id;
+        $this->expectException(ValidationException::class);
+        $setor->save();
+    }
+
+    public function testValidateSetorUpdateSubsetorDoSetorpai()
+    {
+        $setorPai = factory(Setor::class)->create();
+        $subsetor = factory(Setor::class)->create();
+        $subsetor->setor_id = $setorPai->id;
+        $subsetor->save();
+        $setor = factory(Setor::class)->create();
+        $setorPai->setor_id = $setor->id;
+        $this->expectException(ValidationException::class);
+        $setorPai->save();
     }
 }

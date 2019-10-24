@@ -85,16 +85,15 @@ class Bairro extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cidade', 'cidade_id');
     }
 
-
     /**
      * Regras:
-     * Se não nulos o tempo de entrega minimo não pode ser superior ao tempo de entrega maximo;
+     * Se não nulas o prazo de  entrega minima não pode ser superior ao prazo de entrega maximo;
      * O valor da entrega não pode ser negativo.
      */
     public function validate()
     {
         $errors = [];
-        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima) ) {
+        if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima)) {
             if ($this->entrega_minima > $this->entrega_maxima) {
                 $errors['entrega_minima'] = __('messagens.error_time_delivery');
             }

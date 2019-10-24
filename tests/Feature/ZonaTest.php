@@ -1,34 +1,12 @@
 <?php
 
-/**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
- *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
- * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
- * DISPOSIÇÕES GERAIS
- * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
- * ou outros avisos ou restrições de propriedade do GrandChef.
- *
- * O cliente não deverá causar ou permitir a engenharia reversa, desmontagem,
- * ou descompilação do GrandChef.
- *
- * PROPRIEDADE DOS DIREITOS AUTORAIS DO PROGRAMA
- *
- * GrandChef é a especialidade do desenvolvedor e seus
- * licenciadores e é protegido por direitos autorais, segredos comerciais e outros direitos
- * de leis de propriedade.
- *
- * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
- * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
- *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
- */
-
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Zona;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
 
 class ZonaTest extends TestCase
 {
@@ -41,15 +19,29 @@ class ZonaTest extends TestCase
         $response = $this->graphfl('create_zona', [
             'input' => [
                 'bairro_id' => $seed_zona->bairro_id,
-                'nome' => 'Teste',
-                'adicional_entrega' => 1.50,
+                'nome' => 'Zona 3',
+                'adicional_entrega' => 1,
             ]
         ], $headers);
 
         $found_zona = Zona::findOrFail($response->json('data.CreateZona.id'));
         $this->assertEquals($seed_zona->bairro_id, $found_zona->bairro_id);
-        $this->assertEquals('Teste', $found_zona->nome);
-        $this->assertEquals(1.50, $found_zona->adicional_entrega);
+        $this->assertEquals('Zona 3', $found_zona->nome);
+        $this->assertEquals(1, $found_zona->adicional_entrega);
+    }
+
+    public function testFindZona()
+    {
+        $headers = PrestadorTest::auth();
+        $zona = factory(Zona::class)->create();
+        $response = $this->graphfl('find_zona_id', [
+            'id' => $zona->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $zona->nome,
+            $response->json('data.zonas.data.0.nome')
+        );
     }
 
     public function testUpdateZona()
@@ -59,29 +51,40 @@ class ZonaTest extends TestCase
         $this->graphfl('update_zona', [
             'id' => $zona->id,
             'input' => [
-                'nome' => 'Atualizou',
-                'adicional_entrega' => 1.50,
-            ]
+                'nome' => 'Area 51',
+                'adicional_entrega' => 20,
+                'disponivel' => true,
+              ]
         ], $headers);
         $zona->refresh();
-        $this->assertEquals('Atualizou', $zona->nome);
-        $this->assertEquals(1.50, $zona->adicional_entrega);
+        $this->assertEquals('Area 51', $zona->nome);
+        $this->assertEquals(20, $zona->adicional_entrega);
+        $this->assertEquals(true, $zona->disponivel);
     }
-
+    
     public function testDeleteZona()
     {
         $headers = PrestadorTest::auth();
         $zona_to_delete = factory(Zona::class)->create();
-        $zona_to_delete = $this->graphfl('delete_zona', ['id' => $zona_to_delete->id], $headers);
+        $this->graphfl('delete_zona', ['id' => $zona_to_delete->id], $headers);
         $zona = Zona::find($zona_to_delete->id);
         $this->assertNull($zona);
     }
 
-    public function testFindZona()
+    public function testValidateZonaPrazoEntregaInvalido()
     {
-        $headers = PrestadorTest::auth();
         $zona = factory(Zona::class)->create();
-        $response = $this->graphfl('query_zona', [ 'id' => $zona->id ], $headers);
-        $this->assertEquals($zona->id, $response->json('data.zonas.data.0.id'));
+        $zona->entrega_minima = 4;
+        $zona->entrega_maxima = 2;
+        $this->expectException(ValidationException::class);
+        $zona->save();
+    }
+
+    public function testValidateZonaAdicionalNegativo()
+    {
+        $zona = factory(Zona::class)->create();
+        $zona->adicional_entrega = -5;
+        $this->expectException(ValidationException::class);
+        $zona->save();
     }
 }

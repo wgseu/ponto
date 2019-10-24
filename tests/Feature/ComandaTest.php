@@ -28,7 +28,9 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Comanda;
+use App\Models\Pedido;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class ComandaTest extends TestCase
 {
@@ -48,6 +50,28 @@ class ComandaTest extends TestCase
         $found_comanda = Comanda::findOrFail($response->json('data.CreateComanda.id'));
         $this->assertEquals(1, $found_comanda->numero);
         $this->assertEquals('Teste', $found_comanda->nome);
+    }
+
+    public function testFindComanda()
+    {
+        $headers = PrestadorTest::auth();
+        $comanda = factory(Comanda::class)->create();
+        $response = $this->graphfl('find_comanda_id', [
+            'id' => $comanda->id,
+        ], $headers);
+
+        $this->assertEquals(
+            $comanda->id,
+            $response->json('data.comandas.data.0.id')
+        );
+        $this->assertEquals(
+            $comanda->nome,
+            $response->json('data.comandas.data.0.nome')
+        );
+        $this->assertEquals(
+            $comanda->numero,
+            $response->json('data.comandas.data.0.numero')
+        );
     }
 
     public function testUpdateComanda()
@@ -70,16 +94,28 @@ class ComandaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $comanda_to_delete = factory(Comanda::class)->create();
-        $comanda_to_delete = $this->graphfl('delete_comanda', ['id' => $comanda_to_delete->id], $headers);
+        $this->graphfl('delete_comanda', ['id' => $comanda_to_delete->id], $headers);
         $comanda = Comanda::find($comanda_to_delete->id);
         $this->assertNull($comanda);
     }
 
-    public function testFindComanda()
+    public function testValidateComandaCancelarComandaPedido()
     {
-        $headers = PrestadorTest::auth();
         $comanda = factory(Comanda::class)->create();
-        $response = $this->graphfl('query_comanda', [ 'id' => $comanda->id ], $headers);
-        $this->assertEquals($comanda->id, $response->json('data.comandas.data.0.id'));
+        $pedido = factory(Pedido::class)->create();
+        $pedido->comanda_id = $comanda->id;
+        $pedido->save();
+        $comanda->ativa = false;
+        $this->expectException(ValidationException::class);
+        $comanda->save();
+    }
+
+    public function testValidateComandaCreateCancelado()
+    {
+        $comanda = factory(Comanda::class)->create();
+        $comanda->delete();
+        $comanda->ativa = false;
+        $this->expectException(ValidationException::class);
+        $comanda->save();
     }
 }

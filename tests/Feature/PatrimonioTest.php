@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Patrimonio;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 class PatrimonioTest extends TestCase
 {
@@ -76,16 +77,65 @@ class PatrimonioTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $patrimonio_to_delete = factory(Patrimonio::class)->create();
-        $patrimonio_to_delete = $this->graphfl('delete_patrimonio', ['id' => $patrimonio_to_delete->id], $headers);
+        $this->graphfl('delete_patrimonio', ['id' => $patrimonio_to_delete->id], $headers);
         $patrimonio = Patrimonio::find($patrimonio_to_delete->id);
         $this->assertNull($patrimonio);
     }
 
-    public function testFindPatrimonio()
+    public function testValidadePatrimonioQuantidadeNegativa()
     {
-        $headers = PrestadorTest::auth();
         $patrimonio = factory(Patrimonio::class)->create();
-        $response = $this->graphfl('query_patrimonio', [ 'id' => $patrimonio->id ], $headers);
-        $this->assertEquals($patrimonio->id, $response->json('data.patrimonios.data.0.id'));
+        $patrimonio->quantidade = -50;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonioAlturaNegativa()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->altura = -100;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonioLarguraNegativa()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->largura = -150;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonioComprimentoNegativa()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->comprimento = -5;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonioCustoNegativa()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->custo = -10;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonioValorNegativa()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->valor = -50;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
+    }
+
+    public function testValidadePatrimonio()
+    {
+        $patrimonio = factory(Patrimonio::class)->create();
+        $patrimonio->delete();
+        $patrimonio->ativo = false;
+        $this->expectException(ValidationException::class);
+        $patrimonio->save();
     }
 }

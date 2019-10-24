@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -52,6 +53,13 @@ class Pais extends Model implements ValidateInterface
     public $timestamps = false;
 
     /**
+     * Setting model
+     * 
+     * @var App\Models\Settings
+     */
+    public $paisSettings;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -75,6 +83,22 @@ class Pais extends Model implements ValidateInterface
     protected $attributes = [
         'unitario' => false,
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->paisSettings = new Settings();
+    }
+
+    public function loadPais()
+    {
+        $this->paisSettings->addValues(json_decode(base64_decode($this->entradas)));
+    }
+
+    public function applyPais()
+    {
+        $this->entradas = base64_encode(json_encode($this->paisSettings->getValues()));
+    }
 
     /**
      * Informa a moeda principal do país

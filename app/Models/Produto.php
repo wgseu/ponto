@@ -26,11 +26,12 @@
 
 namespace App\Models;
 
+use App\Models\Item;
 use App\Concerns\ModelEvents;
+use App\Exceptions\MySafeException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Informações sobre o produto, composição ou pacote
@@ -165,7 +166,7 @@ class Produto extends Model implements ValidateInterface
             $errors['tipo'] = __('messages.produto_already_packaged');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw new MySafeException(json_encode($errors));
         }
     }
 }

@@ -12,7 +12,7 @@ $factory->define(Pais::class, function (Faker $faker) {
         'nome' => $faker->unique()->name,
         'sigla' => $faker->unique()->word,
         'codigo' => $faker->unique()->word,
-        'moeda_id' => $moeda->id,
+        'moeda_id' => $moeda_id->id,
         'idioma' => $faker->unique()->word,
     ];
 });

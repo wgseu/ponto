@@ -607,4 +607,7 @@ return [
     'mozambique_initials' => 'MOZ',
     'mozambique_code' => 'MZ',
     'token_or_user_invalid' => 'Token inválido ou usuário não está cadastrado',
+    'not_found_company' => 'Empresa não encontrada',
+    'cnpj_invalid' => 'CNPJ inválido',
+    'cpf_invalid' => 'CPF inválido',
 ];

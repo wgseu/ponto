@@ -571,6 +571,14 @@ return [
     'cheddar_border' => 'Borda de Cheddar',
     'cheddar' => 'Cheddar',
 
+    'size' => 'Tamanho',
+    'flavors' => 'Sabores',
+    'border' => 'Borda',
+
+    'small' => 'Pequena',
+    'medium' => 'Média',
+    'large' => 'Grande',
+
     'real' => 'Real',
     'symbol_real' => 'R$',
     'code_real' => 'BRL',

@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             MoedaSeeder::class,
             ProdutoSeeder::class,
             ComposicaoSeeder::class,
+            GrupoSeeder::class,
+            PropriedadeSeeder::class,
+            PacoteSeeder::class,
             PaisSeeder::class,
         ]);
     }

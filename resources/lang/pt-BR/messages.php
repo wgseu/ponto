@@ -646,4 +646,10 @@ return [
     'moeda_conversion_cannot_negative_zero' => 'A conversão não pode ser negativa ou nula',
     'moeda_invalid_format' => 'O formato da moeda deve possuir simbolo, espaço e :value',
     'moeda_invalid_divisao' => 'A divisao deve conter um valor valido',
+    'not_found_company' => 'Empresa não encontrada',
+    'cnpj_invalid' => 'CNPJ inválido',
+    'cpf_invalid' => 'CPF inválido',
+    'tipo_cannot_change' => 'Tipo não pode ser mudado poís já esta sendo usado',
+    'minimum_installments_not_allowed' => 'As parcelas sem juros não podem ser menores que o mínimo de parcelas',
+    'maximum_portion_allows' => 'O máximo de parcelas não pode ser menor que o mínimo de parcelas',
 ];

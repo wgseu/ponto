@@ -29,11 +29,13 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\ValidateUpdateInterface;
+use App\Exceptions\SafeValidationException;
 
 /**
  * Formas de pagamento disponíveis para pedido e contas
  */
-class Forma extends Model implements ValidateInterface
+class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -101,5 +103,35 @@ class Forma extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->parcelas_sem_juros) &&
+            !is_null($this->min_parcelas) &&
+            $this->parcelas_sem_juros < $this->min_parcelas
+        ) {
+            $errors['parcelassemjuros'] = __('minimum_installments_not_allowed');
+        }
+        if (
+            !is_null($this->min_parcelas) &&
+            !is_null($this->max_parcelas) &&
+            $this->min_parcelas > $this->max_parcelas
+        ) {
+            $errors['maxparcelas'] = __('maximum_portion_allows');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old_forma = self::find($this->id);
+        $count = Pagamento::where('forma_id', $this->id)->count();
+        if ($old_forma->exists() && $count > 0 && $old_forma->tipo != $this->tipo) {
+            $errors['tipo'] = __('messages.tipo_cannot_change');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

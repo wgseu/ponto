@@ -58,10 +58,12 @@ class FormaInput extends InputType
             'min_parcelas' => [
                 'type' => Type::int(),
                 'description' => 'Quantidade mínima de parcelas',
+                'rules' => ['min:1'],
             ],
             'max_parcelas' => [
                 'type' => Type::int(),
                 'description' => 'Quantidade máxima de parcelas',
+                'rules' => ['min:1'],
             ],
             'parcelas_sem_juros' => [
                 'type' => Type::int(),

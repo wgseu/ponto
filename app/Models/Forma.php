@@ -108,14 +108,14 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
             !is_null($this->min_parcelas) &&
             $this->parcelas_sem_juros < $this->min_parcelas
         ) {
-            $errors['parcelassemjuros'] = __('minimum_installments_not_allowed');
+            $errors['parcelas_sem_juros'] = __('minimum_installments_not_allowed');
         }
         if (
             !is_null($this->min_parcelas) &&
             !is_null($this->max_parcelas) &&
             $this->min_parcelas > $this->max_parcelas
         ) {
-            $errors['maxparcelas'] = __('maximum_portion_allows');
+            $errors['max_parcelas'] = __('maximum_portion_allows');
         }
         if (!empty($errors)) {
             throw SafeValidationException::withMessages($errors);

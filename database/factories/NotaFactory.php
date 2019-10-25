@@ -4,6 +4,7 @@
 
 use App\Models\Nota;
 use Faker\Generator as Faker;
+use Illuminate\Support\Carbon;
 
 $factory->define(Nota::class, function (Faker $faker) {
     return [

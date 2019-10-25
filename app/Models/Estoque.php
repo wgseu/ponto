@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Estoque de produtos por setor
@@ -143,7 +144,65 @@ class Estoque extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
     }
 
+    /**
+     * Regras:
+     * É obrigatório informar apenas um requisito, ou uma transação.
+     * A entrada_id deve ter um requisito_id relacionado.
+     * O produto deve ser do tipo produto;
+     * Se o produto é indivisivel a quantidade não póde ser float;
+     * Se for entrada de produto a quantidade não pode ser negativa;
+     * Se for saida de produto a quantidade não pode ser positiva;
+     * Se cancelado não pode ser alterado;
+     * Se usado em uma entrada o produto não pode ser cancelado;
+     * Não pode criar já cancelado.
+     */
     public function validate()
     {
+        $errors = [];
+        $produto = Produto::find($this->produto_id);
+        $entrada = self::find($this->entrada_id);
+        if (is_null($this->requisito_id) && is_null($this->transacao_id)) {
+            $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
+        }
+        if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
+            $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
+        }
+        if (!is_null($entrada) && is_null($entrada->requisito_id)) {
+            $errors['entrada_id'] = __('messages.entrada_cannot_trasacao');
+        }
+        if ($produto->tipo != Produto::TIPO_PRODUTO) {
+            $errors['produto_id'] = __('messages.is_not_product');
+        }
+        if (fmod($this->quantidade, 1) > 0 && !$produto->divisivel) {
+            $errors['produto_id'] = __('messages.produto_indivisible');
+        }
+        if (!is_null($this->requisito_id) && $this->quantidade <= 0) {
+            $errors['requisito_id'] = __('messages.quantidade_cannot_less_0');
+        }
+        if (!is_null($this->transacao_id) && $this->quantidade >= 0) {
+            $errors['transacao_id'] = __('messages.quantidade_cannot_greater_0');
+        }
+        if ($this->exists) {
+            $oldEstoque = $this->fresh();
+            if ($oldEstoque->cancelado) {
+                $errors['cancelado'] = __('messages.estoque_already_canceled');
+            } else {
+                $entrada = self::where('entrada_id', $this->id)
+                    ->where('cancelado', false);
+                if ($entrada->exists() && $this->cancelado) {
+                    $errors['cancelado'] = __('messages.used_cannot_cancel');
+                }
+            }
+        } else {
+            if ($this->cancelado) {
+                $errors['cancelado'] = __('messages.estoque_new_canceled');
+            }
+        }
+        if ($this->valor_compra < 0) {
+            $errors['valor_compra'] = __('messages.valor_compra_negative');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

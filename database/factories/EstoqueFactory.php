@@ -4,6 +4,7 @@
 
 use App\Models\Estoque;
 use App\Models\Produto;
+use App\Models\Requisito;
 use App\Models\Setor;
 use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
@@ -11,10 +12,12 @@ use Faker\Generator as Faker;
 $factory->define(Estoque::class, function (Faker $faker) {
     $produto_id = factory(Produto::class)->create();
     $setor_id = factory(Setor::class)->create();
+    $requisito_id = factory(Requisito::class)->create();
     return [
         'produto_id' => $produto_id->id,
         'setor_id' => $setor_id->id,
-        'quantidade' => 2.30,
+        'requisito_id' => $requisito_id->id,
+        'quantidade' => 2,
         'data_movimento' => Carbon::now(),
     ];
 });

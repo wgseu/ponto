@@ -69,7 +69,7 @@ class PaisTest extends TestCase
                 'idioma' => 'RU',
                 'entradas' => '{
                     "cnpj": {
-                        "mascaras" : 999.999/9999-9
+                        "mascaras" : "999.999/9999-9"
                     }
                 }'
             ]

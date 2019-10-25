@@ -92,7 +92,7 @@ class Pais extends Model implements ValidateInterface
 
     public function loadEntries()
     {
-        $this->entries->addValues(json_decode(base64_decode($this->entradas)));
+        $this->entries->addValues(json_decode(base64_decode($this->entradas), true));
     }
 
     public function applyEntries()

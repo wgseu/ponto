@@ -27,9 +27,10 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Exceptions\MySafeException;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Moedas financeiras de um país
@@ -82,7 +83,7 @@ class Moeda extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $value = strpos($this->formato, '{value}');
+        $value = strpos($this->formato, ':value');
         $lista = [1,10,100,1000,10000];
         if ($this->ativa == true) {
             if (is_null($this->conversao)) {
@@ -96,7 +97,7 @@ class Moeda extends Model implements ValidateInterface
             $errors['divisao'] = __('messages.moeda_invalid_divisao');
         }
         if (!empty($errors)) {
-            throw new MySafeException(json_encode($errors));
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

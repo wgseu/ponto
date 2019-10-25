@@ -28,7 +28,7 @@ namespace App\Models;
 
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
-use App\Exceptions\MySafeException;
+use App\Exceptions\SafeValidationException;
 use Illuminate\Foundation\Auth\User;
 use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -190,7 +190,7 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
             }
         }
         if (!empty($errors)) {
-            throw new MySafeException(json_encode($errors));
+            throw SafeValidationException::withMessages($errors);
         }
     }
 

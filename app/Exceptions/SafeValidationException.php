@@ -2,10 +2,10 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
+use Illuminate\Validation\ValidationException;
 
-class MySafeException extends Exception implements ClientAware
+class SafeValidationException extends ValidationException implements ClientAware
 {
     public function isClientSafe()
     {

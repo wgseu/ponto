@@ -67,11 +67,11 @@ class PaisTest extends TestCase
                 'sigla' => 'RUS',
                 'codigo' => 'RS',
                 'idioma' => 'RU',
-                'entradas' => "[{
-                    'cnpj': {
-                        'mascaras': 999.999/9999-9
+                'entradas' => '{
+                    "cnpj": {
+                        "mascaras" : 999.999/9999-9
                     }
-                }]"
+                }'
             ]
         ], $headers);
         $pais->refresh();

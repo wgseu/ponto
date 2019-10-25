@@ -57,7 +57,7 @@ class Pais extends Model implements ValidateInterface
      * 
      * @var App\Models\Settings
      */
-    public $paisSettings;
+    public $entries;
 
     /**
      * The attributes that are mass assignable.
@@ -87,17 +87,17 @@ class Pais extends Model implements ValidateInterface
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->paisSettings = new Settings();
+        $this->entries = new Settings();
     }
 
-    public function loadPais()
+    public function loadEntries()
     {
-        $this->paisSettings->addValues(json_decode(base64_decode($this->entradas)));
+        $this->entries->addValues(json_decode(base64_decode($this->entradas)));
     }
 
-    public function applyPais()
+    public function applyEntries()
     {
-        $this->entradas = base64_encode(json_encode($this->paisSettings->getValues()));
+        $this->entradas = base64_encode(json_encode($this->entries->getValues()));
     }
 
     /**

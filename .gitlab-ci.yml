@@ -4,11 +4,6 @@ stages:
   # - staging
   # - release
 
-variables:
-  CONTAINER_IMAGE: "gcr.io/${GCLOUD_PROJECT}/grandchef-product"
-  CONTAINER_IMAGE_TAG: "${CONTAINER_IMAGE}:latest"
-  CONTAINER_IMAGE_TAG_BETA: "${CONTAINER_IMAGE}:beta"
-
 test:
   stage: test
   image: composer:1.6.5
@@ -88,10 +83,14 @@ build:
     - cp -r build/dist/spa/* public/
     - echo "App artifacts successful downloaded from $APP_REF"
 
+    - export CONTAINER_IMAGE="gcr.io/$GCLOUD_PROJECT/grandchef-product"
+    - export CONTAINER_IMAGE_TAG="$CONTAINER_IMAGE:latest"
+    - export CONTAINER_IMAGE_TAG_BETA="$CONTAINER_IMAGE:beta"
+
   script:
     - echo "$GCR_KEYFILE" > ./gcr-api-key.json
     - gcloud auth activate-service-account --key-file gcr-api-key.json
     - gcloud config set project $GCLOUD_PROJECT
     - cat gcr-api-key.json | docker login -u _json_key --password-stdin https://gcr.io
-    - docker build -t "${CONTAINER_IMAGE_TAG_BETA}" .
-    - docker push "${CONTAINER_IMAGE_TAG_BETA}"
+    - docker build -t "$CONTAINER_IMAGE_TAG_BETA" .
+    - docker push "$CONTAINER_IMAGE_TAG_BETA"

@@ -58,6 +58,10 @@ test:
 build:
   stage: build
   image: google/cloud-sdk:slim
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_TLS_CERTDIR: ""
   services:
     - docker:dind
   only:
@@ -66,13 +70,13 @@ build:
       - master
 
   before_script:
-    - apt-get update -yq
-    - apt-get install jq unzip -yq
+    - apt-get update -yq &> /dev/null
+    - apt-get install jq unzip -yq &> /dev/null
 
     - 'LAST_APP_TAG=`curl -f -S -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/repository/tags?per_page=1" | jq -r ".[0].name"`'
     - if [ "$CI_COMMIT_REF_NAME" = "master" ]; then APP_REF="master"; else APP_REF="$LAST_APP_TAG"; fi
     - 'curl -f -s -L -o app.zip -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/jobs/artifacts/$APP_REF/download?job=build"'
-    - unzip app.zip -d build
+    - unzip -q app.zip -d build
     - cp -r build/dist/spa/* public/
     - echo "App artifacts successful downloaded from $APP_REF"
 

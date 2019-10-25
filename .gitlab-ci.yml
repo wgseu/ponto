@@ -57,19 +57,22 @@ test:
 
 build:
   stage: build
-  image: google/cloud-sdk:268.0.0-slim
+  image: docker:19.03
   variables:
     DOCKER_TLS_CERTDIR: ""
   services:
-    - docker:17.12-dind
+    - docker:19.03-dind
   only:
     refs:
       - tags
       - master
 
   before_script:
+    - docker info
     - apt-get update -yq &> /dev/null
-    - apt-get install jq unzip -yq &> /dev/null
+    - apt-get install jq unzip curl python which bash -yq &> /dev/null
+    - curl -sSL https://sdk.cloud.google.com | bash
+    - PATH=$PATH:/root/google-cloud-sdk/bin
 
     - 'LAST_APP_TAG=`curl -f -S -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/repository/tags?per_page=1" | jq -r ".[0].name"`'
     - if [ "$CI_COMMIT_REF_NAME" = "master" ]; then APP_REF="master"; else APP_REF="$LAST_APP_TAG"; fi
@@ -82,7 +85,6 @@ build:
     - echo "$GCR_KEYFILE" > ./gcr-api-key.json
     - gcloud auth activate-service-account --key-file gcr-api-key.json
     - gcloud config set project $GCLOUD_PROJECT
-    - docker info
     - cat gcr-api-key.json | docker login -u _json_key --password-stdin https://gcr.io
     - docker build -t "${CONTAINER_IMAGE_TAG_BETA}" .
     - docker push "${CONTAINER_IMAGE_TAG_BETA}"

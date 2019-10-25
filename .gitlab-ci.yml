@@ -69,8 +69,15 @@ build:
 
   before_script:
     - docker info
-    - apt-get update -yq &> /dev/null
-    - apt-get install jq unzip curl python which bash -yq &> /dev/null
+    - apk update &> /dev/null
+    - apk upgrade &> /dev/null
+    - apk add --no-cache
+      jq
+      unzip
+      curl
+      python
+      which
+      bash &> /dev/null
     - curl -sSL https://sdk.cloud.google.com | bash
     - PATH=$PATH:/root/google-cloud-sdk/bin
 

@@ -68,15 +68,15 @@ yarn dev
 
 Cria uma imagem do docker
 ```sh
-docker build -t gcr.io/upheld-setting-221119/grandchef-product-api:v2.0 .
+docker build -t gcr.io/upheld-setting-221119/grandchef-product:beta .
 ```
 
 Envia nova versão para repositório
 ```sh
-docker push gcr.io/upheld-setting-221119/grandchef-product-api:v2.0
+docker push gcr.io/upheld-setting-221119/grandchef-product:beta
 ```
 
 Roda o container e aguarda
 ```sh
-docker run -it -e CONTAINER_ROLE=app gcr.io/upheld-setting-221119/grandchef-product-api:v2.0
+docker run -it -e CONTAINER_ROLE=app gcr.io/upheld-setting-221119/grandchef-product:beta
 ```

@@ -20,7 +20,7 @@ class MoedaSeeder extends Seeder
             'fracao' => __('messages.fraction_real'),
             'formato' => __('messages.format_real'),
             'conversao' => 1,
-            'ativa' => 1
+            'ativa' => true,
         ]))->save();
         (new Moeda([
             'nome' => __('messages.dollar'),
@@ -29,8 +29,8 @@ class MoedaSeeder extends Seeder
             'divisao' => 100,
             'fracao' => __('messages.fraction_dollar'),
             'formato' => __('messages.format_dollar'),
-            'conversao' => null,
-            'ativa' => 0
+            'conversao' => 1,
+            'ativa' => false,
         ]))->save();
         (new Moeda([
             'nome' => __('messages.euro'),
@@ -39,8 +39,8 @@ class MoedaSeeder extends Seeder
             'divisao' => 100,
             'fracao' => __('messages.fraction_euro'),
             'formato' => __('messages.format_euro'),
-            'conversao' => null,
-            'ativa' => 0
+            'conversao' => 1,
+            'ativa' => false,
         ]))->save();
         (new Moeda([
             'nome' => __('messages.metical'),
@@ -49,8 +49,8 @@ class MoedaSeeder extends Seeder
             'divisao' => 100,
             'fracao' => __('messages.fraction_metical'),
             'formato' => __('messages.format_metical'),
-            'conversao' => null,
-            'ativa' => 0
+            'conversao' => 1,
+            'ativa' => false,
         ]))->save();
     }
 }

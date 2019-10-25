@@ -1,0 +1,77 @@
+stages:
+  - test
+  - build
+  # - staging
+  # - release
+
+variables:
+  CONTAINER_IMAGE: gcr.io/$GCLOUD_PROJECT/grandchef-product
+  CONTAINER_IMAGE_TAG: "${CONTAINER_IMAGE}:latest"
+  CONTAINER_IMAGE_TAG_BETA: "${CONTAINER_IMAGE}:beta"
+
+test:
+  stage: test
+  image: composer:1.6.5
+
+  before_script:
+    - apk update &> /dev/null
+    - apk upgrade &> /dev/null
+    - apk add --no-cache
+      g++
+      make
+      autoconf
+      freetype
+      libpng
+      libjpeg
+      freetype-dev
+      libpng-dev
+      jpeg-dev &> /dev/null
+    - docker-php-ext-configure gd
+      --with-freetype-dir=/usr/lib/
+      --with-png-dir=/usr/lib/
+      --with-jpeg-dir=/usr/lib/
+      --with-gd &> /dev/null
+    - pecl install xdebug &> /dev/null
+    - docker-php-ext-enable xdebug &> /dev/null
+    - docker-php-ext-install gd &> /dev/null
+    - composer config -g cache-dir .composer-cache
+    - composer global require hirak/prestissimo
+
+  script:
+    - composer install --ignore-platform-reqs --no-interaction
+    # - composer test
+
+  cache:
+    paths:
+      - .composer-cache/
+      - vendor/
+
+build:
+  stage: build
+  image: google/cloud-sdk:slim
+  services:
+    - docker:dind
+  only:
+    refs:
+      - tags
+      - master
+
+  before_script:
+    - apt-get update -yq
+    - apt-get install jq -yq
+
+    - 'LAST_APP_TAG=`curl -f -S -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/repository/tags?per_page=1" | jq -r ".[0].name"`'
+    - if [ "$CI_COMMIT_REF_NAME" = "master" ]; then APP_REF="master"; else APP_REF="$LAST_APP_TAG"; fi
+    - 'curl -f -s -L -o app.zip -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/jobs/artifacts/$APP_REF/download?job=build"'
+    - unzip app.zip -d build
+    - cp -r build/dist/spa/* public/
+    - echo "App artifacts successful downloaded from $APP_REF"
+
+  script:
+    - echo "$GCR_KEYFILE" > ./gcr-api-key.json
+    - gcloud auth activate-service-account --key-file gcr-api-key.json
+    - gcloud config set project $GCLOUD_PROJECT
+    - docker info
+    - cat gcr-api-key.json | docker login -u _json_key --password-stdin https://gcr.io
+    - docker build -t "${CONTAINER_IMAGE_TAG_BETA}" .
+    - docker push "${CONTAINER_IMAGE_TAG_BETA}"

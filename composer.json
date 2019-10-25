@@ -67,6 +67,9 @@
         ],
         "psr-fix": [
             "phpcbf --standard=PSR12 app"
+        ],
+        "test": [
+            "phpunit"
         ]
     }
 }

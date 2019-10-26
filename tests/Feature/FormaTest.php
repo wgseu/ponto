@@ -72,7 +72,7 @@ class FormaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $forma_to_delete = factory(Forma::class)->create();
-        $forma_to_delete = $this->graphfl('delete_forma', ['id' => $forma_to_delete->id], $headers);
+        $this->graphfl('delete_forma', ['id' => $forma_to_delete->id], $headers);
         $forma = Forma::find($forma_to_delete->id);
         $this->assertNull($forma);
     }
@@ -82,6 +82,6 @@ class FormaTest extends TestCase
         $headers = PrestadorTest::auth();
         $forma = factory(Forma::class)->create();
         $response = $this->graphfl('query_forma', [ 'id' => $forma->id ], $headers);
-        $this->assertEquals($forma->id, $response->json('data.formas_de_pagamento.data.0.id'));
+        $this->assertEquals($forma->id, $response->json('data.formas.data.0.id'));
     }
 }

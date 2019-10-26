@@ -28,12 +28,12 @@ namespace App\Models;
 
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use Illuminate\Foundation\Auth\User;
 use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -100,7 +100,7 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
         'imagem_url',
         'linguagem',
     ];
- 
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -129,7 +129,7 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
     {
         return $this->getKey();
     }
- 
+
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
@@ -183,8 +183,14 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
                 $errors['cnpj'] = __('messages.cnpj_invalid');
             }
         }
+        if ($this->empresa_id) {
+            $empresa = Empresa::find($this->empresa_id);
+            if (!$empresa) {
+                $errors['empresa'] = __('messages.not_found_company');
+            }
+        }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 

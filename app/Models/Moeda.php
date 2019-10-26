@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
@@ -111,7 +112,7 @@ class Moeda extends Model implements ValidateInterface
             $errors['divisao'] = __('messages.moeda_invalid_divisao');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

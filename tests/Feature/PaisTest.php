@@ -67,6 +67,11 @@ class PaisTest extends TestCase
                 'sigla' => 'RUS',
                 'codigo' => 'RS',
                 'idioma' => 'RU',
+                'entradas' => '{
+                    "cnpj": {
+                        "mascara" : "999.999/9999-9"
+                    }
+                }'
             ]
         ], $headers);
         $pais->refresh();
@@ -80,7 +85,7 @@ class PaisTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $pais_to_delete = factory(Pais::class)->create();
-        $pais_to_delete = $this->graphfl('delete_pais', ['id' => $pais_to_delete->id], $headers);
+        $this->graphfl('delete_pais', ['id' => $pais_to_delete->id], $headers);
         $pais = Pais::find($pais_to_delete->id);
         $this->assertNull($pais);
     }

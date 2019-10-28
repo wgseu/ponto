@@ -62,19 +62,19 @@ class EnderecoTest extends TestCase
             'id' => $endereco->id,
             'input' => [
                 'logradouro' => 'Atualizou',
-                'cep' => 'Atualizou',
+                'cep' => 'Atualizo',
             ]
         ], $headers);
         $endereco->refresh();
         $this->assertEquals('Atualizou', $endereco->logradouro);
-        $this->assertEquals('Atualizou', $endereco->cep);
+        $this->assertEquals('Atualizo', $endereco->cep);
     }
 
     public function testDeleteEndereco()
     {
         $headers = PrestadorTest::auth();
         $endereco_to_delete = factory(Endereco::class)->create();
-        $endereco_to_delete = $this->graphfl('delete_endereco', ['id' => $endereco_to_delete->id], $headers);
+        $this->graphfl('delete_endereco', ['id' => $endereco_to_delete->id], $headers);
         $endereco = Endereco::find($endereco_to_delete->id);
         $this->assertNull($endereco);
     }

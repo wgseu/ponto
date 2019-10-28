@@ -70,7 +70,7 @@ class RegimeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $regime_to_delete = factory(Regime::class)->create();
-        $regime_to_delete = $this->graphfl('delete_regime', ['id' => $regime_to_delete->id], $headers);
+        $this->graphfl('delete_regime', ['id' => $regime_to_delete->id], $headers);
         $regime = Regime::find($regime_to_delete->id);
         $this->assertNull($regime);
     }

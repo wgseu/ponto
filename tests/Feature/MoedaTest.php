@@ -23,6 +23,7 @@ class MoedaTest extends TestCase
                 'codigo' => '1',
                 'divisao' => 100,
                 'formato' => 'X :value',
+                'conversao' => 1,
             ]
         ], $headers);
 
@@ -78,6 +79,7 @@ class MoedaTest extends TestCase
     {
         $moeda = factory(Moeda::class)->create();
         $moeda->ativa = true;
+        $moeda->conversao = null;
         $this->expectException(ValidationException::class);
         $moeda->save();
     }

@@ -68,7 +68,7 @@ class CidadeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cidade_to_delete = factory(Cidade::class)->create();
-        $cidade_to_delete = $this->graphfl('delete_cidade', ['id' => $cidade_to_delete->id], $headers);
+        $this->graphfl('delete_cidade', ['id' => $cidade_to_delete->id], $headers);
         $cidade = Cidade::find($cidade_to_delete->id);
         $this->assertNull($cidade);
     }

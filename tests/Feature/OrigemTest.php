@@ -70,7 +70,7 @@ class OrigemTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $origem_to_delete = factory(Origem::class)->create();
-        $origem_to_delete = $this->graphfl('delete_origem', ['id' => $origem_to_delete->id], $headers);
+        $this->graphfl('delete_origem', ['id' => $origem_to_delete->id], $headers);
         $origem = Origem::find($origem_to_delete->id);
         $this->assertNull($origem);
     }

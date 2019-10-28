@@ -82,7 +82,7 @@ class AuditoriaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $auditoria_to_delete = factory(Auditoria::class)->create();
-        $auditoria_to_delete = $this->graphfl('delete_auditoria', ['id' => $auditoria_to_delete->id], $headers);
+        $this->graphfl('delete_auditoria', ['id' => $auditoria_to_delete->id], $headers);
         $auditoria = Auditoria::find($auditoria_to_delete->id);
         $this->assertNull($auditoria);
     }

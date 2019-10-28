@@ -82,7 +82,7 @@ class ImpostoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $imposto_to_delete = factory(Imposto::class)->create();
-        $imposto_to_delete = $this->graphfl('delete_imposto', ['id' => $imposto_to_delete->id], $headers);
+        $this->graphfl('delete_imposto', ['id' => $imposto_to_delete->id], $headers);
         $imposto = Imposto::find($imposto_to_delete->id);
         $this->assertNull($imposto);
     }

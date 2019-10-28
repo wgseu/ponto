@@ -74,7 +74,7 @@ class BancoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $banco_to_delete = factory(Banco::class)->create();
-        $banco_to_delete = $this->graphfl('delete_banco', ['id' => $banco_to_delete->id], $headers);
+        $this->graphfl('delete_banco', ['id' => $banco_to_delete->id], $headers);
         $banco = Banco::find($banco_to_delete->id);
         $this->assertNull($banco);
     }

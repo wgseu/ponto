@@ -70,7 +70,7 @@ class ModuloTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $modulo_to_delete = factory(Modulo::class)->create();
-        $modulo_to_delete = $this->graphfl('delete_modulo', ['id' => $modulo_to_delete->id], $headers);
+        $this->graphfl('delete_modulo', ['id' => $modulo_to_delete->id], $headers);
         $modulo = Modulo::find($modulo_to_delete->id);
         $this->assertNull($modulo);
     }

@@ -74,7 +74,7 @@ class LocalizacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $localizacao_to_delete = factory(Localizacao::class)->create();
-        $localizacao_to_delete = $this->graphfl('delete_localizacao', ['id' => $localizacao_to_delete->id], $headers);
+        $this->graphfl('delete_localizacao', ['id' => $localizacao_to_delete->id], $headers);
         $localizacao_to_delete->refresh();
         $this->assertTrue($localizacao_to_delete->trashed());
         $this->assertNotNull($localizacao_to_delete->data_arquivado);

@@ -28,6 +28,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Contagem;
+use App\Models\Produto;
+use App\Models\Setor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ContagemTest extends TestCase
@@ -37,18 +39,19 @@ class ContagemTest extends TestCase
     public function testCreateContagem()
     {
         $headers = PrestadorTest::auth();
-        $seed_contagem =  factory(Contagem::class)->create();
+        $produto_id = factory(Produto::class)->create();
+        $setor_id = factory(Setor::class)->create();
         $response = $this->graphfl('create_contagem', [
             'input' => [
-                'produto_id' => $seed_contagem->produto_id,
-                'setor_id' => $seed_contagem->setor_id,
+                'produto_id' => $produto_id->id,
+                'setor_id' => $setor_id->id,
                 'quantidade' => 1.0,
             ]
         ], $headers);
 
         $found_contagem = Contagem::findOrFail($response->json('data.CreateContagem.id'));
-        $this->assertEquals($seed_contagem->produto_id, $found_contagem->produto_id);
-        $this->assertEquals($seed_contagem->setor_id, $found_contagem->setor_id);
+        $this->assertEquals($produto_id->id, $found_contagem->produto_id);
+        $this->assertEquals($setor_id->id, $found_contagem->setor_id);
         $this->assertEquals(1.0, $found_contagem->quantidade);
     }
 
@@ -70,7 +73,7 @@ class ContagemTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $contagem_to_delete = factory(Contagem::class)->create();
-        $contagem_to_delete = $this->graphfl('delete_contagem', ['id' => $contagem_to_delete->id], $headers);
+        $this->graphfl('delete_contagem', ['id' => $contagem_to_delete->id], $headers);
         $contagem = Contagem::find($contagem_to_delete->id);
         $this->assertNull($contagem);
     }

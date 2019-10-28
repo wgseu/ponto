@@ -26,6 +26,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
+use App\Models\Funcao;
 use Tests\TestCase;
 use App\Models\Prestador;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,6 +44,7 @@ class PrestadorTest extends TestCase
         return [
             'Authorization' => "Bearer $token",
         ];
+        $this->assertEquals(1,1);
     }
 
     /**
@@ -55,12 +58,13 @@ class PrestadorTest extends TestCase
     public function testCreatePrestador()
     {
         $headers = PrestadorTest::auth();
-        $seed_prestador =  factory(Prestador::class)->create();
+        $funcao_id = factory(Funcao::class)->create();
+        $cliente_id = factory(Cliente::class)->create();
         $response = $this->graphfl('create_prestador', [
             'input' => [
                 'codigo' => 'Teste',
-                'funcao_id' => $seed_prestador->funcao_id,
-                'cliente_id' => $seed_prestador->cliente_id,
+                'funcao_id' => $funcao_id->id,
+                'cliente_id' => $cliente_id->id,
             ]
         ], $headers);
 
@@ -88,18 +92,16 @@ class PrestadorTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $prestador_to_delete = factory(Prestador::class)->create();
-        $prestador_to_delete = $this->graphfl('delete_prestador', ['id' => $prestador_to_delete->id], $headers);
+        $this->graphfl('delete_prestador', ['id' => $prestador_to_delete->id], $headers);
         $prestador = Prestador::find($prestador_to_delete->id);
         $this->assertNull($prestador);
     }
 
     public function testQueryPrestador()
     {
-        for ($i = 0; $i < 10; $i++) {
-            factory(Prestador::class)->create();
-        }
         $headers = PrestadorTest::auth();
-        $response = $this->graphfl('query_prestador', [], $headers);
-        $this->assertEquals(10, $response->json('data.prestadores.total'));
+        $prestador = factory(Prestador::class)->create();
+        $response = $this->graphfl('query_prestador', ['id' => $prestador->id], $headers);
+        $this->assertEquals($prestador->id, $response->json('data.prestadores.data.0.id'));
     }
 }

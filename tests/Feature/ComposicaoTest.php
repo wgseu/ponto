@@ -28,6 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Composicao;
+use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ComposicaoTest extends TestCase
@@ -37,18 +38,19 @@ class ComposicaoTest extends TestCase
     public function testCreateComposicao()
     {
         $headers = PrestadorTest::auth();
-        $seed_composicao =  factory(Composicao::class)->create();
+        $composicao_id = factory(Produto::class)->create();
+        $produto_id = factory(Produto::class)->create();
         $response = $this->graphfl('create_composicao', [
             'input' => [
-                'composicao_id' => $seed_composicao->composicao_id,
-                'produto_id' => $seed_composicao->produto_id,
+                'composicao_id' => $composicao_id->id,
+                'produto_id' => $produto_id->id,
                 'quantidade' => 1.0,
             ]
         ], $headers);
 
         $found_composicao = Composicao::findOrFail($response->json('data.CreateComposicao.id'));
-        $this->assertEquals($seed_composicao->composicao_id, $found_composicao->composicao_id);
-        $this->assertEquals($seed_composicao->produto_id, $found_composicao->produto_id);
+        $this->assertEquals($composicao_id->id, $found_composicao->composicao_id);
+        $this->assertEquals($produto_id->id, $found_composicao->produto_id);
         $this->assertEquals(1.0, $found_composicao->quantidade);
     }
 
@@ -70,7 +72,7 @@ class ComposicaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $composicao_to_delete = factory(Composicao::class)->create();
-        $composicao_to_delete = $this->graphfl('delete_composicao', ['id' => $composicao_to_delete->id], $headers);
+        $this->graphfl('delete_composicao', ['id' => $composicao_to_delete->id], $headers);
         $composicao = Composicao::find($composicao_to_delete->id);
         $this->assertNull($composicao);
     }

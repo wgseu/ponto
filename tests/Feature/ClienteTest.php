@@ -66,7 +66,7 @@ class ClienteTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cliente_to_delete = factory(Cliente::class)->create();
-        $cliente_to_delete = $this->graphfl('delete_cliente', ['id' => $cliente_to_delete->id], $headers);
+        $this->graphfl('delete_cliente', ['id' => $cliente_to_delete->id], $headers);
         $cliente = Cliente::find($cliente_to_delete->id);
         $this->assertNull($cliente);
     }

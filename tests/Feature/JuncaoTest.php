@@ -70,7 +70,7 @@ class JuncaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $juncao_to_delete = factory(Juncao::class)->create();
-        $juncao_to_delete = $this->graphfl('delete_juncao', ['id' => $juncao_to_delete->id], $headers);
+        $this->graphfl('delete_juncao', ['id' => $juncao_to_delete->id], $headers);
         $juncao = Juncao::find($juncao_to_delete->id);
         $this->assertNull($juncao);
     }

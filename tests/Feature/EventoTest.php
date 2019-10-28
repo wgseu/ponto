@@ -76,7 +76,7 @@ class EventoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $evento_to_delete = factory(Evento::class)->create();
-        $evento_to_delete = $this->graphfl('delete_evento', ['id' => $evento_to_delete->id], $headers);
+        $this->graphfl('delete_evento', ['id' => $evento_to_delete->id], $headers);
         $evento = Evento::find($evento_to_delete->id);
         $this->assertNull($evento);
     }

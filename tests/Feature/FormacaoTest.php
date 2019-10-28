@@ -58,13 +58,14 @@ class FormacaoTest extends TestCase
             ]
         ], $headers);
         $formacao->refresh();
+        $this->assertEquals(1, $formacao->id);
     }
 
     public function testDeleteFormacao()
     {
         $headers = PrestadorTest::auth();
         $formacao_to_delete = factory(Formacao::class)->create();
-        $formacao_to_delete = $this->graphfl('delete_formacao', ['id' => $formacao_to_delete->id], $headers);
+        $this->graphfl('delete_formacao', ['id' => $formacao_to_delete->id], $headers);
         $formacao = Formacao::find($formacao_to_delete->id);
         $this->assertNull($formacao);
     }

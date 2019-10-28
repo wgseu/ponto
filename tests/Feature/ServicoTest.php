@@ -74,7 +74,7 @@ class ServicoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $servico_to_delete = factory(Servico::class)->create();
-        $servico_to_delete = $this->graphfl('delete_servico', ['id' => $servico_to_delete->id], $headers);
+        $this->graphfl('delete_servico', ['id' => $servico_to_delete->id], $headers);
         $servico = Servico::find($servico_to_delete->id);
         $this->assertNull($servico);
     }

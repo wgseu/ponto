@@ -82,7 +82,7 @@ class ContaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $conta_to_delete = factory(Conta::class)->create();
-        $conta_to_delete = $this->graphfl('delete_conta', ['id' => $conta_to_delete->id], $headers);
+        $this->graphfl('delete_conta', ['id' => $conta_to_delete->id], $headers);
         $conta = Conta::find($conta_to_delete->id);
         $this->assertNull($conta);
     }

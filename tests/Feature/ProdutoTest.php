@@ -74,7 +74,7 @@ class ProdutoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $produto_to_delete = factory(Produto::class)->create();
-        $produto_to_delete = $this->graphfl('delete_produto', ['id' => $produto_to_delete->id], $headers);
+        $this->graphfl('delete_produto', ['id' => $produto_to_delete->id], $headers);
         $produto_to_delete->refresh();
         $this->assertTrue($produto_to_delete->trashed());
         $this->assertNotNull($produto_to_delete->data_arquivado);

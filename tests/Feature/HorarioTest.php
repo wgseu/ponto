@@ -70,7 +70,7 @@ class HorarioTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $horario_to_delete = factory(Horario::class)->create();
-        $horario_to_delete = $this->graphfl('delete_horario', ['id' => $horario_to_delete->id], $headers);
+        $this->graphfl('delete_horario', ['id' => $horario_to_delete->id], $headers);
         $horario = Horario::find($horario_to_delete->id);
         $this->assertNull($horario);
     }

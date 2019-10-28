@@ -72,7 +72,7 @@ class AvaliacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $avaliacao_to_delete = factory(Avaliacao::class)->create();
-        $avaliacao_to_delete = $this->graphfl('delete_avaliacao', ['id' => $avaliacao_to_delete->id], $headers);
+        $this->graphfl('delete_avaliacao', ['id' => $avaliacao_to_delete->id], $headers);
         $avaliacao = Avaliacao::find($avaliacao_to_delete->id);
         $this->assertNull($avaliacao);
     }

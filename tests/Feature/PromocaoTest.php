@@ -37,12 +37,13 @@ class PromocaoTest extends TestCase
     public function testCreatePromocao()
     {
         $headers = PrestadorTest::auth();
-        $seed_promocao =  factory(Promocao::class)->create();
+        $seed_promocao = factory(Promocao::class)->create();
         $response = $this->graphfl('create_promocao', [
             'input' => [
                 'inicio' => 1,
                 'fim' => 1,
                 'valor' => 1.50,
+                'categoria_id' => $seed_promocao->categoria_id
             ]
         ], $headers);
 
@@ -74,7 +75,7 @@ class PromocaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $promocao_to_delete = factory(Promocao::class)->create();
-        $promocao_to_delete = $this->graphfl('delete_promocao', ['id' => $promocao_to_delete->id], $headers);
+        $this->graphfl('delete_promocao', ['id' => $promocao_to_delete->id], $headers);
         $promocao_to_delete->refresh();
         $this->assertTrue($promocao_to_delete->trashed());
         $this->assertNotNull($promocao_to_delete->data_arquivado);

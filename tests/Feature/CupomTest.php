@@ -86,7 +86,7 @@ class CupomTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cupom_to_delete = factory(Cupom::class)->create();
-        $cupom_to_delete = $this->graphfl('delete_cupom', ['id' => $cupom_to_delete->id], $headers);
+        $this->graphfl('delete_cupom', ['id' => $cupom_to_delete->id], $headers);
         $cupom = Cupom::find($cupom_to_delete->id);
         $this->assertNull($cupom);
     }

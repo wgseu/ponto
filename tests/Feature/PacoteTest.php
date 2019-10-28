@@ -70,7 +70,7 @@ class PacoteTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $pacote_to_delete = factory(Pacote::class)->create();
-        $pacote_to_delete = $this->graphfl('delete_pacote', ['id' => $pacote_to_delete->id], $headers);
+        $this->graphfl('delete_pacote', ['id' => $pacote_to_delete->id], $headers);
         $pacote_to_delete->refresh();
         $this->assertTrue($pacote_to_delete->trashed());
         $this->assertNotNull($pacote_to_delete->data_arquivado);

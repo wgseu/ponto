@@ -26,8 +26,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Dispositivo;
 use Tests\TestCase;
 use App\Models\Impressora;
+use App\Models\Setor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ImpressoraTest extends TestCase
@@ -37,19 +39,20 @@ class ImpressoraTest extends TestCase
     public function testCreateImpressora()
     {
         $headers = PrestadorTest::auth();
-        $seed_impressora =  factory(Impressora::class)->create();
+        $dispositivo_id = factory(Dispositivo::class)->create();
+        $setor_id = factory(Setor::class)->create();
         $response = $this->graphfl('create_impressora', [
             'input' => [
-                'dispositivo_id' => $seed_impressora->dispositivo_id,
-                'setor_id' => $seed_impressora->setor_id,
+                'dispositivo_id' => $dispositivo_id->id,
+                'setor_id' => $setor_id->id,
                 'nome' => 'Teste',
                 'modelo' => 'Teste',
             ]
         ], $headers);
 
         $found_impressora = Impressora::findOrFail($response->json('data.CreateImpressora.id'));
-        $this->assertEquals($seed_impressora->dispositivo_id, $found_impressora->dispositivo_id);
-        $this->assertEquals($seed_impressora->setor_id, $found_impressora->setor_id);
+        $this->assertEquals($dispositivo_id->id, $found_impressora->dispositivo_id);
+        $this->assertEquals($setor_id->id, $found_impressora->setor_id);
         $this->assertEquals('Teste', $found_impressora->nome);
         $this->assertEquals('Teste', $found_impressora->modelo);
     }
@@ -74,7 +77,7 @@ class ImpressoraTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $impressora_to_delete = factory(Impressora::class)->create();
-        $impressora_to_delete = $this->graphfl('delete_impressora', ['id' => $impressora_to_delete->id], $headers);
+        $this->graphfl('delete_impressora', ['id' => $impressora_to_delete->id], $headers);
         $impressora = Impressora::find($impressora_to_delete->id);
         $this->assertNull($impressora);
     }

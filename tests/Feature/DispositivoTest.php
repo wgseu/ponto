@@ -70,7 +70,7 @@ class DispositivoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $dispositivo_to_delete = factory(Dispositivo::class)->create();
-        $dispositivo_to_delete = $this->graphfl('delete_dispositivo', ['id' => $dispositivo_to_delete->id], $headers);
+        $this->graphfl('delete_dispositivo', ['id' => $dispositivo_to_delete->id], $headers);
         $dispositivo = Dispositivo::find($dispositivo_to_delete->id);
         $this->assertNull($dispositivo);
     }

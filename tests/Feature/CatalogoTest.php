@@ -28,6 +28,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Catalogo;
+use App\Models\Fornecedor;
+use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CatalogoTest extends TestCase
@@ -37,18 +39,19 @@ class CatalogoTest extends TestCase
     public function testCreateCatalogo()
     {
         $headers = PrestadorTest::auth();
-        $seed_catalogo =  factory(Catalogo::class)->create();
+        $produto_id = factory(Produto::class)->create();
+        $fornecedor_id = factory(Fornecedor::class)->create();
         $response = $this->graphfl('create_catalogo', [
             'input' => [
-                'produto_id' => $seed_catalogo->produto_id,
-                'fornecedor_id' => $seed_catalogo->fornecedor_id,
+                'produto_id' => $produto_id->id,
+                'fornecedor_id' => $fornecedor_id->id,
                 'preco_compra' => 1.50,
             ]
         ], $headers);
 
         $found_catalogo = Catalogo::findOrFail($response->json('data.CreateCatalogo.id'));
-        $this->assertEquals($seed_catalogo->produto_id, $found_catalogo->produto_id);
-        $this->assertEquals($seed_catalogo->fornecedor_id, $found_catalogo->fornecedor_id);
+        $this->assertEquals($produto_id->id, $found_catalogo->produto_id);
+        $this->assertEquals($fornecedor_id->id, $found_catalogo->fornecedor_id);
         $this->assertEquals(1.50, $found_catalogo->preco_compra);
     }
 
@@ -70,7 +73,7 @@ class CatalogoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $catalogo_to_delete = factory(Catalogo::class)->create();
-        $catalogo_to_delete = $this->graphfl('delete_catalogo', ['id' => $catalogo_to_delete->id], $headers);
+        $this->graphfl('delete_catalogo', ['id' => $catalogo_to_delete->id], $headers);
         $catalogo = Catalogo::find($catalogo_to_delete->id);
         $this->assertNull($catalogo);
     }
@@ -80,6 +83,6 @@ class CatalogoTest extends TestCase
         $headers = PrestadorTest::auth();
         $catalogo = factory(Catalogo::class)->create();
         $response = $this->graphfl('query_catalogo', [ 'id' => $catalogo->id ], $headers);
-        $this->assertEquals($catalogo->id, $response->json('data.catalogos_de_produtos.data.0.id'));
+        $this->assertEquals($catalogo->id, $response->json('data.catalogos.data.0.id'));
     }
 }

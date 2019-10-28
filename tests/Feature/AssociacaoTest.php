@@ -116,7 +116,7 @@ class AssociacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $associacao_to_delete = factory(Associacao::class)->create();
-        $associacao_to_delete = $this->graphfl('delete_associacao', ['id' => $associacao_to_delete->id], $headers);
+        $this->graphfl('delete_associacao', ['id' => $associacao_to_delete->id], $headers);
         $associacao = Associacao::find($associacao_to_delete->id);
         $this->assertNull($associacao);
     }

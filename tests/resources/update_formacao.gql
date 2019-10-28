@@ -1,4 +1,5 @@
 mutation updateFormacao($id: ID!, $input: FormacaoUpdateInput!) {
   UpdateFormacao(id: $id, input: $input) {
+    id
   }
 }

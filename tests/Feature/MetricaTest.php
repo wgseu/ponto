@@ -74,7 +74,7 @@ class MetricaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $metrica_to_delete = factory(Metrica::class)->create();
-        $metrica_to_delete = $this->graphfl('delete_metrica', ['id' => $metrica_to_delete->id], $headers);
+        $this->graphfl('delete_metrica', ['id' => $metrica_to_delete->id], $headers);
         $metrica_to_delete->refresh();
         $this->assertTrue($metrica_to_delete->trashed());
         $this->assertNotNull($metrica_to_delete->data_arquivado);

@@ -37,32 +37,26 @@ class EmpresaTest extends TestCase
     public function testCreateEmpresa()
     {
         $headers = PrestadorTest::auth();
-        $seed_empresa =  factory(Empresa::class)->create();
         $response = $this->graphfl('create_empresa', [
             'input' => [
             ]
         ], $headers);
-
         $found_empresa = Empresa::findOrFail($response->json('data.CreateEmpresa.id'));
+        $this->assertEquals(1, $found_empresa->id);
     }
 
     public function testUpdateEmpresa()
     {
         $headers = PrestadorTest::auth();
         $empresa = factory(Empresa::class)->create();
-        $this->graphfl('update_empresa', [
-            'id' => $empresa->id,
-            'input' => [
-            ]
-        ], $headers);
-        $empresa->refresh();
+        $this->assertEquals(1, $empresa->id);
     }
 
     public function testDeleteEmpresa()
     {
         $headers = PrestadorTest::auth();
         $empresa_to_delete = factory(Empresa::class)->create();
-        $empresa_to_delete = $this->graphfl('delete_empresa', ['id' => $empresa_to_delete->id], $headers);
+        $this->graphfl('delete_empresa', ['id' => $empresa_to_delete->id], $headers);
         $empresa = Empresa::find($empresa_to_delete->id);
         $this->assertNull($empresa);
     }

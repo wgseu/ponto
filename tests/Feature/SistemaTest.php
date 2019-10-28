@@ -37,13 +37,12 @@ class SistemaTest extends TestCase
     public function testCreateSistema()
     {
         $headers = PrestadorTest::auth();
-        $seed_sistema =  factory(Sistema::class)->create();
         $response = $this->graphfl('create_sistema', [
             'input' => [
             ]
         ], $headers);
-
         $found_sistema = Sistema::findOrFail($response->json('data.CreateSistema.id'));
+        $this->assertEquals(1, $found_sistema->id);
     }
 
     public function testUpdateSistema()
@@ -56,13 +55,14 @@ class SistemaTest extends TestCase
             ]
         ], $headers);
         $sistema->refresh();
+        $this->assertEquals(1, $sistema->id);
     }
 
     public function testDeleteSistema()
     {
         $headers = PrestadorTest::auth();
         $sistema_to_delete = factory(Sistema::class)->create();
-        $sistema_to_delete = $this->graphfl('delete_sistema', ['id' => $sistema_to_delete->id], $headers);
+        $this->graphfl('delete_sistema', ['id' => $sistema_to_delete->id], $headers);
         $sistema = Sistema::find($sistema_to_delete->id);
         $this->assertNull($sistema);
     }

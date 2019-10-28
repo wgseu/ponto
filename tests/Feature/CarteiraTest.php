@@ -70,7 +70,7 @@ class CarteiraTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $carteira_to_delete = factory(Carteira::class)->create();
-        $carteira_to_delete = $this->graphfl('delete_carteira', ['id' => $carteira_to_delete->id], $headers);
+        $this->graphfl('delete_carteira', ['id' => $carteira_to_delete->id], $headers);
         $carteira = Carteira::find($carteira_to_delete->id);
         $this->assertNull($carteira);
     }

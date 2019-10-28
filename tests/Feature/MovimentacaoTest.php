@@ -72,7 +72,7 @@ class MovimentacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $movimentacao_to_delete = factory(Movimentacao::class)->create();
-        $movimentacao_to_delete = $this->graphfl('delete_movimentacao', ['id' => $movimentacao_to_delete->id], $headers);
+        $this->graphfl('delete_movimentacao', ['id' => $movimentacao_to_delete->id], $headers);
         $movimentacao = Movimentacao::find($movimentacao_to_delete->id);
         $this->assertNull($movimentacao);
     }

@@ -70,7 +70,7 @@ class CompraTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $compra_to_delete = factory(Compra::class)->create();
-        $compra_to_delete = $this->graphfl('delete_compra', ['id' => $compra_to_delete->id], $headers);
+        $this->graphfl('delete_compra', ['id' => $compra_to_delete->id], $headers);
         $compra = Compra::find($compra_to_delete->id);
         $this->assertNull($compra);
     }

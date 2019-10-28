@@ -28,6 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Emitente;
+use App\Models\Regime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class EmitenteTest extends TestCase
@@ -37,15 +38,15 @@ class EmitenteTest extends TestCase
     public function testCreateEmitente()
     {
         $headers = PrestadorTest::auth();
-        $seed_emitente =  factory(Emitente::class)->create();
+        $regime = factory(Regime::class)->create();
         $response = $this->graphfl('create_emitente', [
             'input' => [
-                'regime_id' => $seed_emitente->regime_id,
+                'regime_id' => $regime->id,
             ]
         ], $headers);
 
         $found_emitente = Emitente::findOrFail($response->json('data.CreateEmitente.id'));
-        $this->assertEquals($seed_emitente->regime_id, $found_emitente->regime_id);
+        $this->assertEquals($regime->id, $found_emitente->regime_id);
     }
 
     public function testUpdateEmitente()
@@ -58,13 +59,14 @@ class EmitenteTest extends TestCase
             ]
         ], $headers);
         $emitente->refresh();
+        $this->assertEquals(1, $emitente->id);
     }
 
     public function testDeleteEmitente()
     {
         $headers = PrestadorTest::auth();
         $emitente_to_delete = factory(Emitente::class)->create();
-        $emitente_to_delete = $this->graphfl('delete_emitente', ['id' => $emitente_to_delete->id], $headers);
+        $this->graphfl('delete_emitente', ['id' => $emitente_to_delete->id], $headers);
         $emitente = Emitente::find($emitente_to_delete->id);
         $this->assertNull($emitente);
     }

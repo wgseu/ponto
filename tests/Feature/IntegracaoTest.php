@@ -66,7 +66,7 @@ class IntegracaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $integracao_to_delete = factory(Integracao::class)->create();
-        $integracao_to_delete = $this->graphfl('delete_integracao', ['id' => $integracao_to_delete->id], $headers);
+        $this->graphfl('delete_integracao', ['id' => $integracao_to_delete->id], $headers);
         $integracao = Integracao::find($integracao_to_delete->id);
         $this->assertNull($integracao);
     }

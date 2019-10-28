@@ -1,4 +1,5 @@
 mutation updateEmitente($id: ID!, $input: EmitenteUpdateInput!) {
   UpdateEmitente(id: $id, input: $input) {
+    id
   }
 }

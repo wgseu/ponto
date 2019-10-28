@@ -651,7 +651,7 @@ return [
     'tipo_condominio_required' => 'Se o tipo é condominio o atributo é obrigatório',
     'tipo_apartamento_required' => 'Se o tipo é apartamento o atributo é obrigatório',
     'produto_indivisible' => 'O produtos não é divisível',
-    'is_not_product' => 'O produto informado não é do tipo produto',
+    'tipo_product_cannot_pacote' => 'O produto informado não pode ser do tipo pacote',
     'quantidade_negative' => 'A quantidade não pode ser negativa',
     'estoque_new_canceled' => 'Não é possível inserir no estoque uma entrada cancelada',
     'estoque_already_canceled' => 'Essa movimentação está cancelada e não pode ser alterada',

@@ -148,8 +148,8 @@ class Estoque extends Model implements ValidateInterface
      * Regras:
      * É obrigatório informar apenas um requisito, ou uma transação.
      * A entrada_id deve ter um requisito_id relacionado.
-     * O produto deve ser do tipo produto;
-     * Se o produto é indivisivel a quantidade não póde ser float;
+     * O produto não pode ser do tipo pacote;
+     * Se o produto é indivisivel a quantidade não pode ser float;
      * Se for entrada de produto a quantidade não pode ser negativa;
      * Se for saida de produto a quantidade não pode ser positiva;
      * Se cancelado não pode ser alterado;
@@ -161,17 +161,14 @@ class Estoque extends Model implements ValidateInterface
         $errors = [];
         $produto = Produto::find($this->produto_id);
         $entrada = self::find($this->entrada_id);
-        if (is_null($this->requisito_id) && is_null($this->transacao_id)) {
-            $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
-        }
         if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
             $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
         }
         if (!is_null($entrada) && is_null($entrada->requisito_id)) {
             $errors['entrada_id'] = __('messages.entrada_cannot_trasacao');
         }
-        if ($produto->tipo != Produto::TIPO_PRODUTO) {
-            $errors['produto_id'] = __('messages.is_not_product');
+        if ($produto->tipo == Produto::TIPO_PACOTE) {
+            $errors['produto_id'] = __('messages.tipo_product_cannot_pacote');
         }
         if (fmod($this->quantidade, 1) > 0 && !$produto->divisivel) {
             $errors['produto_id'] = __('messages.produto_indivisible');

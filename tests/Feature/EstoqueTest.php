@@ -62,7 +62,6 @@ class EstoqueTest extends TestCase
         $this->assertEquals('2016-12-25 12:15:00', $found_estoque->data_movimento);
     }
 
-
     public function testUpdateEstoque()
     {
         $headers = PrestadorTest::auth();
@@ -105,15 +104,7 @@ class EstoqueTest extends TestCase
         $estoque->save();
     }
 
-    public function testValidateNenhumAtributoEstoque()
-    {
-        $estoque = factory(Estoque::class)->create();
-        $estoque->requisito_id = null;
-        $this->expectException(ValidationException::class);
-        $estoque->save();
-    }
-
-    public function testValidateEntradaTipoNaoTransacao()
+    public function testValidateEntradaCannotTransacao()
     {
         $oldEstoque = factory(Estoque::class)->create();
         $transacao = factory(Item::class)->create();
@@ -127,7 +118,7 @@ class EstoqueTest extends TestCase
         $estoque->save();
     }
 
-    public function testValidateTipoNaoProduto()
+    public function testValidateProdutoTipoCannotPacote()
     {
         $estoque = factory(Estoque::class)->create();
         $produto = factory(Produto::class)->create();

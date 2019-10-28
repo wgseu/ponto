@@ -37,7 +37,8 @@ class MovimentacaoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Movimentacao',
-        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
+        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de' .
+            ' operadores',
         'model' => Movimentacao::class,
     ];
 
@@ -50,7 +51,8 @@ class MovimentacaoType extends GraphQLType
             ],
             'sessao_id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão',
+                'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo' .
+                    ' código da sessão',
             ],
             'caixa_id' => [
                 'type' => Type::nonNull(Type::id()),

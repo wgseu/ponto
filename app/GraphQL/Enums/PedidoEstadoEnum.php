@@ -35,7 +35,11 @@ class PedidoEstadoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'PedidoEstado',
-        'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido saiu para entrega. Fechado: O cliente pediu a conta e está pronto para pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi cancelado com os itens e pagamentos',
+        'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de' .
+            ' agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido' .
+            ' saiu para entrega. Fechado: O cliente pediu a conta e está pronto para' .
+            ' pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi' .
+            ' cancelado com os itens e pagamentos',
         'values' => [
             Pedido::ESTADO_AGENDADO => Pedido::ESTADO_AGENDADO,
             Pedido::ESTADO_ABERTO => Pedido::ESTADO_ABERTO,

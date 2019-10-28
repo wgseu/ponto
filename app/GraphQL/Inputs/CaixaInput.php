@@ -28,7 +28,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -44,7 +43,7 @@ class CaixaInput extends InputType
         return [
             'carteira_id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'null',
+                'description' => 'Carteira que representa a gaveta de dinheiro do caixa',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
@@ -57,14 +56,11 @@ class CaixaInput extends InputType
             ],
             'numero_inicial' => [
                 'type' => Type::int(),
-                'description' => 'Número inicial na geração da nota, será usado quando maior que o último número utilizado',
+                'description' => 'Número inicial na geração da nota, será usado quando maior que o último' .
+                    ' número utilizado',
             ],
             'ativa' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se o caixa está ativo',
-            ],
-            'data_desativada' => [
-                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa se o caixa está ativo',
             ],
         ];

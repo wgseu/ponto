@@ -36,7 +36,8 @@ class ItemOrder extends InputType
 {
     protected $attributes = [
         'name' => 'ItemOrder',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
+        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o' .
+            ' controle de produção',
     ];
 
     public function fields(): array

@@ -51,7 +51,8 @@ class ProdutoType extends GraphQLType
             ],
             'codigo' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único entre todos os produtos',
+                'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único' .
+                    ' entre todos os produtos',
             ],
             'categoria_id' => [
                 'type' => Type::nonNull(Type::id()),
@@ -67,7 +68,8 @@ class ProdutoType extends GraphQLType
             ],
             'setor_preparo_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa em qual setor de preparo será enviado o ticket de preparo ou autorização, se nenhum for informado nada será impresso',
+                'description' => 'Informa em qual setor de preparo será enviado o ticket de preparo ou' .
+                    ' autorização, se nenhum for informado nada será impresso',
             ],
             'tributacao_id' => [
                 'type' => Type::id(),
@@ -87,11 +89,13 @@ class ProdutoType extends GraphQLType
             ],
             'quantidade_minima' => [
                 'type' => Type::nonNull(Type::float()),
-                'description' => 'Informa a quantidade limite para que o sistema avise que o produto já está acabando',
+                'description' => 'Informa a quantidade limite para que o sistema avise que o produto já' .
+                    ' está acabando',
             ],
             'quantidade_maxima' => [
                 'type' => Type::nonNull(Type::float()),
-                'description' => 'Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa',
+                'description' => 'Informa a quantidade máxima do produto no estoque, não proibe, apenas' .
+                    ' avisa',
             ],
             'preco_venda' => [
                 'type' => Type::nonNull(Type::float()),
@@ -99,18 +103,23 @@ class ProdutoType extends GraphQLType
             ],
             'custo_producao' => [
                 'type' => Type::float(),
-                'description' => 'Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto',
+                'description' => 'Informa qual o valor para o custo de produção do produto, utilizado' .
+                    ' quando não há formação de composição do produto',
                 'privacy' => function (array $args): bool {
                     return Auth::check() && Auth::user()->can('produto:view');
                 },
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('ProdutoTipo')),
-                'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente',
+                'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui' .
+                    ' estoque, Composição: Produto que não possui estoque diretamente, pois é' .
+                    ' composto de outros produtos ou composições, Pacote: Permite a composição' .
+                    ' no momento da venda, não possui estoque diretamente',
             ],
             'cobrar_servico' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se deve ser cobrado a taxa de serviço dos garçons sobre este produto',
+                'description' => 'Informa se deve ser cobrado a taxa de serviço dos garçons sobre este' .
+                    ' produto',
             ],
             'divisivel' => [
                 'type' => Type::nonNull(Type::boolean()),
@@ -118,11 +127,13 @@ class ProdutoType extends GraphQLType
             ],
             'pesavel' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se o peso do produto deve ser obtido de uma balança, obrigatoriamente o produto deve ser divisível',
+                'description' => 'Informa se o peso do produto deve ser obtido de uma balança,' .
+                    ' obrigatoriamente o produto deve ser divisível',
             ],
             'tempo_preparo' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Tempo de preparo em minutos para preparar uma composição, 0 para não informado',
+                'description' => 'Tempo de preparo em minutos para preparar uma composição, 0 para não' .
+                    ' informado',
             ],
             'disponivel' => [
                 'type' => Type::nonNull(Type::boolean()),

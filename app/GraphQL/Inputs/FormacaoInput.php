@@ -35,7 +35,8 @@ class FormacaoInput extends InputType
 {
     protected $attributes = [
         'name' => 'FormacaoInput',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
+        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais' .
+            ' item foram retirados/adicionados da composição',
     ];
 
     public function fields(): array

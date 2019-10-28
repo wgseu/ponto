@@ -37,7 +37,8 @@ class AssociacaoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Associacao',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
+        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados' .
+            ' ao sistema',
         'model' => Associacao::class,
     ];
 
@@ -70,11 +71,13 @@ class AssociacaoType extends GraphQLType
             ],
             'pedido' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'Pedido no formato JSON para exibição na lista de pedidos e posterior integração',
+                'description' => 'Pedido no formato JSON para exibição na lista de pedidos e posterior' .
+                    ' integração',
             ],
             'endereco' => [
                 'type' => Type::string(),
-                'description' => 'Endereço para ser entregue o pedido, nulo para o cliente vir buscar no restaurante',
+                'description' => 'Endereço para ser entregue o pedido, nulo para o cliente vir buscar no' .
+                    ' restaurante',
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),

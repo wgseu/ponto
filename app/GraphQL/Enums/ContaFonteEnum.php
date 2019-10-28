@@ -35,7 +35,8 @@ class ContaFonteEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'ContaFonte',
-        'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional',
+        'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento,' .
+            ' o valor será proporcional',
         'values' => [
             Conta::FONTE_FIXA => Conta::FONTE_FIXA,
             Conta::FONTE_VARIAVEL => Conta::FONTE_VARIAVEL,

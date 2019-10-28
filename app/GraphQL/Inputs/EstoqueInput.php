@@ -28,9 +28,9 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class EstoqueInput extends InputType
 {
@@ -56,7 +56,8 @@ class EstoqueInput extends InputType
             ],
             'entrada_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite estoque FIFO',
+                'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite' .
+                    ' estoque FIFO',
             ],
             'fornecedor_id' => [
                 'type' => Type::id(),
@@ -98,15 +99,12 @@ class EstoqueInput extends InputType
             ],
             'reservado' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas reservados',
+                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas' .
+                    ' reservados',
             ],
             'cancelado' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa a entrada ou saída do estoque foi cancelada',
-            ],
-            'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de entrada ou saída do produto do estoque',
             ],
         ];
     }

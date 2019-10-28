@@ -48,7 +48,8 @@ class ModuloInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'Descrição do módulo, informa detalhes sobre a funcionalidade do módulo no sistema',
+                'description' => 'Descrição do módulo, informa detalhes sobre a funcionalidade do módulo' .
+                    ' no sistema',
                 'rules' => ['max:200'],
             ],
             'habilitado' => [

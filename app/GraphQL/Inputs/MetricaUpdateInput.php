@@ -36,6 +36,7 @@ class MetricaUpdateInput extends MetricaInput
 
     protected $attributes = [
         'name' => 'MetricaUpdateInput',
-        'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
+        'description' => 'Métricas de avaliação do atendimento e outros serviços do' .
+            ' estabelecimento',
     ];
 }

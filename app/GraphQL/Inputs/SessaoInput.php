@@ -36,7 +36,8 @@ class SessaoInput extends InputType
 {
     protected $attributes = [
         'name' => 'SessaoInput',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
+        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos' .
+            ' utilizando uma mesma sessão',
     ];
 
     public function fields(): array

@@ -36,7 +36,8 @@ class MovimentacaoOrder extends InputType
 {
     protected $attributes = [
         'name' => 'MovimentacaoOrder',
-        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
+        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de' .
+            ' operadores',
     ];
 
     public function fields(): array

@@ -70,6 +70,9 @@
         ],
         "test": [
             "phpunit"
+        ],
+        "check-style": [
+            "phpcs --standard=PSR12 app tests"
         ]
     }
 }

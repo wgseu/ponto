@@ -37,7 +37,8 @@ class SessaoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Sessao',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
+        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos' .
+            ' utilizando uma mesma sessão',
         'model' => Sessao::class,
     ];
 

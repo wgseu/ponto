@@ -52,7 +52,8 @@ class PropriedadeInput extends InputType
             ],
             'abreviacao' => [
                 'type' => Type::string(),
-                'description' => 'Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena, essa abreviação fará parte do nome do produto',
+                'description' => 'Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena,' .
+                    ' essa abreviação fará parte do nome do produto',
                 'rules' => ['max:100'],
             ],
             'imagem_url' => [

@@ -37,7 +37,8 @@ class ClienteType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Cliente',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
+        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas,' .
+            ' funcionários, fornecedores e parceiros são cadastrados aqui',
         'model' => Cliente::class,
     ];
 
@@ -74,7 +75,8 @@ class ClienteType extends GraphQLType
             ],
             'cpf' => [
                 'type' => Type::string(),
-                'description' => 'Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa Jurídica(CNPJ)',
+                'description' => 'Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa' .
+                    ' Jurídica(CNPJ)',
             ],
             'rg' => [
                 'type' => Type::string(),
@@ -99,10 +101,6 @@ class ClienteType extends GraphQLType
             'status' => [
                 'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
                 'description' => 'Informa o estado da conta do cliente',
-            ],
-            'secreto' => [
-                'type' => Type::string(),
-                'description' => 'Código secreto para recuperar a conta do cliente',
             ],
             'limite_compra' => [
                 'type' => Type::float(),
@@ -130,7 +128,8 @@ class ClienteType extends GraphQLType
             ],
             'linguagem' => [
                 'type' => Type::string(),
-                'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
+                'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo' .
+                    ' e o site, Ex: pt-BR',
             ],
             'data_atualizacao' => [
                 'type' => GraphQL::type('DateTime'),

@@ -35,7 +35,8 @@ class PromocaoFuncaoClienteEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'PromocaoFuncaoCliente',
-        'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa promoção',
+        'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa' .
+            ' promoção',
         'values' => [
             Promocao::FUNCAO_CLIENTE_MENOR => Promocao::FUNCAO_CLIENTE_MENOR,
             Promocao::FUNCAO_CLIENTE_IGUAL => Promocao::FUNCAO_CLIENTE_IGUAL,

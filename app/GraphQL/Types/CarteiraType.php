@@ -50,7 +50,9 @@ class CarteiraType extends GraphQLType
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('CarteiraTipo')),
-                'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
+                'description' => 'Tipo de carteira, Bancaria: para conta bancária, Financeira: para' .
+                    ' carteira financeira da empresa ou de sites de pagamentos, Credito: para' .
+                    ' cartão de crédito e Local: para caixas e cofres locais',
             ],
             'carteira_id' => [
                 'type' => Type::id(),
@@ -102,7 +104,7 @@ class CarteiraType extends GraphQLType
             ],
             'data_desativada' => [
                 'type' => GraphQL::type('DateTime'),
-                'description' => 'null',
+                'description' => 'Data em que a carteira foi desativada',
             ],
         ];
     }

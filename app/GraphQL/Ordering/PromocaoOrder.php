@@ -36,7 +36,8 @@ class PromocaoOrder extends InputType
 {
     protected $attributes = [
         'name' => 'PromocaoOrder',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
+        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o' .
+            ' preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function fields(): array

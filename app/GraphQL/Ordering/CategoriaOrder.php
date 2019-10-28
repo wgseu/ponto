@@ -36,7 +36,8 @@ class CategoriaOrder extends InputType
 {
     protected $attributes = [
         'name' => 'CategoriaOrder',
-        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
+        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos' .
+            ' mesmos',
     ];
 
     public function fields(): array

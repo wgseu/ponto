@@ -36,6 +36,7 @@ class ResumoUpdateInput extends ResumoInput
 
     protected $attributes = [
         'name' => 'ResumoUpdateInput',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
+        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do' .
+            ' caixa para cada forma de pagamento',
     ];
 }

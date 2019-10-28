@@ -31,7 +31,7 @@ $[table.end]
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-$[table.exists(data_arquivado|data_arquivamento)]
+$[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
 use Illuminate\Database\Eloquent\SoftDeletes;
 $[table.end]
 
@@ -45,7 +45,7 @@ $[table.end]
 class $[Table.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end] implements ValidateInterface
 {
     use ModelEvents;
-$[table.exists(data_arquivado|data_arquivamento)]
+$[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
     use SoftDeletes;
 $[table.end]
 $[field.each(enum)]
@@ -61,11 +61,11 @@ $[field.each(option)]
     public const $[FIELD.unix]_$[FIELD.option.norm] = '$[field.option]';
 $[field.end]
 $[field.end]
-$[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento)]
+$[table.exists(data_cadastro|data_criacao|data_movimento|data_movimentacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
 
 $[field.each(all)]
 $[field.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio)]
     public const CREATED_AT = '$[field]';
 $[field.else.match(.*atualizacao)]
     public const UPDATED_AT = '$[field]';
@@ -74,7 +74,7 @@ $[field.else.match(.*arquivado|.*arquivamento)]
 $[field.end]
 $[field.end]
 $[field.end]
-$[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio)]
+$[table.exists(data_cadastro|data_criacao|data_movimento|data_movimentacao|data_lancamento|data_envio)]
 $[table.exists(data_atualizacao)]
 $[table.else]
     public const UPDATED_AT = null;
@@ -90,7 +90,7 @@ $[table.end]
      * @var string
      */
     protected $table = '$[table]';
-$[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao)]
+$[table.exists(data_cadastro|data_criacao|data_movimento|data_movimentacao|data_lancamento|data_envio|data_atualizacao)]
 $[table.else]
 
     /**
@@ -111,7 +111,7 @@ $[field.each(all)]
 $[field.if(primary)]
 $[field.else.match(secreto)]
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
         '$[field]',
 $[field.end]

@@ -36,6 +36,7 @@ class AssociacaoUpdateInput extends AssociacaoInput
 
     protected $attributes = [
         'name' => 'AssociacaoUpdateInput',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
+        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados' .
+            ' ao sistema',
     ];
 }

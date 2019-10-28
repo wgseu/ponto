@@ -50,7 +50,7 @@ class CaixaType extends GraphQLType
             ],
             'carteira_id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'null',
+                'description' => 'Carteira que representa a gaveta de dinheiro do caixa',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
@@ -62,7 +62,8 @@ class CaixaType extends GraphQLType
             ],
             'numero_inicial' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Número inicial na geração da nota, será usado quando maior que o último número utilizado',
+                'description' => 'Número inicial na geração da nota, será usado quando maior que o último' .
+                    ' número utilizado',
             ],
             'ativa' => [
                 'type' => Type::nonNull(Type::boolean()),

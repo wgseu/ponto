@@ -1,4 +1,5 @@
 mutation updatePedido($id: ID!, $input: PedidoUpdateInput!) {
   UpdatePedido(id: $id, input: $input) {
+    mesa_id
   }
 }

@@ -35,7 +35,8 @@ class ContaModoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'ContaModo',
-        'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia',
+        'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em' .
+            ' frequencia',
         'values' => [
             Conta::MODO_DIARIO => Conta::MODO_DIARIO,
             Conta::MODO_MENSAL => Conta::MODO_MENSAL,

@@ -35,7 +35,8 @@ class JuncaoEstadoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'JuncaoEstado',
-        'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido, Liberado: A mesa está livre, Cancelado: A mesa está liberada',
+        'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
+            ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
         'values' => [
             Juncao::ESTADO_ASSOCIADO => Juncao::ESTADO_ASSOCIADO,
             Juncao::ESTADO_LIBERADO => Juncao::ESTADO_LIBERADO,

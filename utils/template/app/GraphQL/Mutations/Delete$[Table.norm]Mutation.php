@@ -55,7 +55,7 @@ class Delete$[Table.norm]Mutation extends Mutation
         return [
             'id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => '$[primary.comment]',
+                'description' => '$[primary.description]',
             ],
         ];
     }

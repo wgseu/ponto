@@ -58,7 +58,8 @@ class PropriedadeType extends GraphQLType
             ],
             'abreviacao' => [
                 'type' => Type::string(),
-                'description' => 'Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena, essa abreviação fará parte do nome do produto',
+                'description' => 'Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena,' .
+                    ' essa abreviação fará parte do nome do produto',
             ],
             'imagem_url' => [
                 'type' => Type::string(),

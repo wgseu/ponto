@@ -35,7 +35,10 @@ class ProdutoTipoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'ProdutoTipo',
-        'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente',
+        'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui' .
+            ' estoque, Composição: Produto que não possui estoque diretamente, pois é' .
+            ' composto de outros produtos ou composições, Pacote: Permite a composição' .
+            ' no momento da venda, não possui estoque diretamente',
         'values' => [
             Produto::TIPO_PRODUTO => Produto::TIPO_PRODUTO,
             Produto::TIPO_COMPOSICAO => Produto::TIPO_COMPOSICAO,

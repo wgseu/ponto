@@ -9,7 +9,7 @@ $[field.else.if(reference)]
 use App\Models\$[Reference.norm];
 $[field.end]
 $[field.end]
-$[table.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento)]
+$[table.exists(data_cadastro|data_criacao|data_movimento|data_movimentacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
 $[table.else.exists(datetime|date|time)]
 use Illuminate\Support\Carbon;
 $[table.end]
@@ -34,7 +34,7 @@ $[field.else.if(date)]
 $[field.else.if(time)]
         '$[field]' => Carbon::now(),
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
         '$[field]' => Carbon::now(),
 $[field.end]

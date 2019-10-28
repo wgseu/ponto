@@ -36,6 +36,7 @@ class ClienteUpdateInput extends ClienteInput
 
     protected $attributes = [
         'name' => 'ClienteUpdateInput',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
+        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas,' .
+            ' funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 }

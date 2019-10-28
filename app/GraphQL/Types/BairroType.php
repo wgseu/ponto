@@ -65,7 +65,8 @@ class BairroType extends GraphQLType
             ],
             'mapeado' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se o bairro está mapeado por zonas e se é obrigatório selecionar uma zona',
+                'description' => 'Informa se o bairro está mapeado por zonas e se é obrigatório selecionar' .
+                    ' uma zona',
             ],
             'entrega_minima' => [
                 'type' => Type::int(),

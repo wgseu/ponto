@@ -37,7 +37,8 @@ class SistemaType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Sistema',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
+        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema' .
+            ' como a versão do banco de dados e a licença de uso',
         'model' => Sistema::class,
     ];
 

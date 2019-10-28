@@ -37,7 +37,8 @@ class ItemType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Item',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
+        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o' .
+            ' controle de produção',
         'model' => Item::class,
     ];
 

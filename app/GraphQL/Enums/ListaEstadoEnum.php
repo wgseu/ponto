@@ -35,7 +35,9 @@ class ListaEstadoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'ListaEstado',
-        'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os itens foram comprados',
+        'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado' .
+            ' produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os' .
+            ' itens foram comprados',
         'values' => [
             Lista::ESTADO_ANALISE => Lista::ESTADO_ANALISE,
             Lista::ESTADO_FECHADA => Lista::ESTADO_FECHADA,

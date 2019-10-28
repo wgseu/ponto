@@ -44,7 +44,9 @@ class CarteiraInput extends InputType
         return [
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('CarteiraTipo')),
-                'description' => 'Tipo de carteira, \'Bancaria\' para conta bancária, \'Financeira\' para carteira financeira da empresa ou de sites de pagamentos, \'Credito\' para cartão de crédito e \'Local\' para caixas e cofres locais',
+                'description' => 'Tipo de carteira, Bancaria: para conta bancária, Financeira: para' .
+                    ' carteira financeira da empresa ou de sites de pagamentos, Credito: para' .
+                    ' cartão de crédito e Local: para caixas e cofres locais',
             ],
             'carteira_id' => [
                 'type' => Type::id(),
@@ -99,10 +101,6 @@ class CarteiraInput extends InputType
             'ativa' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se a carteira ou conta bancária está ativa',
-            ],
-            'data_desativada' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'null',
             ],
         ];
     }

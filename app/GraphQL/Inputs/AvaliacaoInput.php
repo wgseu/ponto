@@ -48,7 +48,8 @@ class AvaliacaoInput extends InputType
             ],
             'cliente_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando for avaliação de produto',
+                'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando' .
+                    ' for avaliação de produto',
             ],
             'pedido_id' => [
                 'type' => Type::id(),

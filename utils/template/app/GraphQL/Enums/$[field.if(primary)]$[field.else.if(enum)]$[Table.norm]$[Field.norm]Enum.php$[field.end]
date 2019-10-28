@@ -35,7 +35,8 @@ class $[Table.norm]$[Field.norm]Enum extends EnumType
 {
     protected $attributes = [
         'name' => '$[Table.norm]$[Field.norm]',
-        'description' => '$[Field.comment]',
+        'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+            ' $[Field.description]'$[field.end]$[field.end],
         'values' => [
 $[field.each(option)]
             $[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm] => $[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm],

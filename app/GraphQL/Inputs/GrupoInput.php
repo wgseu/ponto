@@ -36,7 +36,8 @@ class GrupoInput extends InputType
 {
     protected $attributes = [
         'name' => 'GrupoInput',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
+        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para' .
+            ' formações de produtos',
     ];
 
     public function fields(): array
@@ -53,16 +54,18 @@ class GrupoInput extends InputType
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os sabores',
+                'description' => 'Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os' .
+                    ' sabores',
                 'rules' => ['max:100'],
             ],
             'tipo' => [
                 'type' => GraphQL::type('GrupoTipo'),
-                'description' => ' Informa se a formação final será apenas uma unidade ou vários itens',
+                'description' => 'Informa se a formação final será apenas uma unidade ou vários itens',
             ],
             'quantidade_minima' => [
                 'type' => Type::int(),
-                'description' => 'Permite definir uma quantidade mínima obrigatória para continuar com a venda',
+                'description' => 'Permite definir uma quantidade mínima obrigatória para continuar com a' .
+                    ' venda',
             ],
             'quantidade_maxima' => [
                 'type' => Type::int(),
@@ -70,7 +73,10 @@ class GrupoInput extends InputType
             ],
             'funcao' => [
                 'type' => GraphQL::type('GrupoFuncao'),
-                'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor preço, Média:  define o preço do produto como a média dos itens selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma: Soma todos os preços dos produtos selecionados',
+                'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor' .
+                    ' preço, Média:  define o preço do produto como a média dos itens' .
+                    ' selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma:' .
+                    ' Soma todos os preços dos produtos selecionados',
             ],
             'ordem' => [
                 'type' => Type::int(),

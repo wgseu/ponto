@@ -81,11 +81,13 @@ class CupomInput extends InputType
             ],
             'limitar_pedidos' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do cliente',
+                'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do' .
+                    ' cliente',
             ],
             'funcao_pedidos' => [
                 'type' => GraphQL::type('CupomFuncaoPedidos'),
-                'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom',
+                'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar' .
+                    ' esse cupom',
             ],
             'pedidos_limite' => [
                 'type' => Type::int(),
@@ -97,7 +99,8 @@ class CupomInput extends InputType
             ],
             'funcao_valor' => [
                 'type' => GraphQL::type('CupomFuncaoValor'),
-                'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse cupom',
+                'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse' .
+                    ' cupom',
             ],
             'valor_limite' => [
                 'type' => Type::float(),

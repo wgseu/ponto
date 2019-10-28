@@ -48,7 +48,7 @@ class BancoInput extends InputType
             ],
             'fantasia' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'null',
+                'description' => 'Nome fantasia do banco',
                 'rules' => ['max:200'],
             ],
             'razao_social' => [

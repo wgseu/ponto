@@ -36,6 +36,7 @@ class ItemUpdateInput extends ItemInput
 
     protected $attributes = [
         'name' => 'ItemUpdateInput',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
+        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o' .
+            ' controle de produção',
     ];
 }

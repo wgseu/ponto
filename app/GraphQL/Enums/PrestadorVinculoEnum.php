@@ -35,7 +35,8 @@ class PrestadorVinculoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'PrestadorVinculo',
-        'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica',
+        'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas' .
+            ' físicas, prestador é pessoa jurídica',
         'values' => [
             Prestador::VINCULO_FUNCIONARIO => Prestador::VINCULO_FUNCIONARIO,
             Prestador::VINCULO_PRESTADOR => Prestador::VINCULO_PRESTADOR,

@@ -36,6 +36,7 @@ class MovimentacaoUpdateInput extends MovimentacaoInput
 
     protected $attributes = [
         'name' => 'MovimentacaoUpdateInput',
-        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de operadores',
+        'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de' .
+            ' operadores',
     ];
 }

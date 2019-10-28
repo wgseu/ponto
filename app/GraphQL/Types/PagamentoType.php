@@ -58,15 +58,19 @@ class PagamentoType extends GraphQLType
             ],
             'pagamento_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa o pagamento principal ou primeira parcela, o valor lançado é zero para os pagamentos filhos, restante de antecipação e taxas são filhos do valor antecipado',
+                'description' => 'Informa o pagamento principal ou primeira parcela, o valor lançado é' .
+                    ' zero para os pagamentos filhos, restante de antecipação e taxas são' .
+                    ' filhos do valor antecipado',
             ],
             'agrupamento_id' => [
                 'type' => Type::id(),
-                'description' => 'Permite antecipar recebimentos de cartões, um pagamento agrupado é internamente tratado como desativado',
+                'description' => 'Permite antecipar recebimentos de cartões, um pagamento agrupado é' .
+                    ' internamente tratado como desativado',
             ],
             'movimentacao_id' => [
                 'type' => Type::id(),
-                'description' => 'Movimentação do caixa quando for pagamento de pedido ou quando a conta for paga do caixa',
+                'description' => 'Movimentação do caixa quando for pagamento de pedido ou quando a conta' .
+                    ' for paga do caixa',
             ],
             'funcionario_id' => [
                 'type' => Type::id(),

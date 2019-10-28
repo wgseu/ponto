@@ -29,8 +29,8 @@ declare(strict_types=1);
 namespace App\GraphQL\Inputs;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class ViagemInput extends InputType
 {
@@ -68,7 +68,8 @@ class ViagemInput extends InputType
             ],
             'data_saida' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as compras',
+                'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as' .
+                    ' compras',
             ],
         ];
     }

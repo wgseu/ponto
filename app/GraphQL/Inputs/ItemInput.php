@@ -36,7 +36,8 @@ class ItemInput extends InputType
 {
     protected $attributes = [
         'name' => 'ItemInput',
-        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção',
+        'description' => 'Produtos, taxas e serviços do pedido, a alteração do estado permite o' .
+            ' controle de produção',
     ];
 
     public function fields(): array

@@ -44,7 +44,8 @@ class PedidoInput extends InputType
         return [
             'pedido_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas forem agrupadas',
+                'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas' .
+                    ' forem agrupadas',
             ],
             'mesa_id' => [
                 'type' => Type::id(),
@@ -68,7 +69,8 @@ class PedidoInput extends InputType
             ],
             'localizacao_id' => [
                 'type' => Type::id(),
-                'description' => 'Endereço de entrega do pedido, se não informado na venda entrega, o pedido será para viagem',
+                'description' => 'Endereço de entrega do pedido, se não informado na venda entrega, o' .
+                    ' pedido será para viagem',
             ],
             'entrega_id' => [
                 'type' => Type::id(),
@@ -84,7 +86,11 @@ class PedidoInput extends InputType
             ],
             'estado' => [
                 'type' => GraphQL::type('PedidoEstado'),
-                'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido saiu para entrega. Fechado: O cliente pediu a conta e está pronto para pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi cancelado com os itens e pagamentos',
+                'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de' .
+                    ' agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido' .
+                    ' saiu para entrega. Fechado: O cliente pediu a conta e está pronto para' .
+                    ' pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi' .
+                    ' cancelado com os itens e pagamentos',
             ],
             'servicos' => [
                 'type' => Type::float(),

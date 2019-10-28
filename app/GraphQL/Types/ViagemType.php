@@ -78,7 +78,8 @@ class ViagemType extends GraphQLType
             ],
             'data_saida' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as compras',
+                'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as' .
+                    ' compras',
             ],
         ];
     }

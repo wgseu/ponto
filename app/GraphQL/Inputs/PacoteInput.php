@@ -59,11 +59,14 @@ class PacoteInput extends InputType
             ],
             'associacao_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde Tamanho é pai de Sabor',
+                'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços' .
+                    ' diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde' .
+                    ' Tamanho é pai de Sabor',
             ],
             'quantidade_minima' => [
                 'type' => Type::int(),
-                'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse item',
+                'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse' .
+                    ' item',
             ],
             'quantidade_maxima' => [
                 'type' => Type::int(),
@@ -75,7 +78,8 @@ class PacoteInput extends InputType
             ],
             'selecionado' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas para produtos',
+                'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas' .
+                    ' para produtos',
             ],
             'disponivel' => [
                 'type' => Type::boolean(),

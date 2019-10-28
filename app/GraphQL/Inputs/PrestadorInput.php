@@ -62,15 +62,18 @@ class PrestadorInput extends InputType
             ],
             'empresa_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do próprio estabelecimento',
+                'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do' .
+                    ' próprio estabelecimento',
             ],
             'vinculo' => [
                 'type' => GraphQL::type('PrestadorVinculo'),
-                'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas físicas, prestador é pessoa jurídica',
+                'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas' .
+                    ' físicas, prestador é pessoa jurídica',
             ],
             'porcentagem' => [
                 'type' => Type::float(),
-                'description' => 'Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.: Comissão de 10%',
+                'description' => 'Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.:' .
+                    ' Comissão de 10%',
             ],
             'pontuacao' => [
                 'type' => Type::int(),

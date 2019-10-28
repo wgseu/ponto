@@ -35,7 +35,9 @@ class HorarioModoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'HorarioModo',
-        'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
+        'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que' .
+            ' o estabelecimento estará aberto, Operação: quando aceitar novos pedidos' .
+            ' locais, Entrega: quando aceita ainda pedidos para entrega',
         'values' => [
             Horario::MODO_FUNCIONAMENTO => Horario::MODO_FUNCIONAMENTO,
             Horario::MODO_OPERACAO => Horario::MODO_OPERACAO,

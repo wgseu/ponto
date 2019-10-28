@@ -36,7 +36,8 @@ class ResumoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Resumo',
-        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento',
+        'description' => 'Resumo de fechamento de caixa, informa o valor contado no fechamento do' .
+            ' caixa para cada forma de pagamento',
         'model' => Resumo::class,
     ];
 

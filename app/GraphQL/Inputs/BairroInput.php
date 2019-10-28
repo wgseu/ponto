@@ -60,7 +60,8 @@ class BairroInput extends InputType
             ],
             'mapeado' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se o bairro está mapeado por zonas e se é obrigatório selecionar uma zona',
+                'description' => 'Informa se o bairro está mapeado por zonas e se é obrigatório selecionar' .
+                    ' uma zona',
             ],
             'entrega_minima' => [
                 'type' => Type::int(),

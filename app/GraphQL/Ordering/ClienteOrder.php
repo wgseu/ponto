@@ -36,7 +36,8 @@ class ClienteOrder extends InputType
 {
     protected $attributes = [
         'name' => 'ClienteOrder',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
+        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas,' .
+            ' funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function fields(): array

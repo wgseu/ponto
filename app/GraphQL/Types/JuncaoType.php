@@ -58,7 +58,8 @@ class JuncaoType extends GraphQLType
             ],
             'estado' => [
                 'type' => Type::nonNull(GraphQL::type('JuncaoEstado')),
-                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido, Liberado: A mesa está livre, Cancelado: A mesa está liberada',
+                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
+                    ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
             'data_movimento' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

@@ -104,7 +104,8 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
     public function validate()
     {
         $errors = [];
-        if (!is_null($this->parcelas_sem_juros) &&
+        if (
+            !is_null($this->parcelas_sem_juros) &&
             !is_null($this->min_parcelas) &&
             $this->parcelas_sem_juros < $this->min_parcelas
         ) {

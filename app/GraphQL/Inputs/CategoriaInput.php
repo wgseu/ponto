@@ -35,7 +35,8 @@ class CategoriaInput extends InputType
 {
     protected $attributes = [
         'name' => 'CategoriaInput',
-        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
+        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos' .
+            ' mesmos',
     ];
 
     public function fields(): array
@@ -43,7 +44,8 @@ class CategoriaInput extends InputType
         return [
             'categoria_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria',
+                'description' => 'Informa a categoria pai da categoria atual, a categoria atual é uma' .
+                    ' subcategoria',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),

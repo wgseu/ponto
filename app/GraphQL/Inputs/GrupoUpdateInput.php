@@ -36,6 +36,7 @@ class GrupoUpdateInput extends GrupoInput
 
     protected $attributes = [
         'name' => 'GrupoUpdateInput',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
+        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para' .
+            ' formações de produtos',
     ];
 }

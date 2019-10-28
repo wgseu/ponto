@@ -36,7 +36,8 @@ class TelefoneType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Telefone',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
+        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por' .
+            ' cliente',
         'model' => Telefone::class,
     ];
 

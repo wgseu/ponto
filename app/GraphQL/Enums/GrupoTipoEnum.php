@@ -35,7 +35,7 @@ class GrupoTipoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'GrupoTipo',
-        'description' => ' Informa se a formação final será apenas uma unidade ou vários itens',
+        'description' => 'Informa se a formação final será apenas uma unidade ou vários itens',
         'values' => [
             Grupo::TIPO_INTEIRO => Grupo::TIPO_INTEIRO,
             Grupo::TIPO_FRACIONADO => Grupo::TIPO_FRACIONADO,

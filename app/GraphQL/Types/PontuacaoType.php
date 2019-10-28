@@ -54,7 +54,8 @@ class PontuacaoType extends GraphQLType
             ],
             'cliente_id' => [
                 'type' => Type::id(),
-                'description' => 'Cliente que possui esses pontos, não informar quando tiver travado por pedido',
+                'description' => 'Cliente que possui esses pontos, não informar quando tiver travado por' .
+                    ' pedido',
             ],
             'pedido_id' => [
                 'type' => Type::id(),

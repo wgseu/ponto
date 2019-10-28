@@ -39,7 +39,8 @@ class $[Table.norm]Type extends GraphQLType
 {
     protected $attributes = [
         'name' => '$[Table.norm]',
-        'description' => '$[Table.comment]',
+        'description' => $[table.each(description)]$[table.if(first)]'$[Table.description]'$[table.else] .
+            ' $[Table.description]'$[table.end]$[table.end],
         'model' => $[Table.norm]::class,
     ];
 
@@ -47,6 +48,8 @@ class $[Table.norm]Type extends GraphQLType
     {
         return [
 $[field.each(all)]
+$[field.match(senha|secreto)]
+$[field.else]
             '$[field]' => [
 $[field.if(primary)]
                 'type' => Type::id(),
@@ -73,8 +76,10 @@ $[field.else.if(enum)]
 $[field.else]
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
 $[field.end]
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
+$[field.end]
 $[field.end]
         ];
     }

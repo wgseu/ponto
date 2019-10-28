@@ -68,7 +68,7 @@ class PontuacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $pontuacao_to_delete = factory(Pontuacao::class)->create();
-        $pontuacao_to_delete = $this->graphfl('delete_pontuacao', ['id' => $pontuacao_to_delete->id], $headers);
+        $this->graphfl('delete_pontuacao', ['id' => $pontuacao_to_delete->id], $headers);
         $pontuacao = Pontuacao::find($pontuacao_to_delete->id);
         $this->assertNull($pontuacao);
     }

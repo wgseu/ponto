@@ -66,11 +66,14 @@ class PacoteType extends GraphQLType
             ],
             'associacao_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde Tamanho é pai de Sabor',
+                'description' => 'Informa a propriedade pai de um complemento, permite atribuir preços' .
+                    ' diferentes dependendo da propriedade, Ex.: Tamanho -> Sabor, onde' .
+                    ' Tamanho é pai de Sabor',
             ],
             'quantidade_minima' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse item',
+                'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse' .
+                    ' item',
             ],
             'quantidade_maxima' => [
                 'type' => Type::nonNull(Type::int()),
@@ -82,7 +85,8 @@ class PacoteType extends GraphQLType
             ],
             'selecionado' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas para produtos',
+                'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas' .
+                    ' para produtos',
             ],
             'disponivel' => [
                 'type' => Type::nonNull(Type::boolean()),

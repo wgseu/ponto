@@ -35,7 +35,8 @@ class CupomFuncaoPedidosEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'CupomFuncaoPedidos',
-        'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom',
+        'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar' .
+            ' esse cupom',
         'values' => [
             Cupom::FUNCAO_PEDIDOS_MENOR => Cupom::FUNCAO_PEDIDOS_MENOR,
             Cupom::FUNCAO_PEDIDOS_IGUAL => Cupom::FUNCAO_PEDIDOS_IGUAL,

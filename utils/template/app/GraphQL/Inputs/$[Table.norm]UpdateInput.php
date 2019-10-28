@@ -36,6 +36,7 @@ class $[Table.norm]UpdateInput extends $[Table.norm]Input
 
     protected $attributes = [
         'name' => '$[Table.norm]UpdateInput',
-        'description' => '$[Table.comment]',
+        'description' => $[table.each(description)]$[table.if(first)]'$[Table.description]'$[table.else] .
+            ' $[Table.description]'$[table.end]$[table.end],
     ];
 }

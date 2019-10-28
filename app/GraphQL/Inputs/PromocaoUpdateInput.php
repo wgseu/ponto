@@ -36,6 +36,7 @@ class PromocaoUpdateInput extends PromocaoInput
 
     protected $attributes = [
         'name' => 'PromocaoUpdateInput',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
+        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o' .
+            ' preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 }

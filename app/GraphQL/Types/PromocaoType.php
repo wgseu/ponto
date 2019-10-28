@@ -37,7 +37,8 @@ class PromocaoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Promocao',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
+        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o' .
+            ' preço pode subir ou descer e ser agendado para ser aplicado',
         'model' => Promocao::class,
     ];
 
@@ -50,7 +51,9 @@ class PromocaoType extends GraphQLType
             ],
             'promocao_id' => [
                 'type' => Type::id(),
-                'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a promoção será o resgate e somente pontos gerados por ela poderão ser usados',
+                'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a' .
+                    ' promoção será o resgate e somente pontos gerados por ela poderão ser' .
+                    ' usados',
             ],
             'categoria_id' => [
                 'type' => Type::id(),
@@ -58,7 +61,8 @@ class PromocaoType extends GraphQLType
             ],
             'produto_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa qual o produto participará da promoção de desconto ou terá acréscimo',
+                'description' => 'Informa qual o produto participará da promoção de desconto ou terá' .
+                    ' acréscimo',
             ],
             'servico_id' => [
                 'type' => Type::id(),
@@ -82,11 +86,13 @@ class PromocaoType extends GraphQLType
             ],
             'inicio' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Momento inicial da semana em minutos que o produto começa a sofrer alteração de preço, em evento será o unix timestamp',
+                'description' => 'Momento inicial da semana em minutos que o produto começa a sofrer' .
+                    ' alteração de preço, em evento será o unix timestamp',
             ],
             'fim' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Momento final da semana em minutos que o produto volta ao preço normal, em evento será o unix timestamp',
+                'description' => 'Momento final da semana em minutos que o produto volta ao preço normal,' .
+                    ' em evento será o unix timestamp',
             ],
             'valor' => [
                 'type' => Type::nonNull(Type::float()),
@@ -94,7 +100,8 @@ class PromocaoType extends GraphQLType
             ],
             'pontos' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Informa quantos pontos será ganho (Positivo) ou descontado (Negativo) na compra desse produto',
+                'description' => 'Informa quantos pontos será ganho (Positivo) ou descontado (Negativo) na' .
+                    ' compra desse produto',
             ],
             'parcial' => [
                 'type' => Type::nonNull(Type::boolean()),
@@ -106,15 +113,19 @@ class PromocaoType extends GraphQLType
             ],
             'evento' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se a promoção será aplicada apenas no intervalo de data informado',
+                'description' => 'Informa se a promoção será aplicada apenas no intervalo de data' .
+                    ' informado',
             ],
             'agendamento' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se essa promoção é um agendamento de preço, na data inicial o preço será aplicado, assim como a visibilidade do produto ou serviço será ativada ou desativada de acordo com o proibir',
+                'description' => 'Informa se essa promoção é um agendamento de preço, na data inicial o' .
+                    ' preço será aplicado, assim como a visibilidade do produto ou serviço' .
+                    ' será ativada ou desativada de acordo com o proibir',
             ],
             'limitar_vendas' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto ou serviço',
+                'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto' .
+                    ' ou serviço',
             ],
             'funcao_vendas' => [
                 'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoVendas')),
@@ -130,7 +141,8 @@ class PromocaoType extends GraphQLType
             ],
             'funcao_cliente' => [
                 'type' => Type::nonNull(GraphQL::type('PromocaoFuncaoCliente')),
-                'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa promoção',
+                'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa' .
+                    ' promoção',
             ],
             'cliente_limite' => [
                 'type' => Type::nonNull(Type::float()),

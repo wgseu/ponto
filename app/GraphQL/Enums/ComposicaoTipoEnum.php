@@ -35,7 +35,8 @@ class ComposicaoTipoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'ComposicaoTipo',
-        'description' => 'Tipo de composição, \'Composicao\' sempre retira do estoque, \'Opcional\' permite desmarcar na venda, \'Adicional\' permite adicionar na venda',
+        'description' => 'Tipo de composição, Composicao: sempre retira do estoque, Opcional:' .
+            ' permite desmarcar na venda, Adicional: permite adicionar na venda',
         'values' => [
             Composicao::TIPO_COMPOSICAO => Composicao::TIPO_COMPOSICAO,
             Composicao::TIPO_OPCIONAL => Composicao::TIPO_OPCIONAL,

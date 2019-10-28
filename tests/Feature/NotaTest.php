@@ -102,7 +102,7 @@ class NotaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $nota_to_delete = factory(Nota::class)->create();
-        $nota_to_delete = $this->graphfl('delete_nota', ['id' => $nota_to_delete->id], $headers);
+        $this->graphfl('delete_nota', ['id' => $nota_to_delete->id], $headers);
         $nota_to_delete->refresh();
         $this->assertTrue($nota_to_delete->trashed());
         $this->assertNotNull($nota_to_delete->data_arquivado);

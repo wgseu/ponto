@@ -54,11 +54,13 @@ class EmpresaType extends GraphQLType
             ],
             'empresa_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a empresa do cadastro de clientes, a empresa deve ser um cliente do tipo pessoa jurídica',
+                'description' => 'Informa a empresa do cadastro de clientes, a empresa deve ser um cliente' .
+                    ' do tipo pessoa jurídica',
             ],
             'parceiro_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa quem realiza o suporte do sistema, deve ser um cliente do tipo empresa que possua um acionista como representante',
+                'description' => 'Informa quem realiza o suporte do sistema, deve ser um cliente do tipo' .
+                    ' empresa que possua um acionista como representante',
             ],
             'opcoes' => [
                 'type' => Type::string(),

@@ -54,7 +54,8 @@ class DispositivoType extends GraphQLType
             ],
             'caixa_id' => [
                 'type' => Type::id(),
-                'description' => 'Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos',
+                'description' => 'Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os' .
+                    ' dispositivos',
             ],
             'nome' => [
                 'type' => Type::nonNull(Type::string()),

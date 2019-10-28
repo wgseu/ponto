@@ -62,11 +62,14 @@ class ContaType extends GraphQLType
             ],
             'agrupamento_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa se esta conta foi agrupada e não precisa ser mais paga individualmente, uma conta agrupada é tratada internamente como desativada',
+                'description' => 'Informa se esta conta foi agrupada e não precisa ser mais paga' .
+                    ' individualmente, uma conta agrupada é tratada internamente como' .
+                    ' desativada',
             ],
             'carteira_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a carteira que essa conta será paga automaticamente ou para informar as contas a pagar dessa carteira',
+                'description' => 'Informa a carteira que essa conta será paga automaticamente ou para' .
+                    ' informar as contas a pagar dessa carteira',
             ],
             'cliente_id' => [
                 'type' => Type::id(),
@@ -94,7 +97,8 @@ class ContaType extends GraphQLType
             ],
             'fonte' => [
                 'type' => Type::nonNull(GraphQL::type('ContaFonte')),
-                'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento, o valor será proporcional',
+                'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento,' .
+                    ' o valor será proporcional',
             ],
             'numero_parcela' => [
                 'type' => Type::nonNull(Type::int()),
@@ -102,7 +106,8 @@ class ContaType extends GraphQLType
             ],
             'parcelas' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Quantidade de parcelas que essa conta terá, zero para conta recorrente e será alterado para 1 quando criar a próxima conta',
+                'description' => 'Quantidade de parcelas que essa conta terá, zero para conta recorrente e' .
+                    ' será alterado para 1 quando criar a próxima conta',
             ],
             'frequencia' => [
                 'type' => Type::nonNull(Type::int()),
@@ -110,11 +115,13 @@ class ContaType extends GraphQLType
             ],
             'modo' => [
                 'type' => Type::nonNull(GraphQL::type('ContaModo')),
-                'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em frequencia',
+                'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em' .
+                    ' frequencia',
             ],
             'automatico' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se o pagamento será automático após o vencimento, só ocorrerá se tiver saldo na carteira, usado para débito automático',
+                'description' => 'Informa se o pagamento será automático após o vencimento, só ocorrerá se' .
+                    ' tiver saldo na carteira, usado para débito automático',
             ],
             'acrescimo' => [
                 'type' => Type::nonNull(Type::float()),

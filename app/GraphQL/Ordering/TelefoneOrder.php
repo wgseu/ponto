@@ -36,7 +36,8 @@ class TelefoneOrder extends InputType
 {
     protected $attributes = [
         'name' => 'TelefoneOrder',
-        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por cliente',
+        'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por' .
+            ' cliente',
     ];
 
     public function fields(): array

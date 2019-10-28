@@ -35,7 +35,8 @@ class MetricaTipoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'MetricaTipo',
-        'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
+        'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no' .
+            ' atendimento, sabor da comida e apresentação do prato',
         'values' => [
             Metrica::TIPO_ENTREGA => Metrica::TIPO_ENTREGA,
             Metrica::TIPO_ATENDIMENTO => Metrica::TIPO_ATENDIMENTO,

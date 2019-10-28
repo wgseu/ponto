@@ -3,7 +3,7 @@ mutation create$[Table.norm]($input: $[Table.norm]Input!) {
 $[field.each(all)]
 $[field.if(default|null)]
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
     $[field]
 $[field.end]

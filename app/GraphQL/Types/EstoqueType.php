@@ -62,7 +62,8 @@ class EstoqueType extends GraphQLType
             ],
             'entrada_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite estoque FIFO',
+                'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite' .
+                    ' estoque FIFO',
             ],
             'fornecedor_id' => [
                 'type' => Type::id(),
@@ -102,7 +103,8 @@ class EstoqueType extends GraphQLType
             ],
             'reservado' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas reservados',
+                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas' .
+                    ' reservados',
             ],
             'cancelado' => [
                 'type' => Type::nonNull(Type::boolean()),

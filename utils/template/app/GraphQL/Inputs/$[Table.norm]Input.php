@@ -30,7 +30,7 @@ namespace App\GraphQL\Inputs;
 
 $[table.exists(date|time|enum)]
 use Rebing\GraphQL\Support\Facades\GraphQL;
-$[table.else.exists(data_cadastro|data_criacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento)]
+$[table.else.exists(data_cadastro|data_criacao|data_movimento|data_movimentacao|data_lancamento|data_envio|data_atualizacao|data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
 $[table.else.exists(datetime)]
 use Rebing\GraphQL\Support\Facades\GraphQL;
 $[table.end]
@@ -41,7 +41,8 @@ class $[Table.norm]Input extends InputType
 {
     protected $attributes = [
         'name' => '$[Table.norm]Input',
-        'description' => '$[Table.comment]',
+        'description' => $[table.each(description)]$[table.if(first)]'$[Table.description]'$[table.else] .
+            ' $[Table.description]'$[table.end]$[table.end],
     ];
 
     public function fields(): array
@@ -52,60 +53,71 @@ $[field.if(primary)]
 $[field.else.if(reference)]
             '$[field]' => [
                 'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::id()$[field.if(null)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(date)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(time)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Time')$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateTime')$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.end]
 $[field.else.if(currency)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(float|double)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(integer|bigint)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(blob)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(boolean)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else.if(enum)]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]')$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
             ],
 $[field.else]
             '$[field]' => [
                 'type' => $[field.if(null|info)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null|info)]$[field.else])$[field.end],
-                'description' => '$[Field.comment]',
+                'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
+                    ' $[Field.description]'$[field.end]$[field.end],
                 'rules' => ['max:$[field.length]'],
             ],
 $[field.end]

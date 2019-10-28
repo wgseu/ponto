@@ -75,7 +75,8 @@ class ServicoInput extends InputType
             ],
             'tempo_limite' => [
                 'type' => Type::int(),
-                'description' => 'Tempo de participação máxima que não será obrigatório adicionar o serviço ao pedido',
+                'description' => 'Tempo de participação máxima que não será obrigatório adicionar o' .
+                    ' serviço ao pedido',
             ],
             'valor' => [
                 'type' => Type::float(),

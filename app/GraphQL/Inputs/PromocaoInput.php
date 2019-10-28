@@ -36,7 +36,8 @@ class PromocaoInput extends InputType
 {
     protected $attributes = [
         'name' => 'PromocaoInput',
-        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado',
+        'description' => 'Informa se há descontos nos produtos em determinados dias da semana, o' .
+            ' preço pode subir ou descer e ser agendado para ser aplicado',
     ];
 
     public function fields(): array
@@ -44,7 +45,9 @@ class PromocaoInput extends InputType
         return [
             'promocao_id' => [
                 'type' => Type::id(),
-                'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a promoção será o resgate e somente pontos gerados por ela poderão ser usados',
+                'description' => 'Promoção que originou os pontos do cliente/pedido, se informado a' .
+                    ' promoção será o resgate e somente pontos gerados por ela poderão ser' .
+                    ' usados',
             ],
             'categoria_id' => [
                 'type' => Type::id(),
@@ -52,7 +55,8 @@ class PromocaoInput extends InputType
             ],
             'produto_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa qual o produto participará da promoção de desconto ou terá acréscimo',
+                'description' => 'Informa qual o produto participará da promoção de desconto ou terá' .
+                    ' acréscimo',
             ],
             'servico_id' => [
                 'type' => Type::id(),
@@ -76,11 +80,13 @@ class PromocaoInput extends InputType
             ],
             'inicio' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Momento inicial da semana em minutos que o produto começa a sofrer alteração de preço, em evento será o unix timestamp',
+                'description' => 'Momento inicial da semana em minutos que o produto começa a sofrer' .
+                    ' alteração de preço, em evento será o unix timestamp',
             ],
             'fim' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Momento final da semana em minutos que o produto volta ao preço normal, em evento será o unix timestamp',
+                'description' => 'Momento final da semana em minutos que o produto volta ao preço normal,' .
+                    ' em evento será o unix timestamp',
             ],
             'valor' => [
                 'type' => Type::nonNull(Type::float()),
@@ -88,7 +94,8 @@ class PromocaoInput extends InputType
             ],
             'pontos' => [
                 'type' => Type::int(),
-                'description' => 'Informa quantos pontos será ganho (Positivo) ou descontado (Negativo) na compra desse produto',
+                'description' => 'Informa quantos pontos será ganho (Positivo) ou descontado (Negativo) na' .
+                    ' compra desse produto',
             ],
             'parcial' => [
                 'type' => Type::boolean(),
@@ -100,15 +107,19 @@ class PromocaoInput extends InputType
             ],
             'evento' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se a promoção será aplicada apenas no intervalo de data informado',
+                'description' => 'Informa se a promoção será aplicada apenas no intervalo de data' .
+                    ' informado',
             ],
             'agendamento' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se essa promoção é um agendamento de preço, na data inicial o preço será aplicado, assim como a visibilidade do produto ou serviço será ativada ou desativada de acordo com o proibir',
+                'description' => 'Informa se essa promoção é um agendamento de preço, na data inicial o' .
+                    ' preço será aplicado, assim como a visibilidade do produto ou serviço' .
+                    ' será ativada ou desativada de acordo com o proibir',
             ],
             'limitar_vendas' => [
                 'type' => Type::boolean(),
-                'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto ou serviço',
+                'description' => 'Informa se deve limitar a quantidade de vendas dessa categoria, produto' .
+                    ' ou serviço',
             ],
             'funcao_vendas' => [
                 'type' => GraphQL::type('PromocaoFuncaoVendas'),
@@ -124,7 +135,8 @@ class PromocaoInput extends InputType
             ],
             'funcao_cliente' => [
                 'type' => GraphQL::type('PromocaoFuncaoCliente'),
-                'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa promoção',
+                'description' => 'Informa a regra para decidir se o cliente consegue comprar mais nessa' .
+                    ' promoção',
             ],
             'cliente_limite' => [
                 'type' => Type::float(),

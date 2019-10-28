@@ -57,7 +57,8 @@ class ZonaType extends GraphQLType
             ],
             'adicional_entrega' => [
                 'type' => Type::nonNull(Type::float()),
-                'description' => 'Taxa adicional para entrega nessa zona, será somado com a taxa para esse bairro',
+                'description' => 'Taxa adicional para entrega nessa zona, será somado com a taxa para esse' .
+                    ' bairro',
             ],
             'disponivel' => [
                 'type' => Type::nonNull(Type::boolean()),
@@ -69,11 +70,13 @@ class ZonaType extends GraphQLType
             ],
             'entrega_minima' => [
                 'type' => Type::int(),
-                'description' => 'Tempo mínimo para entrega nessa zona, sobrescreve o tempo de entrega para o bairro',
+                'description' => 'Tempo mínimo para entrega nessa zona, sobrescreve o tempo de entrega' .
+                    ' para o bairro',
             ],
             'entrega_maxima' => [
                 'type' => Type::int(),
-                'description' => 'Tempo máximo para entrega nessa zona, sobrescreve o tempo de entrega para o bairro',
+                'description' => 'Tempo máximo para entrega nessa zona, sobrescreve o tempo de entrega' .
+                    ' para o bairro',
             ],
         ];
     }

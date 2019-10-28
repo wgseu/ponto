@@ -53,7 +53,7 @@ class BancoType extends GraphQLType
             ],
             'fantasia' => [
                 'type' => Type::nonNull(Type::string()),
-                'description' => 'null',
+                'description' => 'Nome fantasia do banco',
             ],
             'razao_social' => [
                 'type' => Type::nonNull(Type::string()),

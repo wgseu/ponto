@@ -36,6 +36,7 @@ class SessaoUpdateInput extends SessaoInput
 
     protected $attributes = [
         'name' => 'SessaoUpdateInput',
-        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão',
+        'description' => 'Sessão de trabalho do dia, permite que vários caixas sejam abertos' .
+            ' utilizando uma mesma sessão',
     ];
 }

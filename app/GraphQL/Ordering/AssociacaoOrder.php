@@ -36,7 +36,8 @@ class AssociacaoOrder extends InputType
 {
     protected $attributes = [
         'name' => 'AssociacaoOrder',
-        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema',
+        'description' => 'Lista de pedidos que não foram integrados ainda e devem ser associados' .
+            ' ao sistema',
     ];
 
     public function fields(): array

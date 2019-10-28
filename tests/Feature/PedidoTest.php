@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Mesa;
 use Tests\TestCase;
 use App\Models\Pedido;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,31 +41,32 @@ class PedidoTest extends TestCase
         $seed_pedido =  factory(Pedido::class)->create();
         $response = $this->graphfl('create_pedido', [
             'input' => [
+                'tipo' => Pedido::TIPO_BALCAO,
+                'sessao_id' => $seed_pedido->sessao_id,
             ]
         ], $headers);
 
         $found_pedido = Pedido::findOrFail($response->json('data.CreatePedido.id'));
+        $this->assertEquals(Pedido::TIPO_BALCAO, $found_pedido->tipo);
     }
 
     public function testUpdatePedido()
     {
         $headers = PrestadorTest::auth();
         $pedido = factory(Pedido::class)->create();
-        $this->graphfl('update_pedido', [
-            'id' => $pedido->id,
-            'input' => [
-            ]
-        ], $headers);
+        $mesa = factory(Mesa::class)->create();
+        $this->graphfl(
+            'update_pedido',
+            [
+                'id' => $pedido->id,
+                'input' => [
+                    'mesa_id' => $mesa->id,
+                ]
+            ],
+            $headers
+        );
         $pedido->refresh();
-    }
-
-    public function testDeletePedido()
-    {
-        $headers = PrestadorTest::auth();
-        $pedido_to_delete = factory(Pedido::class)->create();
-        $pedido_to_delete = $this->graphfl('delete_pedido', ['id' => $pedido_to_delete->id], $headers);
-        $pedido = Pedido::find($pedido_to_delete->id);
-        $this->assertNull($pedido);
+        $this->assertEquals($mesa->id, $pedido->mesa_id);
     }
 
     public function testFindPedido()

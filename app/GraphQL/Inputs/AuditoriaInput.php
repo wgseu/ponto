@@ -44,7 +44,8 @@ class AuditoriaInput extends InputType
         return [
             'permissao_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa a permissão concedida ou utilizada que permitiu a realização da operação',
+                'description' => 'Informa a permissão concedida ou utilizada que permitiu a realização da' .
+                    ' operação',
             ],
             'prestador_id' => [
                 'type' => Type::nonNull(Type::id()),
@@ -69,7 +70,8 @@ class AuditoriaInput extends InputType
             ],
             'autorizacao' => [
                 'type' => Type::string(),
-                'description' => 'Código de autorização necessário para permitir realizar a função descrita',
+                'description' => 'Código de autorização necessário para permitir realizar a função' .
+                    ' descrita',
                 'rules' => ['max:255'],
             ],
             'data_registro' => [

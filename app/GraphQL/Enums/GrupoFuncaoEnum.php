@@ -35,7 +35,10 @@ class GrupoFuncaoEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'GrupoFuncao',
-        'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor preço, Média:  define o preço do produto como a média dos itens selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma: Soma todos os preços dos produtos selecionados',
+        'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor' .
+            ' preço, Média:  define o preço do produto como a média dos itens' .
+            ' selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma:' .
+            ' Soma todos os preços dos produtos selecionados',
         'values' => [
             Grupo::FUNCAO_MINIMO => Grupo::FUNCAO_MINIMO,
             Grupo::FUNCAO_MEDIA => Grupo::FUNCAO_MEDIA,

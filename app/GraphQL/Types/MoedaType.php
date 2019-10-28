@@ -62,7 +62,8 @@ class MoedaType extends GraphQLType
             ],
             'divisao' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Informa o número fracionário para determinar a quantidade de casas decimais, Ex: 100 para 0,00. 10 para 0,0',
+                'description' => 'Informa o número fracionário para determinar a quantidade de casas' .
+                    ' decimais, Ex: 100 para 0,00. 10 para 0,0',
             ],
             'fracao' => [
                 'type' => Type::string(),
@@ -82,7 +83,8 @@ class MoedaType extends GraphQLType
             ],
             'ativa' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se a moeda é recebida pela empresa, a moeda do país mesmo desativada sempre é aceita',
+                'description' => 'Informa se a moeda é recebida pela empresa, a moeda do país mesmo' .
+                    ' desativada sempre é aceita',
             ],
         ];
     }

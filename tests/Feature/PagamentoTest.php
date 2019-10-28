@@ -74,7 +74,7 @@ class PagamentoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $pagamento_to_delete = factory(Pagamento::class)->create();
-        $pagamento_to_delete = $this->graphfl('delete_pagamento', ['id' => $pagamento_to_delete->id], $headers);
+        $this->graphfl('delete_pagamento', ['id' => $pagamento_to_delete->id], $headers);
         $pagamento = Pagamento::find($pagamento_to_delete->id);
         $this->assertNull($pagamento);
     }

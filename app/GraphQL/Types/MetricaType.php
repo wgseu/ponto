@@ -37,7 +37,8 @@ class MetricaType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Metrica',
-        'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
+        'description' => 'Métricas de avaliação do atendimento e outros serviços do' .
+            ' estabelecimento',
         'model' => Metrica::class,
     ];
 
@@ -58,7 +59,8 @@ class MetricaType extends GraphQLType
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
-                'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
+                'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no' .
+                    ' atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::int()),

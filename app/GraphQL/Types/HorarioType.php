@@ -50,11 +50,14 @@ class HorarioType extends GraphQLType
             ],
             'modo' => [
                 'type' => Type::nonNull(GraphQL::type('HorarioModo')),
-                'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega',
+                'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que' .
+                    ' o estabelecimento estará aberto, Operação: quando aceitar novos pedidos' .
+                    ' locais, Entrega: quando aceita ainda pedidos para entrega',
             ],
             'funcao_id' => [
                 'type' => Type::id(),
-                'description' => 'Permite informar o horário de acesso ao sistema para realizar essa função',
+                'description' => 'Permite informar o horário de acesso ao sistema para realizar essa' .
+                    ' função',
             ],
             'prestador_id' => [
                 'type' => Type::id(),
@@ -62,15 +65,18 @@ class HorarioType extends GraphQLType
             ],
             'inicio' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Início do horário de funcionamento em minutos contando a partir de domingo até sábado',
+                'description' => 'Início do horário de funcionamento em minutos contando a partir de' .
+                    ' domingo até sábado',
             ],
             'fim' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Horário final de funcionamento do estabelecimento contando em minutos a partir de domingo',
+                'description' => 'Horário final de funcionamento do estabelecimento contando em minutos a' .
+                    ' partir de domingo',
             ],
             'mensagem' => [
                 'type' => Type::string(),
-                'description' => 'Mensagem que será mostrada quando o estabelecimento estiver fechado por algum motivo',
+                'description' => 'Mensagem que será mostrada quando o estabelecimento estiver fechado por' .
+                    ' algum motivo',
             ],
             'entrega_minima' => [
                 'type' => Type::int(),
@@ -82,7 +88,9 @@ class HorarioType extends GraphQLType
             ],
             'fechado' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se o estabelecimento estará fechado nesse horário programado, o início e fim será tempo no formato unix, quando verdadeiro tem prioridade sobre todos os horários',
+                'description' => 'Informa se o estabelecimento estará fechado nesse horário programado, o' .
+                    ' início e fim será tempo no formato unix, quando verdadeiro tem' .
+                    ' prioridade sobre todos os horários',
             ],
         ];
     }

@@ -36,7 +36,8 @@ class $[Table.norm]Order extends InputType
 {
     protected $attributes = [
         'name' => '$[Table.norm]Order',
-        'description' => '$[Table.comment]',
+        'description' => $[table.each(description)]$[table.if(first)]'$[Table.description]'$[table.else] .
+            ' $[Table.description]'$[table.end]$[table.end],
     ];
 
     public function fields(): array

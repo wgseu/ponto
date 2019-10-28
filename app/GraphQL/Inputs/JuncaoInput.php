@@ -52,11 +52,8 @@ class JuncaoInput extends InputType
             ],
             'estado' => [
                 'type' => GraphQL::type('JuncaoEstado'),
-                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido, Liberado: A mesa está livre, Cancelado: A mesa está liberada',
-            ],
-            'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data e hora da junção das mesas',
+                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
+                    ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
         ];
     }

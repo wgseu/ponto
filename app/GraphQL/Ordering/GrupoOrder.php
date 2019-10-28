@@ -36,7 +36,8 @@ class GrupoOrder extends InputType
 {
     protected $attributes = [
         'name' => 'GrupoOrder',
-        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos',
+        'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para' .
+            ' formações de produtos',
     ];
 
     public function fields(): array

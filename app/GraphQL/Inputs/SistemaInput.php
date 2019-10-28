@@ -36,7 +36,8 @@ class SistemaInput extends InputType
 {
     protected $attributes = [
         'name' => 'SistemaInput',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
+        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema' .
+            ' como a versão do banco de dados e a licença de uso',
     ];
 
     public function fields(): array

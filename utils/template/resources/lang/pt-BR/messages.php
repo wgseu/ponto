@@ -10,6 +10,6 @@ $[table.end]
 
 $[table.each]
     '$[table.norm]_functionality_name' => '$[Table.name.plural]',
-    '$[table.norm]_functionality_description' => '$[Table.comment]',
+    '$[table.norm]_functionality_description' => '$[Table.description]',
 $[table.end]
 ];

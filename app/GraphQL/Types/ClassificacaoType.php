@@ -49,7 +49,8 @@ class ClassificacaoType extends GraphQLType
             ],
             'classificacao_id' => [
                 'type' => Type::id(),
-                'description' => 'Classificação superior, quando informado, esta classificação será uma subclassificação',
+                'description' => 'Classificação superior, quando informado, esta classificação será uma' .
+                    ' subclassificação',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),

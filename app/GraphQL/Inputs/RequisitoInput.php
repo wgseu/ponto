@@ -56,7 +56,8 @@ class RequisitoInput extends InputType
             ],
             'fornecedor_id' => [
                 'type' => Type::id(),
-                'description' => 'Fornecedor em que deve ser consultado ou realizado as compras dos produtos, pode ser alterado no momento da compra',
+                'description' => 'Fornecedor em que deve ser consultado ou realizado as compras dos' .
+                    ' produtos, pode ser alterado no momento da compra',
             ],
             'quantidade' => [
                 'type' => Type::float(),

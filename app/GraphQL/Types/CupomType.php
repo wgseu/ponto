@@ -86,11 +86,13 @@ class CupomType extends GraphQLType
             ],
             'limitar_pedidos' => [
                 'type' => Type::nonNull(Type::boolean()),
-                'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do cliente',
+                'description' => 'Informa se deve limitar o cupom pela quantidade de pedidos válidos do' .
+                    ' cliente',
             ],
             'funcao_pedidos' => [
                 'type' => Type::nonNull(GraphQL::type('CupomFuncaoPedidos')),
-                'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar esse cupom',
+                'description' => 'Informa a regra para decidir se a quantidade de pedidos permite usar' .
+                    ' esse cupom',
             ],
             'pedidos_limite' => [
                 'type' => Type::nonNull(Type::int()),
@@ -102,7 +104,8 @@ class CupomType extends GraphQLType
             ],
             'funcao_valor' => [
                 'type' => Type::nonNull(GraphQL::type('CupomFuncaoValor')),
-                'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse cupom',
+                'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse' .
+                    ' cupom',
             ],
             'valor_limite' => [
                 'type' => Type::nonNull(Type::float()),

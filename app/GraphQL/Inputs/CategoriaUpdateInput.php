@@ -36,6 +36,7 @@ class CategoriaUpdateInput extends CategoriaInput
 
     protected $attributes = [
         'name' => 'CategoriaUpdateInput',
-        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos mesmos',
+        'description' => 'Informa qual a categoria dos produtos e permite a rápida localização dos' .
+            ' mesmos',
     ];
 }

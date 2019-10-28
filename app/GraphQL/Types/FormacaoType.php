@@ -36,7 +36,8 @@ class FormacaoType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Formacao',
-        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição',
+        'description' => 'Informa qual foi a formação que gerou esse produto, assim como quais' .
+            ' item foram retirados/adicionados da composição',
         'model' => Formacao::class,
     ];
 

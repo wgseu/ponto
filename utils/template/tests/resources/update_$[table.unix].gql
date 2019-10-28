@@ -3,7 +3,7 @@ mutation update$[Table.norm]($id: ID!, $input: $[Table.norm]UpdateInput!) {
 $[field.each(all)]
 $[field.if(primary|default|null)]
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
     $[field]
 $[field.end]

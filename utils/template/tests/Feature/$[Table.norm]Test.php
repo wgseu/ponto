@@ -59,7 +59,7 @@ $[field.else.if(text)]
 $[field.else.if(float)]
                 '$[field]' => 1.30,
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
                 '$[field]' => '2016-12-25 12:15:00',
 $[field.end]
@@ -98,7 +98,7 @@ $[field.else.if(text)]
 $[field.else.if(float)]
         $this->assertEquals(1.30, $found_$[table.unix]->$[field]);
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
         $this->assertEquals('2016-12-25 12:15:00', $found_$[table.unix]->$[field]);
 $[field.end]
@@ -142,7 +142,7 @@ $[field.else.if(text)]
 $[field.else.if(float)]
                 '$[field]' => 1.0,
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
                 '$[field]' => '2016-12-28 12:30:00',
 $[field.end]
@@ -179,7 +179,7 @@ $[field.else.if(text)]
 $[field.else.if(float)]
         $this->assertEquals(1.0, $$[table.unix]->$[field]);
 $[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*lancamento|.*envio|.*atualizacao|.*arquivado|.*arquivamento)]
+$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
         $this->assertEquals('2016-12-28 12:30:00', $$[table.unix]->$[field]);
 $[field.end]
@@ -200,13 +200,19 @@ $[field.end]
     {
         $headers = PrestadorTest::auth();
         $$[table.unix]_to_delete = factory($[Table.norm]::class)->create();
-        $$[table.unix]_to_delete = $this->graphfl('delete_$[table.unix]', ['id' => $$[table.unix]_to_delete->id], $headers);
-$[table.exists(data_arquivado)]
+        $this->graphfl('delete_$[table.unix]', ['id' => $$[table.unix]_to_delete->id], $headers);
+$[table.exists(data_arquivado|data_desativada)]
+$[field.each(all)]
+$[field.if(datetime)]
+$[field.match(.*arquiva.*|.*desativa.*)]
         $$[table.unix]_to_delete->refresh();
         $this->assertTrue($$[table.unix]_to_delete->trashed());
-        $this->assertNotNull($$[table.unix]_to_delete->data_arquivado);
+        $this->assertNotNull($$[table.unix]_to_delete->$[field]);
+$[field.end]
+$[field.end]
+$[field.end]
 $[table.else]
-        $$[table.unix] = $[Table.norm]::find($$[table.unix]_to_delete->id);
+        $$[table.unix] = $$[table.unix]_to_delete->fresh();
         $this->assertNull($$[table.unix]);
 $[table.end]
     }

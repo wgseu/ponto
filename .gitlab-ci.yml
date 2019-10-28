@@ -43,7 +43,53 @@ test:
 
   script:
     - composer install --ignore-platform-reqs --no-interaction
-    # - composer test
+    - composer test
+
+  cache:
+    paths:
+      - .composer-cache/
+      - vendor/
+
+coding style:
+  stage: test
+  image: composer:1.6.5
+
+  before_script:
+    - apk update &> /dev/null
+    - apk upgrade &> /dev/null
+    - apk add --no-cache
+      g++
+      make
+      autoconf
+      freetype
+      libpng
+      libjpeg
+      freetype-dev
+      libpng-dev
+      jpeg-dev &> /dev/null
+    - docker-php-ext-configure gd
+      --with-freetype-dir=/usr/lib/
+      --with-png-dir=/usr/lib/
+      --with-jpeg-dir=/usr/lib/
+      --with-gd &> /dev/null
+    - pecl install xdebug &> /dev/null
+    - docker-php-ext-enable xdebug &> /dev/null
+    - docker-php-ext-install gd &> /dev/null
+    - composer config -g cache-dir .composer-cache
+    - composer global require hirak/prestissimo
+
+  before_script:
+    - mkdir -p storage/logs
+    - mkdir -p storage/app/cache
+    - mkdir -p storage/app/compiled
+    - mkdir -p storage/framework/cache
+    - mkdir -p storage/framework/views
+    - mkdir -p storage/framework/sessions
+    - mkdir -p storage/framework/testing
+
+  script:
+    - composer install --ignore-platform-reqs --no-interaction
+    - composer check-style
 
   cache:
     paths:
@@ -73,7 +119,7 @@ build:
       python
       which
       bash &> /dev/null
-    - curl -sSL https://sdk.cloud.google.com | bash
+    - curl -sSL https://sdk.cloud.google.com | bash &> /dev/null
     - PATH=$PATH:/root/google-cloud-sdk/bin
 
     - 'LAST_APP_TAG=`curl -f -S -s -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/repository/tags?per_page=1" | jq -r ".[0].name"`'

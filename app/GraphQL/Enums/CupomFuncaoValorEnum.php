@@ -35,7 +35,8 @@ class CupomFuncaoValorEnum extends EnumType
 {
     protected $attributes = [
         'name' => 'CupomFuncaoValor',
-        'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse cupom',
+        'description' => 'Informa a regra para decidir se o valor do pedido permite usar esse' .
+            ' cupom',
         'values' => [
             Cupom::FUNCAO_VALOR_MENOR => Cupom::FUNCAO_VALOR_MENOR,
             Cupom::FUNCAO_VALOR_IGUAL => Cupom::FUNCAO_VALOR_IGUAL,

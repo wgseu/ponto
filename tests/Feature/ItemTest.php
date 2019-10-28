@@ -84,7 +84,7 @@ class ItemTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $item_to_delete = factory(Item::class)->create();
-        $item_to_delete = $this->graphfl('delete_item', ['id' => $item_to_delete->id], $headers);
+        $this->graphfl('delete_item', ['id' => $item_to_delete->id], $headers);
         $item = Item::find($item_to_delete->id);
         $this->assertNull($item);
     }

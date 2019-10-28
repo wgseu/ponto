@@ -72,11 +72,13 @@ class NotaInput extends InputType
             ],
             'numero_final' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Número final da nota, igual ao número inicial quando for a nota de um pedido',
+                'description' => 'Número final da nota, igual ao número inicial quando for a nota de um' .
+                    ' pedido',
             ],
             'sequencia' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Permite iniciar o número da nota quando alcançar 999.999.999, deve ser incrementado sempre que alcançar',
+                'description' => 'Permite iniciar o número da nota quando alcançar 999.999.999, deve ser' .
+                    ' incrementado sempre que alcançar',
             ],
             'chave' => [
                 'type' => Type::string(),

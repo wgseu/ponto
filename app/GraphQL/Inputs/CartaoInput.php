@@ -56,7 +56,8 @@ class CartaoInput extends InputType
             ],
             'taxa' => [
                 'type' => Type::float(),
-                'description' => 'Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a 100',
+                'description' => 'Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a' .
+                    ' 100',
             ],
             'dias_repasse' => [
                 'type' => Type::int(),

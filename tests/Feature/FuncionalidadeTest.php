@@ -70,7 +70,11 @@ class FuncionalidadeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $funcionalidade_to_delete = factory(Funcionalidade::class)->create();
-        $funcionalidade_to_delete = $this->graphfl('delete_funcionalidade', ['id' => $funcionalidade_to_delete->id], $headers);
+        $funcionalidade_to_delete = $this->graphfl(
+            'delete_funcionalidade',
+            ['id' => $funcionalidade_to_delete->id],
+            $headers
+        );
         $funcionalidade = Funcionalidade::find($funcionalidade_to_delete->id);
         $this->assertNull($funcionalidade);
     }

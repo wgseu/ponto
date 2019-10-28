@@ -36,6 +36,7 @@ class SistemaUpdateInput extends SistemaInput
 
     protected $attributes = [
         'name' => 'SistemaUpdateInput',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
+        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema' .
+            ' como a versão do banco de dados e a licença de uso',
     ];
 }

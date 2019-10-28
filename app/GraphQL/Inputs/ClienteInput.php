@@ -36,7 +36,8 @@ class ClienteInput extends InputType
 {
     protected $attributes = [
         'name' => 'ClienteInput',
-        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui',
+        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas,' .
+            ' funcionários, fornecedores e parceiros são cadastrados aqui',
     ];
 
     public function fields(): array
@@ -76,7 +77,8 @@ class ClienteInput extends InputType
             ],
             'cpf' => [
                 'type' => Type::string(),
-                'description' => 'Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa Jurídica(CNPJ)',
+                'description' => 'Cadastro de Pessoa Física(CPF) ou Cadastro Nacional de Pessoa' .
+                    ' Jurídica(CNPJ)',
                 'rules' => ['max:20'],
             ],
             'rg' => [
@@ -143,7 +145,8 @@ class ClienteInput extends InputType
             ],
             'linguagem' => [
                 'type' => Type::string(),
-                'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR',
+                'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo' .
+                    ' e o site, Ex: pt-BR',
                 'rules' => ['max:20'],
             ],
         ];

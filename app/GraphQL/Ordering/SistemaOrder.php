@@ -36,7 +36,8 @@ class SistemaOrder extends InputType
 {
     protected $attributes = [
         'name' => 'SistemaOrder',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso',
+        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema' .
+            ' como a versão do banco de dados e a licença de uso',
     ];
 
     public function fields(): array

@@ -53,7 +53,8 @@ class ObservacaoType extends GraphQLType
             ],
             'grupo' => [
                 'type' => Type::nonNull(Type::int()),
-                'description' => 'Informa o grupo de observações obrigatórias, se maior que zero, é obrigatório escolher pelo menos uma opção',
+                'description' => 'Informa o grupo de observações obrigatórias, se maior que zero, é' .
+                    ' obrigatório escolher pelo menos uma opção',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),

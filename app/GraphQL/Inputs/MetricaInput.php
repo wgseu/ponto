@@ -36,7 +36,8 @@ class MetricaInput extends InputType
 {
     protected $attributes = [
         'name' => 'MetricaInput',
-        'description' => 'Métricas de avaliação do atendimento e outros serviços do estabelecimento',
+        'description' => 'Métricas de avaliação do atendimento e outros serviços do' .
+            ' estabelecimento',
     ];
 
     public function fields(): array
@@ -54,7 +55,8 @@ class MetricaInput extends InputType
             ],
             'tipo' => [
                 'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
-                'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no atendimento, sabor da comida e apresentação do prato',
+                'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no' .
+                    ' atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [
                 'type' => Type::int(),

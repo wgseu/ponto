@@ -68,7 +68,7 @@ class PropriedadeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $propriedade_to_delete = factory(Propriedade::class)->create();
-        $propriedade_to_delete = $this->graphfl('delete_propriedade', ['id' => $propriedade_to_delete->id], $headers);
+        $this->graphfl('delete_propriedade', ['id' => $propriedade_to_delete->id], $headers);
         $propriedade = Propriedade::find($propriedade_to_delete->id);
         $this->assertNull($propriedade);
     }

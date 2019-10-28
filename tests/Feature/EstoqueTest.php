@@ -74,7 +74,7 @@ class EstoqueTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $estoque_to_delete = factory(Estoque::class)->create();
-        $estoque_to_delete = $this->graphfl('delete_estoque', ['id' => $estoque_to_delete->id], $headers);
+        $this->graphfl('delete_estoque', ['id' => $estoque_to_delete->id], $headers);
         $estoque = Estoque::find($estoque_to_delete->id);
         $this->assertNull($estoque);
     }

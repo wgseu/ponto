@@ -72,7 +72,7 @@ class TributacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $tributacao_to_delete = factory(Tributacao::class)->create();
-        $tributacao_to_delete = $this->graphfl('delete_tributacao', ['id' => $tributacao_to_delete->id], $headers);
+        $this->graphfl('delete_tributacao', ['id' => $tributacao_to_delete->id], $headers);
         $tributacao = Tributacao::find($tributacao_to_delete->id);
         $this->assertNull($tributacao);
     }

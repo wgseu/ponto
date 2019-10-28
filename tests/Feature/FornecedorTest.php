@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Fornecedor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,34 +38,37 @@ class FornecedorTest extends TestCase
     public function testCreateFornecedor()
     {
         $headers = PrestadorTest::auth();
-        $seed_fornecedor =  factory(Fornecedor::class)->create();
+        $seed_fornecedor =  factory(Cliente::class)->create();
         $response = $this->graphfl('create_fornecedor', [
             'input' => [
-                'empresa_id' => $seed_fornecedor->empresa_id,
+                'empresa_id' => $seed_fornecedor->id,
             ]
         ], $headers);
 
         $found_fornecedor = Fornecedor::findOrFail($response->json('data.CreateFornecedor.id'));
-        $this->assertEquals($seed_fornecedor->empresa_id, $found_fornecedor->empresa_id);
+        $this->assertEquals($seed_fornecedor->id, $found_fornecedor->empresa_id);
     }
 
     public function testUpdateFornecedor()
     {
         $headers = PrestadorTest::auth();
         $fornecedor = factory(Fornecedor::class)->create();
+        $empresa = factory(Cliente::class)->create();
         $this->graphfl('update_fornecedor', [
             'id' => $fornecedor->id,
             'input' => [
+                'empresa_id' => $empresa->id
             ]
         ], $headers);
         $fornecedor->refresh();
+        $this->assertEquals($empresa->id, $fornecedor->empresa_id);
     }
 
     public function testDeleteFornecedor()
     {
         $headers = PrestadorTest::auth();
         $fornecedor_to_delete = factory(Fornecedor::class)->create();
-        $fornecedor_to_delete = $this->graphfl('delete_fornecedor', ['id' => $fornecedor_to_delete->id], $headers);
+        $this->graphfl('delete_fornecedor', ['id' => $fornecedor_to_delete->id], $headers);
         $fornecedor = Fornecedor::find($fornecedor_to_delete->id);
         $this->assertNull($fornecedor);
     }

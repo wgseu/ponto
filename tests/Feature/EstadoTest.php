@@ -72,7 +72,7 @@ class EstadoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $estado_to_delete = factory(Estado::class)->create();
-        $estado_to_delete = $this->graphfl('delete_estado', ['id' => $estado_to_delete->id], $headers);
+        $this->graphfl('delete_estado', ['id' => $estado_to_delete->id], $headers);
         $estado = Estado::find($estado_to_delete->id);
         $this->assertNull($estado);
     }

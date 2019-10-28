@@ -72,7 +72,7 @@ class GrupoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $grupo_to_delete = factory(Grupo::class)->create();
-        $grupo_to_delete = $this->graphfl('delete_grupo', ['id' => $grupo_to_delete->id], $headers);
+        $this->graphfl('delete_grupo', ['id' => $grupo_to_delete->id], $headers);
         $grupo_to_delete->refresh();
         $this->assertTrue($grupo_to_delete->trashed());
         $this->assertNotNull($grupo_to_delete->data_arquivado);

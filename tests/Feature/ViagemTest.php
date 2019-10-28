@@ -68,7 +68,7 @@ class ViagemTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $viagem_to_delete = factory(Viagem::class)->create();
-        $viagem_to_delete = $this->graphfl('delete_viagem', ['id' => $viagem_to_delete->id], $headers);
+        $this->graphfl('delete_viagem', ['id' => $viagem_to_delete->id], $headers);
         $viagem = Viagem::find($viagem_to_delete->id);
         $this->assertNull($viagem);
     }

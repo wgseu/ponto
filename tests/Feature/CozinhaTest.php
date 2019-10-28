@@ -66,7 +66,7 @@ class CozinhaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cozinha_to_delete = factory(Cozinha::class)->create();
-        $cozinha_to_delete = $this->graphfl('delete_cozinha', ['id' => $cozinha_to_delete->id], $headers);
+        $this->graphfl('delete_cozinha', ['id' => $cozinha_to_delete->id], $headers);
         $cozinha = Cozinha::find($cozinha_to_delete->id);
         $this->assertNull($cozinha);
     }

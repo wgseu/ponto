@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Registro de viagem de uma entrega ou compra de insumos
@@ -70,7 +71,18 @@ class Viagem extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'responsavel_id');
     }
 
+    /**
+     * Regras:
+     * A data de chegada é anterior a de saída;
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->data_chegada) && $this->data_chegada < $this->data_saida) {
+            $errors['data_chegada'] = __('messages.error_time_viagem');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -195,5 +196,52 @@ class Promocao extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        $count = null;
+        $query = self::where('inicio', '>=', $this->inicio)->where('fim', '<=', $this->fim);
+        $result = $query->first();
+        if ($result) {
+            if ($this->categoria_id) {
+                $count = $query->where('categoria_id', $this->categoria_id)->count();
+            }
+            if ($this->produto_id) {
+                $count = $query->where('produto_id', $this->produto_id)->count();
+            }
+            if ($this->servico_id) {
+                $count = $query->where('servico_id', $this->servico_id)->count();
+            }
+        }
+        $selecao = !is_null($this->categoria_id) +
+        !is_null($this->produto_id) +
+        !is_null($this->servico_id);
+        if (is_null($this->servico_id) && !is_null($this->bairro_id)) {
+            $errors['servico_id'] = __('messages.servico_id_empty');
+        } elseif ($selecao > 1) {
+            $errors['servico_id'] = __('messages.multiple_selections');
+        } elseif ($selecao < 1) {
+            $errors['servico_id'] = __('messages.no_selection');
+        }
+        if (!is_null($this->zona_id) && is_null($this->bairro_id)) {
+            $errors['bairro_id'] = __('messages.bairro_id_empty');
+        }
+        if ($this->inicio >= $this->fim) {
+            $errors['inicio'] = __('messages.invalid_interval');
+        } 
+        if ($count > 0 && $this->evento != 'Y') {
+            $errors['inicio'] = __('messages.inicio_existing');
+        }
+        if (is_null($this->promocao_id) && $this->pontos < 0) {
+            $errors['pontos'] = __('messages.points_not_negative');
+        } elseif (!is_null($this->promocao_id) && $this->pontos > 0) {
+            $errors['pontos'] = _('messages.points_must_be_negative');
+        }
+        if ($this->agendamento == 'Y'
+            && $this->pontos == 0
+            && $this->valor <= 0) {
+            $errors['valor'] = __('messages.value_cannot_zero');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

@@ -42,6 +42,7 @@ class Servico extends Model implements ValidateInterface
      */
     public const TIPO_EVENTO = 'evento';
     public const TIPO_TAXA = 'taxa';
+    public const ENTREGA_ID = 1;
 
     /**
      * The table associated with the model.

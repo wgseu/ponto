@@ -37,16 +37,16 @@ class PromocaoTest extends TestCase
         $seed_promocao = factory(Promocao::class)->create();
         $response = $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 1,
+                'inicio' => 1234,
+                'fim' => 1345,
                 'valor' => 1.50,
                 'categoria_id' => $seed_promocao->categoria_id
             ]
         ], $headers);
 
         $found_promocao = Promocao::findOrFail($response->json('data.CreatePromocao.id'));
-        $this->assertEquals(1, $found_promocao->inicio);
-        $this->assertEquals(1, $found_promocao->fim);
+        $this->assertEquals(1234, $found_promocao->inicio);
+        $this->assertEquals(1345, $found_promocao->fim);
         $this->assertEquals(1.50, $found_promocao->valor);
     }
 
@@ -57,14 +57,14 @@ class PromocaoTest extends TestCase
         $this->graphfl('update_promocao', [
             'id' => $promocao->id,
             'input' => [
-                'inicio' => 1,
-                'fim' => 1,
+                'inicio' => 10,
+                'fim' => 20,
                 'valor' => 1.50,
             ]
         ], $headers);
         $promocao->refresh();
-        $this->assertEquals(1, $promocao->inicio);
-        $this->assertEquals(1, $promocao->fim);
+        $this->assertEquals(10, $promocao->inicio);
+        $this->assertEquals(20, $promocao->fim);
         $this->assertEquals(1.50, $promocao->valor);
     }
 

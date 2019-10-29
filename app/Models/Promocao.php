@@ -226,7 +226,7 @@ class Promocao extends Model implements ValidateInterface
         }
         if ($this->inicio >= $this->fim) {
             $errors['inicio'] = __('messages.invalid_interval');
-        } 
+        }
         if ($count > 0 && $this->evento != 'Y') {
             $errors['inicio'] = __('messages.inicio_existing');
         }
@@ -235,9 +235,11 @@ class Promocao extends Model implements ValidateInterface
         } elseif (!is_null($this->promocao_id) && $this->pontos > 0) {
             $errors['pontos'] = _('messages.points_must_be_negative');
         }
-        if ($this->agendamento == 'Y'
+        if (
+            $this->agendamento == 'Y'
             && $this->pontos == 0
-            && $this->valor <= 0) {
+            && $this->valor <= 0
+        ) {
             $errors['valor'] = __('messages.value_cannot_zero');
         }
         if (!empty($errors)) {

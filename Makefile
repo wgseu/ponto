@@ -29,8 +29,8 @@ help:
 	@echo "  test         Test application"
 	@echo "  cover        Test application and generate coverage output"
 	@echo "  report       Test application and generate coverage report files"
-	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
-	@echo "  fix          Fix php files code standard using PSR2"
+	@echo "  check        Check the API with PHP Code Sniffer (PSR12)"
+	@echo "  fix          Fix php files code standard using PSR12"
 	@echo "  dump         Create backup of whole database"
 	@echo "  restore      Restore backup from whole database"
 	@echo "  class        Generate initial code from template files"
@@ -61,11 +61,11 @@ purge: clean
 
 check:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR2 app tests
+	@docker-compose exec -T php ./vendor/bin/phpcs --standard=PSR12 app tests
 
 fix:
 	@echo "Fixing to standard code..."
-	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR2 app tests
+	@docker-compose exec -T php ./vendor/bin/phpcbf --standard=PSR12 app tests
 
 update:
 	@docker run --rm \

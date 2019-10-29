@@ -26,8 +26,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Bairro;
+use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Localizacao;
+use App\Models\Zona;
+use Illuminate\Validation\ValidationException;
 
 class LocalizacaoTest extends TestCase
 {
@@ -83,5 +87,48 @@ class LocalizacaoTest extends TestCase
         $localizacao = factory(Localizacao::class)->create();
         $response = $this->graphfl('query_localizacao', [ 'id' => $localizacao->id ], $headers);
         $this->assertEquals($localizacao->id, $response->json('data.localizacoes.data.0.id'));
+    }
+
+    public function testValidateCondominioTipoObrigatorio()
+    {
+        $localizacao = factory(Localizacao::class)->create();
+        $localizacao->tipo = Localizacao::TIPO_CONDOMINIO;
+        $this->expectException(ValidationException::class);
+        $localizacao->save();
+    }
+
+    public function testValidateApartamentoTipoObrigatorio()
+    {
+        $localizacao = factory(Localizacao::class)->create();
+        $localizacao->tipo = Localizacao::TIPO_APARTAMENTO;
+        $this->expectException(ValidationException::class);
+        $localizacao->save();
+    }
+
+    public function testBelongToCliente()
+    {
+        $localizacao = factory(Localizacao::class)->create();
+        $expected = Cliente::find($localizacao->cliente_id);
+        $result = $localizacao->cliente;
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToBairro()
+    {
+        $localizacao = factory(Localizacao::class)->create();
+        $expected = Bairro::find($localizacao->bairro_id);
+        $result = $localizacao->bairro;
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToZona()
+    {
+        $zona = factory(Zona::class)->create();
+        $localizacao = factory(Localizacao::class)->create();
+        $localizacao->zona_id = $zona->id;
+        $localizacao->save();
+        $expected = Zona::find($localizacao->zona_id);
+        $result = $localizacao->zona;
+        $this->assertEquals($expected, $result);
     }
 }

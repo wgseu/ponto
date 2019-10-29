@@ -30,6 +30,7 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Endereço detalhado de um cliente
@@ -118,7 +119,22 @@ class Localizacao extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Zona', 'zona_id');
     }
 
+    /**
+     * Regras:
+     * Se o tipo de Localização for apartamento o atributo apartamento é obrigatório;
+     * Se o tipo de Localização for condominio o atributo condominio é obrigatório;
+     */
     public function validate()
     {
+        $errors = [];
+        if ($this->tipo == Localizacao::TIPO_APARTAMENTO && is_null($this->apartamento)) {
+            $errors['apartamento'] = __('messages.localizacao_tipo_apartamento_required_apartamento');
+        }
+        if ($this->tipo == Localizacao::TIPO_CONDOMINIO && is_null($this->condominio)) {
+            $errors['condominio'] = __('messages.localizacao_tipo_condominio_required_condominio');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

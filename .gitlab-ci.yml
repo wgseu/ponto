@@ -164,5 +164,4 @@ staging:
   script:
     - kubectl config set-context --current --namespace=grandchef-apps
     - kubectl patch deployment beta-grandchef-app  -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
-    - kubectl patch deployment beta-grandchef-cron -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
     - kubectl patch deployment beta-grandchef-sync -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"

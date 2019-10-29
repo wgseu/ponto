@@ -43,7 +43,7 @@ test:
 
   script:
     - composer install --ignore-platform-reqs --no-interaction
-    - composer test
+    - composer test -- --colors=never
 
   cache:
     paths:

@@ -3,15 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Zona;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class ZonaTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateZona()
     {
         $headers = PrestadorTest::auth();

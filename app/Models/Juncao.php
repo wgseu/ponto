@@ -52,12 +52,8 @@ class Juncao extends Model implements ValidateInterface
      */
     protected $table = 'juncoes';
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    public const CREATED_AT = 'data_movimento';
+    public const UPDATED_AT = null;
 
     /**
      * The attributes that are mass assignable.
@@ -68,7 +64,6 @@ class Juncao extends Model implements ValidateInterface
         'mesa_id',
         'pedido_id',
         'estado',
-        'data_movimento',
     ];
 
     /**

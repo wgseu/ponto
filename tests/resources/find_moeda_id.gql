@@ -1,5 +1,5 @@
 query ($id: ID!){
-  moedas(filter: {id: $id}) {
+  moedas(filter: {id: $id}, order: { id: asc }) {
     data {
       id
       nome

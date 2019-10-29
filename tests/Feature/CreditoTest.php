@@ -4,15 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Credito;
 use App\Models\Cliente;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class CreditoTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateCredito()
     {
         $headers = PrestadorTest::auth();

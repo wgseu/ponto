@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,19 +21,17 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Juncao;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Mesa;
 
 class JuncaoTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateJuncao()
     {
         $headers = PrestadorTest::auth();
@@ -42,37 +40,27 @@ class JuncaoTest extends TestCase
             'input' => [
                 'mesa_id' => $seed_juncao->mesa_id,
                 'pedido_id' => $seed_juncao->pedido_id,
-                'data_movimento' => '2016-12-25 12:15:00',
             ]
         ], $headers);
 
         $found_juncao = Juncao::findOrFail($response->json('data.CreateJuncao.id'));
         $this->assertEquals($seed_juncao->mesa_id, $found_juncao->mesa_id);
         $this->assertEquals($seed_juncao->pedido_id, $found_juncao->pedido_id);
-        $this->assertEquals('2016-12-25 12:15:00', $found_juncao->data_movimento);
     }
 
     public function testUpdateJuncao()
     {
         $headers = PrestadorTest::auth();
         $juncao = factory(Juncao::class)->create();
+        $mesa = factory(Mesa::class)->create();
         $this->graphfl('update_juncao', [
             'id' => $juncao->id,
             'input' => [
-                'data_movimento' => '2016-12-28 12:30:00',
+                'mesa_id' => $mesa->id,
             ]
         ], $headers);
         $juncao->refresh();
-        $this->assertEquals('2016-12-28 12:30:00', $juncao->data_movimento);
-    }
-
-    public function testDeleteJuncao()
-    {
-        $headers = PrestadorTest::auth();
-        $juncao_to_delete = factory(Juncao::class)->create();
-        $juncao_to_delete = $this->graphfl('delete_juncao', ['id' => $juncao_to_delete->id], $headers);
-        $juncao = Juncao::find($juncao_to_delete->id);
-        $this->assertNull($juncao);
+        $this->assertEquals($mesa->id, $juncao->mesa_id);
     }
 
     public function testFindJuncao()

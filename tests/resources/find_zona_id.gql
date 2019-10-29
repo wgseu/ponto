@@ -1,6 +1,6 @@
 query zona($id: ID!)
 {
-  zonas(filter: {id: $id}) 
+  zonas(filter: {id: $id}, order: { id: asc }) 
   {
     data{
       id

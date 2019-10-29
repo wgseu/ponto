@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,50 +21,30 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Empresa;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class EmpresaTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function testCreateEmpresa()
-    {
-        $headers = PrestadorTest::auth();
-        $seed_empresa =  factory(Empresa::class)->create();
-        $response = $this->graphfl('create_empresa', [
-            'input' => [
-            ]
-        ], $headers);
-
-        $found_empresa = Empresa::findOrFail($response->json('data.CreateEmpresa.id'));
-    }
-
     public function testUpdateEmpresa()
     {
         $headers = PrestadorTest::auth();
         $empresa = factory(Empresa::class)->create();
+        $parceiro = factory(Cliente::class)->create();
         $this->graphfl('update_empresa', [
             'id' => $empresa->id,
             'input' => [
+                'parceiro_id' => $parceiro->id,
             ]
         ], $headers);
         $empresa->refresh();
-    }
-
-    public function testDeleteEmpresa()
-    {
-        $headers = PrestadorTest::auth();
-        $empresa_to_delete = factory(Empresa::class)->create();
-        $empresa_to_delete = $this->graphfl('delete_empresa', ['id' => $empresa_to_delete->id], $headers);
-        $empresa = Empresa::find($empresa_to_delete->id);
-        $this->assertNull($empresa);
+        $this->assertEquals($parceiro->id, $empresa->parceiro_id);
     }
 
     public function testFindEmpresa()

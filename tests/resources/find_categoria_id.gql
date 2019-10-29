@@ -1,5 +1,5 @@
 query ($id: ID!){
-  categorias(filter: {id: $id}) {
+  categorias(filter: {id: $id}, order: { id: asc }) {
     data {
       id
       descricao

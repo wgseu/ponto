@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,69 +21,19 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Models\Funcionalidade;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FuncionalidadeTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function testCreateFuncionalidade()
-    {
-        $headers = PrestadorTest::auth();
-        $seed_funcionalidade =  factory(Funcionalidade::class)->create();
-        $response = $this->graphfl('create_funcionalidade', [
-            'input' => [
-                'nome' => 'Teste',
-                'descricao' => 'Teste',
-            ]
-        ], $headers);
-
-        $found_funcionalidade = Funcionalidade::findOrFail($response->json('data.CreateFuncionalidade.id'));
-        $this->assertEquals('Teste', $found_funcionalidade->nome);
-        $this->assertEquals('Teste', $found_funcionalidade->descricao);
-    }
-
-    public function testUpdateFuncionalidade()
-    {
-        $headers = PrestadorTest::auth();
-        $funcionalidade = factory(Funcionalidade::class)->create();
-        $this->graphfl('update_funcionalidade', [
-            'id' => $funcionalidade->id,
-            'input' => [
-                'nome' => 'Atualizou',
-                'descricao' => 'Atualizou',
-            ]
-        ], $headers);
-        $funcionalidade->refresh();
-        $this->assertEquals('Atualizou', $funcionalidade->nome);
-        $this->assertEquals('Atualizou', $funcionalidade->descricao);
-    }
-
-    public function testDeleteFuncionalidade()
-    {
-        $headers = PrestadorTest::auth();
-        $funcionalidade_to_delete = factory(Funcionalidade::class)->create();
-        $funcionalidade_to_delete = $this->graphfl(
-            'delete_funcionalidade',
-            ['id' => $funcionalidade_to_delete->id],
-            $headers
-        );
-        $funcionalidade = Funcionalidade::find($funcionalidade_to_delete->id);
-        $this->assertNull($funcionalidade);
-    }
-
     public function testFindFuncionalidade()
     {
         $headers = PrestadorTest::auth();
-        $funcionalidade = factory(Funcionalidade::class)->create();
-        $response = $this->graphfl('query_funcionalidade', [ 'id' => $funcionalidade->id ], $headers);
-        $this->assertEquals($funcionalidade->id, $response->json('data.funcionalidades.data.0.id'));
+        $response = $this->graphfl('query_funcionalidade', [ 'id' => 74 ], $headers);
+        $this->assertEquals(7, $response->json('data.funcionalidades.data.0.modulo_id'));
     }
 }

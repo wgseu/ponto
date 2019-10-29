@@ -37,19 +37,15 @@ class Estoque extends Model implements ValidateInterface
 {
     use ModelEvents;
 
+    public const CREATED_AT = 'data_movimento';
+    public const UPDATED_AT = null;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'estoques';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -72,7 +68,6 @@ class Estoque extends Model implements ValidateInterface
         'detalhes',
         'reservado',
         'cancelado',
-        'data_movimento',
     ];
 
     /**

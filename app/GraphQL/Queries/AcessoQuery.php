@@ -69,7 +69,7 @@ class AcessoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::map(
+        $query = Filter::apply(
             $args['filter'] ?? [],
             Acesso::with($fields->getRelations())->select($fields->getSelect())
         );

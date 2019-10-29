@@ -2,15 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Categoria;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class CategoriaTest extends TestCase
 {
-    use RefreshDatabase;
-    
     public function testCreateCategoria()
     {
         $headers = PrestadorTest::auth();

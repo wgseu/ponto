@@ -3,15 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Classificacao;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class ClassificacaoTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateClassificacao()
     {
         $headers = PrestadorTest::auth();

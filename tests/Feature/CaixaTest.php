@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,32 +21,30 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Caixa;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Carteira;
 
 class CaixaTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateCaixa()
     {
         $headers = PrestadorTest::auth();
-        $seed_caixa =  factory(Caixa::class)->create();
+        $carteira =  factory(Carteira::class)->create();
         $response = $this->graphfl('create_caixa', [
             'input' => [
-                'carteira_id' => $seed_caixa->carteira_id,
+                'carteira_id' => $carteira->id,
                 'descricao' => 'Teste',
             ]
         ], $headers);
 
         $found_caixa = Caixa::findOrFail($response->json('data.CreateCaixa.id'));
-        $this->assertEquals($seed_caixa->carteira_id, $found_caixa->carteira_id);
+        $this->assertEquals($carteira->id, $found_caixa->carteira_id);
         $this->assertEquals('Teste', $found_caixa->descricao);
     }
 
@@ -68,7 +66,7 @@ class CaixaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $caixa_to_delete = factory(Caixa::class)->create();
-        $caixa_to_delete = $this->graphfl('delete_caixa', ['id' => $caixa_to_delete->id], $headers);
+        $this->graphfl('delete_caixa', ['id' => $caixa_to_delete->id], $headers);
         $caixa = Caixa::find($caixa_to_delete->id);
         $this->assertNull($caixa);
     }

@@ -57,6 +57,7 @@ class Modulo extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
+        'id',
         'nome',
         'descricao',
         'habilitado',

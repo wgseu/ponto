@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,19 +21,16 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Cardapio;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CardapioTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateCardapio()
     {
         $headers = PrestadorTest::auth();
@@ -55,16 +52,18 @@ class CardapioTest extends TestCase
         $this->graphfl('update_cardapio', [
             'id' => $cardapio->id,
             'input' => [
+                'produto_id' => $cardapio->produto_id,
             ]
         ], $headers);
         $cardapio->refresh();
+        $this->assertEquals(1, $cardapio->id);
     }
 
     public function testDeleteCardapio()
     {
         $headers = PrestadorTest::auth();
         $cardapio_to_delete = factory(Cardapio::class)->create();
-        $cardapio_to_delete = $this->graphfl('delete_cardapio', ['id' => $cardapio_to_delete->id], $headers);
+        $this->graphfl('delete_cardapio', ['id' => $cardapio_to_delete->id], $headers);
         $cardapio = Cardapio::find($cardapio_to_delete->id);
         $this->assertNull($cardapio);
     }

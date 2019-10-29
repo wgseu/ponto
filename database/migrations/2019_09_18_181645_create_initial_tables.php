@@ -1931,6 +1931,14 @@ class CreateInitialTables extends Migration
                 ->onDelete('restrict');
         });
         Schema::enableForeignKeyConstraints();
+
+        if (env('APP_ENV') == 'testing') {
+            (new ModuloSeeder())->run();
+            (new FuncionalidadeSeeder())->run();
+            (new PermissaoSeeder())->run();
+        } elseif (env('APP_ENV') != 'testing') {
+            (new DatabaseSeeder())->run();
+        }
     }
 
     /**

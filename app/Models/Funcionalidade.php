@@ -57,6 +57,7 @@ class Funcionalidade extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
+        'id',
         'modulo_id',
         'funcionalidade_id',
         'nome',

@@ -27,7 +27,8 @@ help:
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
-	@echo "  cover        Test application and generate coverage files"
+	@echo "  cover        Test application and generate coverage output"
+	@echo "  report       Test application and generate coverage report files"
 	@echo "  check        Check the API with PHP Code Sniffer (PSR2)"
 	@echo "  fix          Fix php files code standard using PSR2"
 	@echo "  dump         Create backup of whole database"
@@ -106,10 +107,13 @@ restore:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysql -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" < $(DB_DUMPS_DIR)/db.sql
 
 test:
-	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --no-coverage
+	@docker-compose exec -T php ./vendor/bin/phpunit --configuration . --no-coverage --colors=always
 
 cover:
-	@docker-compose exec -T php ./vendor/bin/phpunit --configuration ./ --coverage-html storage/coverage
+	@docker-compose exec -T php ./vendor/bin/phpunit --configuration . --colors=always
+
+report:
+	@docker-compose exec -T php ./vendor/bin/phpunit --configuration . --coverage-html storage/coverage --colors=always
 
 class:
 	@java -jar utils/SQLtoClass.jar -p utils/config.properties -t utils/template -o storage/generated

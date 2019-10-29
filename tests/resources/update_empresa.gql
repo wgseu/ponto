@@ -1,4 +1,5 @@
 mutation updateEmpresa($id: ID!, $input: EmpresaUpdateInput!) {
   UpdateEmpresa(id: $id, input: $input) {
+    id
   }
 }

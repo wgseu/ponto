@@ -1,5 +1,5 @@
 query ($id: ID!){
-  cheques(filter: {id: $id}) {
+  cheques(filter: {id: $id}, order: { id: asc }) {
     data{
       agencia
       conta

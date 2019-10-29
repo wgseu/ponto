@@ -5,7 +5,6 @@
 use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\Setor;
-use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Estoque::class, function (Faker $faker) {
@@ -14,7 +13,6 @@ $factory->define(Estoque::class, function (Faker $faker) {
     return [
         'produto_id' => $produto_id->id,
         'setor_id' => $setor_id->id,
-        'quantidade' => 2.30,
-        'data_movimento' => Carbon::now(),
+        'quantidade' => 3,
     ];
 });

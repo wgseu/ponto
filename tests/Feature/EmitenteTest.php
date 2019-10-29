@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,33 +21,17 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Emitente;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Regime;
 
 class EmitenteTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function testCreateEmitente()
-    {
-        $headers = PrestadorTest::auth();
-        $seed_emitente =  factory(Emitente::class)->create();
-        $response = $this->graphfl('create_emitente', [
-            'input' => [
-                'regime_id' => $seed_emitente->regime_id,
-            ]
-        ], $headers);
-
-        $found_emitente = Emitente::findOrFail($response->json('data.CreateEmitente.id'));
-        $this->assertEquals($seed_emitente->regime_id, $found_emitente->regime_id);
-    }
-
     public function testUpdateEmitente()
     {
         $headers = PrestadorTest::auth();
@@ -58,15 +42,7 @@ class EmitenteTest extends TestCase
             ]
         ], $headers);
         $emitente->refresh();
-    }
-
-    public function testDeleteEmitente()
-    {
-        $headers = PrestadorTest::auth();
-        $emitente_to_delete = factory(Emitente::class)->create();
-        $emitente_to_delete = $this->graphfl('delete_emitente', ['id' => $emitente_to_delete->id], $headers);
-        $emitente = Emitente::find($emitente_to_delete->id);
-        $this->assertNull($emitente);
+        $this->assertEquals(1, $emitente->id);
     }
 
     public function testFindEmitente()

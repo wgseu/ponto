@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,7 +21,7 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace App\Core;
@@ -108,7 +108,7 @@ class Settings
     public function addValue($key, $value)
     {
         if (!empty($this->defaults) && !array_key_exists($key, $this->defaults)) {
-            throw new \Exception(_t('settings.inexistent_setting', $key), 403);
+            throw new \Exception(__('messages.inexistent_setting', ['path' => $key]), 403);
         }
         if (is_array($value) && is_array($this->defaults[$key])) {
             if (!empty($this->defaults)) {
@@ -116,7 +116,7 @@ class Settings
             }
             $value = array_replace_recursive($this->values[$key] ?? [], $value);
         } elseif (is_array($value) != is_array($this->defaults[$key])) {
-            throw new \Exception(_t('settings.inexistent_setting', $key), 403);
+            throw new \Exception(__('messages.inexistent_setting', ['path' => $key]), 403);
         }
         $this->values[$key] = $value;
         return $this;
@@ -135,12 +135,12 @@ class Settings
                 !array_key_exists($section, $this->defaults)
                 && !array_key_exists($key, $this->defaults[$section])
             ) {
-                throw new \Exception(_t('settings.inexistent_setting', $section . '.' . $key), 403);
+                throw new \Exception(__('messages.inexistent_setting', ['path' => $section . '.' . $key]), 403);
             }
             if (is_array($value) && is_array($this->defaults[$section][$key])) {
                 $value = Filter::defaults($value, $this->defaults[$section][$key]);
             } elseif (is_array($value) != is_array($this->defaults[$section][$key])) {
-                throw new \Exception(_t('settings.inexistent_setting', $section . '.' . $key), 403);
+                throw new \Exception(__('messages.inexistent_setting', ['path' => $section . '.' . $key]), 403);
             }
         }
         if (is_array($value) && is_array($this->values[$section][$key] ?? null)) {
@@ -235,7 +235,7 @@ class Settings
     {
         $php_file = $path . DIRECTORY_SEPARATOR . $name . '.php';
         if (!file_exists($php_file)) {
-            throw new \Exception(_t('settings.file_not_found'), 404);
+            throw new \Exception(__('messages.file_not_found'), 404);
         }
         require($php_file);
         return $value;

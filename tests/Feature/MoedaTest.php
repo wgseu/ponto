@@ -5,14 +5,11 @@ namespace Tests\Feature;
 use App\Models\Empresa;
 use App\Models\Moeda;
 use App\Models\Pais;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class MoedaTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateMoeda()
     {
         $headers = PrestadorTest::auth();
@@ -78,6 +75,7 @@ class MoedaTest extends TestCase
     public function testValidateMoedaAtivaConversaoNula()
     {
         $moeda = factory(Moeda::class)->create();
+        $moeda->conversao = null;
         $moeda->ativa = true;
         $moeda->conversao = null;
         $this->expectException(ValidationException::class);

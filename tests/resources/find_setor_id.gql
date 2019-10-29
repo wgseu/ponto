@@ -1,5 +1,5 @@
 query ($id: ID!){
-  setores(filter: {id: $id}) {
+  setores(filter: {id: $id}, order: { id: asc }) {
     data{
       nome
       descricao

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Copyright 2014 da MZ Software - MZ Desenvolvimento de Sistemas LTDA
+ * Copyright 2014 da GrandChef - GrandChef Desenvolvimento de Sistemas LTDA
  *
- * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Churrascarias, Bares e Restaurantes.
+ * Este arquivo é parte do programa GrandChef - Sistema para Gerenciamento de Restaurantes e Afins.
  * O GrandChef é um software proprietário; você não pode redistribuí-lo e/ou modificá-lo.
  * DISPOSIÇÕES GERAIS
  * O cliente não deverá remover qualquer identificação do produto, avisos de direitos autorais,
@@ -21,19 +21,16 @@
  * O Cliente adquire apenas o direito de usar o software e não adquire qualquer outros
  * direitos, expressos ou implícitos no GrandChef diferentes dos especificados nesta Licença.
  *
- * @author Equipe GrandChef <desenvolvimento@mzsw.com.br>
+ * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Carteira;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CarteiraTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testCreateCarteira()
     {
         $headers = PrestadorTest::auth();
@@ -70,7 +67,7 @@ class CarteiraTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $carteira_to_delete = factory(Carteira::class)->create();
-        $carteira_to_delete = $this->graphfl('delete_carteira', ['id' => $carteira_to_delete->id], $headers);
+        $this->graphfl('delete_carteira', ['id' => $carteira_to_delete->id], $headers);
         $carteira = Carteira::find($carteira_to_delete->id);
         $this->assertNull($carteira);
     }

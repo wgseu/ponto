@@ -34,12 +34,10 @@ use App\Models\Prestador;
 use App\Models\Produto;
 use App\Models\Requisito;
 use App\Models\Setor;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 
 class EstoqueTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function testCreateEstoque()
     {
@@ -112,19 +110,30 @@ class EstoqueTest extends TestCase
         $oldEstoque->transacao_id = $transacao->id;
         $oldEstoque->quantidade = -2;
         $oldEstoque->save();
-        $estoque = factory(Estoque::class)->create();
+        
+        $estoque = new Estoque();
+        $estoque->produto_id = $oldEstoque->produto_id;
+        $estoque->setor_id = $oldEstoque->setor_id;
         $estoque->entrada_id = $oldEstoque->id;
+        $estoque->quantidade = 1.0;
+        $estoque->data_movimento = '2016-12-25 12:15:00';
         $this->expectException(ValidationException::class);
         $estoque->save();
     }
 
     public function testValidateProdutoTipoCannotPacote()
     {
-        $estoque = factory(Estoque::class)->create();
+        $oldEstoque = factory(Estoque::class)->create();
         $produto = factory(Produto::class)->create();
         $produto->tipo = Produto::TIPO_PACOTE;
         $produto->save();
+
+        $estoque = new Estoque();
         $estoque->produto_id = $produto->id;
+        $estoque->setor_id = $oldEstoque->setor_id;
+        $estoque->requisito_id = $oldEstoque->requisito_id;
+        $estoque->quantidade = 1.0;
+        $estoque->data_movimento = '2016-12-25 12:15:00';
         $this->expectException(ValidationException::class);
         $estoque->save();
     }
@@ -198,14 +207,6 @@ class EstoqueTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBelongToProduto()
-    {
-        $estoque = factory(Estoque::class)->create();
-        $expected = Produto::find($estoque->produto_id);
-        $result = $estoque->produto;
-        $this->assertEquals($expected, $result);
-    }
-
     public function testBelongToRequisito()
     {
         $estoque = factory(Estoque::class)->create();
@@ -224,17 +225,6 @@ class EstoqueTest extends TestCase
         $estoque->save();
         $result = $estoque->transacao;
         $expected = Item::find($estoque->transacao_id);
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testBelongTo()
-    {
-        $estoque = factory(Estoque::class)->create();
-        $entrada = factory(Estoque::class)->create();
-        $estoque->entrada_id = $entrada->id;
-        $estoque->save();
-        $result = $estoque->entrada;
-        $expected = Estoque::find($estoque->entrada_id);
         $this->assertEquals($expected, $result);
     }
 

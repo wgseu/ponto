@@ -159,8 +159,8 @@ class Estoque extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $produto = Produto::find($this->produto_id);
-        $entrada = self::find($this->entrada_id);
+        $produto = $this->produto;
+        $entrada = $this->entrada;
         if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
             $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
         }

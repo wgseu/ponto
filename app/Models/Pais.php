@@ -30,11 +30,13 @@ use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Informações de um páis com sua moeda e língua nativa
  */
-class Pais extends Model implements ValidateInterface
+class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -110,5 +112,18 @@ class Pais extends Model implements ValidateInterface
 
     public function validate()
     {
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $empresa = Empresa::find(1);
+        $moeda = $this->moeda()->first();
+        if ($empresa->pais_id != $this->id || $moeda->conversao != 1) {
+            $errors['conversao'] = __('messages.change_currency_invalid');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

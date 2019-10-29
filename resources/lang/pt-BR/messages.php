@@ -670,4 +670,5 @@ return [
     'points_not_negative' => 'Pontos não devem ser negativo',
     'points_must_be_negative' => 'Pontos devem ser negativo',
     'value_cannot_zero' => 'Valor não pode ser zerado',
+    'change_currency_invalid' => 'Conversão da moeda diferente de um ou empresa não pertence a esse pais',
 ];

@@ -32,7 +32,6 @@ test:
     - composer config -g cache-dir .composer-cache
     - composer global require hirak/prestissimo
 
-  before_script:
     - mkdir -p storage/logs
     - mkdir -p storage/app/cache
     - mkdir -p storage/app/compiled
@@ -78,7 +77,6 @@ coding style:
     - composer config -g cache-dir .composer-cache
     - composer global require hirak/prestissimo
 
-  before_script:
     - mkdir -p storage/logs
     - mkdir -p storage/app/cache
     - mkdir -p storage/app/compiled

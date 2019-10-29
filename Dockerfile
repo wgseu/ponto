@@ -15,21 +15,21 @@ WORKDIR /var/www/html
 EXPOSE 80
 EXPOSE 3000
 
-RUN apt-get -qq update  &> /dev/null \
-    && apt-get -qq upgrade -y &> /dev/null \
+RUN apt-get -qq update \
+    && apt-get -qq upgrade -y \
     && apt-get -qq install -y \
     nginx \
     curl \
     gnupg \
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash &> /dev/null \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash \
     && apt-get -qq install -y \
     nodejs \
     && apt-get -qq remove -y \
     curl \
-    gnupg &> /dev/null \
-    && apt-get -qq autoremove --purge -y &> /dev/null \
-    && apt-get -qq autoclean -y  &> /dev/null \
-    && apt-get -qq clean -y &> /dev/null \
+    gnupg \
+    && apt-get -qq autoremove --purge -y \
+    && apt-get -qq autoclean -y  \
+    && apt-get -qq clean -y \
     && rm -f  /etc/apt/sources.list.d/nodesource.list \
     && rm -f  /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && rm -f  /etc/nginx/sites-enabled/default \

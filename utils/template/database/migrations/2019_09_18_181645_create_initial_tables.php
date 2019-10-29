@@ -85,6 +85,14 @@ $[field.end]
         });
 $[table.end]
         Schema::enableForeignKeyConstraints();
+
+        if (env('APP_ENV') == 'testing') {
+            (new ModuloSeeder())->run();
+            (new FuncionalidadeSeeder())->run();
+            (new PermissaoSeeder())->run();
+        } elseif (env('APP_ENV') != 'testing') {
+            (new DatabaseSeeder())->run();
+        }
     }
 
     /**

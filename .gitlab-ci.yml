@@ -1,8 +1,7 @@
 stages:
   - test
   - build
-  # - staging
-  # - release
+  - staging
 
 test:
   stage: test
@@ -138,3 +137,32 @@ build:
     - cat gcr-api-key.json | docker login -u _json_key --password-stdin https://gcr.io
     - docker build -t "$CONTAINER_IMAGE_TAG_BETA" .
     - docker push "$CONTAINER_IMAGE_TAG_BETA"
+
+staging:
+  stage: staging
+  image: alpine
+  only:
+    refs:
+      - master
+
+  before_script:
+    - apk add --no-cache
+      curl
+      python
+      which
+      bash &> /dev/null
+    - curl -sSL https://sdk.cloud.google.com | bash &> /dev/null
+    - PATH=$PATH:/root/google-cloud-sdk/bin
+    - echo "$GKE_KEYFILE" > ./gke-api-key.json
+    - gcloud auth activate-service-account --key-file gke-api-key.json
+    - gcloud config set project $GCLOUD_PROJECT
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl &> /dev/null
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+    - gcloud container clusters get-credentials $GRANDCHEF_GKE_CLUSTER --zone=$GRANDCHEF_GKE_ZONE
+
+  script:
+    - kubectl config set-context --current --namespace=grandchef-apps
+    - kubectl patch deployment beta-grandchef-app  -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl patch deployment beta-grandchef-cron -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl patch deployment beta-grandchef-sync -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"

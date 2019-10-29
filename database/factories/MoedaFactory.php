@@ -15,6 +15,6 @@ $factory->define(Moeda::class, function (Faker $faker) {
         'divisao' => 100,
         'conversao' => 1.0,
         'formato' => "$simbolo :value",
-        'ativa' => false
+        'ativa' => true
     ];
 });

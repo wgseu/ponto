@@ -28,6 +28,13 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Estoque;
+use App\Models\Fornecedor;
+use App\Models\Item;
+use App\Models\Prestador;
+use App\Models\Produto;
+use App\Models\Requisito;
+use App\Models\Setor;
+use App\Exceptions\SafeValidationException;
 
 class EstoqueTest extends TestCase
 {
@@ -39,6 +46,7 @@ class EstoqueTest extends TestCase
             'input' => [
                 'produto_id' => $seed_estoque->produto_id,
                 'setor_id' => $seed_estoque->setor_id,
+                'requisito_id' => $seed_estoque->requisito_id,
                 'quantidade' => 1.0,
             ]
         ], $headers);
@@ -78,5 +86,117 @@ class EstoqueTest extends TestCase
         $estoque = factory(Estoque::class)->create();
         $response = $this->graphfl('query_estoque', [ 'id' => $estoque->id ], $headers);
         $this->assertEquals($estoque->id, $response->json('data.estoques.data.0.id'));
+    }
+
+    public function testValidateDoisAtributosEstoque()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $transacao = factory(Item::class)->create();
+        $estoque->transacao_id = $transacao->id;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testValidateProdutoTipoCannotPacote()
+    {
+        $oldEstoque = factory(Estoque::class)->create();
+        $produto = factory(Produto::class)->create();
+        $produto->tipo = Produto::TIPO_PACOTE;
+        $produto->save();
+
+        $estoque = new Estoque();
+        $estoque->produto_id = $produto->id;
+        $estoque->setor_id = $oldEstoque->setor_id;
+        $estoque->requisito_id = $oldEstoque->requisito_id;
+        $estoque->quantidade = 1.0;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testValidateProdutoNaoFracionado()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $estoque->quantidade = 2.1;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testValidateEntradaProdutoNegativa()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $estoque->quantidade = -2;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testValidateSaidaProdutoPositiva()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $transacao = factory(Item::class)->create();
+        $estoque->requisito_id = null;
+        $estoque->transacao_id = $transacao->id;
+        $estoque->quantidade = 2;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testValidateCreateEstoqueCancelado()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $estoque->delete();
+        $estoque->cancelado = true;
+        $this->expectException(SafeValidationException::class);
+        $estoque->save();
+    }
+
+    public function testBelongToSetor()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $expected = Setor::find($estoque->setor_id);
+        $result = $estoque->setor;
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToRequisito()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $expected = Requisito::find($estoque->requisito_id);
+        $result = $estoque->requisito;
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToTransacao()
+    {
+        $transacao = factory(Item::class)->create();
+        $estoque = factory(Estoque::class)->create();
+        $estoque->requisito_id = null;
+        $estoque->transacao_id = $transacao->id;
+        $estoque->quantidade = -2;
+        $estoque->save();
+        $result = $estoque->transacao;
+        $expected = Item::find($estoque->transacao_id);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToFornecedor()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $fornecedor = factory(Fornecedor::class)->create();
+        $estoque->fornecedor_id = $fornecedor->id;
+        $estoque->save();
+        $result = $estoque->fornecedor;
+        $expected = Fornecedor::find($estoque->fornecedor_id);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBelongToPrestador()
+    {
+        $estoque = factory(Estoque::class)->create();
+        $prestador = factory(Prestador::class)->create();
+        $estoque->prestador_id = $prestador->id;
+        $estoque->save();
+        $result = $estoque->prestador;
+        $expected = Prestador::find($estoque->prestador_id);
+        $this->assertEquals($expected, $result);
     }
 }

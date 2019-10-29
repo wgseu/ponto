@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -138,7 +139,44 @@ class Estoque extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
     }
 
+    /**
+     * Regras:
+     *
+     * É obrigatório informar apenas um requisito ou uma transação;
+     * O produto não pode ser do tipo pacote;
+     * Se o produto é indivisivel a quantidade não pode ser float;
+     * Se for entrada de produto a quantidade não pode ser negativa;
+     * Se for saida de produto a quantidade não pode ser positiva;
+     * Se cancelado não pode ser alterado;
+     * Não pode criar já cancelado.
+     */
     public function validate()
     {
+        $errors = [];
+        $produto = $this->produto;
+        if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
+            $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
+        }
+        if ($produto->tipo == Produto::TIPO_PACOTE) {
+            $errors['produto_id'] = __('messages.tipo_product_cannot_pacote');
+        }
+        if (fmod($this->quantidade, 1) > 0 && !$produto->divisivel) {
+            $errors['produto_id'] = __('messages.produto_indivisible');
+        }
+        if (!is_null($this->requisito_id) && $this->quantidade <= 0) {
+            $errors['requisito_id'] = __('messages.quantidade_cannot_less_0');
+        }
+        if (!is_null($this->transacao_id) && $this->quantidade >= 0) {
+            $errors['transacao_id'] = __('messages.quantidade_cannot_greater_0');
+        }
+        if (!$this->exists && $this->cancelado) {
+            $errors['cancelado'] = __('messages.estoque_new_canceled');
+        }
+        if ($this->valor_compra < 0) {
+            $errors['valor_compra'] = __('messages.valor_compra_negative');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

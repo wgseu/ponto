@@ -97,7 +97,7 @@ class Servico extends Model implements ValidateInterface
         $errors = [];
         if ($this->valor < 0) {
             $errors['valor'] = __('messages.value_negative');
-        } elseif (Common::is_equal($this->valor, 0)) {
+        } elseif (Common::isEqual($this->valor, 0)) {
             $errors['valor'] = __('messages.valor_cannot_zero');
         }
         if ($this->tipo == self::TIPO_EVENTO) {

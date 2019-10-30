@@ -31,7 +31,7 @@ namespace App\Util;
  */
 class Common
 {
-    public static function is_equal($value, $compare, $delta = 0.005)
+    public static function isEqual($value, $compare, $delta = 0.005)
     {
         return $compare < ($value + $delta) && ($value - $delta) < $compare;
     }

@@ -677,4 +677,6 @@ return [
     'quantidade_cannot_less_0' => 'A entrada de mercadorias requer uma quantidade maior que zero',
     'one_required_requisito_or_transacao' => 'É obrigátorio informar ou um requisito ou uma transação',
     'negative_entry' => 'A origem dessa saída de estoque não pode ser uma venda ou retirada',
+    'caixa_in_use' => 'O caixa está aberto e não pode ser desativado',
+    'tipo_carteira_invalido' => 'O tipo da carteira deve ser Local',
 ];

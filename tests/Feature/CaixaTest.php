@@ -29,6 +29,8 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Caixa;
 use App\Models\Carteira;
+use App\Models\Movimentacao;
+use Illuminate\Validation\ValidationException;
 
 class CaixaTest extends TestCase
 {
@@ -36,6 +38,8 @@ class CaixaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $carteira =  factory(Carteira::class)->create();
+        $carteira->tipo = Carteira::TIPO_LOCAL;
+        $carteira->save();
         $response = $this->graphfl('create_caixa', [
             'input' => [
                 'carteira_id' => $carteira->id,
@@ -77,5 +81,28 @@ class CaixaTest extends TestCase
         $caixa = factory(Caixa::class)->create();
         $response = $this->graphfl('query_caixa', [ 'id' => $caixa->id ], $headers);
         $this->assertEquals($caixa->id, $response->json('data.caixas.data.0.id'));
+    }
+
+    public function testValidadeCaixaCarteiraInvalida()
+    {
+        $carteira = factory(Carteira::class)->create();
+        $carteira->tipo = Carteira::TIPO_CREDITO;
+        $carteira->save();
+        $caixa = new Caixa();
+        $caixa->descricao = 'Caixa 2';
+        $caixa->carteira_id = $carteira->id;
+        $this->expectException(ValidationException::class);
+        $caixa->save();
+    }
+
+    public function testValidadeCaixaDesativarCaixaEmUso()
+    {
+        $caixa = factory(Caixa::class)->create();
+        $movimentacao = factory(Movimentacao::class)->create();
+        $movimentacao->caixa_id = $caixa->id;
+        $movimentacao->save();
+        $caixa->ativa = false;
+        $this->expectException(ValidationException::class);
+        $caixa->save();
     }
 }

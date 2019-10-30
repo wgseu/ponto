@@ -105,7 +105,7 @@ class CreateInitialTables extends Migration
             $table->integer('serie')->default(1);
             $table->integer('numero_inicial')->default(1);
             $table->boolean('ativa')->default(true);
-            $table->dateTime('data_desativada')->nullable();
+            $table->softDeletes();
 
             $table->unique(['descricao']);
             $table->unique(['carteira_id']);

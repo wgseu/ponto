@@ -34,19 +34,19 @@ class ServicoTest extends TestCase
     public function testCreateServico()
     {
         $headers = PrestadorTest::auth();
-        $seed_servico =  factory(Servico::class)->create();
         $response = $this->graphfl('create_servico', [
             'input' => [
                 'nome' => 'Teste',
                 'descricao' => 'Teste',
-                'tipo' => Servico::TIPO_EVENTO,
+                'tipo' => Servico::TIPO_TAXA,
+                'valor' => 100.00
             ]
         ], $headers);
 
         $found_servico = Servico::findOrFail($response->json('data.CreateServico.id'));
         $this->assertEquals('Teste', $found_servico->nome);
         $this->assertEquals('Teste', $found_servico->descricao);
-        $this->assertEquals(Servico::TIPO_EVENTO, $found_servico->tipo);
+        $this->assertEquals(Servico::TIPO_TAXA, $found_servico->tipo);
     }
 
     public function testUpdateServico()
@@ -58,13 +58,13 @@ class ServicoTest extends TestCase
             'input' => [
                 'nome' => 'Atualizou',
                 'descricao' => 'Atualizou',
-                'tipo' => Servico::TIPO_EVENTO,
+                'tipo' => Servico::TIPO_TAXA,
             ]
         ], $headers);
         $servico->refresh();
         $this->assertEquals('Atualizou', $servico->nome);
         $this->assertEquals('Atualizou', $servico->descricao);
-        $this->assertEquals(Servico::TIPO_EVENTO, $servico->tipo);
+        $this->assertEquals(Servico::TIPO_TAXA, $servico->tipo);
     }
 
     public function testDeleteServico()

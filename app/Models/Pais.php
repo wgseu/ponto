@@ -117,9 +117,10 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
     public function onUpdate()
     {
         $errors = [];
-        $empresa = Empresa::find(1);
+        $cliente = new Cliente();
+        $empresa = Empresa::find('1');
         $moeda = $this->moeda()->first();
-        if (!is_null($empresa)) {
+        if ($cliente->isOwner()) {
             if ($empresa->pais_id != $this->id || $moeda->conversao != 1) {
                 $errors['conversao'] = __('messages.change_currency_invalid');
             }

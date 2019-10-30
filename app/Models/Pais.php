@@ -128,8 +128,6 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
             } else {
                 $errors['empresa'] = __('messages.user_not_belongs_company');
             }
-        } else {
-            $errors['empresa'] = __('messages.not_found_company');
         }
         if (!empty($errors)) {
             throw SafeValidationException::withMessages($errors);

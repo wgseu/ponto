@@ -671,4 +671,9 @@ return [
     'points_must_be_negative' => 'Pontos devem ser negativo',
     'value_cannot_zero' => 'Valor não pode ser zerado',
     'change_currency_invalid' => 'Conversão da moeda diferente de um ou empresa não pertence a esse pais',
+    'date_start_cannot_null' => 'Data de início não pode ser vazio',
+    'date_end_cannot_null' => 'Data final não pode ser vazio',
+    'data_inicio_must_empty' => 'Não informar data inicial nesse tipo de serviço',
+    'data_fim_must_empty' => 'Não informar data fim nesse tipo de serviço',
+    'user_not_belongs_company' => 'Usuário não pertence a empresa',
 ];

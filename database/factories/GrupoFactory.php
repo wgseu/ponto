@@ -8,6 +8,8 @@ use Faker\Generator as Faker;
 
 $factory->define(Grupo::class, function (Faker $faker) {
     $produto_id = factory(Produto::class)->create();
+    $produto_id->tipo = Produto::TIPO_PACOTE;
+    $produto_id->save();
     return [
         'produto_id' => $produto_id->id,
         'nome' => $faker->unique()->name,

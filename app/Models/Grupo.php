@@ -30,6 +30,7 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
@@ -110,7 +111,19 @@ class Grupo extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Produto', 'produto_id');
     }
 
+    /**
+     * Regras:
+     * Os grupos são formados apenas por pacotes
+     */
     public function validate()
     {
+        $errors = [];
+        $produto = $this->produto;
+        if ($produto->tipo != Produto::TIPO_PACOTE) {
+            $errors['produto_id'] = __('messages.produto_required_pacote');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

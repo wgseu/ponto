@@ -28,6 +28,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Grupo;
+use App\Models\Produto;
+use Illuminate\Validation\ValidationException;
 
 class GrupoTest extends TestCase
 {
@@ -81,5 +83,18 @@ class GrupoTest extends TestCase
         $grupo = factory(Grupo::class)->create();
         $response = $this->graphfl('query_grupo', [ 'id' => $grupo->id ], $headers);
         $this->assertEquals($grupo->id, $response->json('data.grupos.data.0.id'));
+    }
+
+    public function testValidateTipoProdutoInvalido()
+    {
+        $produto = factory(Produto::class)->create();
+        $produto->tipo = Produto::TIPO_PRODUTO;
+        $produto->save();
+        $grupo = new Grupo();
+        $grupo->nome = 'Pizza G';
+        $grupo->descricao = 'Pizzas com tamanhos G';
+        $grupo->produto_id = $produto->id;
+        $this->expectException(ValidationException::class);
+        $grupo->save();
     }
 }

@@ -628,6 +628,7 @@ class CreateInitialTables extends Migration
             $table->double('quantidade_minima')->default(0);
             $table->double('quantidade_maxima')->default(0);
             $table->decimal('preco_venda', 19, 4)->default(0);
+            $table->decimal('custo_medio', 19, 4)->nullable();
             $table->decimal('custo_producao', 19, 4)->nullable();
             $table->enum('tipo', ['produto', 'composicao', 'pacote'])->default('produto');
             $table->boolean('cobrar_servico')->default(true);
@@ -965,6 +966,7 @@ class CreateInitialTables extends Migration
             $table->boolean('cancelado')->default(false);
             $table->string('motivo', 200)->nullable();
             $table->boolean('desperdicado')->default(false);
+            $table->boolean('reservado')->default(false);
             $table->dateTime('data_processamento')->nullable();
             $table->dateTime('data_atualizacao')->nullable();
             $table->dateTime('data_lancamento');
@@ -1191,7 +1193,6 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('produto_id');
             $table->unsignedInteger('requisito_id')->nullable();
             $table->unsignedInteger('transacao_id')->nullable();
-            $table->unsignedInteger('entrada_id')->nullable();
             $table->unsignedInteger('fornecedor_id')->nullable();
             $table->unsignedInteger('setor_id');
             $table->unsignedInteger('prestador_id')->nullable();
@@ -1210,7 +1211,6 @@ class CreateInitialTables extends Migration
             $table->index(['fornecedor_id']);
             $table->index(['prestador_id']);
             $table->index(['setor_id']);
-            $table->index(['entrada_id']);
             $table->index(['requisito_id']);
             $table->index(['data_movimento']);
             $table->foreign('produto_id')
@@ -1225,10 +1225,6 @@ class CreateInitialTables extends Migration
                 ->references('id')->on('itens')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->foreign('entrada_id')
-                ->references('id')->on('estoques')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
             $table->foreign('fornecedor_id')
                 ->references('id')->on('fornecedores')
                 ->onUpdate('cascade')

@@ -89,7 +89,6 @@ class Produto extends Model implements ValidateInterface
         'disponivel',
         'insumo',
         'avaliacao',
-        'estoque',
         'imagem_url',
     ];
 

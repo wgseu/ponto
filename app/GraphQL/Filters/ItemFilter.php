@@ -104,6 +104,9 @@ class ItemFilter extends InputType
             'desperdicado' => [
                 'type' => Type::boolean(),
             ],
+            'reservado' => [
+                'type' => Type::boolean(),
+            ],
             'data_processamento' => [
                 'type' => GraphQL::type('DateFilter'),
             ],

@@ -80,6 +80,9 @@ class ProdutoFilter extends InputType
             'preco_venda' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],
+            'custo_medio' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
             'custo_producao' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],

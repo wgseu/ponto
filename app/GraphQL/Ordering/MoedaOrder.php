@@ -28,7 +28,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Ordering;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 

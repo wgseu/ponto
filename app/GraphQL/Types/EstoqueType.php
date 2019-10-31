@@ -60,11 +60,6 @@ class EstoqueType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador do item que gerou a saída desse produto do estoque',
             ],
-            'entrada_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa de qual entrada no estoque essa saída foi retirada, permite' .
-                    ' estoque FIFO',
-            ],
             'fornecedor_id' => [
                 'type' => Type::id(),
                 'description' => 'Fornecedor do produto',

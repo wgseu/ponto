@@ -28,7 +28,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Ordering;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
@@ -79,6 +78,9 @@ class ProdutoOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'preco_venda' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'custo_medio' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'custo_producao' => [

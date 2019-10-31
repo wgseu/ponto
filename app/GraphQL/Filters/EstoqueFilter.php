@@ -53,9 +53,6 @@ class EstoqueFilter extends InputType
             'transacao_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],
-            'entrada_id' => [
-                'type' => GraphQL::type('IdFilter'),
-            ],
             'fornecedor_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],

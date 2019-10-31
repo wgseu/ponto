@@ -28,7 +28,6 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Ordering;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
@@ -52,9 +51,6 @@ class EstoqueOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'transacao_id' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
-            'entrada_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'fornecedor_id' => [

@@ -57,7 +57,6 @@ class Estoque extends Model implements ValidateInterface
         'produto_id',
         'requisito_id',
         'transacao_id',
-        'entrada_id',
         'fornecedor_id',
         'setor_id',
         'prestador_id',
@@ -104,15 +103,6 @@ class Estoque extends Model implements ValidateInterface
     public function transacao()
     {
         return $this->belongsTo('App\Models\Item', 'transacao_id');
-    }
-
-    /**
-     * Informa de qual entrada no estoque essa saída foi retirada, permite
-     * estoque FIFO
-     */
-    public function entrada()
-    {
-        return $this->belongsTo('App\Models\Estoque', 'entrada_id');
     }
 
     /**

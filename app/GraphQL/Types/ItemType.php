@@ -129,6 +129,10 @@ class ItemType extends GraphQLType
                 'type' => Type::nonNull(Type::boolean()),
                 'description' => 'Informa se o item foi cancelado por conta de desperdício',
             ],
+            'reservado' => [
+                'type' => Type::nonNull(Type::boolean()),
+                'description' => 'Informa se o produto foi reservado no estoque',
+            ],
             'data_processamento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do processamento do item',

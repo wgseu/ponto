@@ -137,14 +137,6 @@ class ProdutoInput extends InputType
                 'type' => Type::boolean(),
                 'description' => 'Informa se o produto é de uso interno e não está disponível para venda',
             ],
-            'avaliacao' => [
-                'type' => Type::float(),
-                'description' => 'Média das avaliações do último período',
-            ],
-            'estoque' => [
-                'type' => Type::float(),
-                'description' => 'Estoque geral do produto',
-            ],
             'imagem_url' => [
                 'type' => Type::string(),
                 'description' => 'Imagem do produto',

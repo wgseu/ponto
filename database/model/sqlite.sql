@@ -2,14 +2,14 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2019-09-18 11:42
+-- Changed:       2019-10-31 14:25
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
 -- Schema: GrandChef
 --   Armazena todas as informações do sistema GrandChef, exceto configurações de janelas, conexão e lembrete de sessão
 CREATE TABLE "classificacoes"(
---   Classificação se contas, permite atribuir um grupo de contas[N:Classificação|Classificações][G:a][K:App\Models|Models\][H:Model]
+--   Classificação se contas, permite atribuir um grupo de contas[N:Classificação|Classificações][G:a][K:App\Models|Models\][H:Model][L:null][ID:15]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da classificação[G:o]
   "classificacao_id" INTEGER DEFAULT NULL,-- Classificação superior, quando informado, esta classificação será uma subclassificação[N:Classificação superior][G:a][S:S]
   "descricao" VARCHAR(100) NOT NULL,-- Descrição da classificação[N:Descrição][G:a][S]
@@ -24,13 +24,13 @@ CREATE TABLE "classificacoes"(
 );
 CREATE INDEX "classificacoes.FK_classificacoes_classificacao_id_idx" ON "classificacoes" ("classificacao_id");
 CREATE TABLE "sistemas"(
---   Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso[N:Sistema|Sistemas][G:o][L:AlterarConfiguracoes][K:App\Models|Models\][H:Model]
-  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')),-- Identificador único do sistema, valor 1[G:o]
+--   Classe que informa detalhes da empresa, parceiro e opções do sistema como a versão do banco de dados e a licença de uso[N:Sistema|Sistemas][G:o][K:App\Models|Models\][H:Model][L:null][ID:72]
+  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')) DEFAULT '1',-- Identificador único do sistema, valor 1[G:o][F:'1']
   "fuso_horario" VARCHAR(100) DEFAULT NULL,-- Informa qual o fuso horário[G:o][N:Fuso horário]
   "opcoes" TEXT DEFAULT NULL-- Opções gerais do sistema[G:a][N:Opções]
 );
 CREATE TABLE "sessoes"(
---   Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão[N:Sessão|Sessões][G:a][K:App\Models|Models\][H:Model]
+--   Sessão de trabalho do dia, permite que vários caixas sejam abertos utilizando uma mesma sessão[N:Sessão|Sessões][G:a][K:App\Models|Models\][H:Model][L:null][ID:70]
   "ID" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da sessão[G:o]
   "data_inicio" DATETIME NOT NULL,-- Data de início da sessão[N:Data de início][G:a]
   "data_termino" DATETIME DEFAULT NULL,-- Data de fechamento da sessão[N:Data de termíno][G:a]
@@ -40,7 +40,7 @@ CREATE INDEX "sessoes.aberta_INDEX" ON "sessoes" ("aberta" DESC);
 CREATE INDEX "sessoes.data_inicio_INDEX" ON "sessoes" ("data_inicio" DESC);
 CREATE INDEX "sessoes.data_termino_INDEX" ON "sessoes" ("data_termino" DESC);
 CREATE TABLE "servicos"(
---   Taxas, eventos e serviço cobrado nos pedidos[N:Serviço|Serviços][G:o][K:App\Models|Models\][H:Model]
+--   Taxas, eventos e serviço cobrado nos pedidos[N:Serviço|Serviços][G:o][K:App\Models|Models\][H:Model][L:null][ID:69]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do serviço[G:o]
   "nome" VARCHAR(50) NOT NULL,-- Nome do serviço, Ex.: Comissão, Entrega, Couvert[N:Nome][G:o]
   "descricao" VARCHAR(100) NOT NULL,-- Descrição do serviço, Ex.: Show de fulano[N:Descrição][G:a][S]
@@ -56,7 +56,7 @@ CREATE TABLE "servicos"(
   "ativo" TEXT NOT NULL CHECK("ativo" IN('Y', 'N')) DEFAULT 'Y'-- Informa se o serviço está ativo[N:Ativo][G:o][F:true]
 );
 CREATE TABLE "moedas"(
---   Moedas financeiras de um país[N:Moeda|Moedas][G:a][K:App\Models|Models\][H:Model]
+--   Moedas financeiras de um país[N:Moeda|Moedas][G:a][K:App\Models|Models\][H:Model][L:null][ID:49]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da moeda[G:o]
   "nome" VARCHAR(45) NOT NULL,-- Nome da moeda[N:Nome][G:o][S]
   "simbolo" VARCHAR(10) NOT NULL,-- Símbolo da moeda, Ex.: R$, $[N:Símbolo][G:o]
@@ -71,7 +71,7 @@ CREATE TABLE "moedas"(
     UNIQUE("codigo")
 );
 CREATE TABLE "funcoes"(
---   Função ou atribuição de tarefas à um prestador[N:Função|Funções][G:a][K:App\Models|Models\][H:Model]
+--   Função ou atribuição de tarefas à um prestador[N:Função|Funções][G:a][K:App\Models|Models\][H:Model][L:null][ID:36]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da função[G:o]
   "descricao" VARCHAR(45) NOT NULL,-- Descreve o nome da função[N:Descrição][G:a][S]
   "remuneracao" DECIMAL NOT NULL,-- Remuneracao pelas atividades exercidas, não está incluso comissões[N:Remuneração][G:a]
@@ -79,7 +79,7 @@ CREATE TABLE "funcoes"(
     UNIQUE("descricao")
 );
 CREATE TABLE "operacoes"(
---   Código Fiscal de Operações e Prestações (CFOP)[N:Operação|Operações][G:a][K:App\Models|Models\][H:Model]
+--   Código Fiscal de Operações e Prestações (CFOP)[N:Operação|Operações][G:a][K:App\Models|Models\][H:Model][L:7][ID:53]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da operação[G:o]
   "codigo" INTEGER NOT NULL,-- Código CFOP sem pontuação[G:o][N:Código]
   "descricao" VARCHAR(255) NOT NULL,-- Descrição da operação[G:a][N:Descrição]
@@ -88,7 +88,7 @@ CREATE TABLE "operacoes"(
     UNIQUE("codigo")
 );
 CREATE TABLE "comandas"(
---   Comanda individual, permite lançar pedidos em cartões de consumo[N:Comanda|Comandas][G:a][K:App\Models|Models\][H:Model]
+--   Comanda individual, permite lançar pedidos em cartões de consumo[N:Comanda|Comandas][G:a][K:App\Models|Models\][H:Model][L:2][ID:17]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Número da comanda[N:Número][G:o]
   "numero" INTEGER NOT NULL,-- Número da comanda[G:o][N:Número]
   "nome" VARCHAR(50) NOT NULL,-- Nome da comanda[N:Nome][G:o][S]
@@ -99,7 +99,7 @@ CREATE TABLE "comandas"(
     UNIQUE("numero")
 );
 CREATE TABLE "origens"(
---   Origem da mercadoria[N:Origem|Origens][G:a][K:App\Models|Models\][H:Model]
+--   Origem da mercadoria[N:Origem|Origens][G:a][K:App\Models|Models\][H:Model][L:7][ID:54]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da origem[G:o]
   "codigo" INTEGER NOT NULL,-- Código da origem da mercadoria[G:o][N:Código]
   "descricao" VARCHAR(200) NOT NULL,-- Descrição da origem da mercadoria[G:a][N:Descrição]
@@ -107,7 +107,7 @@ CREATE TABLE "origens"(
     UNIQUE("codigo")
 );
 CREATE TABLE "integracoes"(
---   Informa quais integrações estão disponíveis[N:Integração|Integrações][G:a][K:App\Models|Models\][H:Model]
+--   Informa quais integrações estão disponíveis[N:Integração|Integrações][G:a][K:App\Models|Models\][H:Model][L:null][ID:41]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da integração[N:ID][G:o]
   "nome" VARCHAR(45) NOT NULL,-- Nome do módulo de integração[G:o][N:Nome]
   "descricao" VARCHAR(200) DEFAULT NULL,-- Descrição do módulo integrador[G:a][N:Descrição]
@@ -117,12 +117,12 @@ CREATE TABLE "integracoes"(
   "opcoes" TEXT DEFAULT NULL,-- Opções da integração, estados e tokens da loja[G:a][N:Opções]
   "associacoes" TEXT DEFAULT NULL,-- Associações de produtos e cartões[G:a][N:Associações]
   "ativo" TEXT NOT NULL CHECK("ativo" IN('Y', 'N')) DEFAULT 'N',-- Informa de o módulo de integração está habilitado[G:o][N:Habilitado][F:false]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização dos dados do módulo de integração[G:a][N:Data de atualização]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização dos dados do módulo de integração[G:a][N:Data de atualização]
   CONSTRAINT "nome_UNIQUE"
     UNIQUE("nome")
 );
 CREATE TABLE "regimes"(
---   Regimes tributários[N:Regime|Regimes][G:o][K:App\Models|Models\][H:Model]
+--   Regimes tributários[N:Regime|Regimes][G:o][K:App\Models|Models\][H:Model][L:7][ID:66]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do regime tributário[G:o]
   "codigo" INTEGER NOT NULL,-- Código do regime tributário[G:o][N:Código]
   "descricao" VARCHAR(200) NOT NULL,-- Descrição do regime tributário[G:a][N:Descrição]
@@ -130,14 +130,14 @@ CREATE TABLE "regimes"(
     UNIQUE("codigo")
 );
 CREATE TABLE "categorias"(
---   Informa qual a categoria dos produtos e permite a rápida localização dos mesmos[N:Categoria|Categorias][G:a][L:CadastroProdutos][K:App\Models|Models\][H:Model]
+--   Informa qual a categoria dos produtos e permite a rápida localização dos mesmos[N:Categoria|Categorias][G:a][K:App\Models|Models\][H:Model][L:null][ID:12]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da categoria[G:o]
   "categoria_id" INTEGER DEFAULT NULL,-- Informa a categoria pai da categoria atual, a categoria atual é uma subcategoria[N:Categoria superior][G:a][S:S]
   "descricao" VARCHAR(45) NOT NULL,-- Descrição da categoria. Ex.: Refrigerantes, Salgados[N:Descrição][G:a][S]
   "detalhes" VARCHAR(200) DEFAULT NULL,-- Informa os detalhes gerais dos produtos dessa categoria[G:o][N:Detalhes]
   "imagem_url" VARCHAR(100) DEFAULT NULL,-- Imagem representativa da categoria[N:Imagem][G:a][I:256x256|categoria|categoria.png]
   "ordem" INTEGER NOT NULL DEFAULT 0,-- Informa a ordem de exibição das categorias nas vendas[G:a][N:Ordem][F:0]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização das informações da categoria[N:Data de atualização][G:a]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização das informações da categoria[N:Data de atualização][G:a]
   "data_arquivado" DATETIME DEFAULT NULL,-- Data em que a categoria foi arquivada e não será mais usada[G:a][N:Data de arquivação]
   CONSTRAINT "descricao_UNIQUE"
     UNIQUE("descricao"),
@@ -149,7 +149,7 @@ CREATE TABLE "categorias"(
 );
 CREATE INDEX "categorias.FK_categorias_categoria_id_idx" ON "categorias" ("categoria_id");
 CREATE TABLE "paises"(
---   Informações de um páis com sua moeda e língua nativa[N:País|Paises][G:o][K:App\Models|Models\][H:Model]
+--   Informações de um páis com sua moeda e língua nativa[N:País|Paises][G:o][K:App\Models|Models\][H:Model][L:null][ID:57]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do país[G:o]
   "nome" VARCHAR(100) NOT NULL,-- Nome do país[N:Nome][G:o][S]
   "sigla" VARCHAR(10) NOT NULL,-- Abreviação do nome do país[N:Sigla][G:a]
@@ -173,7 +173,7 @@ CREATE TABLE "paises"(
 );
 CREATE INDEX "paises.FK_paises_moeda_id_idx" ON "paises" ("moeda_id");
 CREATE TABLE "impostos"(
---   Impostos disponíveis para informar no produto[N:Imposto|Impostos][G:o][K:App\Models|Models\][H:Model]
+--   Impostos disponíveis para informar no produto[N:Imposto|Impostos][G:o][K:App\Models|Models\][H:Model][L:7][ID:39]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do imposto[G:o]
   "grupo" TEXT NOT NULL CHECK("grupo" IN('icms', 'pis', 'cofins', 'ipi', 'ii')),-- Grupo do imposto[G:o][N:Grupo]
   "simples" TEXT NOT NULL CHECK("simples" IN('Y', 'N')),-- Informa se o imposto é do simples nacional[G:o][N:Simples nacional]
@@ -184,7 +184,7 @@ CREATE TABLE "impostos"(
     UNIQUE("grupo","simples","substituicao","codigo")
 );
 CREATE TABLE "cozinhas"(
---   Categoria de comida servida pelo estabelecimento[G:a][N:Cozinha|Cozinhas][K:App\Models|Models\][H:Model]
+--   Categoria de comida servida pelo estabelecimento[G:a][N:Cozinha|Cozinhas][K:App\Models|Models\][H:Model][L:null][ID:22]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da cozinha[G:o]
   "nome" VARCHAR(50) NOT NULL,-- Nome da cozinha, Ex. Japonesa, Brasileira, Italiana, Pizza[G:o][N:Nome]
   "descricao" VARCHAR(255) DEFAULT NULL,-- Descrição da cozinha, o que é servido[G:a][N:Descrição]
@@ -192,7 +192,7 @@ CREATE TABLE "cozinhas"(
     UNIQUE("nome")
 );
 CREATE TABLE "unidades"(
---   Unidades de medidas aplicadas aos produtos[N:Unidade|Unidades][G:a][K:App\Models|Models\][H:Model]
+--   Unidades de medidas aplicadas aos produtos[N:Unidade|Unidades][G:a][K:App\Models|Models\][H:Model][L:null][ID:75]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da unidade[G:o]
   "nome" VARCHAR(45) NOT NULL,-- Nome da unidade de medida, Ex.: Grama, Quilo[N:Nome][G:o][S]
   "descricao" VARCHAR(45) DEFAULT NULL,-- Detalhes sobre a unidade de medida[N:Descrição][G:a]
@@ -201,7 +201,7 @@ CREATE TABLE "unidades"(
     UNIQUE("sigla")
 );
 CREATE TABLE "modulos"(
---   Módulos do sistema que podem ser desativados/ativados[N:Módulo|Módulos][G:o][K:App\Models|Models\][H:Model]
+--   Módulos do sistema que podem ser desativados/ativados[N:Módulo|Módulos][G:o][K:App\Models|Models\][H:Model][L:null][ID:48]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do módulo[G:o]
   "nome" VARCHAR(50) NOT NULL,-- Nome do módulo, unico em todo o sistema[N:Nome][G:o][S]
   "descricao" VARCHAR(200) NOT NULL,-- Descrição do módulo, informa detalhes sobre a funcionalidade do módulo no sistema[N:Descrição][G:a]
@@ -210,7 +210,7 @@ CREATE TABLE "modulos"(
     UNIQUE("nome")
 );
 CREATE TABLE "metricas"(
---   Métricas de avaliação do atendimento e outros serviços do estabelecimento[N:Métrica|Métricas][G:a][K:App\Models|Models\][H:Model]
+--   Métricas de avaliação do atendimento e outros serviços do estabelecimento[N:Métrica|Métricas][G:a][K:App\Models|Models\][H:Model][L:null][ID:47]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da métrica[G:o]
   "nome" VARCHAR(100) NOT NULL,-- Nome da métrica[G:o][N:Nome]
   "descricao" VARCHAR(200) DEFAULT NULL,-- Descreve o que deve ser avaliado pelo cliente[G:a][N:Descrição]
@@ -223,7 +223,7 @@ CREATE TABLE "metricas"(
     UNIQUE("nome")
 );
 CREATE TABLE "setores"(
---   Setor de impressão e de estoque[N:Setor|Setores][G:o][K:App\Models|Models\][H:Model]
+--   Setor de impressão e de estoque[N:Setor|Setores][G:o][K:App\Models|Models\][H:Model][L:null][ID:71]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do setor[G:o]
   "setor_id" INTEGER DEFAULT NULL,-- Informa o setor que abrange esse subsetor[G:o][N:Setor superior]
   "nome" VARCHAR(50) NOT NULL,-- Nome do setor, único em todo o sistema[N:Nome][G:o][S]
@@ -238,10 +238,10 @@ CREATE TABLE "setores"(
 );
 CREATE INDEX "setores.FK_setores_setor_id_idx" ON "setores" ("setor_id");
 CREATE TABLE "bancos"(
---   Bancos disponíveis no país[N:Banco|Bancos][G:o][K:App\Models|Models\][H:Model]
+--   Bancos disponíveis no país[N:Banco|Bancos][G:o][K:App\Models|Models\][H:Model][L:null][ID:6]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do banco[G:o]
   "numero" VARCHAR(40) NOT NULL,-- Número do banco[N:Número][G:o]
-  "fantasia" VARCHAR(200) NOT NULL,
+  "fantasia" VARCHAR(200) NOT NULL,-- Nome fantasia do banco[G:o][N:Fantasia][S]
   "razao_social" VARCHAR(200) NOT NULL,-- Razão social do banco[N:Razão social][G:a][S]
   "agencia_mascara" VARCHAR(45) DEFAULT NULL,-- Mascara para formatação do número da agência[N:Máscara da agência][G:a]
   "conta_mascara" VARCHAR(45) DEFAULT NULL,-- Máscara para formatação do número da conta[N:Máscara da conta][G:a]
@@ -253,7 +253,7 @@ CREATE TABLE "bancos"(
     UNIQUE("fantasia")
 );
 CREATE TABLE "clientes"(
---   Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui[N:Cliente|Clientes][G:o][K:App\Models|Models\][H:Model]
+--   Informações de cliente físico ou jurídico. Clientes, empresas, funcionários, fornecedores e parceiros são cadastrados aqui[N:Cliente|Clientes][G:o][K:App\Models|Models\][H:Model][L:null][ID:16]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cliente[G:o]
   "tipo" TEXT NOT NULL CHECK("tipo" IN('fisica', 'juridica')) DEFAULT 'fisica',-- Informa o tipo de pessoa, que pode ser física ou jurídica[N:Tipo][G:o][E:Física|Jurídica][S:S][F:self::TIPO_FISICA]
   "empresa_id" INTEGER DEFAULT NULL,-- Informa se esse cliente faz parte da empresa informada[N:Empresa][G:o][S:S]
@@ -277,7 +277,7 @@ CREATE TABLE "clientes"(
   "linkedin_url" VARCHAR(200) DEFAULT NULL,-- URL para acessar a página do LinkedIn do cliente[N:LinkedIn][G:o]
   "imagem_url" VARCHAR(100) DEFAULT NULL,-- Foto do cliente ou logo da empresa[I:256x256|cliente|cliente.png][N:Foto][G:a]
   "linguagem" VARCHAR(20) DEFAULT NULL,-- Código da linguagem utilizada pelo cliente para visualizar o aplicativo e o site, Ex: pt-BR[N:Linguagem][G:a]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização das informações do cliente[N:Data de atualização][G:a][D]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização das informações do cliente[N:Data de atualização][G:a][D]
   "data_cadastro" DATETIME NOT NULL,-- Data de cadastro do cliente[N:Data de cadastro][G:a][D]
   CONSTRAINT "email_UNIQUE"
     UNIQUE("email"),
@@ -296,7 +296,7 @@ CREATE TABLE "clientes"(
 CREATE INDEX "clientes.FK_clientes_empresa_id_idx" ON "clientes" ("empresa_id");
 CREATE INDEX "clientes.nome_INDEX" ON "clientes" ("nome");
 CREATE TABLE "telefones"(
---   Telefones dos clientes, apenas o telefone principal deve ser único por cliente[N:Telefone|Telefones][G:o][K:App\Models|Models\][H:Model]
+--   Telefones dos clientes, apenas o telefone principal deve ser único por cliente[N:Telefone|Telefones][G:o][K:App\Models|Models\][H:Model][L:null][ID:73]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do telefone[G:o]
   "cliente_id" INTEGER NOT NULL,-- Informa o cliente que possui esse número de telefone[G:o][N:Cliente]
   "pais_id" INTEGER NOT NULL,-- Informa o país desse número de telefone[G:o][N:País]
@@ -319,12 +319,12 @@ CREATE INDEX "telefones.FK_telefones_cliente_id_idx" ON "telefones" ("cliente_id
 CREATE INDEX "telefones.numero_INDEX" ON "telefones" ("numero");
 CREATE INDEX "telefones.FK_telefones_pais_id_idx" ON "telefones" ("pais_id");
 CREATE TABLE "funcionalidades"(
---   Grupo de funcionalidades do sistema[N:Funcionalidade|Funcionalidades][G:a][K:App\Models|Models\][H:Model]
+--   Grupo de funcionalidades do sistema[N:Funcionalidade|Funcionalidades][G:a][K:App\Models|Models\][H:Model][L:null][ID:35]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da funcionalidade[G:o]
-  "modulo_id" INTEGER NOT NULL,-- Módulo que essa funcionalidade pertence[G:o][N:Módulo]
+  "modulo_id" INTEGER DEFAULT NULL,-- Módulo que essa funcionalidade pertence[G:o][N:Módulo]
   "funcionalidade_id" INTEGER DEFAULT NULL,-- Funcionalidade principal[G:a][N:Funcionalidade principal]
   "nome" VARCHAR(64) NOT NULL,-- Nome da funcionalidade, único em todo o sistema[N:Nome][G:o]
-  "descricao" VARCHAR(100) NOT NULL,-- Descrição da funcionalidade[N:Descrição][G:a][S]
+  "descricao" VARCHAR(200) NOT NULL,-- Descrição da funcionalidade[N:Descrição][G:a][S]
   CONSTRAINT "nome_UNIQUE"
     UNIQUE("nome"),
   CONSTRAINT "FK_funcionalidades_funcionalidade_id"
@@ -341,7 +341,7 @@ CREATE TABLE "funcionalidades"(
 CREATE INDEX "funcionalidades.FK_funcionalidades_funcionalidade_id_idx" ON "funcionalidades" ("funcionalidade_id");
 CREATE INDEX "funcionalidades.FK_funcionalidades_modulo_id_idx" ON "funcionalidades" ("modulo_id");
 CREATE TABLE "prestadores"(
---   Prestador de serviço que realiza alguma tarefa na empresa[N:Prestador|Prestadores][G:o][K:App\Models|Models\][H:Model]
+--   Prestador de serviço que realiza alguma tarefa na empresa[N:Prestador|Prestadores][G:o][K:App\Models|Models\][H:Model][L:null][ID:62]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do prestador[G:o]
   "codigo" VARCHAR(100) NOT NULL,-- Código do prestador, podendo ser de barras[N:Código][G:o]
   "pin" VARCHAR(200) DEFAULT NULL,-- Código pin para acesso rápido[G:o][N:Pin]
@@ -377,8 +377,8 @@ CREATE TABLE "prestadores"(
 CREATE INDEX "prestadores.FK_prestadores_funcao_id_idx" ON "prestadores" ("funcao_id");
 CREATE INDEX "prestadores.FK_prestadores_prestador_id_idx" ON "prestadores" ("empresa_id");
 CREATE TABLE "emitentes"(
---   Dados do emitente das notas fiscais[N:Emitente|Emitentes][G:o][K:App\Models|Models\][H:Model]
-  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')) DEFAULT '1',-- Identificador do emitente, sempre 1[G:o]
+--   Dados do emitente das notas fiscais[N:Emitente|Emitentes][G:o][K:App\Models|Models\][H:Model][L:7][ID:26]
+  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')) DEFAULT '1',-- Identificador do emitente, sempre 1[G:o][F:'1']
   "contador_id" INTEGER DEFAULT NULL,-- Contador responsável pela contabilidade da empresa[N:Contador][G:o][S:S]
   "regime_id" INTEGER NOT NULL,-- Regime tributário da empresa[N:Regime tributário][G:o]
   "ambiente" TEXT NOT NULL CHECK("ambiente" IN('homologacao', 'producao')) DEFAULT 'homologacao',-- Ambiente de emissão das notas[N:Ambiente][G:o][E:Homologação|Produção][F:self::AMBIENTE_HOMOLOGACAO]
@@ -402,7 +402,7 @@ CREATE TABLE "emitentes"(
 CREATE INDEX "emitentes.FK_emitentes_contador_id_idx" ON "emitentes" ("contador_id");
 CREATE INDEX "emitentes.FK_emitentes_regime_id_idx" ON "emitentes" ("regime_id");
 CREATE TABLE "fornecedores"(
---   Fornecedores de produtos[N:Fornecedor|Fornecedores][G:o][K:App\Models|Models\][H:Model]
+--   Fornecedores de produtos[N:Fornecedor|Fornecedores][G:o][K:App\Models|Models\][H:Model][L:null][ID:34]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do fornecedor[G:o]
   "empresa_id" INTEGER NOT NULL,-- Empresa do fornecedor[N:Empresa][G:a][S]
   "prazo_pagamento" INTEGER NOT NULL DEFAULT 0,-- Prazo em dias para pagamento do fornecedor[N:Prazo de pagamento][G:o][F:0]
@@ -416,7 +416,7 @@ CREATE TABLE "fornecedores"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "creditos"(
---   Créditos de clientes[N:Crédito|Créditos][G:o][K:App\Models|Models\][H:Model]
+--   Créditos de clientes[N:Crédito|Créditos][G:o][K:App\Models|Models\][H:Model][L:null][ID:23]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do crédito[G:o]
   "cliente_id" INTEGER NOT NULL,-- Cliente a qual o crédito pertence[N:Cliente][G:o][S:S]
   "valor" DECIMAL NOT NULL,-- Valor do crédito[N:Valor][G:o]
@@ -431,7 +431,7 @@ CREATE TABLE "creditos"(
 );
 CREATE INDEX "creditos.FK_creditos_cliente_id_idx" ON "creditos" ("cliente_id");
 CREATE TABLE "permissoes"(
---   Informa a listagem de todas as funções do sistema [N:Permissão|Permissões][G:a][K:App\Models|Models\][H:Model]
+--   Informa a listagem de todas as funções do sistema [N:Permissão|Permissões][G:a][K:App\Models|Models\][H:Model][L:null][ID:60]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da permissão[G:o]
   "funcionalidade_id" INTEGER NOT NULL,-- Categoriza um grupo de permissões[N:Funcionalidade][G:a][S:S]
   "nome" VARCHAR(45) NOT NULL,-- Nome da permissão, único no sistema[N:Nome][G:a]
@@ -446,7 +446,7 @@ CREATE TABLE "permissoes"(
 );
 CREATE INDEX "permissoes.FK_permissoes_funcionalidade_id_idx" ON "permissoes" ("funcionalidade_id");
 CREATE TABLE "auditorias"(
---   Registra todas as atividades importantes do sistema[N:Auditoria|Auditorias][G:a][K:App\Models|Models\][H:Model]
+--   Registra todas as atividades importantes do sistema[N:Auditoria|Auditorias][G:a][K:App\Models|Models\][H:Model][L:null][ID:3]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da auditoria[G:o]
   "permissao_id" INTEGER DEFAULT NULL,-- Informa a permissão concedida ou utilizada que permitiu a realização da operação[G:a][N:Permissão]
   "prestador_id" INTEGER NOT NULL,-- Prestador que exerceu a atividade[N:Prestador][G:o][S:S]
@@ -477,7 +477,7 @@ CREATE INDEX "auditorias.data_registro_INDEX" ON "auditorias" ("data_registro" D
 CREATE INDEX "auditorias.FK_auditorias_autorizador_id_idx" ON "auditorias" ("autorizador_id");
 CREATE INDEX "auditorias.FK_auditorias_permissao_id_idx" ON "auditorias" ("permissao_id");
 CREATE TABLE "tributacoes"(
---   Informação tributária dos produtos[N:Tributação|Tributações][G:a][K:App\Models|Models\][H:Model]
+--   Informação tributária dos produtos[N:Tributação|Tributações][G:a][K:App\Models|Models\][H:Model][L:7][ID:74]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da tributação[G:o]
   "ncm" VARCHAR(10) NOT NULL,-- Código NCM (Nomenclatura Comum do Mercosul) do produto[G:o][N:NCM]
   "cest" VARCHAR(20) DEFAULT NULL,-- Código CEST do produto (Opcional)[G:o][N:CEST]
@@ -504,7 +504,7 @@ CREATE INDEX "tributacoes.FK_tributacoes_origem_id_idx" ON "tributacoes" ("orige
 CREATE INDEX "tributacoes.FK_tributacoes_operacao_id_idx" ON "tributacoes" ("operacao_id");
 CREATE INDEX "tributacoes.FK_tributacoes_imposto_id_idx" ON "tributacoes" ("imposto_id");
 CREATE TABLE "horarios"(
---   Informa o horário de funcionamento do estabelecimento[N:Horário|Horários][G:o][K:App\Models|Models\][H:Model]
+--   Informa o horário de funcionamento do estabelecimento[N:Horário|Horários][G:o][K:App\Models|Models\][H:Model][L:null][ID:38]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do horário[G:o]
   "modo" TEXT NOT NULL CHECK("modo" IN('funcionamento', 'operacao', 'entrega')) DEFAULT 'funcionamento',-- Modo de trabalho disponível nesse horário, Funcionamento: horário em que o estabelecimento estará aberto, Operação: quando aceitar novos pedidos locais, Entrega: quando aceita ainda pedidos para entrega[G:o][N:Modo][F:self::MODO_FUNCIONAMENTO][E:Funcionamento|Operação|Entrega]
   "funcao_id" INTEGER DEFAULT NULL,-- Permite informar o horário de acesso ao sistema para realizar essa função[G:a][N:Função]
@@ -529,7 +529,7 @@ CREATE TABLE "horarios"(
 CREATE INDEX "horarios.FK_horarios_prestador_id_idx" ON "horarios" ("prestador_id");
 CREATE INDEX "horarios.FK_horarios_funcao_id_idx" ON "horarios" ("funcao_id");
 CREATE TABLE "produtos"(
---   Informações sobre o produto, composição ou pacote[N:Produto|Produtos][G:o][K:App\Models|Models\][H:Model]
+--   Informações sobre o produto, composição ou pacote[N:Produto|Produtos][G:o][K:App\Models|Models\][H:Model][L:null][ID:63]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código do produto[G:o]
   "codigo" VARCHAR(100) NOT NULL,-- Código do produto podendo ser de barras ou aleatório, deve ser único entre todos os produtos[N:Código][G:o]
   "categoria_id" INTEGER NOT NULL,-- Categoria do produto, permite a rápida localização ao utilizar tablets[N:Categoria][G:a][S:S]
@@ -543,6 +543,7 @@ CREATE TABLE "produtos"(
   "quantidade_minima" DOUBLE NOT NULL DEFAULT 0,-- Informa a quantidade limite para que o sistema avise que o produto já está acabando[N:Quantidade limite][G:a][F:0]
   "quantidade_maxima" DOUBLE NOT NULL DEFAULT 0,-- Informa a quantidade máxima do produto no estoque, não proibe, apenas avisa[N:Quantidade máxima][G:a][F:0]
   "preco_venda" DECIMAL NOT NULL DEFAULT 0,-- Preço de venda base desse produto para todos os cardápios[N:Preço de venda][G:o][F:0]
+  "custo_medio" DECIMAL DEFAULT NULL,-- Informa o preço médio de compra desse produto[G:o][N:Custo médio]
   "custo_producao" DECIMAL DEFAULT NULL,-- Informa qual o valor para o custo de produção do produto, utilizado quando não há formação de composição do produto[N:Custo de produção][G:o]
   "tipo" TEXT NOT NULL CHECK("tipo" IN('produto', 'composicao', 'pacote')) DEFAULT 'produto',-- Informa qual é o tipo de produto. Produto: Produto normal que possui estoque, Composição: Produto que não possui estoque diretamente, pois é composto de outros produtos ou composições, Pacote: Permite a composição no momento da venda, não possui estoque diretamente[N:Tipo][G:o][E:Produto|Composição|Pacote][F:self::TIPO_PRODUTO]
   "cobrar_servico" TEXT NOT NULL CHECK("cobrar_servico" IN('Y', 'N')) DEFAULT 'Y',-- Informa se deve ser cobrado a taxa de serviço dos garçons sobre este produto[N:Cobrança de serviço][G:a][F:true]
@@ -554,7 +555,7 @@ CREATE TABLE "produtos"(
   "avaliacao" DOUBLE DEFAULT NULL,-- Média das avaliações do último período[G:a][N:Avaliação]
   "estoque" DOUBLE DEFAULT 0,-- Estoque geral do produto[G:o][N:Estoque][F:0]
   "imagem_url" VARCHAR(100) DEFAULT NULL,-- Imagem do produto[N:Imagem][G:a][I:256x256|produto|produto.png]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização das informações do produto[N:Data de atualização][G:a][D]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização das informações do produto[N:Data de atualização][G:a][D]
   "data_arquivado" DATETIME DEFAULT NULL,-- Data em que o produto foi arquivado e não será mais usado[G:a][N:Data de arquivação]
   CONSTRAINT "descricao_UNIQUE"
     UNIQUE("descricao"),
@@ -592,7 +593,7 @@ CREATE INDEX "produtos.FK_produtos_setor_preparo_id_idx" ON "produtos" ("setor_p
 CREATE INDEX "produtos.FK_produtos_setor_estoque_id_idx" ON "produtos" ("setor_estoque_id");
 CREATE INDEX "produtos.FK_produtos_tributacao_id_idx" ON "produtos" ("tributacao_id");
 CREATE TABLE "cheques"(
---   Folha de cheque lançado como pagamento[N:Cheque|Cheques][G:o][K:App\Models|Models\][H:Model]
+--   Folha de cheque lançado como pagamento[N:Cheque|Cheques][G:o][K:App\Models|Models\][H:Model][L:null][ID:13]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da folha de cheque[G:o]
   "cliente_id" INTEGER NOT NULL,-- Cliente que emitiu o cheque[N:Cliente][G:o][S:S]
   "banco_id" INTEGER NOT NULL,-- Banco do cheque[N:Banco][G:o][S]
@@ -601,7 +602,7 @@ CREATE TABLE "cheques"(
   "numero" VARCHAR(20) NOT NULL,-- Número da folha do cheque[N:Número][G:o][S]
   "valor" DECIMAL NOT NULL,-- Valor na folha do cheque[N:Valor][G:o]
   "vencimento" DATETIME NOT NULL,-- Data de vencimento do cheque[N:Vencimento][G:o]
-  "cancelado" TEXT NOT NULL CHECK("cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o cheque e todas as suas folhas estão cancelados[N:Cancelado][G:o]
+  "cancelado" TEXT NOT NULL CHECK("cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o cheque e todas as suas folhas estão cancelados[N:Cancelado][G:o][F:false]
   "recolhimento" DATETIME DEFAULT NULL,-- Data de recolhimento do cheque[N:Data de recolhimento][G:a]
   "data_cadastro" DATETIME NOT NULL,-- Data de cadastro do cheque[N:Data de cadastro][G:a][D]
   CONSTRAINT "FK_cheques_cliente_id"
@@ -620,7 +621,7 @@ CREATE INDEX "cheques.FK_cheques_cliente_id_idx" ON "cheques" ("cliente_id");
 CREATE INDEX "cheques.FK_cheques_banco_id_idx" ON "cheques" ("banco_id");
 CREATE INDEX "cheques.recolhimento_INDEX" ON "cheques" ("recolhimento");
 CREATE TABLE "patrimonios"(
---   Informa detalhadamente um bem da empresa[N:Patrimônio|Patrimônios][G:o][K:App\Models|Models\][H:Model]
+--   Informa detalhadamente um bem da empresa[N:Patrimônio|Patrimônios][G:o][K:App\Models|Models\][H:Model][L:null][ID:58]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do bem[G:o]
   "empresa_id" INTEGER NOT NULL,-- Empresa a que esse bem pertence[N:Empresa][G:a][S:S]
   "fornecedor_id" INTEGER DEFAULT NULL,-- Fornecedor do bem[N:Fornecedor][G:o][S:S]
@@ -635,7 +636,7 @@ CREATE TABLE "patrimonios"(
   "valor" DECIMAL NOT NULL DEFAULT 0,-- Valor que o bem vale atualmente[N:Valor][G:o][F:0]
   "ativo" TEXT NOT NULL CHECK("ativo" IN('Y', 'N')) DEFAULT 'Y',-- Informa se o bem está ativo e em uso[N:Ativo][G:o][F:true]
   "imagem_url" VARCHAR(200) DEFAULT NULL,-- Caminho relativo da foto do bem[N:Foto do bem][G:a][I:512x512|patrimonio|patrimonio.png]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização das informações do bem[N:Data de atualização][G:a][D]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização das informações do bem[N:Data de atualização][G:a][D]
   CONSTRAINT "numero_UNIQUE"
     UNIQUE("numero"),
   CONSTRAINT "FK_patrimonios_fornecedor_id"
@@ -652,7 +653,7 @@ CREATE TABLE "patrimonios"(
 CREATE INDEX "patrimonios.FK_patrimonios_fornecedor_id_idx" ON "patrimonios" ("fornecedor_id");
 CREATE INDEX "patrimonios.FK_patrimonios_empresa_id_idx" ON "patrimonios" ("empresa_id");
 CREATE TABLE "observacoes"(
---   Observações e instruções de preparo de produto[N:Observação|Observações][G:a][K:App\Models|Models\][H:Model]
+--   Observações e instruções de preparo de produto[N:Observação|Observações][G:a][K:App\Models|Models\][H:Model][L:null][ID:52]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da observação[G:o]
   "produto_id" INTEGER NOT NULL,-- Informa o produto que pode conter essa observação[G:o][N:Produto]
   "grupo" INTEGER NOT NULL DEFAULT 0,-- Informa o grupo de observações obrigatórias, se maior que zero, é obrigatório escolher pelo menos uma opção[F:0][G:o][N:Grupo]
@@ -666,9 +667,9 @@ CREATE TABLE "observacoes"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "carteiras"(
---   Informa uma conta bancária ou uma carteira financeira[N:Carteira|Carteiras][G:a][K:App\Models|Models\][H:Model]
+--   Informa uma conta bancária ou uma carteira financeira[N:Carteira|Carteiras][G:a][K:App\Models|Models\][H:Model][L:null][ID:9]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código local da carteira[G:o]
-  "tipo" TEXT NOT NULL CHECK("tipo" IN('bancaria', 'financeira', 'credito', 'local')),-- Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para carteira financeira da empresa ou de sites de pagamentos, 'Credito' para cartão de crédito e 'Local' para caixas e cofres locais[N:Tipo][G:o][S:S][E:Bancária|Financeira|Crédito|Local]
+  "tipo" TEXT NOT NULL CHECK("tipo" IN('bancaria', 'financeira', 'credito', 'local')),-- Tipo de carteira, Bancaria: para conta bancária, Financeira: para carteira financeira da empresa ou de sites de pagamentos, Credito: para cartão de crédito e Local: para caixas e cofres locais[N:Tipo][G:o][S:S][E:Bancária|Financeira|Crédito|Local]
   "carteira_id" INTEGER DEFAULT NULL,-- Informa a carteira superior, exemplo: Banco e cartões como subcarteira[G:a][N:Carteira superior]
   "banco_id" INTEGER DEFAULT NULL,-- Código local do banco quando a carteira for bancária[N:Banco][G:o][S:S]
   "descricao" VARCHAR(100) NOT NULL,-- Descrição da carteira, nome dado a carteira cadastrada[N:Descrição][G:a][S]
@@ -681,7 +682,7 @@ CREATE TABLE "carteiras"(
   "logo_url" VARCHAR(100) DEFAULT NULL,-- Logo do gateway de pagamento[N:Logo][G:o][I:256x256|carteira|carteira.png]
   "cor" VARCHAR(20) DEFAULT NULL,-- Cor predominante da marca da instituição[G:a][N:Cor]
   "ativa" TEXT NOT NULL CHECK("ativa" IN('Y', 'N')) DEFAULT 'Y',-- Informa se a carteira ou conta bancária está ativa[N:Ativa][G:a][F:true]
-  "data_desativada" DATETIME DEFAULT NULL,
+  "data_desativada" DATETIME DEFAULT NULL,-- Data em que a carteira foi desativada[G:a][N:Data de desativação]
   CONSTRAINT "FK_carteiras_banco_id"
     FOREIGN KEY("banco_id")
     REFERENCES "bancos"("id")
@@ -696,7 +697,7 @@ CREATE TABLE "carteiras"(
 CREATE INDEX "carteiras.FK_carteiras_banco_id_idx" ON "carteiras" ("banco_id");
 CREATE INDEX "carteiras.FK_carteiras_carteira_id_idx" ON "carteiras" ("carteira_id");
 CREATE TABLE "estados"(
---   Estado federativo de um país[N:Estado|Estados][G:o][K:App\Models|Models\][H:Model]
+--   Estado federativo de um país[N:Estado|Estados][G:o][K:App\Models|Models\][H:Model][L:null][ID:29]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do estado[G:o]
   "pais_id" INTEGER NOT NULL,-- País a qual esse estado pertence[N:País][G:o][S:S]
   "nome" VARCHAR(64) NOT NULL,-- Nome do estado[N:Nome][G:o][S]
@@ -712,8 +713,8 @@ CREATE TABLE "estados"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "empresas"(
---   Informações da empresa[N:Empresa|Empresas][G:a][K:App\Models|Models\][H:Model]
-  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')),-- Identificador único da empresa, valor 1[G:o]
+--   Informações da empresa[N:Empresa|Empresas][G:a][K:App\Models|Models\][H:Model][L:null][ID:27]
+  "id" TEXT PRIMARY KEY NOT NULL CHECK("id" IN('1')) DEFAULT '1',-- Identificador único da empresa, valor 1[G:o][F:'1']
   "pais_id" INTEGER DEFAULT NULL,-- País em que a empresa está situada[N:País][G:o]
   "empresa_id" INTEGER DEFAULT NULL,-- Informa a empresa do cadastro de clientes, a empresa deve ser um cliente do tipo pessoa jurídica[N:Empresa][G:a][S:S]
   "parceiro_id" INTEGER DEFAULT NULL,-- Informa quem realiza o suporte do sistema, deve ser um cliente do tipo empresa que possua um acionista como representante[N:Parceiro][G:o][S:S]
@@ -738,11 +739,11 @@ CREATE INDEX "empresas.FK_empresas_empresa_id_idx" ON "empresas" ("empresa_id");
 CREATE INDEX "empresas.FK_empresas_parceiro_id_idx" ON "empresas" ("parceiro_id");
 CREATE INDEX "empresas.FK_empresas_pais_id_idx" ON "empresas" ("pais_id");
 CREATE TABLE "composicoes"(
---   Informa as propriedades da composição de um produto composto[N:Composição|Composições][G:a][K:App\Models|Models\][H:Model]
+--   Informa as propriedades da composição de um produto composto[N:Composição|Composições][G:a][K:App\Models|Models\][H:Model][L:null][ID:18]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da composição[G:o]
   "composicao_id" INTEGER NOT NULL,-- Informa a qual produto pertence essa composição, deve sempre ser um produto do tipo Composição[N:Composição][G:a][S:S]
   "produto_id" INTEGER NOT NULL,-- Produto ou composição que faz parte dessa composição, Obs: Não pode ser um pacote[N:Produto da composição][G:o][S]
-  "tipo" TEXT NOT NULL CHECK("tipo" IN('composicao', 'opcional', 'adicional')) DEFAULT 'composicao',-- Tipo de composição, 'Composicao' sempre retira do estoque, 'Opcional' permite desmarcar na venda, 'Adicional' permite adicionar na venda[N:Tipo][G:o][E:Composição|Opcional|Adicional][F:self::TIPO_COMPOSICAO]
+  "tipo" TEXT NOT NULL CHECK("tipo" IN('composicao', 'opcional', 'adicional')) DEFAULT 'composicao',-- Tipo de composição, Composicao: sempre retira do estoque, Opcional: permite desmarcar na venda, Adicional: permite adicionar na venda[N:Tipo][G:o][E:Composição|Opcional|Adicional][F:self::TIPO_COMPOSICAO]
   "quantidade" DOUBLE NOT NULL,-- Quantidade que será consumida desse produto para cada composição formada[N:Quantidade][G:a]
   "valor" DECIMAL NOT NULL DEFAULT 0,-- Desconto que será realizado ao retirar esse produto da composição no  momento da venda[N:Valor][G:o][F:0]
   "quantidade_maxima" INTEGER NOT NULL DEFAULT 1,-- Define a quantidade máxima que essa composição pode ser vendida repetidamente[N:Quantidade máxima][G:a][F:1]
@@ -763,7 +764,7 @@ CREATE TABLE "composicoes"(
 );
 CREATE INDEX "composicoes.FK_composicoes_produto_id_idx" ON "composicoes" ("produto_id");
 CREATE TABLE "mesas"(
---   Mesas para lançamento de pedidos[N:Mesa|Mesas][G:a][K:App\Models|Models\][H:Model]
+--   Mesas para lançamento de pedidos[N:Mesa|Mesas][G:a][K:App\Models|Models\][H:Model][L:1][ID:46]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Número da mesa[N:Número][G:o]
   "setor_id" INTEGER NOT NULL,-- Setor em que a mesa está localizada[G:o][N:Setor]
   "numero" INTEGER NOT NULL,-- Número da mesa[G:o][N:Número]
@@ -781,7 +782,7 @@ CREATE TABLE "mesas"(
 );
 CREATE INDEX "mesas.FK_mesas_setor_id_idx" ON "mesas" ("setor_id");
 CREATE TABLE "compras"(
---   Compras realizadas em uma lista num determinado fornecedor[N:Compra|Compras][G:a][K:App\Models|Models\][H:Model]
+--   Compras realizadas em uma lista num determinado fornecedor[N:Compra|Compras][G:a][K:App\Models|Models\][H:Model][L:null][ID:19]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da compra
   "numero" VARCHAR(64) DEFAULT NULL,-- Informa o número fiscal da compra[N:Número da compra][G:o]
   "comprador_id" INTEGER NOT NULL,-- Informa o funcionário que comprou os produtos da lista[N:Comprador][G:o][S:S]
@@ -804,7 +805,7 @@ CREATE TABLE "compras"(
 CREATE INDEX "compras.FK_compras_fornecedor_id_idx" ON "compras" ("fornecedor_id");
 CREATE INDEX "compras.FK_compras_comprador_id_idx" ON "compras" ("comprador_id");
 CREATE TABLE "acessos"(
---   Permite acesso à uma determinada funcionalidade da lista de permissões[N:Acesso|Acessos][G:o][K:App\Models|Models\][H:Model]
+--   Permite acesso à uma determinada funcionalidade da lista de permissões[N:Acesso|Acessos][G:o][K:App\Models|Models\][H:Model][L:null][ID:1]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do acesso[G:o]
   "funcao_id" INTEGER NOT NULL,-- Função a que a permissão se aplica[N:Função][G:a][S:S]
   "permissao_id" INTEGER NOT NULL,-- Permissão liberada para a função[N:Permissão][G:a][S]
@@ -823,7 +824,7 @@ CREATE TABLE "acessos"(
 );
 CREATE INDEX "acessos.FK_acessos_permissao_id_idx" ON "acessos" ("permissao_id");
 CREATE TABLE "viagens"(
---   Registro de viagem de uma entrega ou compra de insumos[N:Viagem|Viagens][G:a][K:App\Models|Models\][H:Model]
+--   Registro de viagem de uma entrega ou compra de insumos[N:Viagem|Viagens][G:a][K:App\Models|Models\][H:Model][L:null][ID:76]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da viagem[G:o]
   "responsavel_id" INTEGER NOT NULL,-- Responsável pela entrega ou compra[N:Responsável][G:o][S:S]
   "latitude" DOUBLE DEFAULT NULL,-- Ponto latitudinal para localização do responsável em tempo real[N:Latitude][G:a]
@@ -841,7 +842,7 @@ CREATE TABLE "viagens"(
 );
 CREATE INDEX "viagens.FK_viagens_responsavel_id_idx" ON "viagens" ("responsavel_id");
 CREATE TABLE "zonas"(
---   Zonas de um bairro[N:Zona|Zonas][G:a][K:App\Models|Models\][H:Model]
+--   Zonas de um bairro[N:Zona|Zonas][G:a][K:App\Models|Models\][H:Model][L:null][ID:77]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da zona[G:o]
   "bairro_id" INTEGER NOT NULL,-- Bairro em que essa zona está localizada[G:o][N:Bairro]
   "nome" VARCHAR(45) NOT NULL,-- Nome da zona, Ex. Sul, Leste, Começo, Fim[G:o][N:Nome]
@@ -859,12 +860,12 @@ CREATE TABLE "zonas"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "contagens"(
---   Guarda a soma do estoque de cada produto por setor[N:Contagem|Contagens][G:a][K:App\Models|Models\][H:Model]
+--   Guarda a soma do estoque de cada produto por setor[N:Contagem|Contagens][G:a][K:App\Models|Models\][H:Model][L:null][ID:20]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da contagem[G:o]
   "produto_id" INTEGER NOT NULL,-- Produto que possui o estoque acumulado nesse setor[G:o][N:Produto]
   "setor_id" INTEGER NOT NULL,-- Setor em que o produto está localizado[G:o][N:Setor]
   "quantidade" DOUBLE NOT NULL,-- Quantidade do produto nesse setor[G:a][N:Quantidade]
-  "data_atualizacao" DATETIME NOT NULL,-- Data em que a contagem foi atualizada[G:a][N:Data de atualização]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data em que a contagem foi atualizada[G:a][N:Data de atualização]
   CONSTRAINT "produto_id_setor_id_UNIQUE"
     UNIQUE("produto_id","setor_id"),
   CONSTRAINT "FK_contagens_produto_id"
@@ -880,7 +881,7 @@ CREATE TABLE "contagens"(
 );
 CREATE INDEX "contagens.FK_contagens_setor_id_idx" ON "contagens" ("setor_id");
 CREATE TABLE "resumos"(
---   Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento[N:Resumo|Resumos][G:o][K:App\Models|Models\][H:Model]
+--   Resumo de fechamento de caixa, informa o valor contado no fechamento do caixa para cada forma de pagamento[N:Resumo|Resumos][G:o][K:App\Models|Models\][H:Model][L:null][ID:68]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do resumo[G:o]
   "movimentacao_id" INTEGER NOT NULL,-- Movimentação do caixa referente ao resumo[N:Movimentação][G:a][S]
   "forma_id" INTEGER NOT NULL,-- Tipo de pagamento do resumo[N:Tipo][G:o][E:Dinheiro|Cartão de credito|Cartão de débito|Vale|Cheque|Crediário|Saldo][S:S]
@@ -907,16 +908,16 @@ CREATE TABLE "resumos"(
 CREATE INDEX "resumos.FK_resumos_cartao_id_idx" ON "resumos" ("cartao_id");
 CREATE INDEX "resumos.FK_resumos_forma_id_idx" ON "resumos" ("forma_id");
 CREATE TABLE "catalogos"(
---   Informa a lista de produtos disponíveis nos fornecedores[N:Catálogo de produtos|Catálogos de produtos][G:o][K:App\Models|Models\][H:Model]
+--   Informa a lista de produtos disponíveis nos fornecedores[N:Catálogo de produtos|Catálogos de produtos][G:o][K:App\Models|Models\][H:Model][L:null][ID:11]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do catálogo[G:o]
   "produto_id" INTEGER NOT NULL,-- Produto consultado[N:Produto][G:o][S]
   "fornecedor_id" INTEGER NOT NULL,-- Fornecedor que possui o produto à venda[N:Fornecedor][G:o][S:S]
   "preco_compra" DECIMAL NOT NULL,-- Preço a qual o produto foi comprado da última vez[N:Preço de compra][G:o]
-  "preco_venda" DECIMAL NOT NULL DEFAULT 0,-- Preço de venda do produto pelo fornecedor na última consulta[N:Preço de venda][G:o]
-  "quantidade_minima" DOUBLE NOT NULL DEFAULT 1,-- Quantidade mínima que o fornecedor vende[N:Quantidade mínima][G:a]
-  "estoque" DOUBLE NOT NULL DEFAULT 0,-- Quantidade em estoque do produto no fornecedor[N:Estoque][G:o]
-  "limitado" TEXT NOT NULL CHECK("limitado" IN('Y', 'N')) DEFAULT 'N',-- Informa se a quantidade de estoque é limitada[N:Limitado][G:o]
-  "conteudo" DOUBLE NOT NULL DEFAULT 1,-- Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote[N:Conteúdo][G:o]
+  "preco_venda" DECIMAL NOT NULL DEFAULT 0,-- Preço de venda do produto pelo fornecedor na última consulta[N:Preço de venda][G:o][F:0]
+  "quantidade_minima" DOUBLE NOT NULL DEFAULT 1,-- Quantidade mínima que o fornecedor vende[N:Quantidade mínima][G:a][F:1]
+  "estoque" DOUBLE NOT NULL DEFAULT 0,-- Quantidade em estoque do produto no fornecedor[N:Estoque][G:o][F:0]
+  "limitado" TEXT NOT NULL CHECK("limitado" IN('Y', 'N')) DEFAULT 'N',-- Informa se a quantidade de estoque é limitada[N:Limitado][G:o][F:false]
+  "conteudo" DOUBLE NOT NULL DEFAULT 1,-- Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote[N:Conteúdo][G:o][F:1]
   "data_consulta" DATETIME DEFAULT NULL,-- Última data de consulta do preço do produto[N:Data de consulta][G:a]
   "data_parada" DATETIME DEFAULT NULL,-- Data em que o produto deixou de ser vendido pelo fornecedor[G:a][N:Data de parada]
   CONSTRAINT "fornecedor_id_produto_id_UNIQUE"
@@ -934,7 +935,7 @@ CREATE TABLE "catalogos"(
 );
 CREATE INDEX "catalogos.FK_catalogos_produto_id_idx" ON "catalogos" ("produto_id");
 CREATE TABLE "pacotes"(
---   Contém todos as opções para a formação do produto final[N:Pacote|Pacotes][G:o][K:App\Models|Models\][H:Model]
+--   Contém todos as opções para a formação do produto final[N:Pacote|Pacotes][G:o][K:App\Models|Models\][H:Model][L:null][ID:55]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do pacote[G:o]
   "pacote_id" INTEGER NOT NULL,-- Pacote a qual pertence as informações de formação do produto final[N:Pacote][G:o][S:S]
   "grupo_id" INTEGER NOT NULL,-- Grupo de formação, Ex.: Tamanho, Sabores e Complementos.[N:Grupo][G:o][S:S]
@@ -979,7 +980,7 @@ CREATE INDEX "pacotes.FK_pacotes_grupo_id_idx" ON "pacotes" ("grupo_id");
 CREATE INDEX "pacotes.FK_pacotes_associacao_id_idx" ON "pacotes" ("associacao_id");
 CREATE INDEX "pacotes.FK_pacotes_propriedade_id_idx" ON "pacotes" ("propriedade_id");
 CREATE TABLE "localizacoes"(
---   Endereço detalhado de um cliente[N:Localização|Localizações][G:a][K:App\Models|Models\][H:Model]
+--   Endereço detalhado de um cliente[N:Localização|Localizações][G:a][K:App\Models|Models\][H:Model][L:null][ID:45]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do endereço[G:o]
   "cliente_id" INTEGER NOT NULL,-- Cliente a qual esse endereço pertence[N:Cliente][G:o][S:S]
   "bairro_id" INTEGER NOT NULL,-- Bairro do endereço[N:Bairro][G:o][S:S]
@@ -1016,7 +1017,7 @@ CREATE TABLE "localizacoes"(
 CREATE INDEX "localizacoes.FK_localizacoes_bairro_id_idx" ON "localizacoes" ("bairro_id");
 CREATE INDEX "localizacoes.FK_localizacoes_zona_id_idx" ON "localizacoes" ("zona_id");
 CREATE TABLE "itens"(
---   Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção[N:Item do pedido|Itens do pedido][G:o][U:Item|Itens][K:App\Models|Models\][H:Model]
+--   Produtos, taxas e serviços do pedido, a alteração do estado permite o controle de produção[N:Item do pedido|Itens do pedido][G:o][U:Item|Itens][K:App\Models|Models\][H:Model][L:null][ID:42]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do item do pedido[G:o]
   "pedido_id" INTEGER NOT NULL,-- Pedido a qual pertence esse item[N:Pedido][G:o][S:S]
   "prestador_id" INTEGER DEFAULT NULL,-- Prestador que lançou esse item no pedido[N:Prestador][G:o][S:S]
@@ -1038,6 +1039,7 @@ CREATE TABLE "itens"(
   "cancelado" TEXT NOT NULL CHECK("cancelado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o item foi cancelado[N:Cancelado][G:o][F:false]
   "motivo" VARCHAR(200) DEFAULT NULL,-- Informa o motivo do item ser cancelado[N:Motivo][G:o]
   "desperdicado" TEXT NOT NULL CHECK("desperdicado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o item foi cancelado por conta de desperdício[N:Desperdiçado][G:o][F:false]
+  "reservado" TEXT NOT NULL CHECK("reservado" IN('Y', 'N')) DEFAULT 'N',-- Informa se o produto foi reservado no estoque[G:o][N:Reservado][F:false]
   "data_processamento" DATETIME DEFAULT NULL,-- Data do processamento do item[N:Data do processamento][G:a]
   "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização do estado do item[N:Data de atualização][G:a]
   "data_lancamento" DATETIME NOT NULL,-- Data e hora da realização do pedido do item[N:Data de lançamento][G:a][D]
@@ -1079,7 +1081,7 @@ CREATE INDEX "itens.FK_itens_item_id_idx" ON "itens" ("item_id");
 CREATE INDEX "itens.FK_itens_servico_id_idx" ON "itens" ("servico_id");
 CREATE INDEX "itens.FK_itens_pagamento_id_idx" ON "itens" ("pagamento_id");
 CREATE TABLE "contas"(
---   Contas a pagar e ou receber[N:Conta|Contas][G:a][K:App\Models|Models\][H:Model]
+--   Contas a pagar e ou receber[N:Conta|Contas][G:a][K:App\Models|Models\][H:Model][L:null][ID:21]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da conta[G:o]
   "classificacao_id" INTEGER NOT NULL,-- Classificação da conta[N:Classificação][G:a][S:S]
   "funcionario_id" INTEGER NOT NULL,-- Funcionário que lançou a conta[N:Funcionário][G:o][S:S]
@@ -1154,7 +1156,7 @@ CREATE INDEX "contas.FK_contas_agrupamento_id_idx" ON "contas" ("agrupamento_id"
 CREATE INDEX "contas.vencimento_INDEX" ON "contas" ("vencimento" DESC);
 CREATE INDEX "contas.data_emissao_INDEX" ON "contas" ("data_emissao" DESC);
 CREATE TABLE "dispositivos"(
---   Computadores e tablets com opções de acesso[N:Dispositivo|Dispositivos][G:o][K:App\Models|Models\][H:Model]
+--   Computadores e tablets com opções de acesso[N:Dispositivo|Dispositivos][G:o][K:App\Models|Models\][H:Model][L:null][ID:25]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do dispositivo[G:o]
   "setor_id" INTEGER DEFAULT NULL,-- Setor em que o dispositivo está instalado/será usado[N:Setor][G:o]
   "caixa_id" INTEGER DEFAULT NULL,-- Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os dispositivos[N:Caixa][G:o]
@@ -1181,7 +1183,7 @@ CREATE TABLE "dispositivos"(
 );
 CREATE INDEX "dispositivos.FK_dispositivos_setor_id_idx" ON "dispositivos" ("setor_id");
 CREATE TABLE "listas"(
---   Lista de compras de produtos[N:Lista de compra|Listas de compras][G:a][K:App\Models|Models\][H:Model]
+--   Lista de compras de produtos[N:Lista de compra|Listas de compras][G:a][K:App\Models|Models\][H:Model][L:null][ID:44]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da lista de compras[G:o]
   "descricao" VARCHAR(100) NOT NULL,-- Nome da lista, pode ser uma data[N:Descrição][G:a][S]
   "estado" TEXT NOT NULL CHECK("estado" IN('analise', 'fechada', 'comprada')) DEFAULT 'analise',-- Estado da lista de compra. Análise: Ainda estão sendo adicionado produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os itens foram comprados[N:Estado][G:o][E:Análise|Fechada|Comprada][F:self::ESTADO_ANALISE]
@@ -1203,7 +1205,7 @@ CREATE TABLE "listas"(
 CREATE INDEX "listas.FK_listas_encarregado_id_idx" ON "listas" ("encarregado_id");
 CREATE INDEX "listas.FK_listas_viagem_id_idx" ON "listas" ("viagem_id");
 CREATE TABLE "avaliacoes"(
---   Avaliação de atendimento e outros serviços do estabelecimento[N:Avaliação|Avaliações][G:a][K:App\Models|Models\][H:Model]
+--   Avaliação de atendimento e outros serviços do estabelecimento[N:Avaliação|Avaliações][G:a][K:App\Models|Models\][H:Model][L:5][ID:4]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da avaliação[G:o]
   "metrica_id" INTEGER NOT NULL,-- Métrica de avaliação[G:a][N:Métrica]
   "cliente_id" INTEGER DEFAULT NULL,-- Informa o cliente que avaliou esse pedido ou produto, obrigatório quando for avaliação de produto[G:o][N:Cliente]
@@ -1238,7 +1240,7 @@ CREATE INDEX "avaliacoes.FK_avaliacoes_metrica_id_idx" ON "avaliacoes" ("metrica
 CREATE INDEX "avaliacoes.FK_avaliacoes_pedido_id_idx" ON "avaliacoes" ("pedido_id");
 CREATE INDEX "avaliacoes.FK_avaliacoes_produto_id_idx" ON "avaliacoes" ("produto_id");
 CREATE TABLE "promocoes"(
---   Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado[N:Promoção|Promoções][G:a][K:App\Models|Models\][H:Model]
+--   Informa se há descontos nos produtos em determinados dias da semana, o preço pode subir ou descer e ser agendado para ser aplicado[N:Promoção|Promoções][G:a][K:App\Models|Models\][H:Model][L:null][ID:64]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da promoção[G:o]
   "promocao_id" INTEGER DEFAULT NULL,-- Promoção que originou os pontos do cliente/pedido, se informado a promoção será o resgate e somente pontos gerados por ela poderão ser usados[G:a][N:Promoção geradora]
   "categoria_id" INTEGER DEFAULT NULL,-- Permite fazer promoção para qualquer produto dessa categoria[G:a][N:Categoria]
@@ -1310,7 +1312,7 @@ CREATE INDEX "promocoes.FK_promocoes_integracao_id_idx" ON "promocoes" ("integra
 CREATE INDEX "promocoes.FK_promocoes_categoria_id_idx" ON "promocoes" ("categoria_id");
 CREATE INDEX "promocoes.FK_promocoes_promocao_id_idx" ON "promocoes" ("promocao_id");
 CREATE TABLE "associacoes"(
---   Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema[N:Associação|Associações][G:a][K:App\Models|Models\][H:Model]
+--   Lista de pedidos que não foram integrados ainda e devem ser associados ao sistema[N:Associação|Associações][G:a][K:App\Models|Models\][H:Model][L:5][ID:2]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da associação no banco de dados[G:o]
   "integracao_id" INTEGER NOT NULL,-- Integração a qual essa associação de pedido deve ser realizada[G:a][N:Integração]
   "entrega_id" INTEGER,-- Entrega que foi realizada[N:Entrega][G:o]
@@ -1345,7 +1347,7 @@ CREATE TABLE "associacoes"(
 CREATE INDEX "associacoes.FK_associacoes_integracao_id_idx" ON "associacoes" ("integracao_id");
 CREATE INDEX "associacoes.FK_associacoes_entrega_id_idx" ON "associacoes" ("entrega_id");
 CREATE TABLE "grupos"(
---   Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos[N:Grupo|Grupos][G:o][K:App\Models|Models\][H:Model]
+--   Grupos de pacotes, permite criar grupos como Tamanho, Sabores para formações de produtos[N:Grupo|Grupos][G:o][K:App\Models|Models\][H:Model][L:null][ID:37]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do grupo[G:o]
   "produto_id" INTEGER NOT NULL,-- Informa o pacote base da formação[N:Pacote][G:o][S:S]
   "nome" VARCHAR(100) NOT NULL,-- Nome resumido do grupo da formação, Exemplo: Tamanho, Sabores[N:Nome][G:o][S:S]
@@ -1365,12 +1367,11 @@ CREATE TABLE "grupos"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "estoques"(
---   Estoque de produtos por setor[N:Estoque|Estoques][G:o][K:App\Models|Models\][H:Model]
+--   Estoque de produtos por setor[N:Estoque|Estoques][G:o][K:App\Models|Models\][H:Model][L:null][ID:30]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da entrada no estoque[G:o]
   "produto_id" INTEGER NOT NULL,-- Produto que entrou no estoque[N:Produto][G:o][S][S:S]
   "requisito_id" INTEGER DEFAULT NULL,-- Informa de qual compra originou essa entrada em estoque[G:o][N:Requisição de Compra]
   "transacao_id" INTEGER DEFAULT NULL,-- Identificador do item que gerou a saída desse produto do estoque[N:Transação][G:a][S:S]
-  "entrada_id" INTEGER DEFAULT NULL,-- Informa de qual entrada no estoque essa saída foi retirada, permite estoque FIFO[N:Entrada][G:a][S:S]
   "fornecedor_id" INTEGER DEFAULT NULL,-- Fornecedor do produto[N:Fornecedor][G:o][S:S]
   "setor_id" INTEGER NOT NULL,-- Setor de onde o produto foi inserido ou retirado[N:Setor][G:o]
   "prestador_id" INTEGER DEFAULT NULL,-- Prestador que inseriu/retirou o produto do estoque[N:Prestador][G:o][S:S]
@@ -1408,11 +1409,6 @@ CREATE TABLE "estoques"(
     REFERENCES "setores"("id")
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  CONSTRAINT "FK_estoques_entrada_id"
-    FOREIGN KEY("entrada_id")
-    REFERENCES "estoques"("id")
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
   CONSTRAINT "FK_estoques_requisito_id"
     FOREIGN KEY("requisito_id")
     REFERENCES "requisitos"("id")
@@ -1424,11 +1420,10 @@ CREATE INDEX "estoques.FK_estoques_transacao_id_idx" ON "estoques" ("transacao_i
 CREATE INDEX "estoques.FK_estoques_fornecedor_id_idx" ON "estoques" ("fornecedor_id");
 CREATE INDEX "estoques.FK_estoques_prestador_id_idx" ON "estoques" ("prestador_id");
 CREATE INDEX "estoques.FK_estoques_setor_id_idx" ON "estoques" ("setor_id");
-CREATE INDEX "estoques.FK_estoques_entrada_id_idx" ON "estoques" ("entrada_id");
 CREATE INDEX "estoques.FK_estoques_requisito_id_idx" ON "estoques" ("requisito_id");
 CREATE INDEX "estoques.data_movimento_INDEX" ON "estoques" ("data_movimento");
 CREATE TABLE "cidades"(
---   Cidade de um estado, contém bairros[N:Cidade|Cidades][G:a][K:App\Models|Models\][H:Model]
+--   Cidade de um estado, contém bairros[N:Cidade|Cidades][G:a][K:App\Models|Models\][H:Model][L:null][ID:14]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código que identifica a cidade[G:o]
   "estado_id" INTEGER NOT NULL,-- Informa a qual estado a cidade pertence[N:Estado][G:o]
   "nome" VARCHAR(100) NOT NULL,-- Nome da cidade, é único para cada estado[S][N:Nome][G:o]
@@ -1444,7 +1439,7 @@ CREATE TABLE "cidades"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "requisitos"(
---   Informa os produtos da lista de compras[N:Produtos da lista|Produtos das listas][G:o][K:App\Models|Models\][H:Model]
+--   Informa os produtos da lista de compras[N:Produtos da lista|Produtos das listas][G:o][K:App\Models|Models\][H:Model][L:null][ID:67]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do produto da lista[G:o]
   "lista_id" INTEGER NOT NULL,-- Lista de compra desse produto[N:Lista de compra][G:a]
   "produto_id" INTEGER NOT NULL,-- Produto que deve ser comprado[N:Produto][G:o][S]
@@ -1482,7 +1477,7 @@ CREATE INDEX "requisitos.FK_requisitos_produto_id_idx" ON "requisitos" ("produto
 CREATE INDEX "requisitos.FK_requisitos_fornecedor_id_idx" ON "requisitos" ("fornecedor_id");
 CREATE INDEX "requisitos.FK_requisitos_compra_id_idx" ON "requisitos" ("compra_id");
 CREATE TABLE "cardapios"(
---   Cardápios para cada integração ou local de venda[G:o][N:Cardápio|Cardápios][K:App\Models|Models\][H:Model]
+--   Cardápios para cada integração ou local de venda[G:o][N:Cardápio|Cardápios][K:App\Models|Models\][H:Model][L:null][ID:8]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cardápio[G:o]
   "produto_id" INTEGER NOT NULL,-- Produto que faz parte desse cardápio[G:o][N:Produto]
   "integracao_id" INTEGER DEFAULT NULL,-- Permite exibir o cardápio somente nessa integração[G:a][N:Integração]
@@ -1503,13 +1498,13 @@ CREATE TABLE "cardapios"(
 CREATE INDEX "cardapios.produto_id_integracao_id_local_UNIQUE" ON "cardapios" ("produto_id","integracao_id","local");
 CREATE INDEX "cardapios.FK_cardapios_integracao_id_idx" ON "cardapios" ("integracao_id");
 CREATE TABLE "propriedades"(
---   Informa tamanhos de pizzas e opções de peso do produto[N:Propriedade|Propriedades][G:a][K:App\Models|Models\][H:Model]
+--   Informa tamanhos de pizzas e opções de peso do produto[N:Propriedade|Propriedades][G:a][K:App\Models|Models\][H:Model][L:null][ID:65]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da propriedade[G:o]
   "grupo_id" INTEGER NOT NULL,-- Grupo que possui essa propriedade como item de um pacote[N:Grupo][G:o][S:S]
   "nome" VARCHAR(100) NOT NULL,-- Nome da propriedade, Ex.: Grande, Pequena[N:Nome][G:o][S]
   "abreviacao" VARCHAR(100) DEFAULT NULL,-- Abreviação do nome da propriedade, Ex.: G para Grande, P para Pequena, essa abreviação fará parte do nome do produto[N:Abreviação][G:a]
   "imagem_url" VARCHAR(100) DEFAULT NULL,-- Imagem que representa a propriedade[N:Imagem][G:a][I:256x256|propriedade|propriedade.png]
-  "data_atualizacao" DATETIME NOT NULL,-- Data de atualização dos dados ou da imagem da propriedade[N:Data de atualização][G:a]
+  "data_atualizacao" DATETIME DEFAULT NULL,-- Data de atualização dos dados ou da imagem da propriedade[N:Data de atualização][G:a]
   CONSTRAINT "grupo_id_nome_UNIQUE"
     UNIQUE("grupo_id","nome"),
   CONSTRAINT "FK_propriedades_grupo_id"
@@ -1519,7 +1514,7 @@ CREATE TABLE "propriedades"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "pagamentos"(
---   Pagamentos de contas e pedidos[N:Pagamento|Pagamentos][G:o][K:App\Models|Models\][H:Model]
+--   Pagamentos de contas e pedidos[N:Pagamento|Pagamentos][G:o][K:App\Models|Models\][H:Model][L:null][ID:56]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do pagamento[G:o]
   "carteira_id" INTEGER NOT NULL,-- Carteira de destino do valor[N:Carteira][G:a]
   "moeda_id" INTEGER NOT NULL,-- Informa em qual moeda está o valor informado[G:a][N:Moeda]
@@ -1627,7 +1622,7 @@ CREATE INDEX "pagamentos.data_compensacao_INDEX" ON "pagamentos" ("data_compensa
 CREATE INDEX "pagamentos.data_lancamento_INDEX" ON "pagamentos" ("data_lancamento" DESC);
 CREATE INDEX "pagamentos.data_pagamento_INDEX" ON "pagamentos" ("data_pagamento" DESC);
 CREATE TABLE "cupons"(
---   Informa os cupons de descontos e seus usos[N:Cupom|Cupons][G:o][K:App\Models|Models\][H:Model]
+--   Informa os cupons de descontos e seus usos[N:Cupom|Cupons][G:o][K:App\Models|Models\][H:Model][L:null][ID:24]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cupom[G:o]
   "cupom_id" INTEGER DEFAULT NULL,-- Informa de qual cupom foi usado[G:o][N:Cupom]
   "pedido_id" INTEGER DEFAULT NULL,-- Informa qual pedido usou este cupom[G:o][N:Pedido]
@@ -1666,7 +1661,7 @@ CREATE INDEX "cupons.FK_cupons_cupom_id_idx" ON "cupons" ("cupom_id");
 CREATE INDEX "cupons.FK_cupons_pedido_id_idx" ON "cupons" ("pedido_id");
 CREATE INDEX "cupons.FK_cupons_cliente_id_idx" ON "cupons" ("cliente_id");
 CREATE TABLE "juncoes"(
---   Junções de mesas, informa quais mesas estão juntas ao pedido[N:Junção|Junções][G:a][K:App\Models|Models\][H:Model]
+--   Junções de mesas, informa quais mesas estão juntas ao pedido[N:Junção|Junções][G:a][K:App\Models|Models\][H:Model][L:1][ID:43]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da junção[G:o]
   "mesa_id" INTEGER NOT NULL,-- Mesa que está junta ao pedido[N:Mesa][G:a][S]
   "pedido_id" INTEGER NOT NULL,-- Pedido a qual a mesa está junta, o pedido deve ser de uma mesa[N:Pedido][G:o][S:S]
@@ -1686,7 +1681,7 @@ CREATE TABLE "juncoes"(
 CREATE INDEX "juncoes.FK_juncoes_pedido_id_idx" ON "juncoes" ("pedido_id");
 CREATE INDEX "juncoes.mesa_id_estado_INDEX" ON "juncoes" ("mesa_id","estado");
 CREATE TABLE "formas"(
---   Formas de pagamento disponíveis para pedido e contas[N:Forma de pagamento|Formas de pagamento][G:a][K:App\Models|Models\][H:Model]
+--   Formas de pagamento disponíveis para pedido e contas[N:Forma de pagamento|Formas de pagamento][G:a][K:App\Models|Models\][H:Model][L:null][ID:33]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da forma de pagamento[G:o]
   "tipo" TEXT NOT NULL CHECK("tipo" IN('dinheiro', 'credito', 'debito', 'vale', 'cheque', 'crediario', 'saldo')),-- Tipo de pagamento[N:Tipo][G:o][E:Dinheiro|Cartão de credito|Cartão de débito|Vale|Cheque|Crediário|Saldo][S:S]
   "carteira_id" INTEGER NOT NULL,-- Carteira que será usada para entrada de valores no caixa[N:Carteira de entrada][G:a]
@@ -1706,7 +1701,7 @@ CREATE TABLE "formas"(
 );
 CREATE INDEX "formas.FK_formas_carteira_id_idx" ON "formas" ("carteira_id");
 CREATE TABLE "eventos"(
---   Eventos de envio das notas[N:Evento|Eventos][G:o][K:App\Models|Models\][H:Model]
+--   Eventos de envio das notas[N:Evento|Eventos][G:o][K:App\Models|Models\][H:Model][L:7][ID:31]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do evento[G:o]
   "nota_id" INTEGER NOT NULL,-- Nota a qual o evento foi criado[G:a][N:Nota][S:S]
   "estado" TEXT NOT NULL CHECK("estado" IN('aberto', 'assinado', 'validado', 'pendente', 'processamento', 'denegado', 'cancelado', 'rejeitado', 'contingencia', 'inutilizado', 'autorizado')),-- Estado do evento[G:o][N:Estado][E:Aberto|Assinado|Validado|Pendente|Em processamento|Denegado|Cancelado|Rejeitado|Contingência|Inutilizado|Autorizado]
@@ -1721,7 +1716,7 @@ CREATE TABLE "eventos"(
 );
 CREATE INDEX "eventos.FK_eventos_nota_id_idx" ON "eventos" ("nota_id");
 CREATE TABLE "impressoras"(
---   Impressora para impressão de serviços e contas[N:Impressora|Impressoras][G:a][K:App\Models|Models\][H:Model]
+--   Impressora para impressão de serviços e contas[N:Impressora|Impressoras][G:a][K:App\Models|Models\][H:Model][L:null][ID:40]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da impressora[G:o]
   "dispositivo_id" INTEGER NOT NULL,-- Dispositivo que contém a impressora[N:Dispositivo][G:o]
   "setor_id" INTEGER NOT NULL,-- Setor de impressão[N:Setor de impressão][G:o]
@@ -1746,9 +1741,9 @@ CREATE TABLE "impressoras"(
 );
 CREATE INDEX "impressoras.FK_impressoras_dispositivo_id_idx" ON "impressoras" ("dispositivo_id");
 CREATE TABLE "caixas"(
---   Caixas de movimentação financeira[N:Caixa|Caixas][G:o][K:App\Models|Models\][H:Model]
+--   Caixas de movimentação financeira[N:Caixa|Caixas][G:o][K:App\Models|Models\][H:Model][L:null][ID:7]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do caixa[G:o]
-  "carteira_id" INTEGER NOT NULL,
+  "carteira_id" INTEGER NOT NULL,-- Carteira que representa a gaveta de dinheiro do caixa[G:a][N:Carteira do caixa]
   "descricao" VARCHAR(50) NOT NULL,-- Descrição do caixa[N:Descrição][G:a][S]
   "serie" INTEGER NOT NULL DEFAULT 1,-- Série do caixa[N:Série][G:a][F:1]
   "numero_inicial" INTEGER NOT NULL DEFAULT 1,-- Número inicial na geração da nota, será usado quando maior que o último número utilizado[N:Número inicial][G:o][F:1]
@@ -1765,7 +1760,7 @@ CREATE TABLE "caixas"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "cartoes"(
---   Cartões utilizados na forma de pagamento em cartão[N:Cartão|Cartões][G:o][K:App\Models|Models\][H:Model]
+--   Cartões utilizados na forma de pagamento em cartão[N:Cartão|Cartões][G:o][K:App\Models|Models\][H:Model][L:null][ID:10]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cartão[G:o]
   "forma_id" INTEGER NOT NULL,-- Forma de pagamento associada à esse cartão ou vale[G:a][N:Forma de pagamento]
   "carteira_id" INTEGER DEFAULT NULL,-- Carteira de entrada de valores no caixa[N:Carteira de entrada][G:a]
@@ -1790,7 +1785,7 @@ CREATE TABLE "cartoes"(
 );
 CREATE INDEX "cartoes.FK_cartoes_carteira_id_idx" ON "cartoes" ("carteira_id");
 CREATE TABLE "bairros"(
---   Bairro de uma cidade[N:Bairro|Bairros][G:o][K:App\Models|Models\][H:Model]
+--   Bairro de uma cidade[N:Bairro|Bairros][G:o][K:App\Models|Models\][H:Model][L:null][ID:5]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do bairro[G:o]
   "cidade_id" INTEGER NOT NULL,-- Cidade a qual o bairro pertence[N:Cidade][G:a][S:S]
   "nome" VARCHAR(100) NOT NULL,-- Nome do bairro[N:Nome][G:o][S]
@@ -1808,7 +1803,7 @@ CREATE TABLE "bairros"(
     ON UPDATE CASCADE
 );
 CREATE TABLE "formacoes"(
---   Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição[N:Formação|Formações][G:a][K:App\Models|Models\][H:Model]
+--   Informa qual foi a formação que gerou esse produto, assim como quais item foram retirados/adicionados da composição[N:Formação|Formações][G:a][K:App\Models|Models\][H:Model][L:null][ID:32]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da formação[G:o]
   "item_id" INTEGER NOT NULL,-- Informa qual foi o produto vendido para essa formação[N:Item do pedido][G:o][S:S]
   "pacote_id" INTEGER DEFAULT NULL,-- Informa qual pacote foi selecionado no momento da venda[N:Pacote][G:o][S]
@@ -1835,7 +1830,7 @@ CREATE TABLE "formacoes"(
 CREATE INDEX "formacoes.FK_formacoes_pacote_id_idx" ON "formacoes" ("pacote_id");
 CREATE INDEX "formacoes.FK_formacoes_composicao_id_idx" ON "formacoes" ("composicao_id");
 CREATE TABLE "notas"(
---   Notas fiscais e inutilizações[N:Nota|Notas][G:a][K:App\Models|Models\][H:Model]
+--   Notas fiscais e inutilizações[N:Nota|Notas][G:a][K:App\Models|Models\][H:Model][L:7][ID:51]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da nota[G:o]
   "tipo" TEXT NOT NULL CHECK("tipo" IN('nota', 'inutilizacao')),-- Tipo de registro se nota ou inutilização[G:o][E:Nota|Inutilização][N:Tipo]
   "ambiente" TEXT NOT NULL CHECK("ambiente" IN('homologacao', 'producao')),-- Ambiente em que a nota foi gerada[G:o][N:Ambiente][E:Homologação|Produção]
@@ -1877,7 +1872,7 @@ CREATE INDEX "notas.FK_notas_pedido_id_idx" ON "notas" ("pedido_id");
 CREATE INDEX "notas.chave_INDEX" ON "notas" ("chave");
 CREATE INDEX "notas.FK_notas_ultimo_evento_id_idx" ON "notas" ("ultimo_evento_id");
 CREATE TABLE "enderecos"(
---   Endereços de ruas e avenidas com informação de CEP[N:Endereço|Endereços][G:o][K:App\Models|Models\][H:Model]
+--   Endereços de ruas e avenidas com informação de CEP[N:Endereço|Endereços][G:o][K:App\Models|Models\][H:Model][L:null][ID:28]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do endereço[G:o]
   "cidade_id" INTEGER NOT NULL,-- Cidade a qual o endereço pertence[N:Cidade][G:a][S:S]
   "bairro_id" INTEGER NOT NULL,-- Bairro a qual o endereço está localizado[N:Bairro][G:o][S:S]
@@ -1900,7 +1895,7 @@ CREATE TABLE "enderecos"(
 );
 CREATE INDEX "enderecos.FK_enderecos_cidade_id_idx" ON "enderecos" ("cidade_id");
 CREATE TABLE "pedidos"(
---   Informações do pedido de venda[N:Pedido|Pedidos][G:o][K:App\Models|Models\][H:Model]
+--   Informações do pedido de venda[N:Pedido|Pedidos][G:o][K:App\Models|Models\][H:Model][L:null][ID:59]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código do pedido[N:Código][G:o]
   "pedido_id" INTEGER DEFAULT NULL,-- Informa o pedido da mesa / comanda principal quando as mesas / comandas forem agrupadas[G:o][N:Pedido principal]
   "mesa_id" INTEGER DEFAULT NULL,-- Identificador da mesa, único quando o pedido não está fechado[N:Mesa][G:a][S:S]
@@ -1998,7 +1993,7 @@ CREATE INDEX "pedidos.FK_pedidos_entrega_id_idx" ON "pedidos" ("entrega_id");
 CREATE INDEX "pedidos.data_criacao_INDEX" ON "pedidos" ("data_criacao" DESC);
 CREATE INDEX "pedidos.FK_pedidos_pedido_id_idx" ON "pedidos" ("pedido_id");
 CREATE TABLE "pontuacoes"(
---   Informa os pontos ganhos e gastos por compras de produtos promocionais[N:Pontuação|Pontuações][G:a][K:App\Models|Models\][H:Model]
+--   Informa os pontos ganhos e gastos por compras de produtos promocionais[N:Pontuação|Pontuações][G:a][K:App\Models|Models\][H:Model][L:null][ID:61]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da pontuação[G:o]
   "promocao_id" INTEGER NOT NULL,-- Informa a promoção que originou os pontos ou que descontou os pontos[G:a][N:Promoção]
   "cliente_id" INTEGER DEFAULT NULL,-- Cliente que possui esses pontos, não informar quando tiver travado por pedido[G:o][N:Cliente]
@@ -2032,7 +2027,7 @@ CREATE INDEX "pontuacoes.FK_pontuacoes_item_id_idx" ON "pontuacoes" ("item_id");
 CREATE INDEX "pontuacoes.FK_pontuacoes_cliente_id_idx" ON "pontuacoes" ("cliente_id");
 CREATE INDEX "pontuacoes.FK_pontuacoes_promocao_id_idx" ON "pontuacoes" ("promocao_id");
 CREATE TABLE "movimentacoes"(
---   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][K:App\Models|Models\][H:Model]
+--   Movimentação do caixa, permite abrir diversos caixas na conta de operadores[N:Movimentação|Movimentações][G:a][K:App\Models|Models\][H:Model][L:null][ID:50]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Código da movimentação do caixa[G:o]
   "sessao_id" INTEGER NOT NULL,-- Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo código da sessão[N:Sessão][G:a][S:S]
   "caixa_id" INTEGER NOT NULL,-- Caixa a qual pertence essa movimentação[N:Caixa][G:o][S]

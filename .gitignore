@@ -12,3 +12,4 @@ database/model/model.mwb.bak
 .phpunit.result.cache
 public/static/
 public/index.html
+docs/api/

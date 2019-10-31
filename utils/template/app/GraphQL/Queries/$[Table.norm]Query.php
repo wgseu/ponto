@@ -59,6 +59,9 @@ class $[Table.norm]Query extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('$[Table.norm]Filter')],
+$[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
+            'filed' => ['name' => 'filed', 'type' => Type::boolean()],
+$[table.end]
             'order' => ['name' => 'order', 'type' => GraphQL::type('$[Table.norm]Order')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -72,6 +75,11 @@ class $[Table.norm]Query extends Query
         $query = $[Table.norm]::with($fields->getRelations())
             ->select($fields->getSelect())
             ->where(Filter::map($args['filter'] ?? []));
+$[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
+        if ($args['filed'] ?? false) {
+            $query->withTrashed();
+        }
+$[table.end]
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

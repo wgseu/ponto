@@ -101,6 +101,13 @@ class ProdutoType extends GraphQLType
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Preço de venda base desse produto para todos os cardápios',
             ],
+            'custo_medio' => [
+                'type' => Type::float(),
+                'description' => 'Informa o preço médio de compra desse produto',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('produto:view');
+                },
+            ],
             'custo_producao' => [
                 'type' => Type::float(),
                 'description' => 'Informa qual o valor para o custo de produção do produto, utilizado' .

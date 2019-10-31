@@ -49,7 +49,7 @@ class PatrimonioType extends GraphQLType
                 'description' => 'Identificador do bem',
             ],
             'empresa_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Empresa a que esse bem pertence',
             ],
             'fornecedor_id' => [
@@ -57,43 +57,43 @@ class PatrimonioType extends GraphQLType
                 'description' => 'Fornecedor do bem',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número que identifica o bem',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição ou nome do bem',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade do bem com as mesmas características',
             ],
             'altura' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Altura do bem em metros',
             ],
             'largura' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Largura do bem em metros',
             ],
             'comprimento' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Comprimento do bem em metros',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PatrimonioEstado')),
+                'type' => GraphQL::type('PatrimonioEstado'),
                 'description' => 'Estado de conservação do bem',
             ],
             'custo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor de custo do bem',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor que o bem vale atualmente',
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o bem está ativo e em uso',
             ],
             'imagem_url' => [

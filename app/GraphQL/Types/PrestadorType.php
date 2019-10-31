@@ -49,7 +49,7 @@ class PrestadorType extends GraphQLType
                 'description' => 'Identificador do prestador',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código do prestador, podendo ser de barras',
             ],
             'pin' => [
@@ -57,11 +57,11 @@ class PrestadorType extends GraphQLType
                 'description' => 'Código pin para acesso rápido',
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Função do prestada na empresa',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Cliente que representa esse prestador, único no cadastro de prestadores',
             ],
             'empresa_id' => [
@@ -70,21 +70,21 @@ class PrestadorType extends GraphQLType
                     ' próprio estabelecimento',
             ],
             'vinculo' => [
-                'type' => Type::nonNull(GraphQL::type('PrestadorVinculo')),
+                'type' => GraphQL::type('PrestadorVinculo'),
                 'description' => 'Vínculo empregatício com a empresa, funcionário e autônomo são pessoas' .
                     ' físicas, prestador é pessoa jurídica',
             ],
             'porcentagem' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Porcentagem cobrada pelo funcionário ou autônomo ao cliente, Ex.:' .
                     ' Comissão de 10%',
             ],
             'pontuacao' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Define a distribuição da porcentagem pela parcela de pontos',
             ],
             'remuneracao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Remuneracao pelas atividades exercidas, não está incluso comissões',
             ],
             'data_termino' => [
@@ -92,7 +92,7 @@ class PrestadorType extends GraphQLType
                 'description' => 'Data de término de contrato, informado apenas quando ativo for não',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data em que o prestador de serviços foi cadastrado no sistema',
             ],
         ];

@@ -49,19 +49,19 @@ class NotaType extends GraphQLType
                 'description' => 'Identificador da nota',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('NotaTipo')),
+                'type' => GraphQL::type('NotaTipo'),
                 'description' => 'Tipo de registro se nota ou inutilização',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAmbiente')),
+                'type' => GraphQL::type('NotaAmbiente'),
                 'description' => 'Ambiente em que a nota foi gerada',
             ],
             'acao' => [
-                'type' => Type::nonNull(GraphQL::type('NotaAcao')),
+                'type' => GraphQL::type('NotaAcao'),
                 'description' => 'Ação que deve ser tomada sobre a nota fiscal',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('NotaEstado')),
+                'type' => GraphQL::type('NotaEstado'),
                 'description' => 'Estado da nota',
             ],
             'ultimo_evento_id' => [
@@ -69,20 +69,20 @@ class NotaType extends GraphQLType
                 'description' => 'Último evento da nota',
             ],
             'serie' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Série da nota',
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número inicial da nota',
             ],
             'numero_final' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número final da nota, igual ao número inicial quando for a nota de um' .
                     ' pedido',
             ],
             'sequencia' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Permite iniciar o número da nota quando alcançar 999.999.999, deve ser' .
                     ' incrementado sempre que alcançar',
             ],
@@ -107,7 +107,7 @@ class NotaType extends GraphQLType
                 'description' => 'Motivo do cancelamento, contingência ou inutilização',
             ],
             'contingencia' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a nota está em contingência',
             ],
             'consulta_url' => [
@@ -127,11 +127,11 @@ class NotaType extends GraphQLType
                 'description' => 'Informações de interesse do contribuinte',
             ],
             'corrigido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se os erros já foram corrigidos para retomada do processamento',
             ],
             'concluido' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se todos os processamentos da nota já foram realizados',
             ],
             'data_autorizacao' => [
@@ -139,11 +139,11 @@ class NotaType extends GraphQLType
                 'description' => 'Data de autorização da nota fiscal',
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de emissão da nota',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de lançamento da nota no sistema',
             ],
             'data_arquivado' => [

@@ -49,35 +49,35 @@ class ChequeType extends GraphQLType
                 'description' => 'Identificador da folha de cheque',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Cliente que emitiu o cheque',
             ],
             'banco_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Banco do cheque',
             ],
             'agencia' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número da agência',
             ],
             'conta' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número da conta do banco descrito no cheque',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número da folha do cheque',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor na folha do cheque',
             ],
             'vencimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de vencimento do cheque',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o cheque e todas as suas folhas estão cancelados',
             ],
             'recolhimento' => [
@@ -85,7 +85,7 @@ class ChequeType extends GraphQLType
                 'description' => 'Data de recolhimento do cheque',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro do cheque',
             ],
         ];

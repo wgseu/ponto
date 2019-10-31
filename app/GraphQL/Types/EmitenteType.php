@@ -53,11 +53,11 @@ class EmitenteType extends GraphQLType
                 'description' => 'Contador responsável pela contabilidade da empresa',
             ],
             'regime_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Regime tributário da empresa',
             ],
             'ambiente' => [
-                'type' => Type::nonNull(GraphQL::type('EmitenteAmbiente')),
+                'type' => GraphQL::type('EmitenteAmbiente'),
                 'description' => 'Ambiente de emissão das notas',
             ],
             'csc_teste' => [

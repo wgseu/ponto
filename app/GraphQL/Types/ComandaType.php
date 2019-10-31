@@ -48,15 +48,15 @@ class ComandaType extends GraphQLType
                 'description' => 'Número da comanda',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número da comanda',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da comanda',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a comanda está diponível para ser usada nas vendas',
             ],
         ];

@@ -53,11 +53,11 @@ class CompraType extends GraphQLType
                 'description' => 'Informa o número fiscal da compra',
             ],
             'comprador_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o funcionário que comprou os produtos da lista',
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Fornecedor em que os produtos foram compras',
             ],
             'documento_url' => [
@@ -65,7 +65,7 @@ class CompraType extends GraphQLType
                 'description' => 'Informa o nome do documento no servidor do sistema',
             ],
             'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Informa da data de finalização da compra',
             ],
         ];

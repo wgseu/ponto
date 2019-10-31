@@ -87,11 +87,11 @@ class PedidoType extends GraphQLType
                 'description' => 'Informa se o pedido veio de uma integração e se está associado',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoTipo')),
+                'type' => GraphQL::type('PedidoTipo'),
                 'description' => 'Tipo de venda',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PedidoEstado')),
+                'type' => GraphQL::type('PedidoEstado'),
                 'description' => 'Estado do pedido, Agendado: O pedido deve ser processado na data de' .
                     ' agendamento. Aberto: O pedido deve ser processado. Entrega: O pedido' .
                     ' saiu para entrega. Fechado: O cliente pediu a conta e está pronto para' .
@@ -99,43 +99,43 @@ class PedidoType extends GraphQLType
                     ' cancelado com os itens e pagamentos',
             ],
             'servicos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total dos serviços desse pedido',
             ],
             'produtos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total dos produtos do pedido sem a comissão',
             ],
             'comissao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total da comissão desse pedido',
             ],
             'subtotal' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Subtotal do pedido sem os descontos',
             ],
             'descontos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total de descontos realizado nesse pedido',
             ],
             'total' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total do pedido já com descontos',
             ],
             'pago' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor já pago do pedido',
             ],
             'troco' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Troco do cliente',
             ],
             'lancado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor lançado para pagar, mas não foi pago ainda',
             ],
             'pessoas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa quantas pessoas estão na mesa',
             ],
             'cpf' => [
@@ -175,7 +175,7 @@ class PedidoType extends GraphQLType
                 'description' => 'Data de finalização do pedido',
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de criação do pedido',
             ],
         ];

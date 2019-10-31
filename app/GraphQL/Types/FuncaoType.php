@@ -48,11 +48,11 @@ class FuncaoType extends GraphQLType
                 'description' => 'Identificador da função',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descreve o nome da função',
             ],
             'remuneracao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Remuneracao pelas atividades exercidas, não está incluso comissões',
             ],
         ];

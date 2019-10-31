@@ -48,16 +48,16 @@ class ModuloType extends GraphQLType
                 'description' => 'Identificador do módulo',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do módulo, unico em todo o sistema',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do módulo, informa detalhes sobre a funcionalidade do módulo' .
                     ' no sistema',
             ],
             'habilitado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o módulo do sistema está habilitado',
             ],
         ];

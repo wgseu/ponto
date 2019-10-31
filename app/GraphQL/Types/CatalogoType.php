@@ -49,35 +49,35 @@ class CatalogoType extends GraphQLType
                 'description' => 'Identificador do catálogo',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Produto consultado',
             ],
             'fornecedor_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Fornecedor que possui o produto à venda',
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço a qual o produto foi comprado da última vez',
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de venda do produto pelo fornecedor na última consulta',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade mínima que o fornecedor vende',
             ],
             'estoque' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade em estoque do produto no fornecedor',
             ],
             'limitado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a quantidade de estoque é limitada',
             ],
             'conteudo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa o conteúdo do produto como é comprado, Ex.: 5UN no mesmo pacote',
             ],
             'data_consulta' => [

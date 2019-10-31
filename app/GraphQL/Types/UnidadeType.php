@@ -48,7 +48,7 @@ class UnidadeType extends GraphQLType
                 'description' => 'Identificador da unidade',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da unidade de medida, Ex.: Grama, Quilo',
             ],
             'descricao' => [
@@ -56,7 +56,7 @@ class UnidadeType extends GraphQLType
                 'description' => 'Detalhes sobre a unidade de medida',
             ],
             'sigla' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Sigla da unidade de medida, Ex.: UN, L, g',
             ],
         ];

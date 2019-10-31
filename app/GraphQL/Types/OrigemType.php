@@ -48,11 +48,11 @@ class OrigemType extends GraphQLType
                 'description' => 'Identificador da origem',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Código da origem da mercadoria',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da origem da mercadoria',
             ],
         ];

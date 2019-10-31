@@ -49,7 +49,7 @@ class PontuacaoType extends GraphQLType
                 'description' => 'Identificador da pontuação',
             ],
             'promocao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa a promoção que originou os pontos ou que descontou os pontos',
             ],
             'cliente_id' => [
@@ -66,11 +66,11 @@ class PontuacaoType extends GraphQLType
                 'description' => 'Informa qual venda originou esses pontos, tanto saída como entrada',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de pontos ganhos ou gastos',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro dos pontos',
             ],
         ];

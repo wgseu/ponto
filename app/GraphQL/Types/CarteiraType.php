@@ -49,7 +49,7 @@ class CarteiraType extends GraphQLType
                 'description' => 'Código local da carteira',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('CarteiraTipo')),
+                'type' => GraphQL::type('CarteiraTipo'),
                 'description' => 'Tipo de carteira, Bancaria: para conta bancária, Financeira: para' .
                     ' carteira financeira da empresa ou de sites de pagamentos, Credito: para' .
                     ' cartão de crédito e Local: para caixas e cofres locais',
@@ -63,7 +63,7 @@ class CarteiraType extends GraphQLType
                 'description' => 'Código local do banco quando a carteira for bancária',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da carteira, nome dado a carteira cadastrada',
             ],
             'conta' => [
@@ -75,7 +75,7 @@ class CarteiraType extends GraphQLType
                 'description' => 'Número da agência da conta bancária ou site da carteira financeira',
             ],
             'transacao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor cobrado pela operadora de pagamento para cada transação',
             ],
             'limite' => [
@@ -99,7 +99,7 @@ class CarteiraType extends GraphQLType
                 'description' => 'Cor predominante da marca da instituição',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a carteira ou conta bancária está ativa',
             ],
             'data_desativada' => [

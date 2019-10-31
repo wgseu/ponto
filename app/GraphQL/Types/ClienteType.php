@@ -50,7 +50,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Identificador do cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteTipo')),
+                'type' => GraphQL::type('ClienteTipo'),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
             'empresa_id' => [
@@ -62,7 +62,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Nome de usuário utilizado para entrar no sistema, aplicativo ou site',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Primeiro nome da pessoa física ou nome fantasia da empresa',
             ],
             'sobrenome' => [
@@ -99,7 +99,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Slogan ou detalhes do cliente',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('ClienteStatus')),
+                'type' => GraphQL::type('ClienteStatus'),
                 'description' => 'Informa o estado da conta do cliente',
             ],
             'limite_compra' => [
@@ -136,7 +136,7 @@ class ClienteType extends GraphQLType
                 'description' => 'Data de atualização das informações do cliente',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro do cliente',
             ],
         ];

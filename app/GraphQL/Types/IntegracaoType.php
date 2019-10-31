@@ -49,7 +49,7 @@ class IntegracaoType extends GraphQLType
                 'description' => 'Identificador da integração',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do módulo de integração',
             ],
             'descricao' => [
@@ -77,7 +77,7 @@ class IntegracaoType extends GraphQLType
                 'description' => 'Associações de produtos e cartões',
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa de o módulo de integração está habilitado',
             ],
             'data_atualizacao' => [

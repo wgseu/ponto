@@ -51,30 +51,26 @@ $[field.each(all)]
 $[field.match(senha|secreto)]
 $[field.else]
             '$[field]' => [
-$[field.if(primary)]
+$[field.if(primary|reference)]
                 'type' => Type::id(),
-$[field.else.if(reference)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::id()$[field.if(null)]$[field.else])$[field.end],
 $[field.else.if(date)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Date')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('Date'),
 $[field.else.if(time)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('Time')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('Time'),
 $[field.else.if(datetime)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('DateTime')$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(currency)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null)]$[field.else])$[field.end],
-$[field.else.if(float|double)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::float()$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('DateTime'),
+$[field.else.if(currency|float|double)]
+                'type' => Type::float(),
 $[field.else.if(integer|bigint)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::int()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::int(),
 $[field.else.if(blob)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::string(),
 $[field.else.if(boolean)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::boolean()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::boolean(),
 $[field.else.if(enum)]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]GraphQL::type('$[Table.norm]$[Field.norm]')$[field.if(null)]$[field.else])$[field.end],
+                'type' => GraphQL::type('$[Table.norm]$[Field.norm]'),
 $[field.else]
-                'type' => $[field.if(null)]$[field.else]Type::nonNull($[field.end]Type::string()$[field.if(null)]$[field.else])$[field.end],
+                'type' => Type::string(),
 $[field.end]
                 'description' => $[field.each(description)]$[field.if(first)]'$[Field.description]'$[field.else] .
                     ' $[Field.description]'$[field.end]$[field.end],

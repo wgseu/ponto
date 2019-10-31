@@ -49,20 +49,20 @@ class JuncaoType extends GraphQLType
                 'description' => 'Identificador da junção',
             ],
             'mesa_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Mesa que está junta ao pedido',
             ],
             'pedido_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('JuncaoEstado')),
+                'type' => GraphQL::type('JuncaoEstado'),
                 'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
                     ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora da junção das mesas',
             ],
         ];

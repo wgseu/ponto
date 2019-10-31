@@ -49,17 +49,17 @@ class ListaType extends GraphQLType
                 'description' => 'Identificador da lista de compras',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da lista, pode ser uma data',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ListaEstado')),
+                'type' => GraphQL::type('ListaEstado'),
                 'description' => 'Estado da lista de compra. Análise: Ainda estão sendo adicionado' .
                     ' produtos na lista, Fechada: Está pronto para compra, Comprada: Todos os' .
                     ' itens foram comprados',
             ],
             'encarregado_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o funcionário encarregado de fazer as compras',
             ],
             'viagem_id' => [
@@ -67,11 +67,11 @@ class ListaType extends GraphQLType
                 'description' => 'Informações da viagem para realizar as compras',
             ],
             'data_viagem' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora para o encarregado ir fazer as compras',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro da lista',
             ],
         ];

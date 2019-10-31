@@ -56,11 +56,11 @@ class FuncionalidadeType extends GraphQLType
                 'description' => 'Funcionalidade principal',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da funcionalidade, único em todo o sistema',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da funcionalidade',
             ],
         ];

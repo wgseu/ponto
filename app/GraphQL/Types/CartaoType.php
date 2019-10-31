@@ -48,7 +48,7 @@ class CartaoType extends GraphQLType
                 'description' => 'Identificador do cartão',
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Forma de pagamento associada à esse cartão ou vale',
             ],
             'carteira_id' => [
@@ -56,20 +56,20 @@ class CartaoType extends GraphQLType
                 'description' => 'Carteira de entrada de valores no caixa',
             ],
             'bandeira' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da bandeira do cartão',
             ],
             'taxa' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a' .
                     ' 100',
             ],
             'dias_repasse' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de dias para repasse do valor',
             ],
             'taxa_antecipacao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Taxa em porcentagem para antecipação de recebimento de parcelas',
             ],
             'imagem_url' => [
@@ -77,7 +77,7 @@ class CartaoType extends GraphQLType
                 'description' => 'Imagem do cartão',
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o cartão está ativo',
             ],
         ];

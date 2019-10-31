@@ -49,23 +49,23 @@ class CreditoType extends GraphQLType
                 'description' => 'Identificador do crédito',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Cliente a qual o crédito pertence',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor do crédito',
             ],
             'detalhes' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Detalhes do crédito, justificativa do crédito',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o crédito foi cancelado',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro do crédito',
             ],
         ];

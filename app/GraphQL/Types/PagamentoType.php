@@ -49,11 +49,11 @@ class PagamentoType extends GraphQLType
                 'description' => 'Identificador do pagamento',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Carteira de destino do valor',
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa em qual moeda está o valor informado',
             ],
             'pagamento_id' => [
@@ -105,19 +105,19 @@ class PagamentoType extends GraphQLType
                 'description' => 'Crédito que foi utilizado para pagar o pedido',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor pago ou recebido na moeda informada no momento do recebimento',
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa qual o número da parcela para este pagamento',
             ],
             'parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas desse pagamento',
             ],
             'lancado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor lançado para pagamento do pedido ou conta na moeda local do país',
             ],
             'codigo' => [
@@ -129,7 +129,7 @@ class PagamentoType extends GraphQLType
                 'description' => 'Detalhes do pagamento',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('PagamentoEstado')),
+                'type' => GraphQL::type('PagamentoEstado'),
                 'description' => 'Informa qual o andamento do processo de pagamento',
             ],
             'data_pagamento' => [
@@ -141,7 +141,7 @@ class PagamentoType extends GraphQLType
                 'description' => 'Data de compensação do pagamento',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora do lançamento do pagamento',
             ],
         ];

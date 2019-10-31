@@ -50,16 +50,16 @@ class ProdutoType extends GraphQLType
                 'description' => 'Código do produto',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único' .
                     ' entre todos os produtos',
             ],
             'categoria_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Categoria do produto, permite a rápida localização ao utilizar tablets',
             ],
             'unidade_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa a unidade do produtos, Ex.: Grama, Litro.',
             ],
             'setor_estoque_id' => [
@@ -76,7 +76,7 @@ class ProdutoType extends GraphQLType
                 'description' => 'Informações de tributação do produto',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do produto, Ex.: Refri. Coca Cola 2L.',
             ],
             'abreviacao' => [
@@ -88,17 +88,17 @@ class ProdutoType extends GraphQLType
                 'description' => 'Informa detalhes do produto, Ex: Com Cebola, Pimenta, Orégano',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa a quantidade limite para que o sistema avise que o produto já' .
                     ' está acabando',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa a quantidade máxima do produto no estoque, não proibe, apenas' .
                     ' avisa',
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de venda base desse produto para todos os cardápios',
             ],
             'custo_medio' => [
@@ -117,37 +117,37 @@ class ProdutoType extends GraphQLType
                 },
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ProdutoTipo')),
+                'type' => GraphQL::type('ProdutoTipo'),
                 'description' => 'Informa qual é o tipo de produto. Produto: Produto normal que possui' .
                     ' estoque, Composição: Produto que não possui estoque diretamente, pois é' .
                     ' composto de outros produtos ou composições, Pacote: Permite a composição' .
                     ' no momento da venda, não possui estoque diretamente',
             ],
             'cobrar_servico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se deve ser cobrado a taxa de serviço dos garçons sobre este' .
                     ' produto',
             ],
             'divisivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto pode ser vendido fracionado',
             ],
             'pesavel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o peso do produto deve ser obtido de uma balança,' .
                     ' obrigatoriamente o produto deve ser divisível',
             ],
             'tempo_preparo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Tempo de preparo em minutos para preparar uma composição, 0 para não' .
                     ' informado',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto estará disponível para venda em todos os cardápios',
             ],
             'insumo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto é de uso interno e não está disponível para venda',
             ],
             'avaliacao' => [

@@ -53,7 +53,7 @@ class ClassificacaoType extends GraphQLType
                     ' subclassificação',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da classificação',
             ],
             'icone_url' => [

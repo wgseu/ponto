@@ -49,24 +49,24 @@ class CaixaType extends GraphQLType
                 'description' => 'Identificador do caixa',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Carteira que representa a gaveta de dinheiro do caixa',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do caixa',
             ],
             'serie' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Série do caixa',
             ],
             'numero_inicial' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número inicial na geração da nota, será usado quando maior que o último' .
                     ' número utilizado',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o caixa está ativo',
             ],
             'data_desativada' => [

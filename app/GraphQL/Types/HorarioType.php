@@ -49,7 +49,7 @@ class HorarioType extends GraphQLType
                 'description' => 'Identificador do horário',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('HorarioModo')),
+                'type' => GraphQL::type('HorarioModo'),
                 'description' => 'Modo de trabalho disponível nesse horário, Funcionamento: horário em que' .
                     ' o estabelecimento estará aberto, Operação: quando aceitar novos pedidos' .
                     ' locais, Entrega: quando aceita ainda pedidos para entrega',
@@ -64,12 +64,12 @@ class HorarioType extends GraphQLType
                 'description' => 'Permite informar o horário de prestação de serviço para esse prestador',
             ],
             'inicio' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Início do horário de funcionamento em minutos contando a partir de' .
                     ' domingo até sábado',
             ],
             'fim' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Horário final de funcionamento do estabelecimento contando em minutos a' .
                     ' partir de domingo',
             ],
@@ -83,11 +83,11 @@ class HorarioType extends GraphQLType
                 'description' => 'Tempo mínimo que leva para entregar nesse horário',
             ],
             'entrega_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Tempo máximo que leva para entregar nesse horário',
             ],
             'fechado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o estabelecimento estará fechado nesse horário programado, o' .
                     ' início e fim será tempo no formato unix, quando verdadeiro tem' .
                     ' prioridade sobre todos os horários',

@@ -52,7 +52,7 @@ class SetorType extends GraphQLType
                 'description' => 'Informa o setor que abrange esse subsetor',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do setor, único em todo o sistema',
             ],
             'descricao' => [

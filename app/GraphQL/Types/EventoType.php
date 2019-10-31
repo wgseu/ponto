@@ -49,23 +49,23 @@ class EventoType extends GraphQLType
                 'description' => 'Identificador do evento',
             ],
             'nota_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Nota a qual o evento foi criado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('EventoEstado')),
+                'type' => GraphQL::type('EventoEstado'),
                 'description' => 'Estado do evento',
             ],
             'mensagem' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Mensagem do evento, descreve que aconteceu',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código de status do evento, geralmente código de erro de uma exceção',
             ],
             'data_criacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de criação do evento',
             ],
         ];

@@ -48,11 +48,11 @@ class MesaType extends GraphQLType
                 'description' => 'Número da mesa',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Setor em que a mesa está localizada',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Número da mesa',
             ],
             'nome' => [
@@ -60,7 +60,7 @@ class MesaType extends GraphQLType
                 'description' => 'Nome da mesa',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a mesa está disponível para lançamento de pedidos',
             ],
         ];

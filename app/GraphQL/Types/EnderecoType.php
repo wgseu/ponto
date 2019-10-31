@@ -48,19 +48,19 @@ class EnderecoType extends GraphQLType
                 'description' => 'Identificador do endereço',
             ],
             'cidade_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Cidade a qual o endereço pertence',
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Bairro a qual o endereço está localizado',
             ],
             'logradouro' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da rua ou avenida',
             ],
             'cep' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código dos correios para identificar a rua ou avenida',
             ],
         ];

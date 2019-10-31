@@ -49,7 +49,7 @@ class ViagemType extends GraphQLType
                 'description' => 'Identificador da viagem',
             ],
             'responsavel_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Responsável pela entrega ou compra',
             ],
             'latitude' => [
@@ -77,7 +77,7 @@ class ViagemType extends GraphQLType
                 'description' => 'Data de chegada no estabelecimento',
             ],
             'data_saida' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora que o responsável saiu para entregar o pedido ou fazer as' .
                     ' compras',
             ],

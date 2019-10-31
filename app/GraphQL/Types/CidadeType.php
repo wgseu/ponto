@@ -48,11 +48,11 @@ class CidadeType extends GraphQLType
                 'description' => 'Código que identifica a cidade',
             ],
             'estado_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa a qual estado a cidade pertence',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da cidade, é único para cada estado',
             ],
             'cep' => [

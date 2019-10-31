@@ -55,7 +55,7 @@ class CategoriaType extends GraphQLType
                     ' subcategoria',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da categoria. Ex.: Refrigerantes, Salgados',
             ],
             'detalhes' => [
@@ -67,7 +67,7 @@ class CategoriaType extends GraphQLType
                 'description' => 'Imagem representativa da categoria',
             ],
             'ordem' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa a ordem de exibição das categorias nas vendas',
             ],
             'data_atualizacao' => [

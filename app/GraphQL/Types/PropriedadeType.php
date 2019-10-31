@@ -49,11 +49,11 @@ class PropriedadeType extends GraphQLType
                 'description' => 'Identificador da propriedade',
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Grupo que possui essa propriedade como item de um pacote',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da propriedade, Ex.: Grande, Pequena',
             ],
             'abreviacao' => [

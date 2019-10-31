@@ -48,11 +48,11 @@ class AcessoType extends GraphQLType
                 'description' => 'Identificador do acesso',
             ],
             'funcao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Função a que a permissão se aplica',
             ],
             'permissao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Permissão liberada para a função',
             ],
         ];

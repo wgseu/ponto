@@ -54,23 +54,23 @@ class AuditoriaType extends GraphQLType
                     ' operação',
             ],
             'prestador_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Prestador que exerceu a atividade',
             ],
             'autorizador_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Prestador que autorizou o acesso ao recurso descrito',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaTipo')),
+                'type' => GraphQL::type('AuditoriaTipo'),
                 'description' => 'Tipo de atividade exercida',
             ],
             'prioridade' => [
-                'type' => Type::nonNull(GraphQL::type('AuditoriaPrioridade')),
+                'type' => GraphQL::type('AuditoriaPrioridade'),
                 'description' => 'Prioridade de acesso do recurso',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da atividade exercida',
             ],
             'autorizacao' => [
@@ -79,7 +79,7 @@ class AuditoriaType extends GraphQLType
                     ' descrita',
             ],
             'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora do ocorrido',
             ],
         ];

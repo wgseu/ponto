@@ -48,15 +48,15 @@ class BancoType extends GraphQLType
                 'description' => 'Identificador do banco',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número do banco',
             ],
             'fantasia' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome fantasia do banco',
             ],
             'razao_social' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Razão social do banco',
             ],
             'agencia_mascara' => [

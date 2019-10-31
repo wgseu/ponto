@@ -49,35 +49,35 @@ class FormaType extends GraphQLType
                 'description' => 'Identificador da forma de pagamento',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('FormaTipo')),
+                'type' => GraphQL::type('FormaTipo'),
                 'description' => 'Tipo de pagamento',
             ],
             'carteira_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Carteira que será usada para entrada de valores no caixa',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da forma de pagamento',
             ],
             'min_parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade mínima de parcelas',
             ],
             'max_parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade máxima de parcelas',
             ],
             'parcelas_sem_juros' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas em que não será cobrado juros',
             ],
             'juros' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Juros cobrado ao cliente no parcelamento',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a forma de pagamento está ativa',
             ],
         ];

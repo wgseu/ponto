@@ -49,23 +49,23 @@ class ImpressoraType extends GraphQLType
                 'description' => 'Identificador da impressora',
             ],
             'dispositivo_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Dispositivo que contém a impressora',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Setor de impressão',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da impressora instalada no sistema operacional',
             ],
             'modelo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Informa qual conjunto de comandos deve ser utilizado',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpressoraModo')),
+                'type' => GraphQL::type('ImpressoraModo'),
                 'description' => 'Modo de impressão',
             ],
             'opcoes' => [
@@ -73,11 +73,11 @@ class ImpressoraType extends GraphQLType
                 'description' => 'Opções da impressora, Ex.: Cortar papel, Acionar gaveta e outros',
             ],
             'colunas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de colunas do cupom',
             ],
             'avanco' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de linhas para avanço do papel',
             ],
         ];

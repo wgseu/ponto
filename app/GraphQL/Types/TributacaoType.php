@@ -48,7 +48,7 @@ class TributacaoType extends GraphQLType
                 'description' => 'Identificador da tributação',
             ],
             'ncm' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código NCM (Nomenclatura Comum do Mercosul) do produto',
             ],
             'cest' => [
@@ -56,15 +56,15 @@ class TributacaoType extends GraphQLType
                 'description' => 'Código CEST do produto (Opcional)',
             ],
             'origem_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Origem do produto',
             ],
             'operacao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'CFOP do produto',
             ],
             'imposto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Imposto do produto',
             ],
         ];

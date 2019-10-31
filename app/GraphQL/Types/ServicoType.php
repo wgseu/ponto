@@ -49,11 +49,11 @@ class ServicoType extends GraphQLType
                 'description' => 'Identificador do serviço',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do serviço, Ex.: Comissão, Entrega, Couvert',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do serviço, Ex.: Show de fulano',
             ],
             'detalhes' => [
@@ -61,11 +61,11 @@ class ServicoType extends GraphQLType
                 'description' => 'Detalhes do serviço, Ex.: Com participação especial de fulano',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ServicoTipo')),
+                'type' => GraphQL::type('ServicoTipo'),
                 'description' => 'Tipo de serviço, Evento: Eventos como show no estabelecimento',
             ],
             'obrigatorio' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a taxa é obrigatória',
             ],
             'data_inicio' => [
@@ -82,11 +82,11 @@ class ServicoType extends GraphQLType
                     ' serviço ao pedido',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor do serviço',
             ],
             'individual' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a taxa ou serviço é individual para cada pessoa',
             ],
             'imagem_url' => [
@@ -94,7 +94,7 @@ class ServicoType extends GraphQLType
                 'description' => 'Banner do evento',
             ],
             'ativo' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o serviço está ativo',
             ],
         ];

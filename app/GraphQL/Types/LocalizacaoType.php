@@ -49,11 +49,11 @@ class LocalizacaoType extends GraphQLType
                 'description' => 'Identificador do endereço',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Cliente a qual esse endereço pertence',
             ],
             'bairro_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Bairro do endereço',
             ],
             'zona_id' => [
@@ -65,15 +65,15 @@ class LocalizacaoType extends GraphQLType
                 'description' => 'Código dos correios para identificar um logradouro',
             ],
             'logradouro' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da rua ou avenida',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número da casa ou do condomínio',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('LocalizacaoTipo')),
+                'type' => GraphQL::type('LocalizacaoTipo'),
                 'description' => 'Tipo de endereço Casa ou Apartamento',
             ],
             'complemento' => [

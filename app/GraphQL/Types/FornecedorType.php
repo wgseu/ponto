@@ -49,15 +49,15 @@ class FornecedorType extends GraphQLType
                 'description' => 'Identificador do fornecedor',
             ],
             'empresa_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Empresa do fornecedor',
             ],
             'prazo_pagamento' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Prazo em dias para pagamento do fornecedor',
             ],
             'data_cadastro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de cadastro do fornecedor',
             ],
         ];

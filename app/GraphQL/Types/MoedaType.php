@@ -49,19 +49,19 @@ class MoedaType extends GraphQLType
                 'description' => 'Identificador da moeda',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da moeda',
             ],
             'simbolo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Símbolo da moeda, Ex.: R$, $',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código internacional da moeda, Ex.: USD, BRL',
             ],
             'divisao' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa o número fracionário para determinar a quantidade de casas' .
                     ' decimais, Ex: 100 para 0,00. 10 para 0,0',
             ],
@@ -70,7 +70,7 @@ class MoedaType extends GraphQLType
                 'description' => 'Informa o nome da fração, Ex.: Centavo',
             ],
             'formato' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Formado de exibição do valor, Ex: $ %s, para $ 3,00',
             ],
             'conversao' => [
@@ -82,7 +82,7 @@ class MoedaType extends GraphQLType
                 'description' => 'Data da última atualização do fator de conversão',
             ],
             'ativa' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a moeda é recebida pela empresa, a moeda do país mesmo' .
                     ' desativada sempre é aceita',
             ],

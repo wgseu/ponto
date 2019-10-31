@@ -50,7 +50,7 @@ class ItemType extends GraphQLType
                 'description' => 'Identificador do item do pedido',
             ],
             'pedido_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Pedido a qual pertence esse item',
             ],
             'prestador_id' => [
@@ -82,31 +82,31 @@ class ItemType extends GraphQLType
                 'description' => 'Informa a composição escolhida',
             ],
             'preco' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço do produto já com desconto',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de itens vendidos',
             ],
             'subtotal' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Subtotal do item sem comissão',
             ],
             'comissao' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor total de comissão cobrada nesse item da venda',
             ],
             'total' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total a pagar do item com a comissão',
             ],
             'preco_venda' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de normal do produto no momento da venda',
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de compra do produto calculado automaticamente na hora da venda',
             ],
             'detalhes' => [
@@ -114,11 +114,11 @@ class ItemType extends GraphQLType
                 'description' => 'Observações do item pedido, Ex.: bem gelado, mal passado',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ItemEstado')),
+                'type' => GraphQL::type('ItemEstado'),
                 'description' => 'Estado de preparo e envio do produto',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o item foi cancelado',
             ],
             'motivo' => [
@@ -126,11 +126,11 @@ class ItemType extends GraphQLType
                 'description' => 'Informa o motivo do item ser cancelado',
             ],
             'desperdicado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o item foi cancelado por conta de desperdício',
             ],
             'reservado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto foi reservado no estoque',
             ],
             'data_processamento' => [
@@ -142,7 +142,7 @@ class ItemType extends GraphQLType
                 'description' => 'Data de atualização do estado do item',
             ],
             'data_lancamento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora da realização do pedido do item',
             ],
         ];

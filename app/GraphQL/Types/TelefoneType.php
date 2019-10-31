@@ -49,15 +49,15 @@ class TelefoneType extends GraphQLType
                 'description' => 'Identificador do telefone',
             ],
             'cliente_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o cliente que possui esse número de telefone',
             ],
             'pais_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o país desse número de telefone',
             ],
             'numero' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Número de telefone com DDD',
             ],
             'operadora' => [
@@ -69,7 +69,7 @@ class TelefoneType extends GraphQLType
                 'description' => 'Informa qual serviço está associado à esse número, Ex: WhatsApp',
             ],
             'principal' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o telefone é principal e exclusivo do cliente',
             ],
         ];

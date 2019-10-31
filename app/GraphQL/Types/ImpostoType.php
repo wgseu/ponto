@@ -49,23 +49,23 @@ class ImpostoType extends GraphQLType
                 'description' => 'Identificador do imposto',
             ],
             'grupo' => [
-                'type' => Type::nonNull(GraphQL::type('ImpostoGrupo')),
+                'type' => GraphQL::type('ImpostoGrupo'),
                 'description' => 'Grupo do imposto',
             ],
             'simples' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o imposto é do simples nacional',
             ],
             'substituicao' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o imposto é por substituição tributária',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa o código do imposto',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do imposto',
             ],
         ];

@@ -48,7 +48,7 @@ class CozinhaType extends GraphQLType
                 'description' => 'Identificador da cozinha',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da cozinha, Ex. Japonesa, Brasileira, Italiana, Pizza',
             ],
             'descricao' => [

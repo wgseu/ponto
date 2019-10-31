@@ -49,7 +49,7 @@ class FormacaoType extends GraphQLType
                 'description' => 'Identificador da formação',
             ],
             'item_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa qual foi o produto vendido para essa formação',
             ],
             'pacote_id' => [
@@ -61,7 +61,7 @@ class FormacaoType extends GraphQLType
                 'description' => 'Informa qual composição foi retirada ou adicionada no momento da venda',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de itens selecionados',
             ],
         ];

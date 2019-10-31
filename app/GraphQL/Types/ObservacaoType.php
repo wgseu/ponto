@@ -48,16 +48,16 @@ class ObservacaoType extends GraphQLType
                 'description' => 'Identificador da observação',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o produto que pode conter essa observação',
             ],
             'grupo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa o grupo de observações obrigatórias, se maior que zero, é' .
                     ' obrigatório escolher pelo menos uma opção',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da observação do produto',
             ],
         ];

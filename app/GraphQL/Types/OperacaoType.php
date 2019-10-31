@@ -48,11 +48,11 @@ class OperacaoType extends GraphQLType
                 'description' => 'Identificador da operação',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Código CFOP sem pontuação',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da operação',
             ],
             'detalhes' => [

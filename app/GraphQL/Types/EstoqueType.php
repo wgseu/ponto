@@ -49,7 +49,7 @@ class EstoqueType extends GraphQLType
                 'description' => 'Identificador da entrada no estoque',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Produto que entrou no estoque',
             ],
             'requisito_id' => [
@@ -65,7 +65,7 @@ class EstoqueType extends GraphQLType
                 'description' => 'Fornecedor do produto',
             ],
             'setor_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Setor de onde o produto foi inserido ou retirado',
             ],
             'prestador_id' => [
@@ -73,11 +73,11 @@ class EstoqueType extends GraphQLType
                 'description' => 'Prestador que inseriu/retirou o produto do estoque',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade do mesmo produto inserido no estoque',
             ],
             'preco_compra' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço de compra do produto',
             ],
             'lote' => [
@@ -97,16 +97,16 @@ class EstoqueType extends GraphQLType
                 'description' => 'Detalhes da inserção ou retirada do estoque',
             ],
             'reservado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas' .
                     ' reservados',
             ],
             'cancelado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa a entrada ou saída do estoque foi cancelada',
             ],
             'data_movimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de entrada ou saída do produto do estoque',
             ],
         ];

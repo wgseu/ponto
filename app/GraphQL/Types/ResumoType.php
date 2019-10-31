@@ -49,11 +49,11 @@ class ResumoType extends GraphQLType
                 'description' => 'Identificador do resumo',
             ],
             'movimentacao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Movimentação do caixa referente ao resumo',
             ],
             'forma_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Tipo de pagamento do resumo',
             ],
             'cartao_id' => [
@@ -61,7 +61,7 @@ class ResumoType extends GraphQLType
                 'description' => 'Cartão da forma de pagamento',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor que foi contado ao fechar o caixa',
             ],
         ];

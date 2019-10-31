@@ -50,40 +50,40 @@ class GrupoType extends GraphQLType
                 'description' => 'Identificador do grupo',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa o pacote base da formação',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome resumido do grupo da formação, Exemplo: Tamanho, Sabores',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição do grupo da formação, Exemplo: Escolha o tamanho, Escolha os' .
                     ' sabores',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoTipo')),
+                'type' => GraphQL::type('GrupoTipo'),
                 'description' => 'Informa se a formação final será apenas uma unidade ou vários itens',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Permite definir uma quantidade mínima obrigatória para continuar com a' .
                     ' venda',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Define a quantidade máxima de itens que podem ser escolhidos',
             ],
             'funcao' => [
-                'type' => Type::nonNull(GraphQL::type('GrupoFuncao')),
+                'type' => GraphQL::type('GrupoFuncao'),
                 'description' => 'Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor' .
                     ' preço, Média:  define o preço do produto como a média dos itens' .
                     ' selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma:' .
                     ' Soma todos os preços dos produtos selecionados',
             ],
             'ordem' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa a ordem de exibição dos grupos',
             ],
             'data_arquivado' => [

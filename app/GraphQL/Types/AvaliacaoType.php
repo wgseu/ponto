@@ -49,7 +49,7 @@ class AvaliacaoType extends GraphQLType
                 'description' => 'Identificador da avaliação',
             ],
             'metrica_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Métrica de avaliação',
             ],
             'cliente_id' => [
@@ -66,7 +66,7 @@ class AvaliacaoType extends GraphQLType
                 'description' => 'Produto que foi avaliado',
             ],
             'estrelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de estrelas de 1 a 5',
             ],
             'comentario' => [
@@ -74,7 +74,7 @@ class AvaliacaoType extends GraphQLType
                 'description' => 'Comentário da avaliação',
             ],
             'data_avaliacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data da avaliação',
             ],
         ];

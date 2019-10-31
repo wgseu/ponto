@@ -49,11 +49,11 @@ class ContaType extends GraphQLType
                 'description' => 'Código da conta',
             ],
             'classificacao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Classificação da conta',
             ],
             'funcionario_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Funcionário que lançou a conta',
             ],
             'conta_id' => [
@@ -80,67 +80,67 @@ class ContaType extends GraphQLType
                 'description' => 'Pedido da qual essa conta foi gerada',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaTipo')),
+                'type' => GraphQL::type('ContaTipo'),
                 'description' => 'Tipo de conta se receita ou despesa',
             ],
             'descricao' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Descrição da conta',
             ],
             'valor' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor da conta',
             ],
             'consolidado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor pago ou recebido da conta',
             ],
             'fonte' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFonte')),
+                'type' => GraphQL::type('ContaFonte'),
                 'description' => 'Fonte dos valores, comissão e remuneração se pagar antes do vencimento,' .
                     ' o valor será proporcional',
             ],
             'numero_parcela' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Informa qual o número da parcela para esta conta',
             ],
             'parcelas' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade de parcelas que essa conta terá, zero para conta recorrente e' .
                     ' será alterado para 1 quando criar a próxima conta',
             ],
             'frequencia' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Frequência da recorrência em dias ou mês, depende do modo de cobrança',
             ],
             'modo' => [
-                'type' => Type::nonNull(GraphQL::type('ContaModo')),
+                'type' => GraphQL::type('ContaModo'),
                 'description' => 'Modo de cobrança se diário ou mensal, a quantidade é definida em' .
                     ' frequencia',
             ],
             'automatico' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o pagamento será automático após o vencimento, só ocorrerá se' .
                     ' tiver saldo na carteira, usado para débito automático',
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Acréscimo de valores ao total',
             ],
             'multa' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor da multa em caso de atraso',
             ],
             'juros' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Juros diário em caso de atraso, valor de 0 a 1, 1 = 100%',
             ],
             'formula' => [
-                'type' => Type::nonNull(GraphQL::type('ContaFormula')),
+                'type' => GraphQL::type('ContaFormula'),
                 'description' => 'Fórmula de juros que será cobrado em caso de atraso',
             ],
             'vencimento' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de vencimento da conta',
             ],
             'numero' => [
@@ -152,7 +152,7 @@ class ContaType extends GraphQLType
                 'description' => 'Caminho do anexo da conta',
             ],
             'estado' => [
-                'type' => Type::nonNull(GraphQL::type('ContaEstado')),
+                'type' => GraphQL::type('ContaEstado'),
                 'description' => 'Informa o estado da conta',
             ],
             'data_calculo' => [
@@ -160,7 +160,7 @@ class ContaType extends GraphQLType
                 'description' => 'Data do último cálculo de acréscimo por atraso de pagamento',
             ],
             'data_emissao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de emissão da conta',
             ],
         ];

@@ -49,11 +49,11 @@ class PacoteType extends GraphQLType
                 'description' => 'Identificador do pacote',
             ],
             'pacote_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Pacote a qual pertence as informações de formação do produto final',
             ],
             'grupo_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Grupo de formação, Ex.: Tamanho, Sabores e Complementos.',
             ],
             'produto_id' => [
@@ -71,25 +71,25 @@ class PacoteType extends GraphQLType
                     ' Tamanho é pai de Sabor',
             ],
             'quantidade_minima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Permite definir uma quantidade mínima obrigatória para a venda desse' .
                     ' item',
             ],
             'quantidade_maxima' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Define a quantidade máxima que pode ser vendido esse item repetidamente',
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Valor acrescentado ao produto quando o item é selecionado',
             ],
             'selecionado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o complemento está selecionado por padrão, recomendado apenas' .
                     ' para produtos',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Indica se o pacote estará disponível para venda',
             ],
             'data_arquivado' => [

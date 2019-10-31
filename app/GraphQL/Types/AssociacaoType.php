@@ -50,7 +50,7 @@ class AssociacaoType extends GraphQLType
                 'description' => 'Identificador da associação no banco de dados',
             ],
             'integracao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Integração a qual essa associação de pedido deve ser realizada',
             ],
             'entrega_id' => [
@@ -58,19 +58,19 @@ class AssociacaoType extends GraphQLType
                 'description' => 'Entrega que foi realizada',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código curto do pedido vindo da plataforma',
             ],
             'cliente' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do cliente que fez o pedido',
             ],
             'chave' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Dado chave do cliente, esperado telefone, e-mail ou CPF',
             ],
             'pedido' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Pedido no formato JSON para exibição na lista de pedidos e posterior' .
                     ' integração',
             ],
@@ -80,27 +80,27 @@ class AssociacaoType extends GraphQLType
                     ' restaurante',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de produtos no pedido',
             ],
             'servicos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total dos serviços, geralmente só taxa de entrega',
             ],
             'produtos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total dos produtos',
             ],
             'descontos' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total dos descontos',
             ],
             'pago' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Total que foi pago incluindo o troco',
             ],
             'status' => [
-                'type' => Type::nonNull(GraphQL::type('AssociacaoStatus')),
+                'type' => GraphQL::type('AssociacaoStatus'),
                 'description' => 'Status do pedido que não foi integrado ainda',
             ],
             'motivo' => [
@@ -112,11 +112,11 @@ class AssociacaoType extends GraphQLType
                 'description' => 'Mensagem de erro que foi gerada ao tentar integrar automaticamente',
             ],
             'sincronizado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a associação já foi sincronizada com a plataforma',
             ],
             'integrado' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a associação já foi integrada no sistema',
             ],
             'data_confirmacao' => [
@@ -124,7 +124,7 @@ class AssociacaoType extends GraphQLType
                 'description' => 'Data e hora que o pedido foi confirmado e impresso na produção',
             ],
             'data_pedido' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora que o pedido foi criado na plataforma que o gerou',
             ],
         ];

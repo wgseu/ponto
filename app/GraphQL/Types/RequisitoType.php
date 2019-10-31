@@ -49,11 +49,11 @@ class RequisitoType extends GraphQLType
                 'description' => 'Identificador do produto da lista',
             ],
             'lista_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Lista de compra desse produto',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Produto que deve ser comprado',
             ],
             'compra_id' => [
@@ -66,19 +66,19 @@ class RequisitoType extends GraphQLType
                     ' produtos, pode ser alterado no momento da compra',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Quantidade de produtos que deve ser comprado',
             ],
             'comprado' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Informa quantos produtos já foram comprados',
             ],
             'preco_maximo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço máximo que deve ser pago na compra desse produto',
             ],
             'preco' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Preço em que o produto foi comprado da última vez ou o novo preço',
             ],
             'observacoes' => [

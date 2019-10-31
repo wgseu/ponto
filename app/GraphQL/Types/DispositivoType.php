@@ -58,11 +58,11 @@ class DispositivoType extends GraphQLType
                     ' dispositivos',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do computador ou tablet em rede, único entre os dispositivos',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('DispositivoTipo')),
+                'type' => GraphQL::type('DispositivoTipo'),
                 'description' => 'Tipo de dispositivo',
             ],
             'descricao' => [
@@ -74,7 +74,7 @@ class DispositivoType extends GraphQLType
                 'description' => 'Opções do dispositivo, Ex.: Balança, identificador de chamadas e outros',
             ],
             'serial' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Serial do tablet para validação, único entre os dispositivos',
             ],
             'validacao' => [

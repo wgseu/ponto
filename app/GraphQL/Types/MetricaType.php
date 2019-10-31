@@ -50,7 +50,7 @@ class MetricaType extends GraphQLType
                 'description' => 'Identificador da métrica',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome da métrica',
             ],
             'descricao' => [
@@ -58,12 +58,12 @@ class MetricaType extends GraphQLType
                 'description' => 'Descreve o que deve ser avaliado pelo cliente',
             ],
             'tipo' => [
-                'type' => Type::nonNull(GraphQL::type('MetricaTipo')),
+                'type' => GraphQL::type('MetricaTipo'),
                 'description' => 'Tipo de métrica que pode ser velocidade de entrega, quantidade no' .
                     ' atendimento, sabor da comida e apresentação do prato',
             ],
             'quantidade' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => Type::int(),
                 'description' => 'Quantidade das últimas avaliações para reavaliação da métrica',
             ],
             'avaliacao' => [

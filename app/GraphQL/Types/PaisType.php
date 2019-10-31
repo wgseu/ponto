@@ -48,23 +48,23 @@ class PaisType extends GraphQLType
                 'description' => 'Identificador do país',
             ],
             'nome' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Nome do país',
             ],
             'sigla' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Abreviação do nome do país',
             ],
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código do país com 2 letras',
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa a moeda principal do país',
             ],
             'idioma' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Idioma nativo do país',
             ],
             'prefixo' => [
@@ -76,7 +76,7 @@ class PaisType extends GraphQLType
                 'description' => 'Frases, nomes de campos e máscaras específicas do país',
             ],
             'unitario' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o país tem apenas um estado federativo',
             ],
         ];

@@ -50,7 +50,7 @@ class SessaoType extends GraphQLType
                 'description' => 'Código da sessão',
             ],
             'data_inicio' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de início da sessão',
             ],
             'data_termino' => [
@@ -58,7 +58,7 @@ class SessaoType extends GraphQLType
                 'description' => 'Data de fechamento da sessão',
             ],
             'aberta' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se a sessão está aberta',
             ],
         ];

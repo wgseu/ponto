@@ -49,7 +49,7 @@ class CardapioType extends GraphQLType
                 'description' => 'Identificador do cardápio',
             ],
             'produto_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Produto que faz parte desse cardápio',
             ],
             'integracao_id' => [
@@ -61,11 +61,11 @@ class CardapioType extends GraphQLType
                 'description' => 'O cardápio será exibido para vendas nesse local',
             ],
             'acrescimo' => [
-                'type' => Type::nonNull(Type::float()),
+                'type' => Type::float(),
                 'description' => 'Acréscimo ao preço de venda do produto nesse cardápio',
             ],
             'disponivel' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => Type::boolean(),
                 'description' => 'Informa se o produto estará disponível para venda nesse cardápio',
             ],
         ];

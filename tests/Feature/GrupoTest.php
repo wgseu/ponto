@@ -85,16 +85,10 @@ class GrupoTest extends TestCase
         $this->assertEquals($grupo->id, $response->json('data.grupos.data.0.id'));
     }
 
-    public function testValidateTipoProdutoInvalido()
+    public function testValidateGrupoTipoProdutoInvalido()
     {
-        $produto = factory(Produto::class)->create();
-        $produto->tipo = Produto::TIPO_PRODUTO;
-        $produto->save();
-        $grupo = new Grupo();
-        $grupo->nome = 'Pizza G';
-        $grupo->descricao = 'Pizzas com tamanhos G';
-        $grupo->produto_id = $produto->id;
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PRODUTO]);
         $this->expectException(ValidationException::class);
-        $grupo->save();
+        factory(Grupo::class)->create(['produto_id' => $produto->id]);
     }
 }

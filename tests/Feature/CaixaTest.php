@@ -37,9 +37,7 @@ class CaixaTest extends TestCase
     public function testCreateCaixa()
     {
         $headers = PrestadorTest::auth();
-        $carteira =  factory(Carteira::class)->create();
-        $carteira->tipo = Carteira::TIPO_LOCAL;
-        $carteira->save();
+        $carteira =  factory(Carteira::class)->create(['tipo' => Carteira::TIPO_LOCAL]);
         $response = $this->graphfl('create_caixa', [
             'input' => [
                 'carteira_id' => $carteira->id,
@@ -83,24 +81,17 @@ class CaixaTest extends TestCase
         $this->assertEquals($caixa->id, $response->json('data.caixas.data.0.id'));
     }
 
-    public function testValidadeCaixaCarteiraInvalida()
+    public function testValidadeCaixaCarteiraTipoInvalida()
     {
-        $carteira = factory(Carteira::class)->create();
-        $carteira->tipo = Carteira::TIPO_CREDITO;
-        $carteira->save();
-        $caixa = new Caixa();
-        $caixa->descricao = 'Caixa 2';
-        $caixa->carteira_id = $carteira->id;
+        $carteira = factory(Carteira::class)->create(['tipo' => Carteira::TIPO_CREDITO]);
         $this->expectException(ValidationException::class);
-        $caixa->save();
+        factory(Caixa::class)->create(['carteira_id' => $carteira->id]);
     }
 
     public function testValidadeCaixaDesativarCaixaEmUso()
     {
         $caixa = factory(Caixa::class)->create();
-        $movimentacao = factory(Movimentacao::class)->create();
-        $movimentacao->caixa_id = $caixa->id;
-        $movimentacao->save();
+        factory(Movimentacao::class)->create(['caixa_id' => $caixa->id]);
         $caixa->ativa = false;
         $this->expectException(ValidationException::class);
         $caixa->save();

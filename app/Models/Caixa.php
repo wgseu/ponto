@@ -40,6 +40,8 @@ class Caixa extends Model implements ValidateInterface
     use ModelEvents;
     use SoftDeletes;
 
+    public const DELETED_AT = 'data_desativada';
+
     /**
      * The table associated with the model.
      *
@@ -65,7 +67,7 @@ class Caixa extends Model implements ValidateInterface
         'serie',
         'numero_inicial',
         'ativa',
-        'deleted_at',
+        'data_desativada',
     ];
 
     /**

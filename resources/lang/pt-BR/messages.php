@@ -677,4 +677,10 @@ return [
     'quantidade_cannot_less_0' => 'A entrada de mercadorias requer uma quantidade maior que zero',
     'one_required_requisito_or_transacao' => 'É obrigátorio informar ou um requisito ou uma transação',
     'negative_entry' => 'A origem dessa saída de estoque não pode ser uma venda ou retirada',
+    'fornecedor_different_sale' => 'O fornecedor do requisito deve ser o mesmo da compra',
+    'quantidade_cannot_greater_comprado' => 'A quantidade comprada não pode ser maior que a pedida',
+    'quantidade_cannot_negative' => 'A quantidade não pode ser negativa',
+    'comprado_cannot_negative' => 'A quantidade comprada não pode ser negativa',
+    'preco_maximo_cannot_negative' => 'O preço máximo não pode ser negativo',
+    'preco_cannot_negative' => 'O preço não pode ser negativo',
 ];

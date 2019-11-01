@@ -26,9 +26,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Compra;
+use App\Models\Fornecedor;
 use App\Models\Produto;
 use Tests\TestCase;
 use App\Models\Requisito;
+use Illuminate\Validation\ValidationException;
 
 class RequisitoTest extends TestCase
 {
@@ -78,5 +81,55 @@ class RequisitoTest extends TestCase
         $requisito = factory(Requisito::class)->create();
         $response = $this->graphfl('query_requisito', [ 'id' => $requisito->id ], $headers);
         $this->assertEquals($requisito->id, $response->json('data.requisitos.data.0.id'));
+    }
+
+    public function testValidateRequisitoFornecedorDiferenteCompra()
+    {
+        $compra = factory(Compra::class)->create();
+        $fornecedor = factory(Fornecedor::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create([
+            'compra_id' => $compra->id,
+            'fornecedor_id' => $fornecedor->id
+        ]);
+    }
+
+    public function testValidateRequisitoCompradoMaiorQuantidade()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create(['comprado' => 10, 'quantidade' => 2]);
+    }
+
+    public function testValidateRequisitoQuantidadeNegativa()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create(['quantidade' => -72]);
+    }
+
+    public function testValidateRequisitoCompradoNegativo()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create(['comprado' => -10]);
+    }
+
+    public function testValidateRequisitoPrecoMaximoNegativo()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create(['preco_maximo' => -50]);
+    }
+
+    public function testValidateRequisitoPrecoNegativo()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Requisito::class)->create(['preco' => -9]);
+    }
+
+    public function testRequisitoBelongToFornecedor()
+    {
+        $fornecedor = factory(Fornecedor::class)->create();
+        $requisito = factory(Requisito::class)->create(['fornecedor_id' => $fornecedor->id]);
+        $expective = Fornecedor::find($requisito->fornecedor_id);
+        $result = $requisito->fornecedor;
+        $this->assertEquals($expective, $result);
     }
 }

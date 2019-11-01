@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Informa os produtos da lista de compras
@@ -114,7 +115,38 @@ class Requisito extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
     }
 
+    /**
+     * Regras:
+     * A compra e o requisito devem ter o mesmo fornecedor;
+     * A quantidade comprada não pode ser superior a quantidade pedida;
+     * A quantidade, comprado, preço máximo e preço não podem ser negativos.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->compra_id)) {
+            $compra = $this->compra;
+            if ($compra->fornecedor_id != $this->fornecedor_id) {
+                $errors['fornecedor_id'] = __('messages.fornecedor_different_sale');
+            }
+        }
+        if ($this->comprado > $this->quantidade) {
+            $errors['quantidade'] = __('messages.quantidade_cannot_greater_comprado');
+        }
+        if ($this->quantidade < 0) {
+            $errors['quantidade'] = __('messages.quantidade_cannot_negative');
+        }
+        if ($this->comprado < 0) {
+            $errors['comprado'] = __('messages.comprado_cannot_negative');
+        }
+        if ($this->preco_maximo < 0) {
+            $errors['preco_maximo'] = __('messages.preco_maximo_cannot_negative');
+        }
+        if ($this->preco < 0) {
+            $errors['preco'] = __('messages.preco_cannot_negative');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

@@ -200,7 +200,8 @@ class Promocao extends Model implements ValidateInterface
         $errors = [];
         $count = null;
         $query = self::whereBetween('inicio', [$this->inicio, $this->fim])
-            ->orWhereBetween(DB::raw(intval($this->inicio)),
+            ->orWhereBetween(
+                DB::raw(intval($this->inicio)),
                 [
                     DB::raw($this->table . '.' . 'inicio'),
                     DB::raw($this->table . '.' . 'fim')

@@ -78,7 +78,10 @@ class Viagem extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        if (!is_null($this->data_chegada) && $this->data_chegada < $this->data_saida) {
+        if (
+            !is_null($this->data_chegada) &&
+            date_timestamp_get($this->data_chegada) < date_timestamp_get($this->data_saida)
+        ) {
             $errors['data_chegada'] = __('messages.error_time_viagem');
         }
         if (!empty($errors)) {

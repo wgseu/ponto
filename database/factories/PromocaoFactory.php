@@ -9,8 +9,8 @@ use Faker\Generator as Faker;
 $factory->define(Promocao::class, function (Faker $faker) {
     $categoria =  factory(Categoria::class)->create();
     return [
-        'inicio' => $faker->numberBetween(1, 30),
-        'fim' => $faker->numberBetween(31, 60),
+        'inicio' => $faker->numberBetween(1, 10),
+        'fim' => $faker->numberBetween(11, 20),
         'valor' => 4.50,
         'categoria_id' => $categoria->id,
     ];

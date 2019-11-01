@@ -27,10 +27,13 @@
 namespace App\Util;
 
 /**
- * Filter values to secure save on database
+ * Common function type float
  */
-class Common
+class Floater
 {
+    /**
+     * Compare if value is iqual zero
+     */
     public static function isEqual($value, $compare, $delta = 0.005)
     {
         return $compare < ($value + $delta) && ($value - $delta) < $compare;

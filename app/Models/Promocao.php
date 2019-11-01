@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\SafeValidationException;
@@ -198,7 +199,13 @@ class Promocao extends Model implements ValidateInterface
     {
         $errors = [];
         $count = null;
-        $query = self::where('inicio', '>=', $this->inicio)->where('fim', '<=', $this->fim);
+        $query = self::whereBetween('inicio', [$this->inicio, $this->fim])
+            ->orWhereBetween(DB::raw(intval($this->inicio)),
+                [
+                    DB::raw($this->table . '.' . 'inicio'),
+                    DB::raw($this->table . '.' . 'fim')
+                ]
+            );
         $result = $query->first();
         if ($result) {
             if ($this->categoria_id) {
@@ -235,7 +242,7 @@ class Promocao extends Model implements ValidateInterface
         } elseif (!is_null($this->promocao_id) && $this->pontos > 0) {
             $errors['pontos'] = _('messages.points_must_be_negative');
         }
-        if ($this->agendamento == 'Y' && $this->valor <= 0) {
+        if ($this->agendamento == true && $this->valor <= 0) {
             $errors['valor'] = __('messages.value_cannot_zero');
         }
         if (!empty($errors)) {

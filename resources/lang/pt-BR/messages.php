@@ -676,4 +676,12 @@ return [
     'data_inicio_must_empty' => 'Não informar data inicial nesse tipo de serviço',
     'data_fim_must_empty' => 'Não informar data fim nesse tipo de serviço',
     'user_not_belongs_company' => 'Usuário não pertence a empresa',
+    'user_not_login' => 'O cliente não possui nome de login',
+    'user_not_cpf' => 'O cliente precisa ser uma pessoa física',
+    'user_not_password' => 'O cliente precisa possuir uma senha',
+    'score_negative' => 'A pontuação não pode ser negativa',
+    'commission_negative' => 'A pontuação não pode ser negativa',
+    'remuneration_negative' => 'A remuneração não pode ser negativa',
+    'date_end_mustbe_null' => 'Data de término deve ser nulo',
+    'date_end_cannot_empty' => 'Data de término não pode ser vazio',
 ];

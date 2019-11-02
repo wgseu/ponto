@@ -680,4 +680,6 @@ return [
     'produto_required_pacote' => ' Os grupos são formados apenas por pacotes',
     'localizacao_tipo_required_apartamento' => 'Se o tipo de Localização for apartamento o atributo é obrigatório',
     'localizacao_tipo_required_condominio' => 'Se o tipo de Localização for condominio o atributo é obrigatório',
+    'caixa_in_use' => 'O caixa está aberto e não pode ser desativado',
+    'tipo_carteira_invalido' => 'O tipo da carteira deve ser Local',
 ];

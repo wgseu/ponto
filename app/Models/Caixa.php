@@ -29,6 +29,8 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Caixas de movimentação financeira
@@ -36,6 +38,9 @@ use Illuminate\Database\Eloquent\Model;
 class Caixa extends Model implements ValidateInterface
 {
     use ModelEvents;
+    use SoftDeletes;
+
+    public const DELETED_AT = 'data_desativada';
 
     /**
      * The table associated with the model.
@@ -81,7 +86,25 @@ class Caixa extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Carteira', 'carteira_id');
     }
 
+    /**
+     * Regras:
+     * Se o caixa estiver em uso não pode ser desativado;
+     * O caixa só pode ter a cateira do tipo local;
+     */
     public function validate()
     {
+        $errors = [];
+        $carteira = $this->carteira;
+        $movimento = Movimentacao::where('caixa_id', $this->id)
+            ->where('aberta', true);
+        if ($carteira->tipo != Carteira::TIPO_LOCAL) {
+            $errors['carteira_id'] = __('messages.tipo_carteira_invalido');
+        }
+        if ($movimento->exists() && !$this->ativa) {
+            $errors['ativa'] = __('caixa_in_use');
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

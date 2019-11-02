@@ -28,6 +28,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Viagem;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class ViagemTest extends TestCase
 {
@@ -76,5 +78,13 @@ class ViagemTest extends TestCase
         $viagem = factory(Viagem::class)->create();
         $response = $this->graphfl('query_viagem', [ 'id' => $viagem->id ], $headers);
         $this->assertEquals($viagem->id, $response->json('data.viagens.data.0.id'));
+    }
+
+    public function testValidateViagemChegadaAntesSaida()
+    {
+        $viagem = factory(Viagem::class)->create();
+        $viagem->data_chegada = Carbon::create(2018, 10, 12, 10, 20, 30);
+        $this->expectException(ValidationException::class);
+        $viagem->save();
     }
 }

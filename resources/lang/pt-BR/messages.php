@@ -682,4 +682,10 @@ return [
     'localizacao_tipo_required_condominio' => 'Se o tipo de Localização for condominio o atributo é obrigatório',
     'caixa_in_use' => 'O caixa está aberto e não pode ser desativado',
     'tipo_carteira_invalido' => 'O tipo da carteira deve ser Local',
+    'fornecedor_different_sale' => 'O fornecedor do requisito deve ser o mesmo da compra',
+    'quantidade_cannot_greater_comprado' => 'A quantidade comprada não pode ser maior que a pedida',
+    'quantidade_cannot_negative' => 'A quantidade não pode ser negativa',
+    'comprado_cannot_negative' => 'A quantidade comprada não pode ser negativa',
+    'preco_maximo_cannot_negative' => 'O preço máximo não pode ser negativo',
+    'preco_cannot_negative' => 'O preço não pode ser negativo',
 ];

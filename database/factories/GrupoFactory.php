@@ -12,5 +12,6 @@ $factory->define(Grupo::class, function (Faker $faker) {
         'produto_id' => $produto_id->id,
         'nome' => $faker->unique()->name,
         'descricao' => $faker->name,
+        'quantidade_maxima' => 2,
     ];
 });

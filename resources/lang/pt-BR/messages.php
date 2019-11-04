@@ -688,4 +688,9 @@ return [
     'comprado_cannot_negative' => 'A quantidade comprada não pode ser negativa',
     'preco_maximo_cannot_negative' => 'O preço máximo não pode ser negativo',
     'preco_cannot_negative' => 'O preço não pode ser negativo',
+    'produto_required_pacote' => 'O grupor requer um produto do tipo pacote',
+    'quantidade_minima_cannot_greater_maxima' => 'A quantidade minima de produtos não pode ser maior que a maxima',
+    'quantidade_minima_cannot_negative_or_null' => 'A quantidade minima não pode ser negativa ou nula',
+    'quantidade_maxima_cannot_negative_or_null' => 'A quantidade maxima não pode ser negativa ou nula',
+
 ];

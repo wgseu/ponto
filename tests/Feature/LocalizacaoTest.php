@@ -26,12 +26,12 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Bairro;
 use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Localizacao;
 use App\Models\Zona;
-use Illuminate\Validation\ValidationException;
 
 class LocalizacaoTest extends TestCase
 {
@@ -91,18 +91,14 @@ class LocalizacaoTest extends TestCase
 
     public function testValidateCondominioTipoObrigatorio()
     {
-        $localizacao = factory(Localizacao::class)->create();
-        $localizacao->tipo = Localizacao::TIPO_CONDOMINIO;
-        $this->expectException(ValidationException::class);
-        $localizacao->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Localizacao::class)->create(['tipo' => Localizacao::TIPO_CONDOMINIO]);
     }
 
     public function testValidateApartamentoTipoObrigatorio()
     {
-        $localizacao = factory(Localizacao::class)->create();
-        $localizacao->tipo = Localizacao::TIPO_APARTAMENTO;
-        $this->expectException(ValidationException::class);
-        $localizacao->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Localizacao::class)->create(['tipo' => Localizacao::TIPO_APARTAMENTO]);
     }
 
     public function testBelongToCliente()
@@ -124,9 +120,7 @@ class LocalizacaoTest extends TestCase
     public function testBelongToZona()
     {
         $zona = factory(Zona::class)->create();
-        $localizacao = factory(Localizacao::class)->create();
-        $localizacao->zona_id = $zona->id;
-        $localizacao->save();
+        $localizacao = factory(Localizacao::class)->create(['zona_id' => $zona->id]);
         $expected = Zona::find($localizacao->zona_id);
         $result = $localizacao->zona;
         $this->assertEquals($expected, $result);

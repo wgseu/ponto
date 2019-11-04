@@ -162,8 +162,8 @@ class Estoque extends Model implements ValidateInterface
         if (!$this->exists && $this->cancelado) {
             $errors['cancelado'] = __('messages.estoque_new_canceled');
         }
-        if ($this->valor_compra < 0) {
-            $errors['valor_compra'] = __('messages.valor_compra_negative');
+        if ($this->preco_compra < 0) {
+            $errors['preco_compra'] = __('messages.valor_compra_negative');
         }
         if (!empty($errors)) {
             throw SafeValidationException::withMessages($errors);

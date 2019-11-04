@@ -27,10 +27,10 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Endereço detalhado de um cliente
@@ -128,13 +128,13 @@ class Localizacao extends Model implements ValidateInterface
     {
         $errors = [];
         if ($this->tipo == Localizacao::TIPO_APARTAMENTO && is_null($this->apartamento)) {
-            $errors['apartamento'] = __('messages.localizacao_tipo_apartamento_required_apartamento');
+            $errors['apartamento'] = __('messages.localizacao_tipo_required_apartamento');
         }
         if ($this->tipo == Localizacao::TIPO_CONDOMINIO && is_null($this->condominio)) {
-            $errors['condominio'] = __('messages.localizacao_tipo_condominio_required_condominio');
+            $errors['condominio'] = __('messages.localizacao_tipo_required_condominio');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Bairro;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Validation\ValidationException;
+use App\Models\Cidade;
 use Tests\TestCase;
 
 class BairroTest extends TestCase
@@ -79,18 +79,21 @@ class BairroTest extends TestCase
 
     public function testValidateBairroPrazoEntregaMaximoMaiorMinimo()
     {
-        $bairro = factory(Bairro::class)->create();
-        $bairro->entrega_minima = 4;
-        $bairro->entrega_maxima = 2;
-        $this->expectException(ValidationException::class);
-        $bairro->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Bairro::class)->create(['entrega_minima' => 4, 'entrega_maxima' => 2]);
     }
 
     public function testValidateBairroValorNegativo()
     {
+        $this->expectException(SafeValidationException::class);
+        factory(Bairro::class)->create(['valor_entrega' => -5]);
+    }
+
+    public function testValidateBairroBelongToCidade()
+    {
         $bairro = factory(Bairro::class)->create();
-        $bairro->valor_entrega = -5;
-        $this->expectException(ValidationException::class);
-        $bairro->save();
+        $expected = Cidade::find($bairro->cidade_id);
+        $result = $bairro->cidade;
+        $this->assertEquals($expected, $result);
     }
 }

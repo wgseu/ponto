@@ -104,8 +104,9 @@ class PrestadorTest extends TestCase
     public function testNotUserLogin()
     {
         $funcao_id = factory(Funcao::class)->create();
-        $cliente_id = factory(Cliente::class)->create();
-        $cliente_id->login = '';
+        $cliente_id = factory(Cliente::class)->create([
+            'login' => ''
+        ]);
         $cliente_id->save();
         $headers = PrestadorTest::auth();
         $this->expectException('Exception');

@@ -118,7 +118,7 @@ class Prestador extends Model implements ValidateInterface
     {
         $errors = [];
         $cliente = $this->cliente()->first();
-        if (trim($cliente->login == '')) {
+        if (trim($cliente->login) == '') {
             $errors['cliente_id'] = __('messages.user_not_login');
         } elseif ($cliente->tipo != Cliente::TIPO_FISICA) {
             $errors['cliente_id'] = __('messages.user_not_cpf');

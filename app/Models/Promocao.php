@@ -44,6 +44,11 @@ class Promocao extends Model implements ValidateInterface
     use SoftDeletes;
 
     /**
+     * Total number of minutes in one day
+     */
+    public const MINUTES_PER_DAY = 1440;
+
+    /**
      * Local onde o preço será aplicado
      */
     public const LOCAL_LOCAL = 'local';
@@ -253,8 +258,15 @@ class Promocao extends Model implements ValidateInterface
         if (!is_null($this->zona_id) && is_null($this->bairro_id)) {
             $errors['bairro_id'] = __('messages.bairro_id_empty');
         }
-        if ($this->inicio >= $this->fim && $this->agendamento != true) {
+        if ($this->inicio >= $this->fim) {
             $errors['inicio'] = __('messages.invalid_interval');
+        } elseif (($this->evento == true || $this->agendamento == true) && $this->inicio < time()) {
+            $errors['inicio'] = __('messages.promotion_begin_invalid');
+        } elseif ($this->evento == false && $this->agendamento == false && $this->inicio < self::MINUTES_PER_DAY) {
+            $errors['inicio'] = __('promocao.inicio_invalid');
+        }
+        if ($this->evento == false && $this->agendamento == false && $this->fim  >= self::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = __('messages.promotion_end_invalid');
         }
         if (is_null($this->promocao_id) && $this->pontos < 0) {
             $errors['pontos'] = __('messages.points_not_negative');

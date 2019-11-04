@@ -179,7 +179,7 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
                 $errors['cpf'] = __('messages.cpf_invalid');
             }
         } else {
-            if (!Validator::checkCNPJ($this->cnpj)) {
+            if (!Validator::checkCNPJ($this->cpf)) {
                 $errors['cnpj'] = __('messages.cnpj_invalid');
             }
         }

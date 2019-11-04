@@ -29,6 +29,8 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Prestador de serviço que realiza alguma tarefa na empresa
@@ -36,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
 class Prestador extends Model implements ValidateInterface
 {
     use ModelEvents;
+    use SoftDeletes;
 
     /**
      * Vínculo empregatício com a empresa, funcionário e autônomo são pessoas
@@ -46,6 +49,7 @@ class Prestador extends Model implements ValidateInterface
     public const VINCULO_AUTONOMO = 'autonomo';
 
     public const CREATED_AT = 'data_cadastro';
+    public const DELETED_AT = 'data_termino';
     public const UPDATED_AT = null;
 
     /**
@@ -112,5 +116,26 @@ class Prestador extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        $cliente = $this->cliente()->first();
+        if (trim($cliente->login) == '') {
+            $errors['cliente_id'] = __('messages.user_not_login');
+        } elseif ($cliente->tipo != Cliente::TIPO_FISICA) {
+            $errors['cliente_id'] = __('messages.user_not_cpf');
+        } elseif (is_null($cliente->senha)) {
+            $errors['cliente_id'] = __('messages.user_not_password');
+        }
+        if ($this->pontuacao < 0) {
+            $errors['pontuacao'] = __('messages.score_negative');
+        }
+        if ($this->porcentagem < 0) {
+            $errors['porcentagem'] = __('messages.commission_negative');
+        }
+        if ($this->remuneracao < 0) {
+            $errors['remuneracao'] = __('messages.remuneration_negative');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

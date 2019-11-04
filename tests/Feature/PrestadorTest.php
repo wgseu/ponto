@@ -26,9 +26,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Cliente;
-use App\Models\Funcao;
 use Tests\TestCase;
+use App\Models\Funcao;
+use App\Models\Cliente;
 use App\Models\Prestador;
 
 class PrestadorTest extends TestCase
@@ -99,5 +99,65 @@ class PrestadorTest extends TestCase
         $prestador = factory(Prestador::class)->create();
         $response = $this->graphfl('query_prestador', ['id' => $prestador->id], $headers);
         $this->assertEquals($prestador->id, $response->json('data.prestadores.data.0.id'));
+    }
+
+    public function testNotUserLogin()
+    {
+        $funcao_id = factory(Funcao::class)->create();
+        $cliente_id = factory(Cliente::class)->create([
+            'login' => ''
+        ]);
+        $cliente_id->save();
+        $headers = PrestadorTest::auth();
+        $this->expectException('Exception');
+        $this->graphfl('create_prestador', [
+            'input' => [
+                'codigo' => 'Teste',
+                'funcao_id' => $funcao_id->id,
+                'cliente_id' => $cliente_id->id,
+            ]
+        ], $headers);
+    }
+
+    public function testUserNotTypeFisical()
+    {
+        $funcao_id = factory(Funcao::class)->create();
+        $cliente_id = factory(Cliente::class)->create();
+        $cliente_id->tipo = Cliente::TIPO_JURIDICA;
+        $cliente_id->cpf = '54557802000126';
+        $cliente_id->save();
+        $headers = PrestadorTest::auth();
+        $this->expectException('Exception');
+        $this->graphfl('create_prestador', [
+            'input' => [
+                'codigo' => 'Teste',
+                'funcao_id' => $funcao_id->id,
+                'cliente_id' => $cliente_id->id,
+            ]
+        ], $headers);
+    }
+
+    public function testScoreNegative()
+    {
+        $prestador = factory(Prestador::class);
+        $prestador->pontuacao = -2;
+        $this->expectException('Exception');
+        $prestador->save();
+    }
+
+    public function testCommissionNegative()
+    {
+        $prestador = factory(Prestador::class);
+        $prestador->porcentagem = -2;
+        $this->expectException('Exception');
+        $prestador->save();
+    }
+
+    public function testRemunerationNegative()
+    {
+        $prestador = factory(Prestador::class);
+        $prestador->remuneracao = -2;
+        $this->expectException('Exception');
+        $prestador->save();
     }
 }

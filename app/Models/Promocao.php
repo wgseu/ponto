@@ -207,8 +207,7 @@ class Promocao extends Model implements ValidateInterface
                     DB::raw($this->table . '.' . 'fim')
                 ]
             );
-        $result = $query->first();
-        if ($result) {
+        if ($query) {
             if ($this->categoria_id) {
                 $count = $query->where('categoria_id', $this->categoria_id)->count();
             }
@@ -220,8 +219,8 @@ class Promocao extends Model implements ValidateInterface
             }
         }
         $selecao = !is_null($this->categoria_id) +
-        !is_null($this->produto_id) +
-        !is_null($this->servico_id);
+            !is_null($this->produto_id) +
+            !is_null($this->servico_id);
         if (is_null($this->servico_id) && !is_null($this->bairro_id)) {
             $errors['servico_id'] = __('messages.servico_id_empty');
         } elseif ($selecao > 1) {

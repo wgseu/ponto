@@ -666,7 +666,7 @@ return [
     'bairro_id_empty' => 'Bairro não informado',
     'invalid_interval' => 'Intervalo inválido',
     'inicio_invalid' => 'Início inválido',
-    'inicio_existing' => 'Já existe promoção para essa data',
+    'promocao_existing' => 'Já existe promoção com esses dados',
     'points_not_negative' => 'Pontos não devem ser negativo',
     'points_must_be_negative' => 'Pontos devem ser negativo',
     'value_cannot_zero' => 'Valor não pode ser zerado',

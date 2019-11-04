@@ -32,6 +32,7 @@ use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\SafeValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\Rules\Exists;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o
@@ -198,7 +199,6 @@ class Promocao extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $count = null;
         $query = self::whereBetween('inicio', [$this->inicio, $this->fim])
             ->orWhereBetween(
                 DB::raw(intval($this->inicio)),
@@ -207,16 +207,38 @@ class Promocao extends Model implements ValidateInterface
                     DB::raw($this->table . '.' . 'fim')
                 ]
             );
-        if ($query) {
-            if ($this->categoria_id) {
-                $count = $query->where('categoria_id', $this->categoria_id)->count();
-            }
-            if ($this->produto_id) {
-                $count = $query->where('produto_id', $this->produto_id)->count();
-            }
-            if ($this->servico_id) {
-                $count = $query->where('servico_id', $this->servico_id)->count();
-            }
+        if ($this->exists) {
+            $query->where('id', '<>', $this->id);
+        }
+        if ($this->categoria_id) {
+            $query->where('categoria_id', $this->categoria_id);
+        }
+        if ($this->produto_id) {
+            $query->where('produto_id', $this->produto_id);
+        }
+        if ($this->servico_id) {
+            $query->where('servico_id', $this->servico_id);
+        }
+        if ($this->bairro_id) {
+            $query->where('bairro_id', $this->bairro_id);
+        }
+        if ($this->zona_id) {
+            $query->where('zona_id', $this->zona_id);
+        }
+        if ($this->integracao_id) {
+            $query->where('integracao_id', $this->integracao_id);
+        }
+        if ($this->local) {
+            $query->where('local', $this->local);
+        }
+        if ($this->evento) {
+            $query->where('evento', $this->evento);
+        }
+        if ($this->agendamento) {
+            $query->where('agendamento', $this->agendamento);
+        }
+        if ($query->exists()) {
+            $errors['id'] = __('promocao_existing');
         }
         $selecao = !is_null($this->categoria_id) +
             !is_null($this->produto_id) +
@@ -233,9 +255,6 @@ class Promocao extends Model implements ValidateInterface
         }
         if ($this->inicio >= $this->fim && $this->agendamento != true) {
             $errors['inicio'] = __('messages.invalid_interval');
-        }
-        if ($count > 0 && $this->evento != true) {
-            $errors['inicio'] = __('messages.inicio_existing');
         }
         if (is_null($this->promocao_id) && $this->pontos < 0) {
             $errors['pontos'] = __('messages.points_not_negative');

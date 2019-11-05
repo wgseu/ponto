@@ -42,16 +42,16 @@ class PromocaoTest extends TestCase
         $seed_promocao = factory(Promocao::class)->create();
         $response = $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1234,
-                'fim' => 1345,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'categoria_id' => $seed_promocao->categoria_id
             ]
         ], $headers);
 
         $found_promocao = Promocao::findOrFail($response->json('data.CreatePromocao.id'));
-        $this->assertEquals(1234, $found_promocao->inicio);
-        $this->assertEquals(1345, $found_promocao->fim);
+        $this->assertEquals(1700, $found_promocao->inicio);
+        $this->assertEquals(1800, $found_promocao->fim);
         $this->assertEquals(1.50, $found_promocao->valor);
     }
 
@@ -62,14 +62,14 @@ class PromocaoTest extends TestCase
         $this->graphfl('update_promocao', [
             'id' => $promocao->id,
             'input' => [
-                'inicio' => 21,
-                'fim' => 30,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
             ]
         ], $headers);
         $promocao->refresh();
-        $this->assertEquals(21, $promocao->inicio);
-        $this->assertEquals(30, $promocao->fim);
+        $this->assertEquals(1700, $promocao->inicio);
+        $this->assertEquals(1800, $promocao->fim);
         $this->assertEquals(1.50, $promocao->valor);
     }
 
@@ -112,8 +112,8 @@ class PromocaoTest extends TestCase
         $headers = PrestadorTest::auth();
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'produto_id' => $seed_produto->id
             ]
@@ -121,8 +121,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'produto_id' => $seed_produto->id
             ]
@@ -135,8 +135,8 @@ class PromocaoTest extends TestCase
         $headers = PrestadorTest::auth();
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'servico_id' => $seed_servico->id
             ]
@@ -144,8 +144,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'servico_id' => $seed_servico->id
             ]
@@ -158,8 +158,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 20,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
             ]
         ], $headers);
@@ -173,8 +173,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 20,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'produto_id' => $seed_produto->id,
                 'servico_id' => $seed_servico->id,
@@ -189,8 +189,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'bairro_id' => $seed_bairro->id
             ]
@@ -204,8 +204,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 100,
-                'fim' => 200,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'zona_id' => $seed_zona->id
             ]
@@ -219,8 +219,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 200,
-                'fim' => 100,
+                'inicio' => 1800,
+                'fim' => 1700,
                 'valor' => 1.50,
                 'agendamento' => false,
                 'categoria_id' => $seed_categoria->id
@@ -235,8 +235,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 20,
+                'inicio' => 1500,
+                'fim' => 1650,
                 'valor' => 1.50,
                 'evento' => false,
                 'categoria_id' => $seed_promocao->categoria_id
@@ -251,8 +251,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 20,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'categoria_id' => $seed_categoria->id,
                 'pontos' => -2,
@@ -268,8 +268,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 21,
-                'fim' => 30,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'categoria_id' => $seed_categoria->id,
                 'promocao_id' => $seed_promocao->id,
@@ -285,8 +285,8 @@ class PromocaoTest extends TestCase
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
-                'inicio' => 21,
-                'fim' => 30,
+                'inicio' => 1700,
+                'fim' => 1800,
                 'valor' => 1.50,
                 'categoria_id' => $seed_categoria->id,
                 'valor' => -1,

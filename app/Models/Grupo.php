@@ -116,8 +116,7 @@ class Grupo extends Model implements ValidateInterface
      * Os grupos são formados apenas por pacotes;
      * A quantidade minima não pode ser maior que a maxima a menos que a maxima seja zero,
      * Se a quantidade maxima for zero não a liminte para produtos do grupo.
-     * A quantidade minima e maxima não pode ser negativas ou nulas;
-     * Se o tipo for inteiro a quantidade minima e maxima não pode ser fracionada.
+     * A quantidade minima e maxima não pode ser negativas;
      */
     public function validate()
     {
@@ -129,17 +128,11 @@ class Grupo extends Model implements ValidateInterface
         if ($this->quantidade_minima > $this->quantidade_maxima && $this->quantidade_maxima != 0) {
             $errors['quantidade_minima'] = __('messages.quantidade_minima_cannot_greater_maxima');
         }
-        if ($this->quantidade_minima <= 0) {
-            $errors['quantidade_minima'] = __('messages.quantidade_minima_cannot_negative_or_null');
+        if ($this->quantidade_minima < 0) {
+            $errors['quantidade_minima'] = __('messages.quantidade_minima_cannot_negative');
         }
         if ($this->quantidade_maxima < 0) {
             $errors['quantidade_maxima'] = __('messages.quantidade_maxima_cannot_negative');
-        }
-        if (fmod($this->quantidade_minima, 1) > 0 && $this->tipo == Grupo::TIPO_INTEIRO) {
-            $errors['tipo'] = __('messages.tipo_inteiro_minimum_quantity_cannot_float');
-        }
-        if (fmod($this->quantidade_maxima, 1) > 0 && $this->tipo == Grupo::TIPO_INTEIRO) {
-            $errors['tipo'] = __('messages.tipo_inteiro_maximum_quantity_cannot_float');
         }
         if (!empty($errors)) {
             throw SafeValidationException::withMessages($errors);

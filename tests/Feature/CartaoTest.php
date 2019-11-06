@@ -91,34 +91,25 @@ class CartaoTest extends TestCase
 
     public function testValidateCartaoTaxaNegativa()
     {
-        $cartao = factory(Cartao::class)->create();
-        $cartao->taxa = -4;
         $this->expectException(ValidationException::class);
-        $cartao->save();
+        factory(Cartao::class)->create(['taxa' => -4]);
     }
 
     public function testValidateCartaoDiasRepasseNegativo()
     {
-        $cartao = factory(Cartao::class)->create();
-        $cartao->dias_repasse = -30;
         $this->expectException(ValidationException::class);
-        $cartao->save();
+        factory(Cartao::class)->create(['dias_repasse' => -30]);
     }
 
     public function testValidateCartaoTaxaAntecipacaoNegativa()
     {
-        $cartao = factory(Cartao::class)->create();
-        $cartao->taxa_antecipacao = -4;
         $this->expectException(ValidationException::class);
-        $cartao->save();
+        factory(Cartao::class)->create(['taxa_antecipacao' => -4]);
     }
 
     public function testValidateCartaoCreateDesativado()
     {
-        $cartao = factory(Cartao::class)->create();
-        $cartao->delete();
-        $cartao->ativo = false;
         $this->expectException(ValidationException::class);
-        $cartao->save();
+        factory(Cartao::class)->create(['ativo' => false]);
     }
 }

@@ -637,7 +637,7 @@ return [
     'categoriapai_some' => 'A categoria não pode referenciar ela mesma',
     'classificacaopai_some' => 'A Classificação não pode referenciar ela mesma',
     'setorpai_some' => 'O setor não pode referenciar ele mesmo',
-    'taxa_negative' => 'A taxa não pode ser negativa',
+    'taxa_cannot_negative_or_greater_100' => 'A taxa não pode ser negativa ou maior que 100',
     'dias_repasse_negative' => 'Os dias para repasse não pode ser negativo',
     'taxa_antecipacao_negative' => 'taxa_antecipacao_cannot_negative',
     'create_cartao_desativado' => 'Novo cartão desativado',
@@ -691,6 +691,8 @@ return [
     'produto_required_pacote' => 'O grupor requer um produto do tipo pacote',
     'quantidade_minima_cannot_greater_maxima' => 'A quantidade minima de produtos não pode ser maior que a maxima',
     'quantidade_minima_cannot_negative_or_null' => 'A quantidade minima não pode ser negativa ou nula',
-    'quantidade_maxima_cannot_negative_or_null' => 'A quantidade maxima não pode ser negativa ou nula',
+    'quantidade_maxima_cannot_negative' => 'A quantidade maxima não pode ser negativa ou nula',
+    'tipo_inteiro_minimum_quantity_cannot_float' => 'Se o tipo é inteiro a quantidade minima não pode ser fracionada',
+    'tipo_inteiro_maximum_quantity_cannot_float' => 'Se o tipo é inteiro a quantidade maxima não pode ser fracionada',
 
 ];

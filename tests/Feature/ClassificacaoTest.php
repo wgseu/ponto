@@ -2,9 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Classificacao;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class ClassificacaoTest extends TestCase
@@ -67,33 +66,26 @@ class ClassificacaoTest extends TestCase
     public function testValidateClassificacaoCreateSubclassificacaoDeSubclassificacao()
     {
         $classificacaoPai = factory(Classificacao::class)->create();
-        $subclassificacao = factory(Classificacao::class)->create();
-        $subclassificacao->classificacao_id = $classificacaoPai->id;
-        $subclassificacao->save();
-        $classificacao = factory(Classificacao::class)->create();
-        $classificacao->delete();
-        $classificacao->classificacao_id = $subclassificacao->id;
-        $this->expectException(ValidationException::class);
-        $classificacao->save();
+        $subclassificacao = factory(Classificacao::class)->create(['classificacao_id' => $classificacaoPai->id]);
+        $this->expectException(SafeValidationException::class);
+        factory(Classificacao::class)->create(['classificacao_id' => $subclassificacao->id]);
     }
 
     public function testValidateClassificacaoUpdateSubclassificacaoElaMesma()
     {
         $classificacao = factory(Classificacao::class)->create();
         $classificacao->classificacao_id = $classificacao->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $classificacao->save();
     }
 
     public function testValidateClassificacaoUpdateClassificacaoPai()
     {
         $classificacaoPai = factory(Classificacao::class)->create();
-        $subclassificacao = factory(Classificacao::class)->create();
-        $subclassificacao->classificacao_id = $classificacaoPai->id;
-        $subclassificacao->save();
+        $subclassificacao = factory(Classificacao::class)->create(['classificacao_id' => $classificacaoPai->id]);
         $classificacao = factory(Classificacao::class)->create();
         $classificacaoPai->classificacao_id = $classificacao->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $classificacaoPai->save();
     }
 }

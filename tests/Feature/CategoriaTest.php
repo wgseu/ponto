@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Categoria;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class CategoriaTest extends TestCase
@@ -70,33 +70,26 @@ class CategoriaTest extends TestCase
     public function testValidateCategoriaCreateSubcategoriaDeSubcategoria()
     {
         $categoriaPai = factory(Categoria::class)->create();
-        $subcategoria = factory(Categoria::class)->create();
-        $subcategoria->categoria_id = $categoriaPai->id;
-        $subcategoria->save();
-        $categoria = factory(Categoria::class)->create();
-        $categoria->delete();
-        $categoria->categoria_id = $subcategoria->id;
-        $this->expectException(ValidationException::class);
-        $categoria->save();
+        $subcategoria = factory(Categoria::class)->create(['categoria_id' => $categoriaPai->id]);
+        $this->expectException(SafeValidationException::class);
+        factory(Categoria::class)->create(['categoria_id' => $subcategoria->id]);
     }
 
     public function testValidateCategoriaUpdateSubcategoriaElaMesma()
     {
         $categoria = factory(Categoria::class)->create();
         $categoria->categoria_id = $categoria->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $categoria->save();
     }
 
     public function testValidateCategoriaUpdateSubcategoriaDaCategoriaPai()
     {
         $categoriaPai = factory(Categoria::class)->create();
-        $subcategoria = factory(Categoria::class)->create();
-        $subcategoria->categoria_id = $categoriaPai->id;
-        $subcategoria->save();
+        $subcategoria = factory(Categoria::class)->create(['categoria_id' => $categoriaPai->id]);
         $categoria = factory(Categoria::class)->create();
         $categoriaPai->categoria_id = $categoria->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $categoriaPai->save();
     }
 }

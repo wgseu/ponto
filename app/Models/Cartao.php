@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Cartões utilizados na forma de pagamento em cartão
@@ -105,7 +105,7 @@ class Cartao extends Model implements ValidateInterface
     {
         $errors = [];
         if ($this->taxa < 0) {
-            $errors['taxa'] = __('messages.taxa_negative');
+            $errors['taxa'] = __('messages.taxa_cannot_negative');
         } elseif ($this->dias_repasse < 0) {
             $errors['dias_repasse'] = __('messages.dias_repasse_negative');
         } elseif ($this->taxa_antecipacao < 0) {
@@ -115,7 +115,7 @@ class Cartao extends Model implements ValidateInterface
             $errors['ativo'] = __('messages.create_cartao_desativado');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

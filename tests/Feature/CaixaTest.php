@@ -26,11 +26,11 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Caixa;
 use App\Models\Carteira;
 use App\Models\Movimentacao;
-use Illuminate\Validation\ValidationException;
 
 class CaixaTest extends TestCase
 {
@@ -84,7 +84,7 @@ class CaixaTest extends TestCase
     public function testValidadeCaixaCarteiraTipoInvalida()
     {
         $carteira = factory(Carteira::class)->create(['tipo' => Carteira::TIPO_CREDITO]);
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Caixa::class)->create(['carteira_id' => $carteira->id]);
     }
 
@@ -93,7 +93,7 @@ class CaixaTest extends TestCase
         $caixa = factory(Caixa::class)->create();
         factory(Movimentacao::class)->create(['caixa_id' => $caixa->id]);
         $caixa->ativa = false;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $caixa->save();
     }
 }

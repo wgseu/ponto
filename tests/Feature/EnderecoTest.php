@@ -26,6 +26,9 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
+use App\Models\Bairro;
+use App\Models\Cidade;
 use Tests\TestCase;
 use App\Models\Endereco;
 
@@ -40,7 +43,7 @@ class EnderecoTest extends TestCase
                 'cidade_id' => $seed_endereco->cidade_id,
                 'bairro_id' => $seed_endereco->bairro_id,
                 'logradouro' => 'Teste',
-                'cep' => 'Teste',
+                'cep' => '87878000',
             ]
         ], $headers);
 
@@ -48,7 +51,7 @@ class EnderecoTest extends TestCase
         $this->assertEquals($seed_endereco->cidade_id, $found_endereco->cidade_id);
         $this->assertEquals($seed_endereco->bairro_id, $found_endereco->bairro_id);
         $this->assertEquals('Teste', $found_endereco->logradouro);
-        $this->assertEquals('Teste', $found_endereco->cep);
+        $this->assertEquals('87878000', $found_endereco->cep);
     }
 
     public function testUpdateEndereco()
@@ -59,12 +62,13 @@ class EnderecoTest extends TestCase
             'id' => $endereco->id,
             'input' => [
                 'logradouro' => 'Atualizou',
-                'cep' => 'Atualizo',
+                'cep' => '85440000',
+
             ]
         ], $headers);
         $endereco->refresh();
         $this->assertEquals('Atualizou', $endereco->logradouro);
-        $this->assertEquals('Atualizo', $endereco->cep);
+        $this->assertEquals('85440000', $endereco->cep);
     }
 
     public function testDeleteEndereco()
@@ -82,5 +86,26 @@ class EnderecoTest extends TestCase
         $endereco = factory(Endereco::class)->create();
         $response = $this->graphfl('query_endereco', [ 'id' => $endereco->id ], $headers);
         $this->assertEquals($endereco->id, $response->json('data.enderecos.data.0.id'));
+
+        $found_endereco = Endereco::findOrFail($response->json('data.enderecos.data.0.id'));
+        $expectedBairro = Bairro::find($response->json('data.enderecos.data.0.bairro_id'));
+        $resultBairro = $found_endereco->bairro;
+        $this->assertEquals($expectedBairro, $resultBairro);
+    
+        $expectedCidade = Cidade::find($response->json('data.enderecos.data.0.cidade_id'));
+        $resultCidade = $found_endereco->cidade;
+        $this->assertEquals($expectedCidade, $resultCidade);
+    }
+
+    public function testValidCepEndereco()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Endereco::class)->create(['cep' => '8875 0a0']);
+    }
+
+    public function testValidCepEnderecoNulo()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Endereco::class)->create(['cep' => '']);
     }
 }

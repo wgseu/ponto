@@ -27,7 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
+use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -81,5 +83,12 @@ class Endereco extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!Validator::checkCEP($this->cep)) {
+            $errors['cep'] = __('messages.cep_invalid');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

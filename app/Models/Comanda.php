@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Comanda individual, permite lançar pedidos em cartões de consumo
@@ -92,7 +92,7 @@ class Comanda extends Model implements ValidateInterface
             $errors['ativa'] = __('messages.comanda_inativa_invalid');
         }
         if (!empty($errors)) {
-            throw new ValidationException($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

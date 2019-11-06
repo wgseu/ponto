@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Empresa;
 use App\Models\Moeda;
 use App\Models\Pais;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class MoedaTest extends TestCase
@@ -74,59 +74,42 @@ class MoedaTest extends TestCase
 
     public function testValidateMoedaAtivaConversaoNula()
     {
-        $moeda = factory(Moeda::class)->create();
-        $moeda->conversao = null;
-        $moeda->ativa = true;
-        $moeda->conversao = null;
-        $this->expectException(ValidationException::class);
-        $moeda->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Moeda::class)->create(['conversao' => null, 'ativa' => true]);
     }
 
     public function testValidateMoedaFormatoInvalido()
     {
-        $moeda = factory(Moeda::class)->create();
-        $moeda->formato = 'valor';
-        $this->expectException(ValidationException::class);
-        $moeda->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Moeda::class)->create(['formato' => 'valor']);
     }
 
     public function testValidateMoedaFormatoSimboloInvalido()
     {
-        $moeda = factory(Moeda::class)->create();
-        $moeda->formato = ':value';
-        $this->expectException(ValidationException::class);
-        $moeda->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Moeda::class)->create(['formato' => ':value']);
     }
 
     public function testValidateMoedaDivisaoInvalida()
     {
-        $moeda = factory(Moeda::class)->create();
-        $moeda->divisao = 5;
-        $this->expectException(ValidationException::class);
-        $moeda->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Moeda::class)->create(['divisao' => 5]);
     }
 
     public function testValidateMoedaPaisAtivo()
     {
         $moeda = factory(Moeda::class)->create();
-        $pais = factory(Pais::class)->create();
-        $pais->moeda_id = $moeda->id;
-        $pais->save();
-
-        $empresa = factory(Empresa::class)->create();
-        $empresa->pais_id = $pais->id;
-        $empresa->save();
+        $pais = factory(Pais::class)->create(['moeda_id' => $moeda->id]);
+        $empresa = factory(Empresa::class)->create(['pais_id' => $pais->id]);
 
         $moeda->conversao = 8;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $moeda->save();
     }
 
     public function testValidateMoedaConversaoNegativa()
     {
-        $moeda = factory(Moeda::class)->create();
-        $moeda->conversao = -5;
-        $this->expectException(ValidationException::class);
-        $moeda->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Moeda::class)->create(['conversao' => -5]);
     }
 }

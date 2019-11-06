@@ -2,10 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Credito;
 use App\Models\Cliente;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class CreditoTest extends TestCase
@@ -70,89 +69,48 @@ class CreditoTest extends TestCase
     public function testValidateCreditoAbatimentoMaiorSaldo()
     {
         $cliente = factory(Cliente::class)->create();
-        $oldCredito = factory(Credito::class)->create();
-        $oldCredito->valor = 100;
-        $oldCredito->cliente_id = $cliente->id;
-        $oldCredito->save();
-
-        $credito = factory(Credito::class)->create();
-        $credito->cliente_id = $cliente->id;
-        $credito->save();
-
-        $credito->valor = -101;
-        $this->expectException(ValidationException::class);
-        $credito->save();
+        $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
+        $this->expectException(SafeValidationException::class);
+        $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -101]);
     }
 
     public function testValidateCreditoCreateCancelado()
     {
-        $credito = factory(Credito::class)->create();
-        $credito->delete();
-        $credito->cancelado = true;
-        $this->expectException(ValidationException::class);
-        $credito->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Credito::class)->create(['cancelado' => true]);
     }
 
     public function testValidateCreditoCancelamentoMaiorSaldoCredito()
     {
         $cliente = factory(Cliente::class)->create();
-        $oldCredito = factory(Credito::class)->create();
-        $oldCredito->valor = 100;
-        $oldCredito->cliente_id = $cliente->id;
-        $oldCredito->save();
-
-        $credito = factory(Credito::class)->create();
-        $credito->cliente_id = $cliente->id;
-        $credito->save();
-
-        $credito->valor = -40;
-        $credito->save();
-
+        $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
+        $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -40]);
         $oldCredito->cancelado = true;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $oldCredito->save();
     }
 
     public function testValidateCreditoTranferirAbatimento()
     {
         $cliente = factory(Cliente::class)->create();
-        $oldCredito = factory(Credito::class)->create();
-        $oldCredito->valor = 100;
-        $oldCredito->cliente_id = $cliente->id;
-        $oldCredito->save();
-
-        $credito = factory(Credito::class)->create();
-        $credito->cliente_id = $cliente->id;
-        $credito->save();
-
-        $credito->valor = -40;
-        $credito->save();
+        $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
+        $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -40]);
 
         $newCliente = factory(Cliente::class)->create();
         $credito->cliente_id = $newCliente->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $credito->save();
     }
 
     public function testValidateCreditoTranferefirSaldoNegativo()
     {
         $cliente = factory(Cliente::class)->create();
-        $oldCredito = factory(Credito::class)->create();
-        $oldCredito->valor = 100;
-        $oldCredito->cliente_id = $cliente->id;
-        $oldCredito->save();
-
-        $credito = factory(Credito::class)->create();
-        $credito->cliente_id = $cliente->id;
-        $credito->save();
-
-        $credito->cliente_id = $cliente->id;
-        $credito->valor = -40;
-        $credito->save();
+        $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
+        $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -40]);
 
         $newCliente = factory(Cliente::class)->create();
         $oldCredito->cliente_id = $newCliente->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $oldCredito->save();
     }
 
@@ -162,7 +120,16 @@ class CreditoTest extends TestCase
         $credito->cancelado = true;
         $credito->save();
         $credito->valor = 15;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $credito->save();
+    }
+
+    public function testCreditoBelongToCliente()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id]);
+        $expected = Cliente::find($cliente->id);
+        $result = $credito->cliente;
+        $this->assertEquals($expected, $result);
     }
 }

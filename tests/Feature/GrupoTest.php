@@ -26,8 +26,10 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Grupo;
+use App\Models\Produto;
 
 class GrupoTest extends TestCase
 {
@@ -81,5 +83,30 @@ class GrupoTest extends TestCase
         $grupo = factory(Grupo::class)->create();
         $response = $this->graphfl('query_grupo', [ 'id' => $grupo->id ], $headers);
         $this->assertEquals($grupo->id, $response->json('data.grupos.data.0.id'));
+    }
+
+    public function testValidateGrupoTipoProdutoInvalido()
+    {
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PRODUTO]);
+        $this->expectException(SafeValidationException::class);
+        factory(Grupo::class)->create(['produto_id' => $produto->id]);
+    }
+
+    public function testValidateGrupoQuantidadeMinimaMaiorMaxima()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Grupo::class)->create(['quantidade_minima' => 10, 'quantidade_maxima' => 1]);
+    }
+
+    public function testValidateGrupoQuantidadeMinimaCannotNegativa()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Grupo::class)->create(['quantidade_minima' => -1]);
+    }
+
+    public function testValidateGrupoQuantidadeMaximaCannotNegative()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Grupo::class)->create(['quantidade_maxima' => -10]);
     }
 }

@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -110,7 +111,31 @@ class Grupo extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Produto', 'produto_id');
     }
 
+    /**
+     * Regras:
+     * Os grupos são formados apenas por pacotes;
+     * A quantidade minima não pode ser maior que a maxima a menos que a maxima seja zero,
+     * Se a quantidade maxima for zero não a liminte para produtos do grupo.
+     * A quantidade minima e maxima não pode ser negativas;
+     */
     public function validate()
     {
+        $errors = [];
+        $produto = $this->produto;
+        if ($produto->tipo != Produto::TIPO_PACOTE) {
+            $errors['produto_id'] = __('messages.produto_required_pacote');
+        }
+        if ($this->quantidade_minima > $this->quantidade_maxima && $this->quantidade_maxima != 0) {
+            $errors['quantidade_minima'] = __('messages.quantidade_minima_cannot_greater_maxima');
+        }
+        if ($this->quantidade_minima < 0) {
+            $errors['quantidade_minima'] = __('messages.quantidade_minima_cannot_negative');
+        }
+        if ($this->quantidade_maxima < 0) {
+            $errors['quantidade_maxima'] = __('messages.quantidade_maxima_cannot_negative');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace App\Util;
 /**
  * Common function type float
  */
-class Floater
+class Number
 {
     /**
      * Compare if value is iqual zero

@@ -263,7 +263,7 @@ class Promocao extends Model implements ValidateInterface
         } elseif (($this->evento == true || $this->agendamento == true) && $this->inicio < time()) {
             $errors['inicio'] = __('messages.promotion_begin_invalid');
         } elseif ($this->evento == false && $this->agendamento == false && $this->inicio < self::MINUTES_PER_DAY) {
-            $errors['inicio'] = __('promocao.inicio_invalid');
+            $errors['inicio'] = __('messages.inicio_invalid');
         }
         if ($this->evento == false && $this->agendamento == false && $this->fim  >= self::MINUTES_PER_DAY * 8) {
             $errors['fim'] = __('messages.promotion_end_invalid');

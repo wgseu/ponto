@@ -26,7 +26,7 @@
 
 namespace App\Models;
 
-use App\Util\Floater;
+use App\Util\Number;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -97,7 +97,7 @@ class Servico extends Model implements ValidateInterface
         $errors = [];
         if ($this->valor < 0) {
             $errors['valor'] = __('messages.value_negative');
-        } elseif (Floater::isEqual($this->valor, 0)) {
+        } elseif (Number::isEqual($this->valor, 0)) {
             $errors['valor'] = __('messages.valor_cannot_zero');
         }
         if ($this->tipo == self::TIPO_EVENTO) {

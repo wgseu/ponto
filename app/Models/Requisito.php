@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Informa os produtos da lista de compras
@@ -146,7 +146,7 @@ class Requisito extends Model implements ValidateInterface
             $errors['preco'] = __('messages.preco_cannot_negative');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

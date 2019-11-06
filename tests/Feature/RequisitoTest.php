@@ -26,12 +26,13 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Compra;
 use App\Models\Fornecedor;
+use App\Models\Lista;
 use App\Models\Produto;
 use Tests\TestCase;
 use App\Models\Requisito;
-use Illuminate\Validation\ValidationException;
 
 class RequisitoTest extends TestCase
 {
@@ -80,6 +81,15 @@ class RequisitoTest extends TestCase
         $headers = PrestadorTest::auth();
         $requisito = factory(Requisito::class)->create();
         $response = $this->graphfl('query_requisito', [ 'id' => $requisito->id ], $headers);
+
+        $listaExpect = Lista::find($response->json('data.requisitos.data.0.lista_id'));
+        $listaResult = $requisito->lista;
+        $this->assertEquals($listaExpect, $listaResult);
+
+        $produtoExpect = Produto::find($response->json('data.requisitos.data.0.produto_id'));
+        $produtoResult = $requisito->produto;
+        $this->assertEquals($produtoExpect, $produtoResult);
+
         $this->assertEquals($requisito->id, $response->json('data.requisitos.data.0.id'));
     }
 
@@ -87,7 +97,7 @@ class RequisitoTest extends TestCase
     {
         $compra = factory(Compra::class)->create();
         $fornecedor = factory(Fornecedor::class)->create();
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create([
             'compra_id' => $compra->id,
             'fornecedor_id' => $fornecedor->id
@@ -96,31 +106,31 @@ class RequisitoTest extends TestCase
 
     public function testValidateRequisitoCompradoMaiorQuantidade()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create(['comprado' => 10, 'quantidade' => 2]);
     }
 
     public function testValidateRequisitoQuantidadeNegativa()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create(['quantidade' => -72]);
     }
 
     public function testValidateRequisitoCompradoNegativo()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create(['comprado' => -10]);
     }
 
     public function testValidateRequisitoPrecoMaximoNegativo()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create(['preco_maximo' => -50]);
     }
 
     public function testValidateRequisitoPrecoNegativo()
     {
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         factory(Requisito::class)->create(['preco' => -9]);
     }
 

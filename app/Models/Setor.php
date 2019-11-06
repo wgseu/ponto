@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Setor de impressão e de estoque
@@ -95,7 +95,7 @@ class Setor extends Model implements ValidateInterface
             }
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

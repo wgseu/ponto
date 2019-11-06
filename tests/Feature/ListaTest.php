@@ -26,9 +26,11 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Lista;
-use Illuminate\Validation\ValidationException;
+use App\Models\Prestador;
+use App\Models\Viagem;
 
 class ListaTest extends TestCase
 {
@@ -76,27 +78,36 @@ class ListaTest extends TestCase
     public function testFindLista()
     {
         $headers = PrestadorTest::auth();
-        $lista = factory(Lista::class)->create();
+        $viagem = factory(Viagem::class)->create();
+        $lista = factory(Lista::class)->create(['viagem_id' => $viagem->id]);
         $response = $this->graphfl('query_lista', [ 'id' => $lista->id ], $headers);
+
+        $encarregadoExpect = Prestador::find($response->json('data.listas.data.0.encarregado_id'));
+        $encarregadoResult = $lista->encarregado;
+        $this->assertEquals($encarregadoExpect, $encarregadoResult);
+
+        $viagemExpect = Viagem::find($response->json('data.listas.data.0.viagem_id'));
+        $viagemResult = $lista->viagem;
+        $this->assertEquals($viagemExpect, $viagemResult);
+
         $this->assertEquals($lista->id, $response->json('data.listas.data.0.id'));
         $this->assertEquals($lista->descricao, $response->json('data.listas.data.0.descricao'));
     }
 
     public function testValidateListaCompraFinalizada()
     {
-        $lista = factory(Lista::class)->create();
-        $lista->estado = Lista::ESTADO_COMPRADA;
-        $lista->save();
+        $lista = factory(Lista::class)->create(['estado' => Lista::ESTADO_COMPRADA]);
         $lista->descricao = 'Mercado';
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $lista->save();
     }
 
     public function testValidateListaDataViagemInvalida()
     {
-        $lista = factory(Lista::class)->create();
-        $lista->data_viagem = '2016-12-25 12:15:00';
-        $this->expectException(ValidationException::class);
-        $lista->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Lista::class)->create([
+            'data_viagem' => '2016-12-25 12:15:00',
+            'data_cadastro' => '2019-12-25 12:15:00'
+        ]);
     }
 }

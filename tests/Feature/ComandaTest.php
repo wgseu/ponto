@@ -53,7 +53,7 @@ class ComandaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $comanda = factory(Comanda::class)->create();
-        $response = $this->graphfl('find_comanda_id', [
+        $response = $this->graphfl('query_comanda', [
             'id' => $comanda->id,
         ], $headers);
 

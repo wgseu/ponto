@@ -26,9 +26,9 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Setor;
-use Illuminate\Validation\ValidationException;
 
 class SetorTest extends TestCase
 {
@@ -50,17 +50,13 @@ class SetorTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $setor = factory(Setor::class)->create();
-        $response = $this->graphfl('find_setor_id', [
+        $response = $this->graphfl('query_setor', [
             'id' => $setor->id,
         ], $headers);
 
         $this->assertEquals(
             $setor->id,
             $response->json('data.setores.data.0.id')
-        );
-        $this->assertEquals(
-            $setor->nome,
-            $response->json('data.setores.data.0.nome')
         );
         $this->assertEquals(
             $setor->nome,
@@ -94,33 +90,26 @@ class SetorTest extends TestCase
     public function testValidateSetorCreateSubsetor()
     {
         $setorPai = factory(Setor::class)->create();
-        $subsetor = factory(Setor::class)->create();
-        $subsetor->setor_id = $setorPai->id;
-        $subsetor->save();
-        $setor = factory(Setor::class)->create();
-        $setor->delete();
-        $setor->setor_id = $subsetor->id;
-        $this->expectException(ValidationException::class);
-        $setor->save();
+        $subsetor = factory(Setor::class)->create(['setor_id' => $setorPai->id]);
+        $this->expectException(SafeValidationException::class);
+        factory(Setor::class)->create(['setor_id' => $subsetor->id]);
     }
 
     public function testValidateSetorUpdateSubsetorEleMesmo()
     {
         $setor = factory(Setor::class)->create();
         $setor->setor_id = $setor->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $setor->save();
     }
 
     public function testValidateSetorUpdateSubsetorDoSetorpai()
     {
         $setorPai = factory(Setor::class)->create();
-        $subsetor = factory(Setor::class)->create();
-        $subsetor->setor_id = $setorPai->id;
-        $subsetor->save();
+        $subsetor = factory(Setor::class)->create(['setor_id' => $setorPai->id]);
         $setor = factory(Setor::class)->create();
         $setorPai->setor_id = $setor->id;
-        $this->expectException(ValidationException::class);
+        $this->expectException(SafeValidationException::class);
         $setorPai->save();
     }
 }

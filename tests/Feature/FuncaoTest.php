@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Funcao;
 use Illuminate\Validation\ValidationException;
@@ -76,7 +77,7 @@ class FuncaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $credito = factory(Funcao::class)->create();
-        $response = $this->graphfl('find_funcao_id', [
+        $response = $this->graphfl('query_funcao', [
             'id' => $credito->id,
         ], $headers);
 
@@ -88,9 +89,7 @@ class FuncaoTest extends TestCase
 
     public function testValidateFuncaoRemuneracaoNegativa()
     {
-        $funcao = factory(Funcao::class)->create();
-        $funcao->remuneracao = -50;
-        $this->expectException(ValidationException::class);
-        $funcao->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Funcao::class)->create(['remuneracao' => -50]);
     }
 }

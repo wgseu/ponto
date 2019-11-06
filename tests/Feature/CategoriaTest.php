@@ -26,7 +26,7 @@ class CategoriaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $categoria = factory(Categoria::class)->create();
-        $response = $this->graphfl('find_categoria_id', [
+        $response = $this->graphfl('query_categoria', [
             'id' => $categoria->id,
         ], $headers);
 

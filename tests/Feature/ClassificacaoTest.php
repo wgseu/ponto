@@ -27,7 +27,7 @@ class ClassificacaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $classificacao = factory(Classificacao::class)->create();
-        $response = $this->graphfl('find_classificacao_id', [
+        $response = $this->graphfl('query_classificacao', [
             'id' => $classificacao->id,
         ], $headers);
 

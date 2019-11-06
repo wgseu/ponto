@@ -52,7 +52,7 @@ class CartaoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cartao = factory(Cartao::class)->create();
-        $response = $this->graphfl('find_cartao_id', [
+        $response = $this->graphfl('query_cartao', [
             'id' => $cartao->id,
         ], $headers);
 

@@ -1,9 +1,0 @@
-query ($id: ID!){
-  cartoes(filter: {id: $id}, order: { id: asc }) {
-    data{
-      bandeira
-      taxa
-      id
-    }
-  }
-}

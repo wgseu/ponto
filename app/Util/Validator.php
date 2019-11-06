@@ -82,4 +82,21 @@ class Validator
         }
         return true;
     }
+
+    /**
+     * Check if CEP is valid
+     * @param  string  $cep   CEP to check
+     * @param  boolean $empty    allow empty CEP as valid
+     * @return boolean           True if CEP is valid or false otherwise
+     */
+    public static function checkCEP($cep, $empty = false)
+    {
+        if ($cep == '' && $empty) {
+            return true;
+        }
+        $mask = '99999-999';
+        $cep = Filter::unmask($cep, $mask);
+        $mask_len = strlen(Filter::digits($mask));
+        return strlen($cep) == $mask_len;
+    }
 }

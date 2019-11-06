@@ -14,6 +14,6 @@ $factory->define(Endereco::class, function (Faker $faker) {
         'cidade_id' => $cidade_id->id,
         'bairro_id' => $bairro_id->id,
         'logradouro' => $faker->unique()->name,
-        'cep' => $faker->unique()->name,
+        'cep' => '87880000',
     ];
 });

@@ -44,4 +44,47 @@ class Filter
         }
         return $result;
     }
+
+    /**
+     * Filter string and remove all non digits
+     * @param  string $value text containing digits
+     * @return string only digits number from string
+     */
+    public static function digits($value)
+    {
+        $value = preg_replace('/[^0-9]/', '', strval($value));
+        if ($value == '') {
+            return null;
+        }
+        return $value;
+    }
+
+    /**
+     * Unmask string from mask format
+     * @param  string $str  text to unmask
+     * @param  string $mask mask to apply
+     * @return string new text unmasked or null if empty
+     */
+    public static function unmask($str, $mask)
+    {
+        $res = '';
+        $j = 0;
+        $opt = false;
+        for ($i = 0; $i < strlen($mask); $i++) {
+            if ($j >= strlen($str)) {
+                break;
+            }
+            if (($mask[$i] == '9' || $mask[$i] == '0') && preg_match('/[0-9]/', $str[$j])) {
+                $res .= $str[$j++];
+            } elseif ($mask[$i] == '?') {
+                $opt = true;
+            } elseif ($mask[$i] == $str[$j]) {
+                $j++;
+            }
+        }
+        if (trim($res) == '') {
+            return null;
+        }
+        return $res;
+    }
 }

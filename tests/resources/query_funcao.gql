@@ -2,6 +2,7 @@ query ($id: ID!) {
   funcoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
+      descricao
     }
     total
   }

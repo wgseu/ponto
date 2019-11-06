@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Registro de viagem de uma entrega ou compra de insumos
@@ -85,7 +85,7 @@ class Viagem extends Model implements ValidateInterface
             $errors['data_chegada'] = __('messages.error_time_viagem');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

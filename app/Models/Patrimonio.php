@@ -27,9 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Informa detalhadamente um bem da empresa
@@ -132,7 +132,7 @@ class Patrimonio extends Model implements ValidateInterface
             $errors['ativo'] = __('messages.cannot_create_disabled');
         }
         if (!empty($errors)) {
-            throw ValidationException::withMessages($errors);
+            throw SafeValidationException::withMessages($errors);
         }
     }
 }

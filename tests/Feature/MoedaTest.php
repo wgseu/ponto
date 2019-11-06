@@ -36,7 +36,7 @@ class MoedaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $moeda = factory(Moeda::class)->create();
-        $response = $this->graphfl('find_moeda_id', [
+        $response = $this->graphfl('query_moeda', [
             'id' => $moeda->id,
         ], $headers);
         $this->assertEquals(

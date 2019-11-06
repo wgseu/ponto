@@ -26,6 +26,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
+use App\Models\Fornecedor;
 use Tests\TestCase;
 use App\Models\Patrimonio;
 use Illuminate\Validation\ValidationException;
@@ -82,33 +84,37 @@ class PatrimonioTest extends TestCase
     public function testFindPatrimonio()
     {
         $headers = PrestadorTest::auth();
-        $patrimonio = factory(Patrimonio::class)->create();
+        $fornecedor = factory(Fornecedor::class)->create();
+        $patrimonio = factory(Patrimonio::class)->create(['fornecedor_id' => $fornecedor->id]);
         $response = $this->graphfl('query_patrimonio', [ 'id' => $patrimonio->id ], $headers);
+
+        $empresaExpect = Cliente::find($response->json('data.patrimonios.data.0.empresa_id'));
+        $empresaResult = $patrimonio->empresa;
+        $this->assertEquals($empresaExpect, $empresaResult);
+
+        $fornecedorExpect = Fornecedor::find($response->json('data.patrimonios.data.0.fornecedor_id'));
+        $fornecedorResult = $patrimonio->fornecedor;
+        $this->assertEquals($fornecedorExpect, $fornecedorResult);
+
         $this->assertEquals($patrimonio->id, $response->json('data.patrimonios.data.0.id'));
     }
 
     public function testValidadePatrimonioQuantidadeNegativa()
     {
-        $patrimonio = factory(Patrimonio::class)->create();
-        $patrimonio->quantidade = -50;
         $this->expectException(ValidationException::class);
-        $patrimonio->save();
+        factory(Patrimonio::class)->create(['quantidade' => -50]);
     }
 
     public function testValidadePatrimonioAlturaNegativa()
     {
-        $patrimonio = factory(Patrimonio::class)->create();
-        $patrimonio->altura = -100;
         $this->expectException(ValidationException::class);
-        $patrimonio->save();
+        factory(Patrimonio::class)->create(['altura' => -100]);
     }
 
     public function testValidadePatrimonioLarguraNegativa()
     {
-        $patrimonio = factory(Patrimonio::class)->create();
-        $patrimonio->largura = -150;
         $this->expectException(ValidationException::class);
-        $patrimonio->save();
+        factory(Patrimonio::class)->create(['largura' => -150]);
     }
 
     public function testValidadePatrimonioComprimentoNegativa()

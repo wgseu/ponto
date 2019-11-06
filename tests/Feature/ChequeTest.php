@@ -31,7 +31,6 @@ use App\Models\Banco;
 use Tests\TestCase;
 use App\Models\Cheque;
 use App\Models\Cliente;
-use Illuminate\Validation\ValidationException;
 
 class ChequeTest extends TestCase
 {
@@ -65,26 +64,12 @@ class ChequeTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $cheque = factory(Cheque::class)->create();
-        $response = $this->graphfl('find_cheque_id', [
-            'id' => $cheque->id,
-        ], $headers);
+        $response = $this->graphfl('query_cheque', ['id' => $cheque->id], $headers);
 
-        $this->assertEquals(
-            $cheque->id,
-            $response->json('data.cheques.data.0.id')
-        );
-        $this->assertEquals(
-            $cheque->agencia,
-            $response->json('data.cheques.data.0.agencia')
-        );
-        $this->assertEquals(
-            $cheque->conta,
-            $response->json('data.cheques.data.0.conta')
-        );
-        $this->assertEquals(
-            $cheque->valor,
-            $response->json('data.cheques.data.0.valor')
-        );
+        $this->assertEquals($cheque->id, $response->json('data.cheques.data.0.id'));
+        $this->assertEquals($cheque->agencia, $response->json('data.cheques.data.0.agencia'));
+        $this->assertEquals($cheque->conta, $response->json('data.cheques.data.0.conta'));
+        $this->assertEquals($cheque->valor, $response->json('data.cheques.data.0.valor'));
     }
 
     public function testUpdateCheque()

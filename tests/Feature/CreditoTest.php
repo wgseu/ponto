@@ -30,7 +30,7 @@ class CreditoTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $credito = factory(Credito::class)->create();
-        $response = $this->graphfl('find_credito_id', [
+        $response = $this->graphfl('query_credito', [
             'id' => $credito->id,
         ], $headers);
 

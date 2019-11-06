@@ -3,6 +3,8 @@ query ($id: ID!) {
     data {
       id
       descricao
+      encarregado_id
+      viagem_id
     }
     total
   }

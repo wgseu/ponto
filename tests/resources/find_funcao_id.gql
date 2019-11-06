@@ -1,8 +1,0 @@
-query funcao ($id: ID!){
-  funcoes(filter: {id: $id}, order: { id: asc }) {
-    data{
-      descricao
-      remuneracao
-    }
-  }
-}

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
+use App\Models\Bairro;
 use App\Models\Zona;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -30,14 +32,13 @@ class ZonaTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $zona = factory(Zona::class)->create();
-        $response = $this->graphfl('find_zona_id', [
-            'id' => $zona->id,
-        ], $headers);
+        $response = $this->graphfl('query_zona', ['id' => $zona->id], $headers);
 
-        $this->assertEquals(
-            $zona->nome,
-            $response->json('data.zonas.data.0.nome')
-        );
+        $bairroExpect = Bairro::find($response->json('data.zonas.data.0.bairro_id'));
+        $bairroResult = $zona->bairro;
+        $this->assertEquals($bairroExpect, $bairroResult);
+
+        $this->assertEquals($zona->nome, $response->json('data.zonas.data.0.nome'));
     }
 
     public function testUpdateZona()
@@ -69,18 +70,13 @@ class ZonaTest extends TestCase
 
     public function testValidateZonaPrazoEntregaInvalido()
     {
-        $zona = factory(Zona::class)->create();
-        $zona->entrega_minima = 4;
-        $zona->entrega_maxima = 2;
-        $this->expectException(ValidationException::class);
-        $zona->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Zona::class)->create(['entrega_minima' => 4, 'entrega_maxima' => 2]);
     }
 
     public function testValidateZonaAdicionalNegativo()
     {
-        $zona = factory(Zona::class)->create();
-        $zona->adicional_entrega = -5;
-        $this->expectException(ValidationException::class);
-        $zona->save();
+        $this->expectException(SafeValidationException::class);
+        factory(Zona::class)->create(['adicional_entrega' => -5]);
     }
 }

@@ -32,7 +32,7 @@ class BairroTest extends TestCase
     {
         $headers = PrestadorTest::auth();
         $bairro = factory(Bairro::class)->create();
-        $response = $this->graphfl('find_bairro_id', [
+        $response = $this->graphfl('query_bairro', [
             'id' => $bairro->id,
         ], $headers);
 

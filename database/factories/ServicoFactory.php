@@ -9,6 +9,7 @@ $factory->define(Servico::class, function (Faker $faker) {
     return [
         'nome' => $faker->name,
         'descricao' => $faker->name,
-        'tipo' => Servico::TIPO_EVENTO,
+        'tipo' => Servico::TIPO_TAXA,
+        'valor' => $faker->numberBetween(1, 70),
     ];
 });

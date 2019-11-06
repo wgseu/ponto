@@ -26,9 +26,11 @@
 
 namespace App\Models;
 
+use App\Util\Number;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos
@@ -42,6 +44,7 @@ class Servico extends Model implements ValidateInterface
      */
     public const TIPO_EVENTO = 'evento';
     public const TIPO_TAXA = 'taxa';
+    public const ENTREGA_ID = 1;
 
     /**
      * The table associated with the model.
@@ -91,5 +94,29 @@ class Servico extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if ($this->valor < 0) {
+            $errors['valor'] = __('messages.value_negative');
+        } elseif (Number::isEqual($this->valor, 0)) {
+            $errors['valor'] = __('messages.valor_cannot_zero');
+        }
+        if ($this->tipo == self::TIPO_EVENTO) {
+            if (is_null($this->data_inicio)) {
+                $errors['data_inicio'] = __('messages.date_start_cannot_null');
+            }
+            if (is_null($this->data_fim)) {
+                $errors['data_fim'] = __('messages.date_end_cannot_null');
+            }
+        } else {
+            if (!is_null($this->data_inicio)) {
+                $errors['data_inicio'] = __('messages.data_inicio_must_empty');
+            }
+            if (!is_null($this->data_fim)) {
+                $errors['data_fim'] = __('messages.data_fim_must_empty');
+            }
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

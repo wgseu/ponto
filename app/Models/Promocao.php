@@ -27,9 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\Rules\Exists;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o
@@ -39,6 +42,11 @@ class Promocao extends Model implements ValidateInterface
 {
     use ModelEvents;
     use SoftDeletes;
+
+    /**
+     * Total number of minutes in one day
+     */
+    public const MINUTES_PER_DAY = 1440;
 
     /**
      * Local onde o preço será aplicado
@@ -195,5 +203,81 @@ class Promocao extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        $query = self::whereBetween('inicio', [$this->inicio, $this->fim])
+            ->orWhereBetween(
+                DB::raw(intval($this->inicio)),
+                [
+                    DB::raw($this->table . '.' . 'inicio'),
+                    DB::raw($this->table . '.' . 'fim')
+                ]
+            );
+        if ($this->exists) {
+            $query->where('id', '<>', $this->id);
+        }
+        if ($this->categoria_id) {
+            $query->where('categoria_id', $this->categoria_id);
+        }
+        if ($this->produto_id) {
+            $query->where('produto_id', $this->produto_id);
+        }
+        if ($this->servico_id) {
+            $query->where('servico_id', $this->servico_id);
+        }
+        if ($this->bairro_id) {
+            $query->where('bairro_id', $this->bairro_id);
+        }
+        if ($this->zona_id) {
+            $query->where('zona_id', $this->zona_id);
+        }
+        if ($this->integracao_id) {
+            $query->where('integracao_id', $this->integracao_id);
+        }
+        if ($this->local) {
+            $query->where('local', $this->local);
+        }
+        if ($this->evento) {
+            $query->where('evento', $this->evento);
+        }
+        if ($this->agendamento) {
+            $query->where('agendamento', $this->agendamento);
+        }
+        if ($query->exists()) {
+            $errors['id'] = __('promocao_existing');
+        }
+        $selecao = !is_null($this->categoria_id) +
+            !is_null($this->produto_id) +
+            !is_null($this->servico_id);
+        if (is_null($this->servico_id) && !is_null($this->bairro_id)) {
+            $errors['servico_id'] = __('messages.servico_id_empty');
+        } elseif ($selecao > 1) {
+            $errors['servico_id'] = __('messages.multiple_selections');
+        } elseif ($selecao < 1) {
+            $errors['servico_id'] = __('messages.no_selection');
+        }
+        if (!is_null($this->zona_id) && is_null($this->bairro_id)) {
+            $errors['bairro_id'] = __('messages.bairro_id_empty');
+        }
+        if ($this->inicio >= $this->fim) {
+            $errors['inicio'] = __('messages.invalid_interval');
+        } elseif (($this->evento == true || $this->agendamento == true) && $this->inicio < time()) {
+            $errors['inicio'] = __('messages.promotion_begin_invalid');
+        } elseif ($this->evento == false && $this->agendamento == false && $this->inicio < self::MINUTES_PER_DAY) {
+            $errors['inicio'] = __('messages.inicio_invalid');
+        }
+        if ($this->evento == false && $this->agendamento == false && $this->fim  >= self::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = __('messages.promotion_end_invalid');
+        }
+        if (is_null($this->promocao_id) && $this->pontos < 0) {
+            $errors['pontos'] = __('messages.points_not_negative');
+        } elseif (!is_null($this->promocao_id) && $this->pontos > 0) {
+            $errors['pontos'] = _('messages.points_must_be_negative');
+        }
+        if ($this->agendamento == true && $this->valor <= 0) {
+            $errors['valor'] = __('messages.value_cannot_zero');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

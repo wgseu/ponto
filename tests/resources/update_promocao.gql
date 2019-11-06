@@ -1,5 +1,6 @@
 mutation updatePromocao($id: ID!, $input: PromocaoUpdateInput!) {
   UpdatePromocao(id: $id, input: $input) {
+    id
     inicio
     fim
     valor

@@ -22,6 +22,7 @@
     </filter>
     <php>
         <ini name="date.timezone" value="UTC"/>
+        <server name="APP_KEY" value="das3615d6sa58d14ds6a51asd654dsad"/>
         <server name="APP_ENV" value="testing"/>
         <server name="JWT_SECRET" value="skjadkuwb32d486ads48ac1da"/>
         <server name="BCRYPT_ROUNDS" value="4"/>

@@ -14,8 +14,8 @@ class MailController extends Controller
             $user = Cliente::findOrFail($token->id);
             $user->status = Cliente::STATUS_ATIVO;
             $user->save();
-            return redirect(url('/conta/entrar'));
+            return redirect(url('/authenticate'));
         }
-        return response()->json(['error' => __('messages.token_or_user_invalid')]);
+        return response()->json(['error' => __('messages.token_or_user_invalid')], 401);
     }
 }

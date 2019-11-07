@@ -719,4 +719,5 @@ return [
     'date_end_mustbe_null' => 'Data de término deve ser nulo',
     'date_end_cannot_empty' => 'Data de término não pode ser vazio',
     'cep_invalid' => 'O Cep é inválido',
+    'ncm_invalid' => 'O NCM é inválido',
 ];

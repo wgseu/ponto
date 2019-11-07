@@ -27,7 +27,9 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
+use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -90,5 +92,12 @@ class Tributacao extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!Validator::checkNCM($this->ncm)) {
+            $errors['ncm'] = __('messages.ncm_invalid');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

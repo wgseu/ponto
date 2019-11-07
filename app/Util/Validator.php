@@ -99,4 +99,15 @@ class Validator
         $mask_len = strlen(Filter::digits($mask));
         return strlen($cep) == $mask_len;
     }
+
+    public static function checkNCM($ncm)
+    {
+        if ($ncm == '00') {
+            return true;
+        }
+        $mask = '9999.99.99';
+        $ncm = Filter::unmask($ncm, $mask);
+        $mask_len = strlen(Filter::digits($mask));
+        return strlen($ncm) == $mask_len;
+    }
 }

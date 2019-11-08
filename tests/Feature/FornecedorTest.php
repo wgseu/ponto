@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Fornecedor;
@@ -76,5 +77,15 @@ class FornecedorTest extends TestCase
         $fornecedor = factory(Fornecedor::class)->create();
         $response = $this->graphfl('query_fornecedor', [ 'id' => $fornecedor->id ], $headers);
         $this->assertEquals($fornecedor->id, $response->json('data.fornecedores.data.0.id'));
+
+        $expectedEmpresa = Cliente::find($response->json('data.fornecedores.data.0.empresa_id'));
+        $resultEmpresa = $fornecedor->empresa;
+        $this->assertEquals($expectedEmpresa, $resultEmpresa);
+    }
+
+    public function testValidadeFornecedorPrazoNegativo()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Fornecedor::class)->create(['prazo_pagamento' => -10]);
     }
 }

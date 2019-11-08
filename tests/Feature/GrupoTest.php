@@ -109,4 +109,13 @@ class GrupoTest extends TestCase
         $this->expectException(SafeValidationException::class);
         factory(Grupo::class)->create(['quantidade_maxima' => -10]);
     }
+
+    public function testValidateGrupoProdutoCannotUpdate()
+    {
+        $produto = factory(Produto::class)->create();
+        $grupo = factory(Grupo::class)->create();
+        $grupo->produto_id = $produto->id;
+        $this->expectException(SafeValidationException::class);
+        $grupo->save();
+    }
 }

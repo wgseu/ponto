@@ -101,6 +101,12 @@ class LocalizacaoTest extends TestCase
         factory(Localizacao::class)->create(['tipo' => Localizacao::TIPO_APARTAMENTO]);
     }
 
+    public function testValidateLocalizacaoNcmInvalido()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Localizacao::class)->create(['cep' => '87880p00']);
+    }
+
     public function testBelongToCliente()
     {
         $localizacao = factory(Localizacao::class)->create();

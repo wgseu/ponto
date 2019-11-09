@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -76,5 +77,12 @@ class Fornecedor extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if ($this->prazo_pagamento < 0) {
+            $errors['prazo_pagamento'] = __('messages.prazo_pagamento_cannot_negative');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 }

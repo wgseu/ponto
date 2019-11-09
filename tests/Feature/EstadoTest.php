@@ -28,6 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Estado;
+use App\Models\Pais;
 
 class EstadoTest extends TestCase
 {
@@ -80,5 +81,9 @@ class EstadoTest extends TestCase
         $estado = factory(Estado::class)->create();
         $response = $this->graphfl('query_estado', [ 'id' => $estado->id ], $headers);
         $this->assertEquals($estado->id, $response->json('data.estados.data.0.id'));
+
+        $expectedPais = Pais::find($response->json('data.estados.data.0.pais_id'));
+        $resultPais = $estado->pais;
+        $this->assertEquals($expectedPais, $resultPais);
     }
 }

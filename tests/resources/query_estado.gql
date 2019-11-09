@@ -2,6 +2,7 @@ query ($id: ID!) {
   estados (filter: { id: $id }, order: { id: asc }) {
     data {
       id
+      pais_id
     }
     total
   }

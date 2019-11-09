@@ -28,6 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Auditoria;
+use App\Models\Prestador;
 
 class AuditoriaTest extends TestCase
 {
@@ -37,5 +38,13 @@ class AuditoriaTest extends TestCase
         $auditoria = factory(Auditoria::class)->create();
         $response = $this->graphfl('query_auditoria', [ 'id' => $auditoria->id ], $headers);
         $this->assertEquals($auditoria->id, $response->json('data.auditorias.data.0.id'));
+
+        $prestadorExpected = Prestador::find($response->json('data.auditorias.data.0.prestador_id'));
+        $prestadorResult = $auditoria->prestador;
+        $this->assertEquals($prestadorExpected, $prestadorResult);
+
+        $autorizadorExpected = Prestador::find($response->json('data.auditorias.data.0.autorizador_id'));
+        $autorizadorResult = $auditoria->autorizador;
+        $this->assertEquals($autorizadorExpected, $autorizadorResult);
     }
 }

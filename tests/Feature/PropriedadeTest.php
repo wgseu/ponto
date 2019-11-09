@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Grupo;
 use Tests\TestCase;
 use App\Models\Propriedade;
 
@@ -76,5 +77,9 @@ class PropriedadeTest extends TestCase
         $propriedade = factory(Propriedade::class)->create();
         $response = $this->graphfl('query_propriedade', [ 'id' => $propriedade->id ], $headers);
         $this->assertEquals($propriedade->id, $response->json('data.propriedades.data.0.id'));
+
+        $expectedGrupo = Grupo::find($response->json('data.propriedades.data.0.grupo_id'));
+        $resultGrupo = $propriedade->grupo;
+        $this->assertEquals($expectedGrupo, $resultGrupo);
     }
 }

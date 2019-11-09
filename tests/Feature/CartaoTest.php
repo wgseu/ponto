@@ -28,6 +28,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Cartao;
+use App\Models\Carteira;
+use App\Models\Forma;
 use Illuminate\Validation\ValidationException;
 
 class CartaoTest extends TestCase
@@ -51,19 +53,19 @@ class CartaoTest extends TestCase
     public function testFindCartao()
     {
         $headers = PrestadorTest::auth();
-        $cartao = factory(Cartao::class)->create();
+        $carteira = factory(Carteira::class)->create();
+        $cartao = factory(Cartao::class)->create(['carteira_id' => $carteira->id]);
         $response = $this->graphfl('query_cartao', [
             'id' => $cartao->id,
         ], $headers);
 
-        $this->assertEquals(
-            $cartao->id,
-            $response->json('data.cartoes.data.0.id')
-        );
-        $this->assertEquals(
-            $cartao->bandeira,
-            $response->json('data.cartoes.data.0.bandeira')
-        );
+        $this->assertEquals($cartao->id, $response->json('data.cartoes.data.0.id'));
+        $this->assertEquals($cartao->bandeira, $response->json('data.cartoes.data.0.bandeira'));
+
+        $forma = Forma::find($response->json('data.cartoes.data.0.forma_id'));
+        $this->assertEquals($cartao->forma, $forma);
+        $carteiras = Carteira::find($response->json('data.cartoes.data.0.carteira_id'));
+        $this->assertEquals($cartao->carteira, $carteiras);
     }
 
     public function testUpdateCartao()

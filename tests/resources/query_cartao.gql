@@ -3,6 +3,8 @@ query ($id: ID!) {
     data {
       id
       bandeira
+      forma_id
+      carteira_id
     }
     total
   }

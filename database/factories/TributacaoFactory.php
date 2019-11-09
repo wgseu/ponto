@@ -13,7 +13,7 @@ $factory->define(Tributacao::class, function (Faker $faker) {
     $operacao_id = factory(Operacao::class)->create();
     $imposto_id = factory(Imposto::class)->create();
     return [
-        'ncm' => $faker->name,
+        'ncm' => '87881000',
         'origem_id' => $origem_id->id,
         'operacao_id' => $operacao_id->id,
         'imposto_id' => $imposto_id->id,

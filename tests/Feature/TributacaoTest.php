@@ -26,6 +26,10 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
+use App\Models\Imposto;
+use App\Models\Operacao;
+use App\Models\Origem;
 use Tests\TestCase;
 use App\Models\Tributacao;
 
@@ -37,7 +41,7 @@ class TributacaoTest extends TestCase
         $seed_tributacao =  factory(Tributacao::class)->create();
         $response = $this->graphfl('create_tributacao', [
             'input' => [
-                'ncm' => 'Teste',
+                'ncm' => '2202.10.00',
                 'origem_id' => $seed_tributacao->origem_id,
                 'operacao_id' => $seed_tributacao->operacao_id,
                 'imposto_id' => $seed_tributacao->imposto_id,
@@ -45,7 +49,7 @@ class TributacaoTest extends TestCase
         ], $headers);
 
         $found_tributacao = Tributacao::findOrFail($response->json('data.CreateTributacao.id'));
-        $this->assertEquals('Teste', $found_tributacao->ncm);
+        $this->assertEquals('2202.10.00', $found_tributacao->ncm);
         $this->assertEquals($seed_tributacao->origem_id, $found_tributacao->origem_id);
         $this->assertEquals($seed_tributacao->operacao_id, $found_tributacao->operacao_id);
         $this->assertEquals($seed_tributacao->imposto_id, $found_tributacao->imposto_id);
@@ -58,11 +62,11 @@ class TributacaoTest extends TestCase
         $this->graphfl('update_tributacao', [
             'id' => $tributacao->id,
             'input' => [
-                'ncm' => 'Atualizou',
+                'ncm' => '00',
             ]
         ], $headers);
         $tributacao->refresh();
-        $this->assertEquals('Atualizou', $tributacao->ncm);
+        $this->assertEquals('00', $tributacao->ncm);
     }
 
     public function testDeleteTributacao()
@@ -77,8 +81,32 @@ class TributacaoTest extends TestCase
     public function testFindTributacao()
     {
         $headers = PrestadorTest::auth();
-        $tributacao = factory(Tributacao::class)->create();
+        $tributacao = factory(Tributacao::class)->create(['ncm' => '8752.10.00']);
         $response = $this->graphfl('query_tributacao', [ 'id' => $tributacao->id ], $headers);
         $this->assertEquals($tributacao->id, $response->json('data.tributacoes.data.0.id'));
+
+        $origemExpect = Origem::find($response->json('data.tributacoes.data.0.origem_id'));
+        $origemResult = $tributacao->origem;
+        $this->assertEquals($origemExpect, $origemResult);
+
+        $operacaoExpect = Operacao::find($response->json('data.tributacoes.data.0.operacao_id'));
+        $operacaoResult = $tributacao->operacao;
+        $this->assertEquals($operacaoExpect, $operacaoResult);
+
+        $impostoExpect = Imposto::find($response->json('data.tributacoes.data.0.imposto_id'));
+        $impostoResult = $tributacao->imposto;
+        $this->assertEquals($impostoExpect, $impostoResult);
+    }
+
+    public function testValidateTributacaoNcmInvalido()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Tributacao::class)->create(['ncm' => '87520']);
+    }
+
+    public function testValidateTributacaoNcmCaracterInvalido()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Tributacao::class)->create(['ncm' => '875200g24']);
     }
 }

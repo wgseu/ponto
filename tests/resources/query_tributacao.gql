@@ -2,6 +2,9 @@ query ($id: ID!) {
   tributacoes (filter: { id: $id }, order: { id: asc }) {
     data {
       id
+      origem_id
+      operacao_id
+      imposto_id
     }
     total
   }

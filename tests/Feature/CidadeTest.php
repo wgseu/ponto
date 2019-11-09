@@ -26,15 +26,17 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Cidade;
+use App\Models\Estado;
 
 class CidadeTest extends TestCase
 {
     public function testCreateCidade()
     {
         $headers = PrestadorTest::auth();
-        $seed_cidade =  factory(Cidade::class)->create();
+        $seed_cidade =  factory(Cidade::class)->create(['cep' => '87540000']);
         $response = $this->graphfl('create_cidade', [
             'input' => [
                 'estado_id' => $seed_cidade->estado_id,
@@ -64,7 +66,7 @@ class CidadeTest extends TestCase
     public function testDeleteCidade()
     {
         $headers = PrestadorTest::auth();
-        $cidade_to_delete = factory(Cidade::class)->create();
+        $cidade_to_delete = factory(Cidade::class)->create(['cep' => '87880-000']);
         $this->graphfl('delete_cidade', ['id' => $cidade_to_delete->id], $headers);
         $cidade = Cidade::find($cidade_to_delete->id);
         $this->assertNull($cidade);
@@ -76,5 +78,15 @@ class CidadeTest extends TestCase
         $cidade = factory(Cidade::class)->create();
         $response = $this->graphfl('query_cidade', [ 'id' => $cidade->id ], $headers);
         $this->assertEquals($cidade->id, $response->json('data.cidades.data.0.id'));
+
+        $expectedCidade = Estado::find($response->json('data.cidades.data.0.estado_id'));
+        $resultCidade = $cidade->estado;
+        $this->assertEquals($expectedCidade, $resultCidade);
+    }
+
+    public function testValidCidade()
+    {
+        $this->expectException(SafeValidationException::class);
+        factory(Cidade::class)->create(['cep' => '887p50a0']);
     }
 }

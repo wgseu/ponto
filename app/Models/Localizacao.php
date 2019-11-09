@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
+use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -127,6 +128,9 @@ class Localizacao extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
+        if (!Validator::checkCEP($this->cep, true)) {
+            $errors['cep'] = __('messages.cep_invalid');
+        }
         if ($this->tipo == Localizacao::TIPO_APARTAMENTO && is_null($this->apartamento)) {
             $errors['apartamento'] = __('messages.localizacao_tipo_required_apartamento');
         }

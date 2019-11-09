@@ -2,7 +2,7 @@
 -- Author:        Mazin
 -- Caption:       GrandChef Model
 -- Project:       GrandChef
--- Changed:       2019-10-31 14:25
+-- Changed:       2019-11-07 09:40
 -- Created:       2012-09-05 23:08
 PRAGMA foreign_keys = OFF;
 
@@ -1358,14 +1358,13 @@ CREATE TABLE "grupos"(
   "funcao" TEXT NOT NULL CHECK("funcao" IN('minimo', 'media', 'maximo', 'soma')) DEFAULT 'soma',-- Informa qual será a fórmula de cálculo do preço, Mínimo: obtém o menor preço, Média:  define o preço do produto como a média dos itens selecionados, Máximo: Obtém o preço do item mais caro do grupo, Soma: Soma todos os preços dos produtos selecionados[N:Função de preço][G:a][E:Mínimo|Média|Máximo|Soma][F:self::FUNCAO_SOMA]
   "ordem" INTEGER NOT NULL DEFAULT 0,-- Informa a ordem de exibição dos grupos[G:a][N:Ordem][F:0]
   "data_arquivado" DATETIME DEFAULT NULL,-- Data em que o grupo foi arquivado e não será mais usado[G:a][N:Data de arquivação]
-  CONSTRAINT "produto_id_nome_UNIQUE"
-    UNIQUE("produto_id","nome"),
   CONSTRAINT "FK_grupos_produto_id"
     FOREIGN KEY("produto_id")
     REFERENCES "produtos"("id")
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
+CREATE INDEX "grupos.FK_grupos_produto_id_idx" ON "grupos" ("produto_id");
 CREATE TABLE "estoques"(
 --   Estoque de produtos por setor[N:Estoque|Estoques][G:o][K:App\Models|Models\][H:Model][L:null][ID:30]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da entrada no estoque[G:o]
@@ -1479,7 +1478,10 @@ CREATE INDEX "requisitos.FK_requisitos_compra_id_idx" ON "requisitos" ("compra_i
 CREATE TABLE "cardapios"(
 --   Cardápios para cada integração ou local de venda[G:o][N:Cardápio|Cardápios][K:App\Models|Models\][H:Model][L:null][ID:8]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador do cardápio[G:o]
-  "produto_id" INTEGER NOT NULL,-- Produto que faz parte desse cardápio[G:o][N:Produto]
+  "produto_id" INTEGER DEFAULT NULL,-- Produto que faz parte desse cardápio[G:o][N:Produto]
+  "composicao_id" INTEGER DEFAULT NULL,-- Composição que faz parte desse cardápio[G:a][N:Composição]
+  "pacote_id" INTEGER DEFAULT NULL,-- Pacote que faz parte desse cardápio[G:o][N:Pacote]
+  "cliente_id" INTEGER DEFAULT NULL,-- Permite exibir um cardápio diferenciado somente para esse cliente[G:o][N:Cliente]
   "integracao_id" INTEGER DEFAULT NULL,-- Permite exibir o cardápio somente nessa integração[G:a][N:Integração]
   "local" TEXT CHECK("local" IN('local', 'mesa', 'comanda', 'balcao', 'entrega', 'online')) DEFAULT NULL,-- O cardápio será exibido para vendas nesse local[N:Local][G:o][E:Venda local|Mesa|Comanda|Balcão|Entrega|Delivery online][F:self::LOCAL_LOCAL]
   "acrescimo" DECIMAL NOT NULL DEFAULT 0,-- Acréscimo ao preço de venda do produto nesse cardápio[N:Acréscimo][G:o][F:0]
@@ -1493,10 +1495,28 @@ CREATE TABLE "cardapios"(
     FOREIGN KEY("produto_id")
     REFERENCES "produtos"("id")
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT "FK_cardapios_composicao_id"
+    FOREIGN KEY("composicao_id")
+    REFERENCES "composicoes"("id")
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT "FK_cardapios_pacote_id"
+    FOREIGN KEY("pacote_id")
+    REFERENCES "pacotes"("id")
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT "FK_cardapios_cliente_id"
+    FOREIGN KEY("cliente_id")
+    REFERENCES "clientes"("id")
+    ON DELETE CASCADE
     ON UPDATE CASCADE
 );
-CREATE INDEX "cardapios.produto_id_integracao_id_local_UNIQUE" ON "cardapios" ("produto_id","integracao_id","local");
+CREATE INDEX "cardapios.item_destino_UNIQUE" ON "cardapios" ("produto_id","composicao_id","pacote_id","cliente_id","integracao_id","local");
 CREATE INDEX "cardapios.FK_cardapios_integracao_id_idx" ON "cardapios" ("integracao_id");
+CREATE INDEX "cardapios.FK_cardapios_composicao_id_idx" ON "cardapios" ("composicao_id");
+CREATE INDEX "cardapios.FK_cardapios_pacote_id_idx" ON "cardapios" ("pacote_id");
+CREATE INDEX "cardapios.FK_cardapios_cliente_id_idx" ON "cardapios" ("cliente_id");
 CREATE TABLE "propriedades"(
 --   Informa tamanhos de pizzas e opções de peso do produto[N:Propriedade|Propriedades][G:a][K:App\Models|Models\][H:Model][L:null][ID:65]
   "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,-- Identificador da propriedade[G:o]

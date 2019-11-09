@@ -1251,7 +1251,7 @@ class CreateInitialTables extends Migration
             $table->integer('ordem')->default(0);
             $table->dateTime('data_arquivado')->nullable();
 
-            $table->unique(['produto_id', 'nome']);
+            $table->index(['produto_id']);
             $table->foreign('produto_id')
                 ->references('id')->on('produtos')
                 ->onUpdate('cascade')
@@ -1890,16 +1890,34 @@ class CreateInitialTables extends Migration
 
         Schema::create('cardapios', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('produto_id');
+            $table->unsignedInteger('produto_id')->nullable();
+            $table->unsignedInteger('composicao_id')->nullable();
+            $table->unsignedInteger('pacote_id')->nullable();
+            $table->unsignedInteger('cliente_id')->nullable();
             $table->unsignedInteger('integracao_id')->nullable();
             $table->enum('local', ['local', 'mesa', 'comanda', 'balcao', 'entrega', 'online'])->nullable();
             $table->decimal('acrescimo', 19, 4)->default(0);
             $table->boolean('disponivel')->default(true);
 
-            $table->index(['produto_id', 'integracao_id', 'local']);
+            $table->index(['produto_id', 'composicao_id', 'pacote_id', 'cliente_id', 'integracao_id', 'local']);
             $table->index(['integracao_id']);
+            $table->index(['composicao_id']);
+            $table->index(['pacote_id']);
+            $table->index(['cliente_id']);
             $table->foreign('produto_id')
                 ->references('id')->on('produtos')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('composicao_id')
+                ->references('id')->on('composicoes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('pacote_id')
+                ->references('id')->on('pacotes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('cliente_id')
+                ->references('id')->on('clientes')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreign('integracao_id')

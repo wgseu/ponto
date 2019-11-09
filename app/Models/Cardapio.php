@@ -68,6 +68,9 @@ class Cardapio extends Model implements ValidateInterface
      */
     protected $fillable = [
         'produto_id',
+        'composicao_id',
+        'pacote_id',
+        'cliente_id',
         'integracao_id',
         'local',
         'acrescimo',
@@ -90,6 +93,30 @@ class Cardapio extends Model implements ValidateInterface
     public function produto()
     {
         return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    /**
+     * Composição que faz parte desse cardápio
+     */
+    public function composicao()
+    {
+        return $this->belongsTo('App\Models\Composicao', 'composicao_id');
+    }
+
+    /**
+     * Pacote que faz parte desse cardápio
+     */
+    public function pacote()
+    {
+        return $this->belongsTo('App\Models\Pacote', 'pacote_id');
+    }
+
+    /**
+     * Permite exibir um cardápio diferenciado somente para esse cliente
+     */
+    public function cliente()
+    {
+        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
     }
 
     /**

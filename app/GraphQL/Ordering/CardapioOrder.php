@@ -47,6 +47,15 @@ class CardapioOrder extends InputType
             'produto_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'composicao_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'pacote_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'cliente_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'integracao_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

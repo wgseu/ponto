@@ -52,6 +52,18 @@ class CardapioType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Produto que faz parte desse cardápio',
             ],
+            'composicao_id' => [
+                'type' => Type::id(),
+                'description' => 'Composição que faz parte desse cardápio',
+            ],
+            'pacote_id' => [
+                'type' => Type::id(),
+                'description' => 'Pacote que faz parte desse cardápio',
+            ],
+            'cliente_id' => [
+                'type' => Type::id(),
+                'description' => 'Permite exibir um cardápio diferenciado somente para esse cliente',
+            ],
             'integracao_id' => [
                 'type' => Type::id(),
                 'description' => 'Permite exibir o cardápio somente nessa integração',

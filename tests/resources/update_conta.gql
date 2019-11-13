@@ -1,8 +1,10 @@
-mutation updateConta($id: ID!, $input: ContaUpdateInput!) {
-  UpdateConta(id: $id, input: $input) {
+mutation updateConta($id: ID!, $input: ContaUpdateInput!, $recursive: Boolean) {
+  UpdateConta(id: $id, input: $input, recursive: $recursive) {
+    id
     descricao
     valor
     vencimento
     data_emissao
+    estado
   }
 }

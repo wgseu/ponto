@@ -57,7 +57,7 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
     /**
      * Setting model
      *
-     * @var App\Models\Settings
+     * @var Settings
      */
     public $entries;
 

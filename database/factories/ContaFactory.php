@@ -15,8 +15,9 @@ $factory->define(Conta::class, function (Faker $faker) {
         'classificacao_id' => $classificacao_id->id,
         'funcionario_id' => $funcionario_id->id,
         'descricao' => $faker->name,
-        'valor' => 4.50,
+        'valor' => 40,
         'vencimento' => Carbon::now(),
         'data_emissao' => Carbon::now(),
+        'frequencia' => 1,
     ];
 });

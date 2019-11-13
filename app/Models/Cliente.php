@@ -195,6 +195,17 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
     }
 
     /**
+     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     */
+    public function getNomeCompleto()
+    {
+        if ($this->tipo == self::TIPO_JURIDICA) {
+            return $this->nome;
+        }
+        return trim($this->nome . ' ' . $this->sobrenome);
+    }
+
+    /**
      * Informa se esse cliente é dono da empresa
      *
      * @return boolean

@@ -38,4 +38,12 @@ class Number
     {
         return $compare < ($value + $delta) && ($value - $delta) < $compare;
     }
+
+    /**
+     * Verify if value is bigger zero
+     */
+    public static function isGreater($value, $compare, $delta = 0.005)
+    {
+        return $value > ($compare + $delta);
+    }
 }

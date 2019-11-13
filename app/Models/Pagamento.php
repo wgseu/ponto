@@ -207,6 +207,12 @@ class Pagamento extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Credito', 'credito_id');
     }
 
+    public function cancel()
+    {
+        $this->estado = Pagamento::ESTADO_CANCELADO;
+        $this->save();
+    }
+
     public function validate()
     {
     }

@@ -28,8 +28,11 @@ class DateTimeType extends ScalarType
      */
     public function serialize($value): string
     {
+        if (is_string($value)) {
+            $value = new DateTime($value);
+        }
         if (! $value instanceof DateTime) {
-            throw new InvariantViolation('DateTime is not an instance of DateTimeImmutable');
+            throw new InvariantViolation('DateTime is not an instance of DateTime');
         }
 
         return $value->format('Y-m-d H:i:s');

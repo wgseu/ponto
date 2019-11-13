@@ -721,4 +721,22 @@ return [
     'cep_invalid' => 'O Cep é inválido',
     'ncm_invalid' => 'O NCM é inválido',
     'produto_cannot_update' => 'Depois de casdastrado não pode alterar o produto do grupo',
+    'account_cannot_changed_consolidated' => 'A conta informada já foi consolidada e não pode ser alterada',
+    'account_cannot_changed_canceled' => 'A conta informada já foi cancelada e não pode ser alterada',
+    'account_cannot_changed_total' => 'O total da conta não pode ser alterado',
+    'total_received_greater_account' => 'O total recebido é maior que o valor da conta',
+    'total_paid_greater_account' => 'O total pago é maior que o valor da conta',
+    'promotion_begin_invalid' => 'Início de promoção inválida',
+    'promotion_end_invalid' => 'Fim de promoção inválida',
+    'account_have_conta_id' => 'Conta atribuida já contem conta atrelada',
+    'account_no_limit' => 'O cliente ":customer" não possui limite de crédito ' .
+    'suficiente para concluir a operação, necessário :remaining, limite ' .
+    'utilizado :used de :limit',
+    'grouping_no_change' => 'Agrupamento não pode ser alterado, só desagrupado',
+    'account_not_canceled_order_open' => 'Conta não pode ser cancelada pois pedido não foi cancelado',
+    'wallet_null_not_automatic' => 'Débito automático, favor informar carteira',
+    'automatic_order_not_recipe' => 'Débito automático para pedido só pode ser receita',
+    'grouping_already_canceled' => 'Conta cancelada e não pode ser agrupada',
+    'frequency_lowest_zero' => 'Frequencia não pode ser menor que zero',
+    'frequency_higher' => 'Frequencia não pode ser maior que :value'
 ];

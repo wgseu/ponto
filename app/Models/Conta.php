@@ -26,14 +26,19 @@
 
 namespace App\Models;
 
+use App\Util\Mask;
+use App\Util\Number;
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends Model implements ValidateInterface
+class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -129,7 +134,7 @@ class Conta extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
-        'tipo' => self::TIPO_DESPESA,
+        'tipo' => self::TIPO_RECEITA,
         'consolidado' => 0,
         'fonte' => self::FONTE_FIXA,
         'numero_parcela' => 1,
@@ -205,5 +210,141 @@ class Conta extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->pedido_id)) {
+            $pedido = $this->pedido;
+            if ($pedido->estado != Pedido::ESTADO_CANCELADO) {
+                $errors['pedido_id'] = __('messages.account_not_canceled_order_open');
+            } elseif ($this->automatico == true && $this->tipo != Conta::TIPO_RECEITA) {
+                $errors['pedido_id'] = __('messages.automatic_order_not_recipe');
+            }
+        }
+        if (($this->modo == Conta::MODO_MENSAL || $this->modo == Conta::MODO_DIARIO) && $this->frequencia <= 0) {
+            $errors['frequencia'] = __('messages.frequency_lowest_zero');
+        } elseif ($this->modo == Conta::MODO_DIARIO && $this->frequencia > 31) {
+            $errors['frequencia'] = __('messages.frequency_higher', ['value' => $this->frequencia]);
+        }
+        if (is_null($this->carteira_id) && $this->automatico == true) {
+            $errors['carteira_id'] = __('messages.wallet_null_not_automatic');
+        }
+        $agrupamento = self::find($this->agrupamento_id);
+        if (!is_null($this->agrupamento_id) && $agrupamento->estado == Conta::ESTADO_CANCELADA) {
+            $errors['agrupamento_id'] = __('messages.grouping_already_canceled');
+        }
+        if (Number::isEqual($this->valor, 0)) {
+            $errors['valor'] = __('messages.valor_cannot_zero');
+        } elseif ($this->valor < 0 && $this->tipo == self::TIPO_RECEITA) {
+            $errors['valor'] = __('messages.receita_negativa');
+        } elseif ($this->valor > 0 && $this->tipo == self::TIPO_DESPESA) {
+            $errors['valor'] = __('messages.despesa_positiva');
+        }
+        if ($this->tipo == self::TIPO_RECEITA && $this->acrescimo < 0) {
+            $errors['acrescimo'] = __('messages.acrescimo_cannot_negative');
+        } elseif ($this->tipo == self::TIPO_DESPESA && $this->acrescimo > 0) {
+            $errors['acrescimo'] = __('messages.acrescimo_cannot_positive');
+        }
+        if ($this->tipo == self::TIPO_RECEITA && $this->multa < 0) {
+            $errors['multa'] = __('messages.multa_cannot_negative');
+        } elseif ($this->tipo == self::TIPO_DESPESA && $this->multa > 0) {
+            $errors['multa'] = __('messages.multa_cannot_positive');
+        }
+        if ($this->juros < 0) {
+            $errors['juros'] = __('messages.juros_cannot_negative');
+        }
+        $conta_id = self::find($this->conta_id);
+        if (!is_null($conta_id)) {
+            if (!is_null($conta_id->conta_id)) {
+                $errors['conta_id'] = __('messages.account_have_conta_id');
+            }
+        }
+        if ($this->tipo == self::TIPO_RECEITA && Number::isGreater($this->consolidado, $this->valor)) {
+            $errors['valor'] = __('messages.total_received_greater_account');
+        }
+        if ($this->tipo == self::TIPO_DESPESA && Number::isGreater(-$this->consolidado, -$this->valor)) {
+            $errors['valor'] = __('messages.total_paid_greater_account');
+        }
+        if (!is_null($this->cliente_id) && $this->valor > 0) {
+            $cliente = $this->cliente;
+            if ($cliente->limite_compra > 0) {
+                $query = self::where('cliente_id', $this->cliente_id)
+                    ->where('estado', self::ESTADO_ATIVA);
+                if ($this->exists) {
+                    $query->where('id', '<>', $this->id);
+                }
+                $utilizado = $query->sum('valor - consolidado');
+                if ($this->valor + $utilizado > $cliente->limite_compra) {
+                    $restante = ($this->valor + $utilizado) - $cliente->limite_compra;
+                    $errors['valor'] = __(
+                        'messages.account_no_limit',
+                        [
+                            'customer' => $cliente->getNomeCompleto(),
+                            'remaining' => Mask::money($restante, true),
+                            'used' => Mask::money($utilizado, true),
+                            'limit' => Mask::money($cliente->limite_compra, true)
+                        ]
+                    );
+                }
+            }
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old_conta = self::find($this->id);
+        if ($old_conta->estado == self::ESTADO_PAGA && $this->estado != self::ESTADO_CANCELADA) {
+            $errors['id'] = __('messages.account_cannot_changed_consolidated');
+        }
+        if ($old_conta->estado == self::ESTADO_CANCELADA) {
+            $errors['id'] = __('messages.account_cannot_changed_canceled');
+        }
+        if (
+            ($this->estado == self::ESTADO_PAGA
+                && !Number::isEqual($this->consolidado, $this->valor))
+            || ($old_conta->estado == self::ESTADO_PAGA
+                && !Number::isEqual($old_conta->consolidado, $this->valor))
+        ) {
+            $errors['id'] = __('messages.account_cannot_changed_total');
+        }
+        if (
+            !is_null($old_conta->agrupamento_id)
+            && !is_null($this->agrupamento_id)
+            && $this->estado != Conta::ESTADO_CANCELADA
+        ) {
+            $errors['agrupamento_id'] = __('messages.grouping_no_change');
+        }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
+    }
+
+    public function cancel($recursive = false)
+    {
+        DB::transaction(function () use ($recursive) {
+            $this->internalCancel($recursive);
+        });
+    }
+
+    private function internalCancel($recursive)
+    {
+        $this->estado = self::ESTADO_CANCELADA;
+        $this->save();
+        $pagamentos = Pagamento::where('conta_id', $this->id)
+            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
+        foreach ($pagamentos as $pagamento) {
+            $pagamento->cancel();
+        }
+        $contas = self::where('agrupamento_id', $this->id)
+            ->where('estado', '<>', self::ESTADO_CANCELADA)->get();
+        foreach ($contas as $conta) {
+            $conta->agrupamento_id = null;
+            $conta->save();
+            if ($recursive) {
+                $conta->internalCancel($recursive);
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Grupo;
+use App\Models\Pacote;
 use App\Models\Produto;
 
 class GrupoTest extends TestCase
@@ -115,6 +116,19 @@ class GrupoTest extends TestCase
         $produto = factory(Produto::class)->create();
         $grupo = factory(Grupo::class)->create();
         $grupo->produto_id = $produto->id;
+        $this->expectException(SafeValidationException::class);
+        $grupo->save();
+    }
+
+    public function testValidateGrupoProdutoCannotQuantidadeMaximaLessPacote()
+    {
+        $grupo = factory(Grupo::class)->create();
+        factory(Pacote::class)->create([
+            'quantidade_maxima' => 10,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $grupo->quantidade_maxima = 6;
         $this->expectException(SafeValidationException::class);
         $grupo->save();
     }

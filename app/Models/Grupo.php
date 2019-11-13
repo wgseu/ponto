@@ -113,11 +113,12 @@ class Grupo extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * Os grupos são formados apenas por pacotes;
+     * Os grupos são formados apenas por pacotes,
      * A quantidade minima não pode ser maior que a maxima a menos que a maxima seja zero,
-     * Se a quantidade maxima for zero não a liminte para produtos do grupo.
+     * Se a quantidade maxima for zero não a liminte para produtos do grupo,
      * A quantidade minima e maxima não pode ser negativas,
-     * epois de casdastrado não pode alterar o produto do grupo.
+     * Depois de casdastrado não pode alterar o produto do grupo,
+     * A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote.
      */
     public function validate()
     {
@@ -139,6 +140,16 @@ class Grupo extends Model implements ValidateInterface
             $oldGrupo = $this->fresh();
             if ($oldGrupo->produto_id != $this->produto_id) {
                 $errors['produto_id'] = __('messages.produto_cannot_update');
+            }
+            if (
+                $oldGrupo->quantidade_maxima > $this->quantidade_maxima ||
+                $oldGrupo->quantidade_maxima == 0 &&
+                $this->quantidade_maxima != 0
+            ) {
+                $pacoteMaximo = Pacote::where('grupo_id', $this->id)->max('quantidade_maxima');
+                if (!is_null($pacoteMaximo) && $pacoteMaximo > $this->quantidade_maxima) {
+                    $errors['produto_id'] = __('messages.grupo_cannot_update_quantidade_maxima_less_group');
+                }
             }
         }
         if (!empty($errors)) {

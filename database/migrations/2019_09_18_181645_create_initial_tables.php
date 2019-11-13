@@ -1899,7 +1899,7 @@ class CreateInitialTables extends Migration
             $table->decimal('acrescimo', 19, 4)->default(0);
             $table->boolean('disponivel')->default(true);
 
-            $table->index(['produto_id', 'composicao_id', 'pacote_id', 'cliente_id', 'integracao_id', 'local']);
+            $table->index(['produto_id', 'composicao_id', 'pacote_id', 'cliente_id', 'integracao_id', 'local'], 'seletor_index');
             $table->index(['integracao_id']);
             $table->index(['composicao_id']);
             $table->index(['pacote_id']);

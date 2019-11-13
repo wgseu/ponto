@@ -30,6 +30,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Conta;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 

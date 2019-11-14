@@ -63,6 +63,9 @@ class TelefoneOrder extends InputType
             'principal' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'data_validacao' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
         ];
     }
 }

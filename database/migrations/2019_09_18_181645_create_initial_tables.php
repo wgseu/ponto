@@ -2017,7 +2017,7 @@ class CreateInitialTables extends Migration
             $table->decimal('acrescimo', 19, 4)->default(0);
             $table->boolean('disponivel')->default(true);
 
-            $table->index(
+            $table->unique(
                 [
                     'produto_id',
                     'composicao_id',

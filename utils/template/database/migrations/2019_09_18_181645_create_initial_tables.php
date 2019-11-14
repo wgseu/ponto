@@ -131,6 +131,10 @@ $[table.end]
         Schema::enableForeignKeyConstraints();
 
         if (env('APP_ENV') == 'testing') {
+            (new SistemaSeeder())->run();
+            (new MoedaSeeder())->run();
+            (new PaisSeeder())->run();
+            (new EmpresaSeeder())->run();
             (new ModuloSeeder())->run();
             (new FuncionalidadeSeeder())->run();
             (new PermissaoSeeder())->run();

@@ -79,6 +79,7 @@ class Comanda extends Model implements ValidateInterface
      */
     public function validate()
     {
+        $errors = [];
         $old_comanda = $this->fresh();
         if ($this->exists && $old_comanda->ativa && !$this->ativa) {
             $pedido = Pedido::where('comanda_id', $this->id)
@@ -91,8 +92,6 @@ class Comanda extends Model implements ValidateInterface
         if (!$this->exists && !$this->ativa) {
             $errors['ativa'] = __('messages.comanda_inativa_invalid');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

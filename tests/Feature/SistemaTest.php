@@ -26,6 +26,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
+use App\Models\Empresa;
 use Tests\TestCase;
 use App\Models\Sistema;
 
@@ -34,21 +36,28 @@ class SistemaTest extends TestCase
     public function testUpdateSistema()
     {
         $headers = PrestadorTest::auth();
-        $sistema = factory(Sistema::class)->create();
+        $sistema = Sistema::find('1');
+        $data = [
+            'auto_sair' => true,
+        ];
         $this->graphfl('update_sistema', [
-            'id' => $sistema->id,
             'input' => [
+                'opcoes' => json_encode($data)
             ]
         ], $headers);
         $sistema->refresh();
-        $this->assertEquals(1, $sistema->id);
+        $sistema->loadOptions();
+        $this->assertTrue($sistema->options->getValue('auto_sair'));
     }
 
     public function testFindSistema()
     {
         $headers = PrestadorTest::auth();
-        $sistema = factory(Sistema::class)->create();
-        $response = $this->graphfl('query_sistema', [ 'id' => $sistema->id ], $headers);
-        $this->assertEquals($sistema->id, $response->json('data.sistemas.data.0.id'));
+        $empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
+        Empresa::find('1')->update(['empresa_id' => $empresa->id]);
+        $response = $this->graphfl('query_sistema', [], $headers);
+        $this->assertArrayHasKey('empresa', $response->json('data.sistema'));
+        $this->assertArrayHasKey('fuso_horario', $response->json('data.sistema'));
+        $this->assertArrayHasKey('opcoes', $response->json('data.sistema'));
     }
 }

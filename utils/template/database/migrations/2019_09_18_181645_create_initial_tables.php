@@ -23,7 +23,18 @@ $[table.end]
 $[field.each(all)]
 $[field.if(primary)]
 $[field.if(enum)]
+$[field.if(few_fields)]
             $table->enum('$[field]', [$[field.each(option)]$[field.if(first)]$[field.else], $[field.end]'$[field.option]'$[field.end]])$[field.if(null)]->nullable()$[field.end]$[field.if(default)]->default($[field.default])$[field.end];
+$[field.else]
+            $table->enum(
+                '$[field]',
+                [
+$[field.each(option)]
+                    '$[field.option]',
+$[field.end]
+                ]
+            )$[field.if(null)]->nullable()$[field.end]$[field.if(default)]->default($[field.default])$[field.end];
+$[field.end]
 $[field.else]
             $table->increments('$[field]')$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
 $[field.end]
@@ -52,7 +63,18 @@ $[field.else.if(text)]
 $[field.else.if(boolean)]
             $table->boolean('$[field]')$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
 $[field.else.if(enum)]
+$[field.if(few_fields)]
             $table->enum('$[field]', [$[field.each(option)]$[field.if(first)]$[field.else], $[field.end]'$[field.option]'$[field.end]])$[field.if(null)]->nullable()$[field.end]$[field.if(default)]->default($[field.default])$[field.end];
+$[field.else]
+            $table->enum(
+                '$[field]',
+                [
+$[field.each(option)]
+                    '$[field.option]',
+$[field.end]
+                ]
+            )$[field.if(null)]->nullable()$[field.end]$[field.if(default)]->default($[field.default])$[field.end];
+$[field.end]
 $[field.else.if(string)]
             $table->string('$[field]', $[field.length])$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
 $[field.end]
@@ -70,11 +92,33 @@ $[field.end]
 $[table.each(unique)]
 $[unique.if(primary)]
 $[unique.else]
+$[unique.if(few_fields)]
             $table->unique([$[unique.each(all)]$[field.if(first)]$[field.else], $[field.end]'$[field]'$[unique.end]]);
+$[unique.else]
+            $table->unique(
+                [
+$[unique.each(all)]
+                    '$[field]',
+$[unique.end]
+                ],
+                '$[unique.name]'
+            );
+$[unique.end]
 $[unique.end]
 $[table.end]
 $[table.each(index)]
+$[index.if(few_fields)]
             $table->index([$[index.each(all)]$[field.if(first)]$[field.else], $[field.end]'$[field]'$[index.end]]);
+$[index.else]
+            $table->index(
+                [
+$[index.each(all)]
+                    '$[field]',
+$[index.end]
+                ],
+                '$[index.name]'
+            );
+$[index.end]
 $[table.end]
 $[field.each(reference)]
             $table->foreign('$[field]')

@@ -94,8 +94,6 @@ class Setor extends Model implements ValidateInterface
                 $errors['setor_id'] = __('messagens.setorpai_invalid_update');
             }
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

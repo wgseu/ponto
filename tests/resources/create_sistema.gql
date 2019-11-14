@@ -1,5 +1,0 @@
-mutation createSistema($input: SistemaInput!) {
-  CreateSistema(input: $input) {
-    id
-  }
-}

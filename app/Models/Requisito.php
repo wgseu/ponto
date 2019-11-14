@@ -145,8 +145,6 @@ class Requisito extends Model implements ValidateInterface
         if ($this->preco < 0) {
             $errors['preco'] = __('messages.preco_cannot_negative');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

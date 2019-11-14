@@ -101,8 +101,6 @@ class Bairro extends Model implements ValidateInterface
         if ($this->valor_entrega < 0) {
             $errors['valor_entrega'] = __('messagens.error_time_delivery');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

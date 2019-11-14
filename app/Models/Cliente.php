@@ -175,23 +175,19 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
     {
         $errors = [];
         if ($this->tipo == self::TIPO_FISICA) {
-            if (!Validator::checkCPF($this->cpf)) {
+            if (!Validator::checkCPF($this->cpf, true)) {
                 $errors['cpf'] = __('messages.cpf_invalid');
             }
         } else {
-            if (!Validator::checkCNPJ($this->cpf)) {
+            if (!Validator::checkCNPJ($this->cpf, true)) {
                 $errors['cnpj'] = __('messages.cnpj_invalid');
             }
         }
-        if ($this->empresa_id) {
-            $empresa = Empresa::find($this->empresa_id);
-            if (!$empresa) {
-                $errors['empresa'] = __('messages.not_found_company');
-            }
+        $empresa = $this->empresa;
+        if (!is_null($empresa) && $empresa->tipo != self::TIPO_JURIDICA) {
+            $errors['empresa'] = __('messages.must_be_company');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 
     /**

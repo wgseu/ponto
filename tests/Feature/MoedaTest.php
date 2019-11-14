@@ -100,7 +100,7 @@ class MoedaTest extends TestCase
     {
         $moeda = factory(Moeda::class)->create();
         $pais = factory(Pais::class)->create(['moeda_id' => $moeda->id]);
-        $empresa = factory(Empresa::class)->create(['pais_id' => $pais->id]);
+        Empresa::find('1')->update(['pais_id' => $pais->id]);
 
         $moeda->conversao = 8;
         $this->expectException(SafeValidationException::class);

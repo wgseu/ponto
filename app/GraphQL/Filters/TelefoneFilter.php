@@ -62,6 +62,9 @@ class TelefoneFilter extends InputType
             'principal' => [
                 'type' => Type::boolean(),
             ],
+            'data_validacao' => [
+                'type' => GraphQL::type('DateFilter'),
+            ],
         ];
     }
 }

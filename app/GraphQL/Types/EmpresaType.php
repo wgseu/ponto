@@ -29,8 +29,9 @@ declare(strict_types=1);
 namespace App\GraphQL\Types;
 
 use App\Models\Empresa;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class EmpresaType extends GraphQLType
@@ -44,12 +45,12 @@ class EmpresaType extends GraphQLType
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador único da empresa, valor 1',
-            ],
             'pais_id' => [
                 'type' => Type::id(),
+                'description' => 'País em que a empresa está situada',
+            ],
+            'pais' => [
+                'type' => GraphQL::type('Pais'),
                 'description' => 'País em que a empresa está situada',
             ],
             'empresa_id' => [
@@ -57,14 +58,25 @@ class EmpresaType extends GraphQLType
                 'description' => 'Informa a empresa do cadastro de clientes, a empresa deve ser um cliente' .
                     ' do tipo pessoa jurídica',
             ],
+            'empresa' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Informa a empresa do cadastro de clientes, a empresa deve ser um cliente' .
+                    ' do tipo pessoa jurídica',
+            ],
             'parceiro_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa quem realiza o suporte do sistema, deve ser um cliente do tipo' .
                     ' empresa que possua um acionista como representante',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('empresa:view');
+                },
             ],
             'opcoes' => [
                 'type' => Type::string(),
                 'description' => 'Opções gerais do sistema como opções de impressão e comportamento',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('empresa:view');
+                },
             ],
         ];
     }

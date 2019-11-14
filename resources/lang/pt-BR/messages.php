@@ -721,4 +721,7 @@ return [
     'cep_invalid' => 'O Cep é inválido',
     'ncm_invalid' => 'O NCM é inválido',
     'produto_cannot_update' => 'Depois de casdastrado não pode alterar o produto do grupo',
+    'invalid_timezone' => 'Fuso horário inválido',
+    'invalid_setting_type' => 'O tipo do valor da configuração é inválido',
+    'must_be_company' => 'A empresa informada no cliente deve ser do tipo jurídica',
 ];

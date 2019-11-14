@@ -29,20 +29,16 @@ declare(strict_types=1);
 namespace App\GraphQL\Queries;
 
 use App\Models\Empresa;
-use App\GraphQL\Utils\Filter;
-use App\GraphQL\Utils\Ordering;
-use Closure;
+use App\Util\Filter;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class EmpresaQuery extends Query
 {
     protected $attributes = [
-        'name' => 'empresas',
+        'name' => 'empresa',
     ];
 
     public function authorize(array $args): bool
@@ -52,28 +48,28 @@ class EmpresaQuery extends Query
 
     public function type(): Type
     {
-        return GraphQL::paginate('Empresa');
+        return GraphQL::type('Empresa');
     }
 
     public function args(): array
     {
         return [
-            'filter' => ['name' => 'filter', 'type' => GraphQL::type('EmpresaFilter')],
-            'order' => ['name' => 'order', 'type' => GraphQL::type('EmpresaOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
-            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
+            'all' => [
+                'name' => 'all',
+                'type' => Type::boolean(),
+                'description' => 'Se verdadeiro devolve todas as opções da empresa',
+            ],
         ];
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+    public function resolve($root, $args)
     {
-        /** @var SelectFields $fields */
-        $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Empresa::with($fields->getRelations())->select($fields->getSelect())
-        );
-        return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        $empresa = Empresa::find('1');
+        $empresa->loadOptions();
+        $empresa_data = $empresa->toArray();
+        $empresa_data['opcoes'] = json_encode(Filter::emptyObject(
+            $empresa->options->getValues($args['all'] ?? false)
+        ));
+        return $empresa_data;
     }
 }

@@ -131,8 +131,6 @@ class Patrimonio extends Model implements ValidateInterface
         if (!$this->ativo && !$this->exists) {
             $errors['ativo'] = __('messages.cannot_create_disabled');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

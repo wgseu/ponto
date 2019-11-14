@@ -84,8 +84,6 @@ class Viagem extends Model implements ValidateInterface
         ) {
             $errors['data_chegada'] = __('messages.error_time_viagem');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

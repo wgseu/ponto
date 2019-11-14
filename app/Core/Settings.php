@@ -45,7 +45,7 @@ class Settings
      *
      * @var array
      */
-    private $defaults = [];
+    public $defaults = [];
 
     /**
      * Constructor for a new instance of Settings
@@ -110,15 +110,21 @@ class Settings
         if (!empty($this->defaults) && !array_key_exists($key, $this->defaults)) {
             throw new \Exception(__('messages.inexistent_setting', ['path' => $key]), 403);
         }
-        if (is_array($value) && is_array($this->defaults[$key])) {
-            if (!empty($this->defaults)) {
-                $value = Filter::defaults($value, $this->defaults[$key]);
-            }
+        if (!empty($this->defaults) && is_array($value) != is_array($this->defaults[$key])) {
+            throw new \Exception(__('messages.invalid_setting_type', ['path' => $key]), 403);
+        }
+        if (is_array($value)) {
             $value = array_replace_recursive($this->values[$key] ?? [], $value);
-        } elseif (is_array($value) != is_array($this->defaults[$key])) {
-            throw new \Exception(__('messages.inexistent_setting', ['path' => $key]), 403);
+        }
+        if (!empty($this->defaults) && is_array($value)) {
+            $value = Filter::defaults($value, $this->defaults[$key]);
         }
         $this->values[$key] = $value;
+        if (is_array($value) && empty($value)) {
+            unset($this->values[$key]);
+        } elseif (!empty($this->defaults) && !is_array($value) && $value === $this->defaults[$key]) {
+            unset($this->values[$key]);
+        }
         return $this;
     }
 
@@ -133,20 +139,29 @@ class Settings
         if (!empty($this->defaults)) {
             if (
                 !array_key_exists($section, $this->defaults)
-                && !array_key_exists($key, $this->defaults[$section])
+                || !array_key_exists($key, $this->defaults[$section])
             ) {
                 throw new \Exception(__('messages.inexistent_setting', ['path' => $section . '.' . $key]), 403);
             }
-            if (is_array($value) && is_array($this->defaults[$section][$key])) {
-                $value = Filter::defaults($value, $this->defaults[$section][$key]);
-            } elseif (is_array($value) != is_array($this->defaults[$section][$key])) {
+            if (is_array($value) != is_array($this->defaults[$section][$key])) {
                 throw new \Exception(__('messages.inexistent_setting', ['path' => $section . '.' . $key]), 403);
             }
         }
         if (is_array($value) && is_array($this->values[$section][$key] ?? null)) {
             $value = array_replace_recursive($this->values[$section][$key], $value);
         }
+        if (!empty($this->defaults) && is_array($value)) {
+            $value = Filter::defaults($value, $this->defaults[$section][$key]);
+        }
         $this->values[$section][$key] = $value;
+        if (is_array($value) && empty($value)) {
+            unset($this->values[$section][$key]);
+        } elseif (!empty($this->defaults) && !is_array($value) && $value === $this->defaults[$section][$key]) {
+            unset($this->values[$section][$key]);
+        }
+        if (empty($this->values[$section])) {
+            unset($this->values[$section]);
+        }
         return $this;
     }
 
@@ -196,19 +211,24 @@ class Settings
         if (!is_array($values)) {
             return $this;
         }
+        $values = array_replace_recursive($this->values, $values);
         if (!empty($this->defaults)) {
             $values = Filter::defaults($values, $this->defaults);
         }
-        $this->values = array_replace_recursive($this->values, $values);
+        $this->values = $values;
         return $this;
     }
 
     /**
      * Get all dynamic values for save
+     * @param bool $include_defaults include default values
      * @return array all values set
      */
-    public function getValues()
+    public function getValues($include_defaults = false)
     {
+        if ($include_defaults) {
+            return array_replace_recursive($this->defaults, $this->values);
+        }
         return $this->values;
     }
 
@@ -237,7 +257,6 @@ class Settings
         if (!file_exists($php_file)) {
             throw new \Exception(__('messages.file_not_found'), 404);
         }
-        require($php_file);
-        return $value;
+        return require $php_file;
     }
 }

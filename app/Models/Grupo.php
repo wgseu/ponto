@@ -141,8 +141,6 @@ class Grupo extends Model implements ValidateInterface
                 $errors['produto_id'] = __('messages.produto_cannot_update');
             }
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

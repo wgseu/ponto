@@ -134,8 +134,6 @@ class Prestador extends Model implements ValidateInterface
         if ($this->remuneracao < 0) {
             $errors['remuneracao'] = __('messages.remuneration_negative');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

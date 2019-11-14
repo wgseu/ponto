@@ -111,8 +111,6 @@ class Moeda extends Model implements ValidateInterface
         if (!in_array($this->divisao, $divisao)) {
             $errors['divisao'] = __('messages.moeda_invalid_divisao');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

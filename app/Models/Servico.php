@@ -115,8 +115,6 @@ class Servico extends Model implements ValidateInterface
                 $errors['data_fim'] = __('messages.data_fim_must_empty');
             }
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

@@ -53,18 +53,18 @@ class UpdateSistemaMutation extends Mutation
     public function args(): array
     {
         return [
-            'id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Identificador único do sistema, valor 1',
-            ],
             'input' => ['type' => Type::nonNull(GraphQL::type('SistemaUpdateInput'))],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $sistema = Sistema::findOrFail($args['id']);
+        $sistema = Sistema::find('1');
+        $sistema->loadOptions();
+        $sistema->opcoes = null;
         $sistema->fill($args['input']);
+        $sistema->options->addValues(json_decode($sistema->opcoes ?? '{}', true));
+        $sistema->applyOptions();
         $sistema->save();
         return $sistema;
     }

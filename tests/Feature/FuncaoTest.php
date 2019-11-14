@@ -26,10 +26,9 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
 use Tests\TestCase;
 use App\Models\Funcao;
-use Illuminate\Validation\ValidationException;
+use App\Exceptions\SafeValidationException;
 
 class FuncaoTest extends TestCase
 {

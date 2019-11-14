@@ -60,6 +60,9 @@ class ClienteType extends GraphQLType
             'login' => [
                 'type' => Type::string(),
                 'description' => 'Nome de usuário utilizado para entrar no sistema, aplicativo ou site',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cliente:view');
+                },
             ],
             'nome' => [
                 'type' => Type::string(),

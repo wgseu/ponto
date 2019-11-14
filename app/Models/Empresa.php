@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -52,6 +53,13 @@ class Empresa extends Model implements ValidateInterface
     public $timestamps = false;
 
     /**
+     * Opções de impressão e comportamento do sistema
+     *
+     * @var Settings
+     */
+    public $options;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -64,12 +72,13 @@ class Empresa extends Model implements ValidateInterface
     ];
 
     /**
-     * The model's default values for attributes.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected $attributes = [
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->options = new Settings([]);
+    }
 
     /**
      * País em que a empresa está situada
@@ -95,6 +104,26 @@ class Empresa extends Model implements ValidateInterface
     public function parceiro()
     {
         return $this->belongsTo('App\Models\Cliente', 'parceiro_id');
+    }
+
+    /**
+     * Carrega as opções do sistema
+     *
+     * @return void
+     */
+    public function loadOptions()
+    {
+        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+    }
+
+    /**
+     * Aplica as opções do sistema para salvar no banco
+     *
+     * @return void
+     */
+    public function applyOptions()
+    {
+        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
     }
 
     public function validate()

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -53,6 +54,13 @@ class Sistema extends Model implements ValidateInterface
     public $timestamps = false;
 
     /**
+     * Opções de impressão e comportamento do sistema
+     *
+     * @var Settings
+     */
+    public $options;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -63,14 +71,116 @@ class Sistema extends Model implements ValidateInterface
     ];
 
     /**
-     * The model's default values for attributes.
-     *
-     * @var array
+     * @inheritDoc
      */
-    protected $attributes = [
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->options = new Settings([
+            'auto_sair' => false,
+            'padrao_imprimir' => true,
+            'motivo_cancelamento' => false,
+            'fiscal' => [
+                'mostrar_campos' => false,
+            ],
+            'cupom_pedido' => [
+                'empresa_cnpj' => true,
+                'empresa_endereco' => true,
+                'empresa_slogan' => true,
+                'empresa_logo' => false,
+                'empresa_telefone' => true,
+                'empresa_celular' => true,
+                'garcom' => true,
+                'todos_garcons' => false,
+                'atendente' => true,
+                'permanencia' => true,
+                'divisao_conta' => true,
+                'servicos_detalhados' => false,
+                'pessoas' => true,
+                'pacote_agrupado' => true,
+                'descricao' => true,
+            ],
+            'cupom_entrega' => [
+                'endereco_destacado' => true,
+            ],
+            'cupom_preparo' => [
+                'local_destacado' => true,
+                'codigo_produto' => false,
+                'detalhes_produto' => false,
+                'letra_gigante_produto' => false,
+                'cliente' => false,
+                'descricao_pedido' => false,
+                'saldo_comanda' => false,
+                'separar_item' => false,
+            ],
+            'cupom_fechamento' => [
+                'produtos' => false,
+                'cancelamentos' => true,
+            ],
+            'cupom' => [
+                'via2_pedido' => false,
+                'cancelamento_pedido' => true,
+                'cancelamento_preparo' => true,
+                'senha_balcao' => false,
+                'senha_comanda' => false,
+                'entrega_antecipada' => false,
+                'comprovante_conta' => true,
+                'operacao_caixa' => true,
+                'pagamento_pedido' => true,
+                'fechamento_caixa' => true,
+            ],
+            'mobile' => [
+                'auto_sair' => false,
+            ],
+            'venda' => [
+                'lembrar_garcom' => false,
+                'enviar_sair' => false,
+                'quantidade_perguntar' => true,
+                'peso_automatico' => true,
+            ],
+            'balcao' => [
+                'comissao' => false,
+            ],
+            'comanda' => [
+                'observacao_nome' => true,
+                'fila_pesagem' => false,
+            ],
+            'estoque' => [
+                'controlar' => true,
+            ],
+            'comanda' => [
+                'pre_paga' => false
+            ],
+        ]);
+    }
+
+    /**
+     * Carrega as opções do sistema
+     *
+     * @return void
+     */
+    public function loadOptions()
+    {
+        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+    }
+
+    /**
+     * Aplica as opções do sistema para salvar no banco
+     *
+     * @return void
+     */
+    public function applyOptions()
+    {
+        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+    }
 
     public function validate()
     {
+        $errors = [];
+        $timezone_identifiers = timezone_identifiers_list();
+        if (!is_null($this->fuso_horario) && !in_array($this->fuso_horario, $timezone_identifiers)) {
+            $errors['fuso_horario'] = __('messages.invalid_timezone');
+        }
+        return $errors;
     }
 }

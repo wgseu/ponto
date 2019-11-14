@@ -74,6 +74,9 @@ class PaisType extends GraphQLType
             'entradas' => [
                 'type' => Type::string(),
                 'description' => 'Frases, nomes de campos e máscaras específicas do país',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('pais:view');
+                },
             ],
             'unitario' => [
                 'type' => Type::boolean(),

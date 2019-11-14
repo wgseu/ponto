@@ -26,8 +26,9 @@
 
 namespace App\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use App\Interfaces\ValidateInterface;
+use Illuminate\Database\Eloquent\Builder;
+use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
 
@@ -45,12 +46,27 @@ trait ModelEvents
     protected function performInsert(Builder $query)
     {
         if ($this instanceof ValidateInterface) {
-            $this->validate();
+            $errors = $this->validate();
+            $this->checkErrors($errors);
         }
         if ($this instanceof ValidateInsertInterface) {
-            $this->onInsert();
+            $errors = $this->onInsert();
+            $this->checkErrors($errors);
         }
         return parent::performInsert($query);
+    }
+
+    /**
+     * Check errors existence and throw them
+     *
+     * @param array $errors
+     * @return void
+     */
+    protected function checkErrors($errors)
+    {
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
     }
 
     /**
@@ -62,10 +78,12 @@ trait ModelEvents
     protected function performUpdate(Builder $query)
     {
         if ($this instanceof ValidateInterface) {
-            $this->validate();
+            $errors = $this->validate();
+            $this->checkErrors($errors);
         }
         if ($this instanceof ValidateUpdateInterface) {
-            $this->onUpdate();
+            $errors = $this->onUpdate();
+            $this->checkErrors($errors);
         }
         return parent::performUpdate($query);
     }

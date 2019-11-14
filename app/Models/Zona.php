@@ -100,8 +100,6 @@ class Zona extends Model implements ValidateInterface
         if ($this->adicional_entrega < 0) {
             $errors['adicional_entrega'] = __('messagens.error_time_delivery');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

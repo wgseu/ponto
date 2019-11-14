@@ -164,8 +164,6 @@ class Produto extends Model implements ValidateInterface
         ) {
             $errors['tipo'] = __('messages.produto_already_packaged');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

@@ -31,15 +31,42 @@ namespace App\Util;
  */
 class Filter
 {
+    /**
+     * Transform empty array into stdClass object
+     *
+     * @param array $array
+     * @return mixed
+     */
+    public static function emptyObject($array)
+    {
+        if (empty($array)) {
+            return new \stdClass();
+        }
+        return $array;
+    }
+
+    /**
+     * Filter array using defaults values
+     * Remove same values as default
+     *
+     * @param array $values
+     * @param array $defaults
+     * @return array filtered values
+     */
     public static function defaults($values, $defaults)
     {
         $result = [];
         $values = array_intersect_key($values, $defaults);
         foreach ($values as $key => $value) {
             if (is_array($value) && is_array($defaults[$key])) {
-                $result[$key] = self::defaults($value, $defaults[$key]);
+                $array = self::defaults($value, $defaults[$key]);
+                if (!empty($array)) {
+                    $result[$key] = $array;
+                }
             } elseif (!is_array($value) && !is_array($defaults[$key])) {
-                $result[$key] = $value;
+                if ($defaults[$key] !== $value) {
+                    $result[$key] = $value;
+                }
             }
         }
         return $result;

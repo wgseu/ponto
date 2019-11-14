@@ -1,8 +1,12 @@
-query ($id: ID!) {
-  sistemas (filter: { id: $id }, order: { id: asc }) {
-    data {
-      id
+query {
+  sistema (all: true) {
+    empresa {
+      empresa {
+        nome
+        imagem_url
+      }
     }
-    total
+    fuso_horario
+    opcoes
   }
 }

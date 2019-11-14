@@ -1,9 +1,14 @@
 {
     "better-phpunit.phpunitBinary": "${workspaceFolder}/vendor/bin/phpunit",
-    "better-phpunit.commandSuffix": "--no-coverage",
+    "better-phpunit.commandSuffix": "",
     "phpcs.standard": "PSR12",
+    "coverage-gutters.coverageFileNames": ["clover.xml"],
+    "coverage-gutters.ignoredPathGlobs": "{node_modules,vendor,storage}/**",
+    "coverage-gutters.showLineCoverage": true,
     "phpcs.executablePath": "vendor/bin/phpcs",
     "phpcs.ignorePatterns": [
+        "docs/api/*",
+        "node_modules/*",
         "storage/*",
         "vendor/*"
     ],

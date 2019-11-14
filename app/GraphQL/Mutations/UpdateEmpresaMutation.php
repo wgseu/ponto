@@ -53,18 +53,18 @@ class UpdateEmpresaMutation extends Mutation
     public function args(): array
     {
         return [
-            'id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Identificador único da empresa, valor 1',
-            ],
             'input' => ['type' => Type::nonNull(GraphQL::type('EmpresaUpdateInput'))],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $empresa = Empresa::findOrFail($args['id']);
+        $empresa = Empresa::find('1');
+        $empresa->loadOptions();
+        $empresa->opcoes = null;
         $empresa->fill($args['input']);
+        $empresa->options->addValues(json_decode($empresa->opcoes ?? '{}', true));
+        $empresa->applyOptions();
         $empresa->save();
         return $empresa;
     }

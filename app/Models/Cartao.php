@@ -114,8 +114,6 @@ class Cartao extends Model implements ValidateInterface
         if (!$this->exists && !$this->ativo) {
             $errors['ativo'] = __('messages.create_cartao_desativado');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

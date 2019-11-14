@@ -118,9 +118,7 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
         ) {
             $errors['max_parcelas'] = __('maximum_portion_allows');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 
     public function onUpdate()
@@ -131,8 +129,6 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
         if ($old_forma->exists() && $count > 0 && $old_forma->tipo != $this->tipo) {
             $errors['tipo'] = __('messages.tipo_cannot_change');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

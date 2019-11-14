@@ -1,5 +1,0 @@
-mutation ($id: ID!) {
-  DeleteEmpresa(id: $id) {
-    id
-  }
-}

@@ -31,31 +31,38 @@ namespace App\GraphQL\Types;
 use App\Models\Sistema;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class SistemaType extends GraphQLType
 {
     protected $attributes = [
         'name' => 'Sistema',
-        'description' => 'Classe que informa detalhes da empresa, parceiro e opções do sistema' .
-            ' como a versão do banco de dados e a licença de uso',
+        'description' => 'Informações do restaurante e da aplicação',
         'model' => Sistema::class,
     ];
 
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador único do sistema, valor 1',
+            'empresa' => [
+                'type' => GraphQL::type('Empresa'),
+                'description' => 'Informações da empresa',
             ],
             'fuso_horario' => [
                 'type' => Type::string(),
-                'description' => 'Informa qual o fuso horário',
+                'description' => 'Informa qual o fuso horário da aplicação',
+            ],
+            'versao' => [
+                'type' => Type::string(),
+                'description' => 'Informa a versão atual da aplicação',
             ],
             'opcoes' => [
                 'type' => Type::string(),
                 'description' => 'Opções gerais do sistema',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('sistema:view');
+                },
             ],
         ];
     }

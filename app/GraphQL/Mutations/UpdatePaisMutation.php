@@ -65,8 +65,9 @@ class UpdatePaisMutation extends Mutation
     {
         $pais = Pais::findOrFail($args['id']);
         $pais->loadEntries();
-        $pais->entries->addValues(json_encode($args['input']['entradas'] ?? '{}'));
+        $pais->entradas = null;
         $pais->fill($args['input']);
+        $pais->entries->addValues(json_decode($pais->entradas ?? '{}', true));
         $pais->applyEntries();
         $pais->save();
         return $pais;

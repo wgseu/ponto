@@ -26,8 +26,8 @@
 
 namespace Tests\Unit;
 
+use Tests\TestCase;
 use App\Core\Settings;
-use PHPUnit\Framework\TestCase;
 
 class SettingsTest extends TestCase
 {
@@ -56,8 +56,6 @@ class SettingsTest extends TestCase
         $this->assertEquals(123456, $settings->getEntry('entry', 'key'));
         $settings->addEntry('section', 'key', 3.14);
         $this->assertEquals(3.14, $settings->getEntry('section', 'key'));
-        $this->assertNotEmpty($settings);
-        $this->assertNotNull($settings);
     }
 
     public function testDefaultEntry()
@@ -84,26 +82,43 @@ class SettingsTest extends TestCase
         $this->assertNull($settings->getEntry('entry', 'key'));
     }
 
+    public function testAddValueToInexistentKey()
+    {
+        $defaults = ['key' => 'value'];
+        $settings = new Settings($defaults);
+        $this->expectException('\Exception');
+        $settings->addValue('other_key', 'val');
+    }
+
+    public function testAddEntryToInexistentPath()
+    {
+        $defaults = ['section' => ['key' => 'value']];
+        $settings = new Settings($defaults);
+        $this->expectException('\Exception');
+        $settings->addEntry('section', 'other_key', 'val');
+    }
+
     public function testAddOtherThanDefaults()
     {
-        $defaults = ['path' => ['test' => 1], 'db' => []];
+        $defaults = ['path' => ['test' => 1], 'db' => null];
         $settings = new Settings($defaults);
         $settings->addValues([
             'path' => ['key' => 1, 'test' => 2],
-            'db' => ['test' => []],
+            'db' => [],
             'other' => []
         ]);
         $defaults['path']['test'] = 2;
-        $this->assertEquals($defaults, $settings->getValues());
+        $this->assertEquals($defaults, $settings->getValues(true));
     }
 
-    public function testChangeType()
+    public function testAddValueDifferentType()
     {
-        $settings = new Settings(['path' => [], 'db' => null]);
+        $settings = new Settings(['path' => ['key' => 3], 'db' => null]);
         $settings->addValues([
-            'path' => [],
+            'path' => 2,
             'db' => [],
         ]);
+        $this->assertEquals(3, $settings->getEntry('path', 'key'));
         $this->assertNull($settings->getValue('db'));
         $settings->addValue('db', 123);
         $this->assertEquals(123, $settings->getValue('db'));
@@ -155,9 +170,10 @@ class SettingsTest extends TestCase
     public function testDeleteValue()
     {
         $settings = new Settings();
-        $settings->deleteValue('db');
-        $this->assertNotNull($settings);
-        $this->assertTrue((true));
+        $settings->addValue('a', 1);
+        $this->assertTrue($settings->has('a'));
+        $settings->deleteValue('a');
+        $this->assertFalse($settings->has('a'));
     }
 
     public function testDeleteEntry()
@@ -169,10 +185,95 @@ class SettingsTest extends TestCase
         $this->assertNotFalse(true);
     }
 
-    public function testHas()
+    public function testHasKey()
     {
         $settings = new Settings();
-        $settings->has('1');
-        $this->assertNotNull($settings);
+        $settings->addValues(['a' => 1]);
+        $this->assertTrue($settings->has('a'));
+        $this->assertFalse($settings->has('b'));
+    }
+
+    public function testHasSectionKey()
+    {
+        $settings = new Settings();
+        $settings->addValues(['a' => ['b' => 2]]);
+        $this->assertTrue($settings->has('a', 'b'));
+        $this->assertFalse($settings->has('b', 'c'));
+    }
+
+    public function testAddEntryArraySameAsDefault()
+    {
+        $settings = new Settings(['a' => ['b' => ['c' => 1]]]);
+        $settings->addEntry('a', 'b', ['c' => 2]);
+        $settings->addEntry('a', 'b', ['c' => 1]);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddEntryValueSameAsDefault()
+    {
+        $settings = new Settings(['a' => ['b' => 1]]);
+        $settings->addEntry('a', 'b', 2);
+        $settings->addEntry('a', 'b', 1);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddValueSameAsDefault()
+    {
+        $settings = new Settings(['a' => 1]);
+        $settings->addValue('a', 2);
+        $settings->addValue('a', 1);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddValueArraySameAsDefault()
+    {
+        $settings = new Settings(['a' => ['b' => 1]]);
+        $settings->addValue('a', ['b' => 2]);
+        $settings->addValue('a', ['b' => 1]);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddEntryReplaceValue()
+    {
+        $settings = new Settings();
+        $settings->addValues(['a' => ['b' => ['c' => 1, 'd' => 3]]]);
+        $settings->addEntry('a', 'b', ['c' => 2]);
+        $this->assertEquals(['a' => ['b' => ['c' => 2, 'd' => 3]]], $settings->getValues());
+    }
+
+    public function testAddValuesNoArray()
+    {
+        $settings = new Settings();
+        $settings->addValues(1);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddValuesSameAsDefault()
+    {
+        $settings = new Settings(['a' => ['b' => 1]]);
+        $settings->addEntry('a', 'b', 2);
+        $settings->addValues(['a' => ['b' => 1]]);
+        $this->assertEquals([], $settings->getValues());
+    }
+
+    public function testAddEntryDifferentType()
+    {
+        $settings = new Settings(['a' => ['b' => ['c' => 1]]]);
+        $this->expectException('\Exception');
+        $settings->addEntry('a', 'b', 2);
+    }
+
+    public function testLoad()
+    {
+        $settings = new Settings(['settings_file' => ['key' => 'value']]);
+        $settings->load(self::resourcePath());
+        $this->assertEquals('value', $settings->getEntry('settings_file', 'key'));
+    }
+
+    public function testLoadInexistingFile()
+    {
+        $settings = new Settings(['inexisting_filename' => ['key' => 1]]);
+        $this->expectException('\Exception');
+        $settings->load(self::resourcePath());
     }
 }

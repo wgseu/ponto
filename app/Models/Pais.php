@@ -57,7 +57,7 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
     /**
      * Setting model
      *
-     * @var App\Models\Settings
+     * @var Settings
      */
     public $entries;
 
@@ -124,8 +124,6 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
                 $errors['conversao'] = __('messages.change_currency_invalid');
             }
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

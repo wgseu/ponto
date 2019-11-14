@@ -103,8 +103,6 @@ class Caixa extends Model implements ValidateInterface
         if ($movimento->exists() && !$this->ativa) {
             $errors['ativa'] = __('caixa_in_use');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

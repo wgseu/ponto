@@ -32,8 +32,11 @@ namespace App\Util;
 class Validator
 {
 
-    public static function checkCPF($cpf)
+    public static function checkCPF($cpf, $empty = false)
     {
+        if (is_null($cpf) && $empty) {
+            return true;
+        }
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
         // Verifica se nenhuma das sequências abaixo foi digitada, caso seja, retorna falso
@@ -56,8 +59,11 @@ class Validator
         return true;
     }
 
-    public static function checkCNPJ($cnpj)
+    public static function checkCNPJ($cnpj, $empty = false)
     {
+        if (is_null($cnpj) && $empty) {
+            return true;
+        }
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
         if (preg_match($pattern, $cnpj)) {
@@ -91,7 +97,7 @@ class Validator
      */
     public static function checkCEP($cep, $empty = false)
     {
-        if ($cep == '' && $empty) {
+        if (is_null($cep) && $empty) {
             return true;
         }
         $mask = '99999-999';
@@ -100,9 +106,16 @@ class Validator
         return strlen($cep) == $mask_len;
     }
 
-    public static function checkNCM($ncm)
+    /**
+     * Verifica se o NCM é válido
+     *
+     * @param string $ncm
+     * @param bool $empty aceita ncm nulo
+     * @return bool
+     */
+    public static function checkNCM($ncm, $empty = false)
     {
-        if ($ncm == '00') {
+        if ($ncm == '00' || (is_null($ncm) && $empty)) {
             return true;
         }
         $mask = '9999.99.99';

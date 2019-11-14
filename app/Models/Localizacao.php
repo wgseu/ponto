@@ -137,8 +137,6 @@ class Localizacao extends Model implements ValidateInterface
         if ($this->tipo == Localizacao::TIPO_CONDOMINIO && is_null($this->condominio)) {
             $errors['condominio'] = __('messages.localizacao_tipo_required_condominio');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

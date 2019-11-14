@@ -117,8 +117,6 @@ class Credito extends Model implements ValidateInterface
         } elseif ($this->cancelado) {
             $errors['cancelado'] = __('messages.cancel_cannot_create');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

@@ -95,8 +95,6 @@ class Classificacao extends Model implements ValidateInterface
                 $errors['classificacao_id'] = __('messagens.classificacao_invalid_update');
             }
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

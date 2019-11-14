@@ -110,8 +110,6 @@ class Lista extends Model implements ValidateInterface
         if ($this->exists && $oldLista->estado == self::ESTADO_COMPRADA) {
             $errors['estado'] = __('messages.lista_comprada_cannot_update');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

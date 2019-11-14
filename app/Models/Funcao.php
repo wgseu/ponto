@@ -72,8 +72,6 @@ class Funcao extends Model implements ValidateInterface
         if ($this->remuneracao < 0) {
             $errors['remuneracao'] = __('messages.remuneracao_cannot_negative');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

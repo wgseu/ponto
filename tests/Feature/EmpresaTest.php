@@ -26,19 +26,18 @@
 
 namespace Tests\Feature;
 
-use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Empresa;
+use App\Models\Cliente;
 
 class EmpresaTest extends TestCase
 {
     public function testUpdateEmpresa()
     {
         $headers = PrestadorTest::auth();
-        $empresa = factory(Empresa::class)->create();
+        $empresa = Empresa::find('1');
         $parceiro = factory(Cliente::class)->create();
         $this->graphfl('update_empresa', [
-            'id' => $empresa->id,
             'input' => [
                 'parceiro_id' => $parceiro->id,
             ]
@@ -50,8 +49,8 @@ class EmpresaTest extends TestCase
     public function testFindEmpresa()
     {
         $headers = PrestadorTest::auth();
-        $empresa = factory(Empresa::class)->create();
-        $response = $this->graphfl('query_empresa', [ 'id' => $empresa->id ], $headers);
-        $this->assertEquals($empresa->id, $response->json('data.empresas.data.0.id'));
+        $empresa = Empresa::find('1');
+        $response = $this->graphfl('query_empresa', [], $headers);
+        $this->assertEquals($empresa->pais_id, $response->json('data.empresa.pais_id'));
     }
 }

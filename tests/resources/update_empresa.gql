@@ -1,5 +1,5 @@
-mutation updateEmpresa($id: ID!, $input: EmpresaUpdateInput!) {
-  UpdateEmpresa(id: $id, input: $input) {
-    id
+mutation updateEmpresa($input: EmpresaUpdateInput!) {
+  UpdateEmpresa(input: $input) {
+    parceiro_id
   }
 }

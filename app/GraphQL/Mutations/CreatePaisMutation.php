@@ -60,7 +60,10 @@ class CreatePaisMutation extends Mutation
     public function resolve($root, $args)
     {
         $pais = new Pais();
+        $pais->entradas = null;
         $pais->fill($args['input']);
+        $pais->entries->addValues(json_decode($pais->entradas ?? '{}', true));
+        $pais->applyEntries();
         $pais->save();
         return $pais;
     }

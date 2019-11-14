@@ -117,7 +117,18 @@ class CreateInitialTables extends Migration
 
         Schema::create('formas', function (Blueprint $table) {
             $table->increments('id');
-            $table->enum('tipo', ['dinheiro', 'credito', 'debito', 'vale', 'cheque', 'crediario', 'saldo']);
+            $table->enum(
+                'tipo',
+                [
+                    'dinheiro',
+                    'credito',
+                    'debito',
+                    'vale',
+                    'cheque',
+                    'crediario',
+                    'saldo',
+                ]
+            );
             $table->unsignedInteger('carteira_id');
             $table->string('descricao', 50);
             $table->integer('min_parcelas')->default(1);
@@ -426,7 +437,16 @@ class CreateInitialTables extends Migration
             $table->decimal('produtos', 19, 4);
             $table->decimal('descontos', 19, 4);
             $table->decimal('pago', 19, 4);
-            $table->enum('status', ['agendado', 'aberto', 'entrega', 'concluido', 'cancelado']);
+            $table->enum(
+                'status',
+                [
+                    'agendado',
+                    'aberto',
+                    'entrega',
+                    'concluido',
+                    'cancelado',
+                ]
+            );
             $table->string('motivo', 200)->nullable();
             $table->string('mensagem', 255)->nullable();
             $table->boolean('sincronizado');
@@ -458,7 +478,17 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('entrega_id')->nullable();
             $table->unsignedInteger('associacao_id')->nullable();
             $table->enum('tipo', ['mesa', 'comanda', 'balcao', 'entrega'])->default('mesa');
-            $table->enum('estado', ['agendado', 'aberto', 'entrega', 'fechado', 'concluido', 'cancelado'])->default('aberto');
+            $table->enum(
+                'estado',
+                [
+                    'agendado',
+                    'aberto',
+                    'entrega',
+                    'fechado',
+                    'concluido',
+                    'cancelado',
+                ]
+            )->default('aberto');
             $table->decimal('servicos', 19, 4)->default(0);
             $table->decimal('produtos', 19, 4)->default(0);
             $table->decimal('comissao', 19, 4)->default(0);
@@ -580,7 +610,16 @@ class CreateInitialTables extends Migration
 
         Schema::create('impostos', function (Blueprint $table) {
             $table->increments('id');
-            $table->enum('grupo', ['icms', 'pis', 'cofins', 'ipi', 'ii']);
+            $table->enum(
+                'grupo',
+                [
+                    'icms',
+                    'pis',
+                    'cofins',
+                    'ipi',
+                    'ii',
+                ]
+            );
             $table->boolean('simples');
             $table->boolean('substituicao');
             $table->integer('codigo');
@@ -729,7 +768,16 @@ class CreateInitialTables extends Migration
             $table->dateTime('vencimento');
             $table->string('numero', 64)->nullable();
             $table->string('anexo_url', 200)->nullable();
-            $table->enum('estado', ['analise', 'ativa', 'paga', 'cancelada', 'desativada'])->default('ativa');
+            $table->enum(
+                'estado',
+                [
+                    'analise',
+                    'ativa',
+                    'paga',
+                    'cancelada',
+                    'desativada',
+                ]
+            )->default('ativa');
             $table->dateTime('data_calculo')->nullable();
             $table->dateTime('data_emissao');
 
@@ -869,7 +917,18 @@ class CreateInitialTables extends Migration
             $table->decimal('lancado', 19, 4);
             $table->string('codigo', 100)->nullable();
             $table->string('detalhes', 200)->nullable();
-            $table->enum('estado', ['aberto', 'aguardando', 'analise', 'pago', 'disputa', 'devolvido', 'cancelado'])->default('aberto');
+            $table->enum(
+                'estado',
+                [
+                    'aberto',
+                    'aguardando',
+                    'analise',
+                    'pago',
+                    'disputa',
+                    'devolvido',
+                    'cancelado',
+                ]
+            )->default('aberto');
             $table->dateTime('data_pagamento')->nullable();
             $table->dateTime('data_compensacao')->nullable();
             $table->dateTime('data_lancamento');
@@ -962,7 +1021,17 @@ class CreateInitialTables extends Migration
             $table->decimal('preco_venda', 19, 4);
             $table->decimal('preco_compra', 19, 4)->default(0);
             $table->string('detalhes', 255)->nullable();
-            $table->enum('estado', ['adicionado', 'enviado', 'processado', 'pronto', 'disponivel', 'entregue'])->default('adicionado');
+            $table->enum(
+                'estado',
+                [
+                    'adicionado',
+                    'enviado',
+                    'processado',
+                    'pronto',
+                    'disponivel',
+                    'entregue',
+                ]
+            )->default('adicionado');
             $table->boolean('cancelado')->default(false);
             $table->string('motivo', 200)->nullable();
             $table->boolean('desperdicado')->default(false);
@@ -1370,7 +1439,17 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('bairro_id')->nullable();
             $table->unsignedInteger('zona_id')->nullable();
             $table->unsignedInteger('integracao_id')->nullable();
-            $table->enum('local', ['local', 'mesa', 'comanda', 'balcao', 'entrega', 'online'])->nullable();
+            $table->enum(
+                'local',
+                [
+                    'local',
+                    'mesa',
+                    'comanda',
+                    'balcao',
+                    'entrega',
+                    'online',
+                ]
+            )->nullable();
             $table->integer('inicio');
             $table->integer('fim');
             $table->decimal('valor', 19, 4);
@@ -1656,7 +1735,20 @@ class CreateInitialTables extends Migration
             $table->enum('tipo', ['nota', 'inutilizacao']);
             $table->enum('ambiente', ['homologacao', 'producao']);
             $table->enum('acao', ['autorizar', 'cancelar', 'inutilizar']);
-            $table->enum('estado', ['aberto', 'assinado', 'pendente', 'processamento', 'denegado', 'rejeitado', 'cancelado', 'inutilizado', 'autorizado']);
+            $table->enum(
+                'estado',
+                [
+                    'aberto',
+                    'assinado',
+                    'pendente',
+                    'processamento',
+                    'denegado',
+                    'rejeitado',
+                    'cancelado',
+                    'inutilizado',
+                    'autorizado',
+                ]
+            );
             $table->unsignedInteger('ultimo_evento_id')->nullable();
             $table->integer('serie');
             $table->integer('numero_inicial');
@@ -1695,7 +1787,22 @@ class CreateInitialTables extends Migration
         Schema::create('eventos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('nota_id');
-            $table->enum('estado', ['aberto', 'assinado', 'validado', 'pendente', 'processamento', 'denegado', 'cancelado', 'rejeitado', 'contingencia', 'inutilizado', 'autorizado']);
+            $table->enum(
+                'estado',
+                [
+                    'aberto',
+                    'assinado',
+                    'validado',
+                    'pendente',
+                    'processamento',
+                    'denegado',
+                    'cancelado',
+                    'rejeitado',
+                    'contingencia',
+                    'inutilizado',
+                    'autorizado',
+                ]
+            );
             $table->text('mensagem');
             $table->string('codigo', 20);
             $table->dateTime('data_criacao');
@@ -1771,6 +1878,7 @@ class CreateInitialTables extends Migration
             $table->string('operadora', 45)->nullable();
             $table->string('servico', 45)->nullable();
             $table->boolean('principal')->default(false);
+            $table->dateTime('data_validacao')->nullable();
 
             $table->index(['cliente_id']);
             $table->index(['numero']);
@@ -1895,11 +2003,31 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('pacote_id')->nullable();
             $table->unsignedInteger('cliente_id')->nullable();
             $table->unsignedInteger('integracao_id')->nullable();
-            $table->enum('local', ['local', 'mesa', 'comanda', 'balcao', 'entrega', 'online'])->nullable();
+            $table->enum(
+                'local',
+                [
+                    'local',
+                    'mesa',
+                    'comanda',
+                    'balcao',
+                    'entrega',
+                    'online',
+                ]
+            )->nullable();
             $table->decimal('acrescimo', 19, 4)->default(0);
             $table->boolean('disponivel')->default(true);
 
-            $table->index(['produto_id', 'composicao_id', 'pacote_id', 'cliente_id', 'integracao_id', 'local']);
+            $table->index(
+                [
+                    'produto_id',
+                    'composicao_id',
+                    'pacote_id',
+                    'cliente_id',
+                    'integracao_id',
+                    'local',
+                ],
+                'item_destino_unique'
+            );
             $table->index(['integracao_id']);
             $table->index(['composicao_id']);
             $table->index(['pacote_id']);
@@ -1947,6 +2075,10 @@ class CreateInitialTables extends Migration
         Schema::enableForeignKeyConstraints();
 
         if (env('APP_ENV') == 'testing') {
+            (new SistemaSeeder())->run();
+            (new MoedaSeeder())->run();
+            (new PaisSeeder())->run();
+            (new EmpresaSeeder())->run();
             (new ModuloSeeder())->run();
             (new FuncionalidadeSeeder())->run();
             (new PermissaoSeeder())->run();

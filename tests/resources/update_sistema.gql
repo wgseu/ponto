@@ -1,5 +1,5 @@
-mutation updateSistema($id: ID!, $input: SistemaUpdateInput!) {
-  UpdateSistema(id: $id, input: $input) {
-    id
+mutation updateSistema($input: SistemaUpdateInput!) {
+  UpdateSistema(input: $input) {
+    fuso_horario
   }
 }

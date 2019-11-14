@@ -276,8 +276,6 @@ class Promocao extends Model implements ValidateInterface
         if ($this->agendamento == true && $this->valor <= 0) {
             $errors['valor'] = __('messages.value_cannot_zero');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

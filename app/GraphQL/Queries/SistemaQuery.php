@@ -28,52 +28,58 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use App\Models\Empresa;
 use App\Models\Sistema;
-use App\GraphQL\Utils\Filter;
-use App\GraphQL\Utils\Ordering;
-use Closure;
+use App\Util\Filter;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
-use Illuminate\Support\Facades\Auth;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class SistemaQuery extends Query
 {
     protected $attributes = [
-        'name' => 'sistemas',
+        'name' => 'sistema',
     ];
-
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('sistema:view');
-    }
 
     public function type(): Type
     {
-        return GraphQL::paginate('Sistema');
+        return GraphQL::type('Sistema');
     }
 
     public function args(): array
     {
         return [
-            'filter' => ['name' => 'filter', 'type' => GraphQL::type('SistemaFilter')],
-            'order' => ['name' => 'order', 'type' => GraphQL::type('SistemaOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
-            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
+            'all' => [
+                'name' => 'all',
+                'type' => Type::boolean(),
+                'description' => 'Se verdadeiro devolve todas as opções do sistema',
+            ],
         ];
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+    public function resolve($root, $args)
     {
-        /** @var SelectFields $fields */
-        $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Sistema::with($fields->getRelations())->select($fields->getSelect())
-        );
-        return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        $sistema = Sistema::find('1');
+        $sistema->loadOptions();
+        $sistema_data = $sistema->toArray();
+        $sistema_data['opcoes'] = json_encode(Filter::emptyObject(
+            $sistema->options->getValues($args['all'] ?? false)
+        ));
+        $empresa = Empresa::find('1');
+        if (is_null($empresa)) {
+            return $sistema_data;
+        }
+        $empresa_data = $empresa->toArray();
+        $pais = $empresa->pais;
+        if (!is_null($pais)) {
+            $empresa_data['pais'] = $pais->toArray();
+            $empresa_data['pais']['moeda'] = $pais->moeda->toArray();
+        }
+        $cliente_empresa = $empresa->empresa;
+        if (!is_null($cliente_empresa)) {
+            $empresa_data['empresa'] = $cliente_empresa->toArray();
+        }
+        $sistema_data['empresa'] = $empresa_data;
+        return $sistema_data;
     }
 }

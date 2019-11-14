@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Exceptions\SafeValidationException;
 use Exception;
 use App\Models\Sistema;
 use Illuminate\Contracts\Console\Kernel;
@@ -138,6 +139,17 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Get resources path of tests
+     *
+     * @param string $join
+     * @return string
+     */
+    public static function resourcePath($join = '')
+    {
+        return __DIR__ . '/resources' . $join;
+    }
+
+    /**
      * GraphQL POST request using filename as query
      *
      * @param  string $filename
@@ -147,7 +159,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function graphfl(string $filename, array $variables = [], array $headers = []): TestResponse
     {
-        $query = file_get_contents(__DIR__ . "/resources/$filename.gql");
+        $query = file_get_contents(self::resourcePath("/$filename.gql"));
         return $this->graphql($query, $variables, $headers);
     }
 }

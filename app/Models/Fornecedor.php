@@ -81,8 +81,6 @@ class Fornecedor extends Model implements ValidateInterface
         if ($this->prazo_pagamento < 0) {
             $errors['prazo_pagamento'] = __('messages.prazo_pagamento_cannot_negative');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

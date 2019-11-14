@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace App\GraphQL\Types;
 
 use App\Models\Telefone;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
@@ -71,6 +72,10 @@ class TelefoneType extends GraphQLType
             'principal' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se o telefone é principal e exclusivo do cliente',
+            ],
+            'data_validacao' => [
+                'type' => GraphQL::type('DateTime'),
+                'description' => 'Informa da data em que o número do telefone foi validado',
             ],
         ];
     }

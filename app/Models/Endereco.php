@@ -87,8 +87,6 @@ class Endereco extends Model implements ValidateInterface
         if (!Validator::checkCEP($this->cep)) {
             $errors['cep'] = __('messages.cep_invalid');
         }
-        if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
-        }
+        return $errors;
     }
 }

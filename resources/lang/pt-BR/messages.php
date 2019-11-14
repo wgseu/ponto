@@ -740,5 +740,8 @@ return [
     'grupo_cannot_update_quantidade_maxima_less_group' => 'A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote',
     'classificacaopai_already' => 'Classificação inválida',
     'categoriapai_already' => 'Categoria inválida',
-
+    'movement' => 'Movimentações do caixa',
+    'payment' => 'Pagamento de contas',
+    'wallet_1' => 'Gaveta do Caixa 1',
+    'cash' => 'Caixa 1',
 ];

@@ -29,6 +29,15 @@ class DatabaseSeeder extends Seeder
             PropriedadeSeeder::class,
             PacoteSeeder::class,
             PaisSeeder::class,
+            EstadoSeeder::class,
+            OrigemSeeder::class,
+            RegimeSeeder::class,
+            ImpostoSeeder::class,
+            AcessoSeeder::class,
+            BancoSeeder::class,
+            ClassificacaoSeeder::class,
+            CarteiraSeeder::class,
+            CaixaSeeder::class,
         ]);
     }
 }

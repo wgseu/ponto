@@ -30,7 +30,7 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\ValidateUpdateInterface;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 
 /**
  * Formas de pagamento disponíveis para pedido e contas

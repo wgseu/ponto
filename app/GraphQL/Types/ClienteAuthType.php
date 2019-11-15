@@ -51,6 +51,10 @@ class ClienteAuthType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Token que permite acessar os recursos',
             ],
+            'refresh_token' => [
+                'type' => Type::string(),
+                'description' => 'Token para renovar o token de acesso',
+            ],
             'token_type' => [
                 'type' => Type::string(),
                 'description' => 'Tipo de token, sempre bearer',

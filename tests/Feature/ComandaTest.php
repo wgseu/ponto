@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Comanda;
 use App\Models\Pedido;
@@ -101,13 +101,13 @@ class ComandaTest extends TestCase
         $comanda = factory(Comanda::class)->create();
         $pedido = factory(Pedido::class)->create(['comanda_id' => $comanda->id]);
         $comanda->ativa = false;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $comanda->save();
     }
 
     public function testValidateComandaCreateCancelado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Comanda::class)->create(['ativa' => false]);
     }
 }

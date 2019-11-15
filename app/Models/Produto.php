@@ -28,7 +28,6 @@ namespace App\Models;
 
 use App\Models\Item;
 use App\Concerns\ModelEvents;
-use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

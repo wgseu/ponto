@@ -34,7 +34,7 @@ use App\Models\Prestador;
 use App\Models\Produto;
 use App\Models\Requisito;
 use App\Models\Setor;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 
 class EstoqueTest extends TestCase
 {
@@ -91,33 +91,33 @@ class EstoqueTest extends TestCase
     public function testValidateDoisAtributosEstoque()
     {
         $transacao = factory(Item::class)->create();
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['transacao_id' => $transacao->id]);
     }
 
     public function testValidateProdutoTipoCannotPacote()
     {
         $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PACOTE]);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['produto_id' => $produto->id]);
     }
 
     public function testValidateProdutoNaoFracionado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['quantidade' => 2.1]);
     }
 
     public function testValidateEntradaProdutoNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['quantidade' => -2]);
     }
 
     public function testValidateSaidaProdutoPositiva()
     {
         $transacao = factory(Item::class)->create();
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create([
             'requisito_id' => null,
             'transacao_id' => $transacao->id,
@@ -127,13 +127,13 @@ class EstoqueTest extends TestCase
 
     public function testValidateCreateEstoqueCancelado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['cancelado' => true]);
     }
 
     public function testValidateEstoqueValorCompraNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['preco_compra' => -5]);
     }
 

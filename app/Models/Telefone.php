@@ -28,13 +28,15 @@ namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
+use App\Util\Filter;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Telefones dos clientes, apenas o telefone principal deve ser único por
  * cliente
  */
-class Telefone extends Model implements ValidateInterface
+class Telefone extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -93,5 +95,37 @@ class Telefone extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        $query = self::where('cliente_id', $this->cliente_id)->where(function ($query) {
+            $query->where('numero', Filter::include9thDigit($this->numero))
+                ->orWhere('numero', Filter::remove9thDigit($this->numero));
+        });
+        if ($this->exists) {
+            $query->where('id', '<>', $this->id);
+        }
+        if ($query->exists()) {
+            $errors['numero'] = __('messages.phone_exists');
+        }
+        $query = self::where('cliente_id', $this->cliente_id)->where('principal', true);
+        if ($this->exists) {
+            $query->where('id', '<>', $this->id);
+        }
+        if ($this->principal && $query->exists()) {
+            $errors['numero'] = __('messages.main_phone_exists');
+        }
+        return $errors;
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old = $this->fresh();
+        if ($old->numero != $this->numero && !is_null($this->data_validacao)) {
+            $errors['numero'] = __('messages.phone_mustbe_revalidated');
+        }
+        if ($old->tentativas > $this->numero && $old->codigo_verificacao == $this->codigo_verificacao) {
+            $errors['numero'] = __('messages.phone_code_mustbe_regenerated');
+        }
+        return $errors;
     }
 }

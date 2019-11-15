@@ -33,9 +33,15 @@ use App\Models\Prestador;
 
 class PrestadorTest extends TestCase
 {
-    public static function auth()
+    /**
+     * Obtém os headers de autenticação do prestador de serviço
+     *
+     * @param Prestador $prestador opcional
+     * @return array
+     */
+    public static function auth($prestador = null)
     {
-        $prestador = factory(Prestador::class)->create();
+        $prestador = $prestador ?: factory(Prestador::class)->create();
         $user = $prestador->cliente()->first();
         $token = auth()->fromUser($user);
         return [

@@ -47,7 +47,10 @@ class LocalizacaoQuery extends Query
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('localizacao:view');
+        return Auth::check() && (
+            ($args['filter']['cliente_id']['eq'] ?? null) == Auth::user()->id
+            || Auth::user()->can('localizacao:view')
+        );
     }
 
     public function type(): Type

@@ -1,0 +1,11 @@
+query ($destinatario_id: String) {
+  notificacoes (filter: { destinatario_id: { eq: $destinatario_id } }, order: { data_notificacao: desc }) {
+    data {
+      mensagem
+      redirecionar
+      categoria
+      data_notificacao
+    }
+    total
+  }
+}

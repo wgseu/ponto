@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Bairro;
 use App\Models\Cidade;
 use Tests\TestCase;
@@ -79,13 +79,13 @@ class BairroTest extends TestCase
 
     public function testValidateBairroPrazoEntregaMaximoMaiorMinimo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Bairro::class)->create(['entrega_minima' => 4, 'entrega_maxima' => 2]);
     }
 
     public function testValidateBairroValorNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Bairro::class)->create(['valor_entrega' => -5]);
     }
 

@@ -2,9 +2,7 @@
 
 namespace App\Exceptions;
 
-use GraphQL\Error\ClientAware;
-
-class SafeValidationException extends \Exception implements ClientAware
+class ValidationException extends Exception
 {
     public $errors = [];
 
@@ -13,11 +11,6 @@ class SafeValidationException extends \Exception implements ClientAware
         $this->errors = $errors;
         reset($errors);
         parent::__construct(current($errors), $code);
-    }
-
-    public function isClientSafe()
-    {
-        return true;
     }
 
     public function getCategory()

@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Prestador;
 use Tests\TestCase;
 use App\Models\Viagem;
@@ -90,7 +90,7 @@ class ViagemTest extends TestCase
     {
         $viagem = factory(Viagem::class)->create();
         $viagem->data_chegada = Carbon::create(2018, 10, 12, 10, 20, 30);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $viagem->save();
     }
 }

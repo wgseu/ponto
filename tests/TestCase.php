@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use App\Exceptions\SafeValidationException;
 use Exception;
 use App\Models\Sistema;
 use Illuminate\Contracts\Console\Kernel;

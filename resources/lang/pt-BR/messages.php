@@ -724,4 +724,8 @@ return [
     'invalid_timezone' => 'Fuso horário inválido',
     'invalid_setting_type' => 'O tipo do valor da configuração é inválido',
     'must_be_company' => 'A empresa informada no cliente deve ser do tipo jurídica',
+    'verify_account' => 'Falha na autenticação, valide sua conta por e-mail',
+    'account_already_created' => 'Você já criou uma conta, verifique seu e-mail para validar',
+    'invalid_refresh_token' => 'Token de atualização inválido',
+    'phone_exists' => 'O número de telefone informado já existe',
 ];

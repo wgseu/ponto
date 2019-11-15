@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Fornecedor;
@@ -85,7 +85,7 @@ class FornecedorTest extends TestCase
 
     public function testValidadeFornecedorPrazoNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Fornecedor::class)->create(['prazo_pagamento' => -10]);
     }
 }

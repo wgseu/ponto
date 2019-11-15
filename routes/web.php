@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/active/{token}', 'MailController@activeUser');
+Route::get('/account/verify/{token}', 'AccountVerifyController@activateByToken');
 
 Route::get('/{page}', 'IndexController@any')->where('page', '.*');

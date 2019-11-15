@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Compra;
 use App\Models\Fornecedor;
 use App\Models\Lista;
@@ -97,7 +97,7 @@ class RequisitoTest extends TestCase
     {
         $compra = factory(Compra::class)->create();
         $fornecedor = factory(Fornecedor::class)->create();
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create([
             'compra_id' => $compra->id,
             'fornecedor_id' => $fornecedor->id
@@ -106,31 +106,31 @@ class RequisitoTest extends TestCase
 
     public function testValidateRequisitoCompradoMaiorQuantidade()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create(['comprado' => 10, 'quantidade' => 2]);
     }
 
     public function testValidateRequisitoQuantidadeNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create(['quantidade' => -72]);
     }
 
     public function testValidateRequisitoCompradoNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create(['comprado' => -10]);
     }
 
     public function testValidateRequisitoPrecoMaximoNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create(['preco_maximo' => -50]);
     }
 
     public function testValidateRequisitoPrecoNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Requisito::class)->create(['preco' => -9]);
     }
 

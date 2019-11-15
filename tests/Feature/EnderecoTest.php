@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Bairro;
 use App\Models\Cidade;
 use Tests\TestCase;
@@ -99,13 +99,13 @@ class EnderecoTest extends TestCase
 
     public function testValidCepEndereco()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Endereco::class)->create(['cep' => '8875 0a0']);
     }
 
     public function testValidCepEnderecoNulo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Endereco::class)->create(['cep' => '']);
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
-use App\Models\Bairro;
-use App\Models\Zona;
-use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
+use App\Models\Zona;
+use App\Models\Bairro;
+use App\Exceptions\ValidationException;
 
 class ZonaTest extends TestCase
 {
@@ -70,13 +69,13 @@ class ZonaTest extends TestCase
 
     public function testValidateZonaPrazoEntregaInvalido()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Zona::class)->create(['entrega_minima' => 4, 'entrega_maxima' => 2]);
     }
 
     public function testValidateZonaAdicionalNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Zona::class)->create(['adicional_entrega' => -5]);
     }
 }

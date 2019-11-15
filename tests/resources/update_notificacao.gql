@@ -1,0 +1,5 @@
+mutation updateNotificacao($id: ID!, $visualizado: Boolean!) {
+  UpdateNotificacao(id: $id, visualizado: $visualizado) {
+    data_visualizacao
+  }
+}

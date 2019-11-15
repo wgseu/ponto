@@ -28,7 +28,7 @@ namespace App\Concerns;
 
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Builder;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
 
@@ -65,7 +65,7 @@ trait ModelEvents
     protected function checkErrors($errors)
     {
         if (!empty($errors)) {
-            throw SafeValidationException::withMessages($errors);
+            throw ValidationException::withMessages($errors);
         }
     }
 

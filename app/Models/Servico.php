@@ -30,7 +30,7 @@ use App\Util\Number;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos

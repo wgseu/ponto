@@ -19,7 +19,7 @@ $factory->define($[Table.norm]::class, function (Faker $faker) {
 $[field.each(all)]
 $[field.if(null)]
 $[field.else.if(reference)]
-    $$[field.unix] = factory($[Reference.norm]::class)->create();
+    $$[fIeld.noid] = factory($[Reference.norm]::class)->create();
 $[field.end]
 $[field.end]
     return [
@@ -28,7 +28,7 @@ $[field.if(primary|null|default)]
 $[field.else.if(enum)]
         '$[field]' => $[field.each(option)]$[field.if(first)]$[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end],
 $[field.else.if(reference)]
-        '$[field]' => $$[field.unix]->id,
+        '$[field]' => $$[fIeld.noid]->id,
 $[field.else.if(date)]
         '$[field]' => Carbon::now(),
 $[field.else.if(time)]
@@ -41,7 +41,7 @@ $[field.end]
 $[field.else.if(currency)]
         '$[field]' => 4.50,
 $[field.else.if(float|double)]
-        '$[field]' => 2.30,
+        '$[field]' => 2.3,
 $[field.else.if(integer|bigint)]
         '$[field]' => $faker->numberBetween(1, 70),
 $[field.else.if(blob)]

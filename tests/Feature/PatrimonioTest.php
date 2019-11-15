@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Cliente;
 use App\Models\Fornecedor;
 use Tests\TestCase;
@@ -101,19 +101,19 @@ class PatrimonioTest extends TestCase
 
     public function testValidadePatrimonioQuantidadeNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Patrimonio::class)->create(['quantidade' => -50]);
     }
 
     public function testValidadePatrimonioAlturaNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Patrimonio::class)->create(['altura' => -100]);
     }
 
     public function testValidadePatrimonioLarguraNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Patrimonio::class)->create(['largura' => -150]);
     }
 
@@ -121,7 +121,7 @@ class PatrimonioTest extends TestCase
     {
         $patrimonio = factory(Patrimonio::class)->create();
         $patrimonio->comprimento = -5;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $patrimonio->save();
     }
 
@@ -129,7 +129,7 @@ class PatrimonioTest extends TestCase
     {
         $patrimonio = factory(Patrimonio::class)->create();
         $patrimonio->custo = -10;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $patrimonio->save();
     }
 
@@ -137,7 +137,7 @@ class PatrimonioTest extends TestCase
     {
         $patrimonio = factory(Patrimonio::class)->create();
         $patrimonio->valor = -50;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $patrimonio->save();
     }
 
@@ -146,7 +146,7 @@ class PatrimonioTest extends TestCase
         $patrimonio = factory(Patrimonio::class)->create();
         $patrimonio->delete();
         $patrimonio->ativo = false;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $patrimonio->save();
     }
 }

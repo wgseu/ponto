@@ -12,7 +12,7 @@ class ClienteSeeder extends Seeder
      */
     public function run()
     {
-        (new Cliente([
+        $cliente = new Cliente([
             'tipo' => Cliente::TIPO_FISICA,
             'login' => 'admin',
             'senha' => 'Teste123',
@@ -20,7 +20,8 @@ class ClienteSeeder extends Seeder
             'sobrenome' => 'Teste',
             'genero' => Cliente::GENERO_MASCULINO,
             'email' => 'beta@grandchef.com.br',
-            'status' => Cliente::STATUS_ATIVO,
-        ]))->save();
+        ]);
+        $cliente->forceFill(['status' => Cliente::STATUS_ATIVO]);
+        $cliente->save();
     }
 }

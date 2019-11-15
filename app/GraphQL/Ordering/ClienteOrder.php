@@ -87,9 +87,6 @@ class ClienteOrder extends InputType
             'status' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
-            'secreto' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
             'limite_compra' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
@@ -99,16 +96,13 @@ class ClienteOrder extends InputType
             'facebook_url' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
-            'twitter' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
-            'linkedin_url' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
             'imagem_url' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'linguagem' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'data_envio' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_atualizacao' => [

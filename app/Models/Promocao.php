@@ -30,7 +30,7 @@ use App\Concerns\ModelEvents;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rules\Exists;
 

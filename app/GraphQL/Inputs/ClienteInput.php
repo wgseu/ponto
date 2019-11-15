@@ -96,6 +96,10 @@ class ClienteInput extends InputType
                 'description' => 'E-mail do cliente ou da empresa',
                 'rules' => ['max:100'],
             ],
+            'telefones' => [
+                'type' => Type::listOf(GraphQL::type('TelefoneUpdateInput')),
+                'description' => 'Informa os telefones do cliente',
+            ],
             'data_nascimento' => [
                 'type' => GraphQL::type('Date'),
                 'description' => 'Data de aniversário ou data de fundação',
@@ -109,11 +113,6 @@ class ClienteInput extends InputType
                 'type' => GraphQL::type('ClienteStatus'),
                 'description' => 'Informa o estado da conta do cliente',
             ],
-            'secreto' => [
-                'type' => Type::string(),
-                'description' => 'Código secreto para recuperar a conta do cliente',
-                'rules' => ['max:40'],
-            ],
             'limite_compra' => [
                 'type' => Type::float(),
                 'description' => 'Limite de compra utilizando a forma de pagamento Conta',
@@ -126,16 +125,6 @@ class ClienteInput extends InputType
             'facebook_url' => [
                 'type' => Type::string(),
                 'description' => 'URL para acessar a página do Facebook do cliente',
-                'rules' => ['max:200'],
-            ],
-            'twitter' => [
-                'type' => Type::string(),
-                'description' => 'URL para acessar a página do Twitter do cliente',
-                'rules' => ['max:200'],
-            ],
-            'linkedin_url' => [
-                'type' => Type::string(),
-                'description' => 'URL para acessar a página do LinkedIn do cliente',
                 'rules' => ['max:200'],
             ],
             'imagem_url' => [

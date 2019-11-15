@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Imposto;
 use App\Models\Operacao;
 use App\Models\Origem;
@@ -100,13 +100,13 @@ class TributacaoTest extends TestCase
 
     public function testValidateTributacaoNcmInvalido()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Tributacao::class)->create(['ncm' => '87520']);
     }
 
     public function testValidateTributacaoNcmCaracterInvalido()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Tributacao::class)->create(['ncm' => '875200g24']);
     }
 }

@@ -46,6 +46,40 @@ class Filter
     }
 
     /**
+     * Inclui o nono dígito no telefone
+     *
+     * @param string $number
+     * @return string
+     */
+    public static function include9thDigit($number)
+    {
+        if (strlen($number) == 10) {
+            return substr($number, 0, 2) . '9' . substr($number, 2);
+        }
+        if (strlen($number) == 8) {
+            return '9' . $number;
+        }
+        return $number;
+    }
+
+    /**
+     * Remove o nono dígito do telefone
+     *
+     * @param string $number
+     * @return string
+     */
+    public static function remove9thDigit($number)
+    {
+        if (strlen($number) == 11) {
+            return substr($number, 0, 2) . substr($number, 3);
+        }
+        if (strlen($number) == 9) {
+            return substr($number, 1);
+        }
+        return $number;
+    }
+
+    /**
      * Filter array using defaults values
      * Remove same values as default
      *

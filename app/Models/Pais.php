@@ -30,7 +30,7 @@ use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Interfaces\ValidateUpdateInterface;
 
 /**

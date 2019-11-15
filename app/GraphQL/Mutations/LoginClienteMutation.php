@@ -28,9 +28,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Exceptions\AuthenticationException;
+use App\Exceptions\AuthorizationException;
 use App\Models\Cliente;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Auth\AuthenticationException;
 use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
@@ -63,15 +64,14 @@ class LoginClienteMutation extends Mutation
         if (! $token = auth()->attempt($credentials)) {
             throw new AuthenticationException(__('messages.authentication_failed'));
         }
-        $cliente = Cliente::where('email', $credentials['email'])
-            ->get()
-            ->first()
-            ->toArray();
+        if (auth()->user()->status != Cliente::STATUS_ATIVO) {
+            auth()->logout();
+            throw new AuthorizationException(__('messages.verify_account'));
+        }
         return [
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,
-            'cliente'      => $cliente
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Classificacao;
 use Tests\TestCase;
 
@@ -67,7 +67,7 @@ class ClassificacaoTest extends TestCase
     {
         $classificacaoPai = factory(Classificacao::class)->create();
         $subclassificacao = factory(Classificacao::class)->create(['classificacao_id' => $classificacaoPai->id]);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Classificacao::class)->create(['classificacao_id' => $subclassificacao->id]);
     }
 
@@ -75,7 +75,7 @@ class ClassificacaoTest extends TestCase
     {
         $classificacao = factory(Classificacao::class)->create();
         $classificacao->classificacao_id = $classificacao->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $classificacao->save();
     }
 
@@ -85,7 +85,7 @@ class ClassificacaoTest extends TestCase
         $subclassificacao = factory(Classificacao::class)->create(['classificacao_id' => $classificacaoPai->id]);
         $classificacao = factory(Classificacao::class)->create();
         $classificacaoPai->classificacao_id = $classificacao->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $classificacaoPai->save();
     }
 }

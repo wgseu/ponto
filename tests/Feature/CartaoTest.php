@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Cartao;
 use App\Models\Carteira;
@@ -93,25 +93,25 @@ class CartaoTest extends TestCase
 
     public function testValidateCartaoTaxaNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cartao::class)->create(['taxa' => -4]);
     }
 
     public function testValidateCartaoDiasRepasseNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cartao::class)->create(['dias_repasse' => -30]);
     }
 
     public function testValidateCartaoTaxaAntecipacaoNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cartao::class)->create(['taxa_antecipacao' => -4]);
     }
 
     public function testValidateCartaoCreateDesativado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cartao::class)->create(['ativo' => false]);
     }
 }

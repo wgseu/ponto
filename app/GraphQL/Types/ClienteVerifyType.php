@@ -24,29 +24,29 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace Tests\Feature;
+declare(strict_types=1);
+
+namespace App\GraphQL\Types;
 
 use App\Models\Cliente;
-use Illuminate\Support\Facades\View;
-use Tests\TestCase;
+use GraphQL\Type\Definition\Type;
 
-class MailControllerTest extends TestCase
+class ClienteVerifyType extends ClienteType
 {
-    public function testActivateAccount()
-    {
-        $cliente = factory(Cliente::class)->create();
-        $this->assertEquals(Cliente::STATUS_INATIVO, $cliente->status);
-        $token = auth()->fromUser($cliente);
-        $response = $this->get("/active/$token");
-        $response->assertStatus(302);
-        $cliente->refresh();
-        $this->assertEquals(Cliente::STATUS_ATIVO, $cliente->status);
-    }
+    protected $attributes = [
+        'name' => 'ClienteVerify',
+        'description' => 'Informações de cliente físico ou jurídico. Clientes, empresas,' .
+            ' funcionários, fornecedores e parceiros são cadastrados aqui',
+        'model' => Cliente::class,
+    ];
 
-    public function testInvalidActivation()
+    public function fields(): array
     {
-        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwIn0.x33jwTSqjLhnjEDeO8sFbNXRhzoHeaabyOfTzJrzwqA';
-        $response = $this->get("/active/$token");
-        $response->assertStatus(401);
+        return array_merge(parent::fields(), [
+            'refresh_token' => [
+                'type' => Type::string(),
+                'description' => 'Token de verificação de conta, permite verificar a conta e logar após validar',
+            ],
+        ]);
     }
 }

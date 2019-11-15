@@ -28,18 +28,25 @@ namespace App\Models;
 
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
-use App\Exceptions\SafeValidationException;
 use Illuminate\Foundation\Auth\User;
 use App\Interfaces\ValidateInterface;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
+use App\Interfaces\ValidateInsertInterface;
+use Illuminate\Support\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
  * funcionários, fornecedores e parceiros são cadastrados aqui
  */
-class Cliente extends User implements ValidateInterface, JWTSubject, AuthorizableInterface
+class Cliente extends User implements
+    ValidateInterface,
+    JWTSubject,
+    AuthorizableInterface,
+    ValidateInsertInterface
 {
     use Notifiable;
     use ModelEvents;
@@ -95,8 +102,6 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
         'limite_compra',
         'instagram',
         'facebook_url',
-        'twitter',
-        'linkedin_url',
         'imagem_url',
         'linguagem',
     ];
@@ -107,7 +112,7 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
      * @var array
      */
     protected $hidden = [
-        'senha', 'secreto',
+        'senha', 'ip', 'data_envio',
     ];
 
     /**
@@ -137,7 +142,10 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
      */
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'uid' => null,
+            'typ' => 'access',
+        ];
     }
 
     /**
@@ -163,6 +171,30 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
         return $this->senha;
     }
 
+    public function createValidateToken()
+    {
+        $customClaims = [
+            'uid' => $this->id,
+            'sub' => null,
+            'typ' => 'check',
+            'exp' => Carbon::now('UTC')->addMinutes(24 * 60)->getTimestamp(),
+        ];
+        $payload = JWTFactory::claims($customClaims)->make(true);
+        return JWTAuth::encode($payload)->get();
+    }
+
+    public function createRefreshToken()
+    {
+        $customClaims = [
+            'uid' => $this->id,
+            'sub' => null,
+            'typ' => 'refresh',
+            'exp' => Carbon::now('UTC')->addMinutes(24 * 60)->getTimestamp(),
+        ];
+        $payload = JWTFactory::claims($customClaims)->make(true);
+        return JWTAuth::encode($payload)->get();
+    }
+
     /**
      * Informa se esse cliente faz parte da empresa informada
      */
@@ -186,6 +218,21 @@ class Cliente extends User implements ValidateInterface, JWTSubject, Authorizabl
         $empresa = $this->empresa;
         if (!is_null($empresa) && $empresa->tipo != self::TIPO_JURIDICA) {
             $errors['empresa'] = __('messages.must_be_company');
+        }
+        return $errors;
+    }
+
+    public function onInsert()
+    {
+        $errors = [];
+        if (!is_null($this->ip)) {
+            // evita muitos cadastros inválidos por dia de uma mesma pessoa
+            $registro = self::where('status', '<>', self::STATUS_ATIVO)
+                ->where('ip', $this->ip)
+                ->where('data_cadastro', '>', Carbon::parse('-1 day'));
+            if ($registro->exists()) {
+                $errors['status'] = __('messages.account_already_created');
+            }
         }
         return $errors;
     }

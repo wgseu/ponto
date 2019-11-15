@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+    'host' => env('MAIL_HOST', 'smtp.grandchef.com.br'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'desenvolvimento@mzsw.com.br'),
+        'address' => env('MAIL_FROM_ADDRESS', 'cliente@grandchef.com.br'),
         'name' => env('MAIL_FROM_NAME', 'GrandChef'),
     ],
 

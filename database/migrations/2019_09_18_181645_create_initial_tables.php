@@ -192,21 +192,19 @@ class CreateInitialTables extends Migration
             $table->date('data_nascimento')->nullable();
             $table->string('slogan', 100)->nullable();
             $table->enum('status', ['inativo', 'ativo', 'bloqueado'])->default('inativo');
-            $table->string('secreto', 40)->nullable();
             $table->decimal('limite_compra', 19, 4)->nullable();
             $table->string('instagram', 200)->nullable();
             $table->string('facebook_url', 200)->nullable();
-            $table->string('twitter', 200)->nullable();
-            $table->string('linkedin_url', 200)->nullable();
             $table->string('imagem_url', 100)->nullable();
             $table->string('linguagem', 20)->nullable();
+            $table->string('ip', 60)->nullable();
+            $table->dateTime('data_envio')->nullable();
             $table->dateTime('data_atualizacao')->nullable();
             $table->dateTime('data_cadastro');
 
             $table->unique(['email']);
             $table->unique(['cpf']);
             $table->unique(['login']);
-            $table->unique(['secreto']);
             $table->index(['empresa_id']);
             $table->index(['nome']);
             $table->foreign('empresa_id')
@@ -1878,8 +1876,13 @@ class CreateInitialTables extends Migration
             $table->string('operadora', 45)->nullable();
             $table->string('servico', 45)->nullable();
             $table->boolean('principal')->default(false);
+            $table->string('codigo_verificacao', 10)->nullable();
+            $table->integer('tentativas')->nullable();
+            $table->dateTime('data_geracao')->nullable();
+            $table->dateTime('data_envio')->nullable();
             $table->dateTime('data_validacao')->nullable();
 
+            $table->unique(['codigo_verificacao']);
             $table->index(['cliente_id']);
             $table->index(['numero']);
             $table->index(['pais_id']);
@@ -2072,6 +2075,28 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
+
+        Schema::create('notificacoes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('destinatario_id');
+            $table->unsignedInteger('remetente_id')->nullable();
+            $table->text('mensagem');
+            $table->string('categoria', 50)->nullable();
+            $table->string('redirecionar', 255)->nullable();
+            $table->dateTime('data_visualizacao')->nullable();
+            $table->dateTime('data_notificacao');
+
+            $table->index(['destinatario_id']);
+            $table->index(['remetente_id']);
+            $table->foreign('destinatario_id')
+                ->references('id')->on('clientes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('remetente_id')
+                ->references('id')->on('clientes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+        });
         Schema::enableForeignKeyConstraints();
 
         if (env('APP_ENV') == 'testing') {
@@ -2172,6 +2197,7 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('cozinhas');
         Schema::dropIfExists('cardapios');
         Schema::dropIfExists('contagens');
+        Schema::dropIfExists('notificacoes');
         Schema::enableForeignKeyConstraints();
     }
 }

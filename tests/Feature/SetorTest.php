@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Setor;
 
@@ -91,7 +91,7 @@ class SetorTest extends TestCase
     {
         $setorPai = factory(Setor::class)->create();
         $subsetor = factory(Setor::class)->create(['setor_id' => $setorPai->id]);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Setor::class)->create(['setor_id' => $subsetor->id]);
     }
 
@@ -99,7 +99,7 @@ class SetorTest extends TestCase
     {
         $setor = factory(Setor::class)->create();
         $setor->setor_id = $setor->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $setor->save();
     }
 
@@ -109,7 +109,7 @@ class SetorTest extends TestCase
         $subsetor = factory(Setor::class)->create(['setor_id' => $setorPai->id]);
         $setor = factory(Setor::class)->create();
         $setorPai->setor_id = $setor->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $setorPai->save();
     }
 }

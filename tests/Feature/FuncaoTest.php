@@ -28,7 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Funcao;
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 
 class FuncaoTest extends TestCase
 {
@@ -88,7 +88,7 @@ class FuncaoTest extends TestCase
 
     public function testValidateFuncaoRemuneracaoNegativa()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Funcao::class)->create(['remuneracao' => -50]);
     }
 }

@@ -86,9 +86,6 @@ class ClienteFilter extends InputType
             'status' => [
                 'type' => GraphQL::type('ClienteStatusFilter'),
             ],
-            'secreto' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
             'limite_compra' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],
@@ -98,17 +95,14 @@ class ClienteFilter extends InputType
             'facebook_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
-            'twitter' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'linkedin_url' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
             'imagem_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
             'linguagem' => [
                 'type' => GraphQL::type('StringFilter'),
+            ],
+            'data_envio' => [
+                'type' => GraphQL::type('DateFilter'),
             ],
             'data_atualizacao' => [
                 'type' => GraphQL::type('DateFilter'),

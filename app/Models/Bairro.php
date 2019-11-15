@@ -27,7 +27,6 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 

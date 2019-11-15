@@ -170,6 +170,7 @@ return [
                 'cozinhas' => 'App\GraphQL\Queries\CozinhaQuery',
                 'cardapios' => 'App\GraphQL\Queries\CardapioQuery',
                 'contagens' => 'App\GraphQL\Queries\ContagemQuery',
+                'notificacoes' => 'App\GraphQL\Queries\NotificacaoQuery',
 
                 'empresa' => 'App\GraphQL\Queries\EmpresaQuery',
                 'sistema' => 'App\GraphQL\Queries\SistemaQuery',
@@ -370,6 +371,7 @@ return [
                 'CreateCardapio' => 'App\GraphQL\Mutations\CreateCardapioMutation',
                 'UpdateCardapio' => 'App\GraphQL\Mutations\UpdateCardapioMutation',
                 'DeleteCardapio' => 'App\GraphQL\Mutations\DeleteCardapioMutation',
+                'UpdateNotificacao' => 'App\GraphQL\Mutations\UpdateNotificacaoMutation',
             ],
             'middleware' => [],
             'method'     => ['get', 'post'],
@@ -475,6 +477,7 @@ return [
         'CozinhaFilter' => 'App\GraphQL\Filters\CozinhaFilter',
         'CardapioFilter' => 'App\GraphQL\Filters\CardapioFilter',
         'ContagemFilter' => 'App\GraphQL\Filters\ContagemFilter',
+        'NotificacaoFilter' => 'App\GraphQL\Filters\NotificacaoFilter',
 
         'CarteiraTipoFilter' => 'App\GraphQL\Filters\CarteiraTipoFilter',
         'CarteiraAmbienteFilter' => 'App\GraphQL\Filters\CarteiraAmbienteFilter',
@@ -598,6 +601,7 @@ return [
         'CozinhaOrder' => 'App\GraphQL\Ordering\CozinhaOrder',
         'CardapioOrder' => 'App\GraphQL\Ordering\CardapioOrder',
         'ContagemOrder' => 'App\GraphQL\Ordering\ContagemOrder',
+        'NotificacaoOrder' => 'App\GraphQL\Ordering\NotificacaoOrder',
 
         'SetorInput' => 'App\GraphQL\Inputs\SetorInput',
         'MesaInput' => 'App\GraphQL\Inputs\MesaInput',
@@ -820,6 +824,9 @@ return [
         'Cozinha' => 'App\GraphQL\Types\CozinhaType',
         'Cardapio' => 'App\GraphQL\Types\CardapioType',
         'Contagem' => 'App\GraphQL\Types\ContagemType',
+        'Notificacao' => 'App\GraphQL\Types\NotificacaoType',
+
+        'ClienteVerify' => 'App\GraphQL\Types\ClienteVerifyType',
 
         'CarteiraTipo' => 'App\GraphQL\Enums\CarteiraTipoEnum',
         'CarteiraAmbiente' => 'App\GraphQL\Enums\CarteiraAmbienteEnum',

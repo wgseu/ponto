@@ -28,21 +28,76 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Cliente;
+use App\Models\Telefone;
 
 class ClienteTest extends TestCase
 {
+    /**
+     * Retorna os headers de autenticação do usuário
+     *
+     * @param Cliente $user opcional
+     * @return array
+     */
+    public static function auth($user = null)
+    {
+        $user = $user ?: factory(Cliente::class)->make();
+        $user->status = Cliente::STATUS_ATIVO;
+        $user->save();
+        $token = auth()->fromUser($user);
+        return [
+            'Authorization' => "Bearer $token",
+        ];
+    }
+
     public function testCreateCliente()
     {
         $headers = PrestadorTest::auth();
-        $seed_cliente =  factory(Cliente::class)->create();
+        $cliente_data =  factory(Cliente::class)->make(['nome' => 'Teste']);
         $response = $this->graphfl('create_cliente', [
-            'input' => [
-                'nome' => 'Teste',
-            ]
+            'input' => $cliente_data,
         ], $headers);
 
         $found_cliente = Cliente::findOrFail($response->json('data.CreateCliente.id'));
         $this->assertEquals('Teste', $found_cliente->nome);
+    }
+
+    public function testCreateAccount()
+    {
+        $cliente_data = factory(Cliente::class)->make(['email' => 'contato@grandchef.com.br']);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $this->assertNotNull($response->json('data.CreateCliente.refresh_token'));
+    }
+
+    public function testCreateAccountWithPhones()
+    {
+        $cliente_data = factory(Cliente::class)->raw(['nome' => 'Teste']);
+        $cliente_data = array_merge($cliente_data, [
+            'telefones' => [
+                ['numero' => '44987654321'],
+                ['numero' => '44987654320'],
+            ],
+        ]);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $cliente = Cliente::findOrFail($response->json('data.CreateCliente.id'));
+        $fone1 = Telefone::where('cliente_id', $cliente->id)
+            ->where('numero', '44987654321')->first();
+        $fone2 = Telefone::where('cliente_id', $cliente->id)
+            ->where('numero', '44987654320')->first();
+        $this->assertNotNull($fone1);
+        $this->assertNotNull($fone2);
+    }
+
+    public function testCreateAccountWithSamePhones()
+    {
+        $cliente_data = factory(Cliente::class)->raw(['nome' => 'Teste']);
+        $cliente_data = array_merge($cliente_data, [
+            'telefones' => [
+                ['numero' => '44987654321'],
+                ['numero' => '4487654321'],
+            ],
+        ]);
+        $this->expectException('\Exception');
+        $this->graphfl('create_cliente', ['input' => $cliente_data]);
     }
 
     public function testUpdateCliente()

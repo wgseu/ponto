@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Cidade;
 use App\Models\Estado;
@@ -86,7 +86,7 @@ class CidadeTest extends TestCase
 
     public function testValidCidade()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cidade::class)->create(['cep' => '887p50a0']);
     }
 }

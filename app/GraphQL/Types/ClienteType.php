@@ -60,9 +60,6 @@ class ClienteType extends GraphQLType
             'login' => [
                 'type' => Type::string(),
                 'description' => 'Nome de usuário utilizado para entrar no sistema, aplicativo ou site',
-                'privacy' => function (array $args): bool {
-                    return Auth::check() && Auth::user()->can('cliente:view');
-                },
             ],
             'nome' => [
                 'type' => Type::string(),
@@ -117,14 +114,6 @@ class ClienteType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'URL para acessar a página do Facebook do cliente',
             ],
-            'twitter' => [
-                'type' => Type::string(),
-                'description' => 'URL para acessar a página do Twitter do cliente',
-            ],
-            'linkedin_url' => [
-                'type' => Type::string(),
-                'description' => 'URL para acessar a página do LinkedIn do cliente',
-            ],
             'imagem_url' => [
                 'type' => Type::string(),
                 'description' => 'Foto do cliente ou logo da empresa',
@@ -133,6 +122,13 @@ class ClienteType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo' .
                     ' e o site, Ex: pt-BR',
+            ],
+            'data_envio' => [
+                'type' => GraphQL::type('DateTime'),
+                'description' => 'Data do envio do e-mail de validação ou recuperação de conta',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cliente:view');
+                },
             ],
             'data_atualizacao' => [
                 'type' => GraphQL::type('DateTime'),

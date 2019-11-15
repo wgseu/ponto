@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Credito;
 use App\Models\Cliente;
 use Tests\TestCase;
@@ -70,13 +70,13 @@ class CreditoTest extends TestCase
     {
         $cliente = factory(Cliente::class)->create();
         $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -101]);
     }
 
     public function testValidateCreditoCreateCancelado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Credito::class)->create(['cancelado' => true]);
     }
 
@@ -86,7 +86,7 @@ class CreditoTest extends TestCase
         $oldCredito = factory(Credito::class)->create(['valor' => 100, 'cliente_id' => $cliente->id]);
         $credito = factory(Credito::class)->create(['cliente_id' => $cliente->id, 'valor' => -40]);
         $oldCredito->cancelado = true;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $oldCredito->save();
     }
 
@@ -98,7 +98,7 @@ class CreditoTest extends TestCase
 
         $newCliente = factory(Cliente::class)->create();
         $credito->cliente_id = $newCliente->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $credito->save();
     }
 
@@ -110,7 +110,7 @@ class CreditoTest extends TestCase
 
         $newCliente = factory(Cliente::class)->create();
         $oldCredito->cliente_id = $newCliente->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $oldCredito->save();
     }
 
@@ -120,7 +120,7 @@ class CreditoTest extends TestCase
         $credito->cancelado = true;
         $credito->save();
         $credito->valor = 15;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $credito->save();
     }
 

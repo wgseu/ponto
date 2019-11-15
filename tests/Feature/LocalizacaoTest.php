@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Bairro;
 use App\Models\Cliente;
 use Tests\TestCase;
@@ -91,19 +91,19 @@ class LocalizacaoTest extends TestCase
 
     public function testValidateCondominioTipoObrigatorio()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Localizacao::class)->create(['tipo' => Localizacao::TIPO_CONDOMINIO]);
     }
 
     public function testValidateApartamentoTipoObrigatorio()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Localizacao::class)->create(['tipo' => Localizacao::TIPO_APARTAMENTO]);
     }
 
     public function testValidateLocalizacaoNcmInvalido()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Localizacao::class)->create(['cep' => '87880p00']);
     }
 

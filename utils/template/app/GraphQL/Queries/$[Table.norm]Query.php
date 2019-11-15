@@ -72,9 +72,10 @@ $[table.end]
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = $[Table.norm]::with($fields->getRelations())
-            ->select($fields->getSelect())
-            ->where(Filter::map($args['filter'] ?? []));
+        $query = Filter::apply(
+            $args['filter'] ?? [],
+            $[Table.norm]::with($fields->getRelations())->select($fields->getSelect())
+        );
 $[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
         if ($args['filed'] ?? false) {
             $query->withTrashed();

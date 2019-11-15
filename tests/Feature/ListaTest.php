@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Lista;
 use App\Models\Prestador;
@@ -98,13 +98,13 @@ class ListaTest extends TestCase
     {
         $lista = factory(Lista::class)->create(['estado' => Lista::ESTADO_COMPRADA]);
         $lista->descricao = 'Mercado';
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $lista->save();
     }
 
     public function testValidateListaDataViagemInvalida()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Lista::class)->create([
             'data_viagem' => '2016-12-25 12:15:00',
             'data_cadastro' => '2019-12-25 12:15:00'

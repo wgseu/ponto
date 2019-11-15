@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Categoria;
 use Tests\TestCase;
 
@@ -71,7 +71,7 @@ class CategoriaTest extends TestCase
     {
         $categoriaPai = factory(Categoria::class)->create();
         $subcategoria = factory(Categoria::class)->create(['categoria_id' => $categoriaPai->id]);
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Categoria::class)->create(['categoria_id' => $subcategoria->id]);
     }
 
@@ -79,7 +79,7 @@ class CategoriaTest extends TestCase
     {
         $categoria = factory(Categoria::class)->create();
         $categoria->categoria_id = $categoria->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $categoria->save();
     }
 
@@ -89,7 +89,7 @@ class CategoriaTest extends TestCase
         $subcategoria = factory(Categoria::class)->create(['categoria_id' => $categoriaPai->id]);
         $categoria = factory(Categoria::class)->create();
         $categoriaPai->categoria_id = $categoria->id;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $categoriaPai->save();
     }
 }

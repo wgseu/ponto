@@ -26,7 +26,7 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\SafeValidationException;
+use App\Exceptions\ValidationException;
 use App\Models\Banco;
 use Tests\TestCase;
 use App\Models\Cheque;
@@ -106,7 +106,7 @@ class ChequeTest extends TestCase
     public function testValidateChequeDuplicado()
     {
         $oldcheque = factory(Cheque::class)->create();
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cheque::class)->create([
             'agencia' => $oldcheque->agencia,
             'conta' => $oldcheque->conta,
@@ -116,7 +116,7 @@ class ChequeTest extends TestCase
 
     public function testValidateChequeNegativo()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cheque::class)->create(['valor' =>  -100]);
     }
 
@@ -127,7 +127,7 @@ class ChequeTest extends TestCase
         $cheque->cancelado = true;
         $cheque->save();
         $cheque->valor =  1000;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
@@ -135,13 +135,13 @@ class ChequeTest extends TestCase
     {
         $cheque = factory(Cheque::class)->create(['recolhimento' => '2016-12-28 12:30:00']);
         $cheque->valor =  1000;
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         $cheque->save();
     }
 
     public function testValidateChequeCreateCancelado()
     {
-        $this->expectException(SafeValidationException::class);
+        $this->expectException(ValidationException::class);
         factory(Cheque::class)->create(['cancelado' => true]);
     }
 

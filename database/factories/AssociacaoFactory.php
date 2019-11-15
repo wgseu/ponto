@@ -8,9 +8,9 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Associacao::class, function (Faker $faker) {
-    $integracao_id = factory(Integracao::class)->create();
+    $integracao = factory(Integracao::class)->create();
     return [
-        'integracao_id' => $integracao_id->id,
+        'integracao_id' => $integracao->id,
         'codigo' => $faker->name,
         'cliente' => $faker->name,
         'chave' => $faker->name,

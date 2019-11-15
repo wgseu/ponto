@@ -43,7 +43,7 @@ services:
             - db
     db:
         image: mysql:5.7.27
-        command: mysqld --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+        command: mysqld --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         restart: always
         env_file:
             - ".env"

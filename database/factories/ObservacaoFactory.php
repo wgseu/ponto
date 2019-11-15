@@ -7,9 +7,9 @@ use App\Models\Produto;
 use Faker\Generator as Faker;
 
 $factory->define(Observacao::class, function (Faker $faker) {
-    $produto_id = factory(Produto::class)->create();
+    $produto = factory(Produto::class)->create();
     return [
-        'produto_id' => $produto_id->id,
+        'produto_id' => $produto->id,
         'descricao' => $faker->unique()->name,
     ];
 });

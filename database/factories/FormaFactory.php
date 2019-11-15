@@ -7,10 +7,10 @@ use App\Models\Carteira;
 use Faker\Generator as Faker;
 
 $factory->define(Forma::class, function (Faker $faker) {
-    $carteira_id = factory(Carteira::class)->create();
+    $carteira = factory(Carteira::class)->create();
     return [
         'tipo' => Forma::TIPO_DINHEIRO,
-        'carteira_id' => $carteira_id->id,
+        'carteira_id' => $carteira->id,
         'descricao' => $faker->unique()->name,
     ];
 });

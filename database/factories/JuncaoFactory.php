@@ -8,10 +8,10 @@ use App\Models\Pedido;
 use Faker\Generator as Faker;
 
 $factory->define(Juncao::class, function (Faker $faker) {
-    $mesa_id = factory(Mesa::class)->create();
-    $pedido_id = factory(Pedido::class)->create();
+    $mesa = factory(Mesa::class)->create();
+    $pedido = factory(Pedido::class)->create();
     return [
-        'mesa_id' => $mesa_id->id,
-        'pedido_id' => $pedido_id->id,
+        'mesa_id' => $mesa->id,
+        'pedido_id' => $pedido->id,
     ];
 });

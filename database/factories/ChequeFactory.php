@@ -9,11 +9,11 @@ use Carbon\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Cheque::class, function (Faker $faker) {
-    $cliente_id = factory(Cliente::class)->create();
-    $banco_id = factory(Banco::class)->create();
+    $cliente = factory(Cliente::class)->create();
+    $banco = factory(Banco::class)->create();
     return [
-        'cliente_id' => $cliente_id->id,
-        'banco_id' => $banco_id->id,
+        'cliente_id' => $cliente->id,
+        'banco_id' => $banco->id,
         'agencia' => $faker->name,
         'conta' => $faker->name,
         'numero' => $faker->name,

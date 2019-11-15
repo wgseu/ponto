@@ -8,10 +8,10 @@ use App\Models\Produto;
 use Faker\Generator as Faker;
 
 $factory->define(Requisito::class, function (Faker $faker) {
-    $lista_id = factory(Lista::class)->create();
-    $produto_id = factory(Produto::class)->create();
+    $lista = factory(Lista::class)->create();
+    $produto = factory(Produto::class)->create();
     return [
-        'lista_id' => $lista_id->id,
-        'produto_id' => $produto_id->id,
+        'lista_id' => $lista->id,
+        'produto_id' => $produto->id,
     ];
 });

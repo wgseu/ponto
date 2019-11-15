@@ -7,9 +7,9 @@ use App\Models\Grupo;
 use Faker\Generator as Faker;
 
 $factory->define(Propriedade::class, function (Faker $faker) {
-    $grupo_id = factory(Grupo::class)->create();
+    $grupo = factory(Grupo::class)->create();
     return [
-        'grupo_id' => $grupo_id->id,
+        'grupo_id' => $grupo->id,
         'nome' => $faker->unique()->name,
     ];
 });

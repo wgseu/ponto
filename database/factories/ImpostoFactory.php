@@ -10,7 +10,7 @@ $factory->define(Imposto::class, function (Faker $faker) {
         'grupo' => Imposto::GRUPO_ICMS,
         'simples' => true,
         'substituicao' => false,
-        'codigo' => $faker->numberBetween(1, 100),
+        'codigo' => $faker->unique()->numberBetween(1, 999),
         'descricao' => $faker->unique()->word,
     ];
 });

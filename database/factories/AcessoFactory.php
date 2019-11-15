@@ -8,10 +8,10 @@ use App\Models\Permissao;
 use Faker\Generator as Faker;
 
 $factory->define(Acesso::class, function (Faker $faker) {
-    $funcao_id = factory(Funcao::class)->create();
-    $permissao_id = Permissao::first();
+    $funcao = factory(Funcao::class)->create();
+    $permissao = Permissao::first();
     return [
-        'funcao_id' => $funcao_id->id,
-        'permissao_id' => $permissao_id->id,
+        'funcao_id' => $funcao->id,
+        'permissao_id' => $permissao->id,
     ];
 });

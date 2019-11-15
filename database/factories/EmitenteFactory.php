@@ -8,8 +8,8 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Emitente::class, function (Faker $faker) {
-    $regime_id = factory(Regime::class)->create();
+    $regime = factory(Regime::class)->create();
     return [
-        'regime_id' => $regime_id->id,
+        'regime_id' => $regime->id,
     ];
 });

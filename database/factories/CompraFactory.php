@@ -9,11 +9,11 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Compra::class, function (Faker $faker) {
-    $comprador_id = factory(Prestador::class)->create();
-    $fornecedor_id = factory(Fornecedor::class)->create();
+    $comprador = factory(Prestador::class)->create();
+    $fornecedor = factory(Fornecedor::class)->create();
     return [
-        'comprador_id' => $comprador_id->id,
-        'fornecedor_id' => $fornecedor_id->id,
+        'comprador_id' => $comprador->id,
+        'fornecedor_id' => $fornecedor->id,
         'data_compra' => Carbon::now(),
     ];
 });

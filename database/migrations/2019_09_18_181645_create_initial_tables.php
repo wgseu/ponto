@@ -33,7 +33,7 @@ class CreateInitialTables extends Migration
             $table->increments('id');
             $table->unsignedInteger('setor_id');
             $table->integer('numero');
-            $table->string('nome', 50)->nullable();
+            $table->string('nome', 50);
             $table->boolean('ativa')->default(true);
 
             $table->unique(['nome']);

@@ -8,11 +8,11 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Auditoria::class, function (Faker $faker) {
-    $prestador_id = factory(Prestador::class)->create();
-    $autorizador_id = factory(Prestador::class)->create();
+    $prestador = factory(Prestador::class)->create();
+    $autorizador = factory(Prestador::class)->create();
     return [
-        'prestador_id' => $prestador_id->id,
-        'autorizador_id' => $autorizador_id->id,
+        'prestador_id' => $prestador->id,
+        'autorizador_id' => $autorizador->id,
         'tipo' => Auditoria::TIPO_FINANCEIRO,
         'prioridade' => Auditoria::PRIORIDADE_BAIXA,
         'descricao' => $faker->name,

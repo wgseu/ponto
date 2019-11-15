@@ -9,11 +9,11 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Catalogo::class, function (Faker $faker) {
-    $produto_id = factory(Produto::class)->create();
-    $fornecedor_id = factory(Fornecedor::class)->create();
+    $produto = factory(Produto::class)->create();
+    $fornecedor = factory(Fornecedor::class)->create();
     return [
-        'produto_id' => $produto_id->id,
-        'fornecedor_id' => $fornecedor_id->id,
+        'produto_id' => $produto->id,
+        'fornecedor_id' => $fornecedor->id,
         'preco_compra' => 4.50,
     ];
 });

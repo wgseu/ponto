@@ -9,11 +9,11 @@ use Illuminate\Support\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Conta::class, function (Faker $faker) {
-    $classificacao_id = factory(Classificacao::class)->create();
-    $funcionario_id = factory(Prestador::class)->create();
+    $classificacao = factory(Classificacao::class)->create();
+    $funcionario = factory(Prestador::class)->create();
     return [
-        'classificacao_id' => $classificacao_id->id,
-        'funcionario_id' => $funcionario_id->id,
+        'classificacao_id' => $classificacao->id,
+        'funcionario_id' => $funcionario->id,
         'descricao' => $faker->name,
         'valor' => 4.50,
         'vencimento' => Carbon::now(),

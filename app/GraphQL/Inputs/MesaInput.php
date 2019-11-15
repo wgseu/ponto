@@ -50,7 +50,7 @@ class MesaInput extends InputType
                 'description' => 'Número da mesa',
             ],
             'nome' => [
-                'type' => Type::string(),
+                'type' => Type::nonNull(Type::string()),
                 'description' => 'Nome da mesa',
                 'rules' => ['max:50'],
             ],

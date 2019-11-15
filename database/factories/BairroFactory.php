@@ -7,9 +7,9 @@ use App\Models\Cidade;
 use Faker\Generator as Faker;
 
 $factory->define(Bairro::class, function (Faker $faker) {
-    $cidade_id = factory(Cidade::class)->create();
+    $cidade = factory(Cidade::class)->create();
     return [
-        'cidade_id' => $cidade_id->id,
+        'cidade_id' => $cidade->id,
         'nome' => $faker->unique()->name,
         'valor_entrega' => 4.50,
     ];

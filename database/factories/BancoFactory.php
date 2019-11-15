@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Banco::class, function (Faker $faker) {
     return [
-        'numero' => $faker->unique()->name,
+        'numero' => $faker->unique()->numberBetween(1, 10000) . '',
         'fantasia' => $faker->unique()->name,
         'razao_social' => $faker->unique()->name,
     ];

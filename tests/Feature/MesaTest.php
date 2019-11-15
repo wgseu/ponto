@@ -31,23 +31,16 @@ use App\Models\Mesa;
 
 class MesaTest extends TestCase
 {
-    public function testCreateMesa()
+    public function testCreate()
     {
         $headers = PrestadorTest::auth();
-        $seed_mesa =  factory(Mesa::class)->create();
-        $response = $this->graphfl('create_mesa', [
-            'input' => [
-                'setor_id' => $seed_mesa->setor_id,
-                'numero' => 1,
-            ]
-        ], $headers);
-
-        $found_mesa = Mesa::findOrFail($response->json('data.CreateMesa.id'));
-        $this->assertEquals($seed_mesa->setor_id, $found_mesa->setor_id);
-        $this->assertEquals(1, $found_mesa->numero);
+        $mesa_data =  factory(Mesa::class)->raw();
+        $response = $this->graphfl('create_mesa', ['input' => $mesa_data], $headers);
+        $mesa = Mesa::find($response->json('data.CreateMesa.id'));
+        $this->assertNotNull($mesa);
     }
 
-    public function testUpdateMesa()
+    public function testUpdate()
     {
         $headers = PrestadorTest::auth();
         $mesa = factory(Mesa::class)->create();
@@ -55,22 +48,24 @@ class MesaTest extends TestCase
             'id' => $mesa->id,
             'input' => [
                 'numero' => 1,
+                'nome' => 'Atualizou',
             ]
         ], $headers);
         $mesa->refresh();
         $this->assertEquals(1, $mesa->numero);
+        $this->assertEquals('Atualizou', $mesa->nome);
     }
 
-    public function testDeleteMesa()
+    public function testDelete()
     {
         $headers = PrestadorTest::auth();
         $mesa_to_delete = factory(Mesa::class)->create();
         $this->graphfl('delete_mesa', ['id' => $mesa_to_delete->id], $headers);
-        $mesa = Mesa::find($mesa_to_delete->id);
+        $mesa = $mesa_to_delete->fresh();
         $this->assertNull($mesa);
     }
 
-    public function testFindMesa()
+    public function testFind()
     {
         $headers = PrestadorTest::auth();
         $mesa = factory(Mesa::class)->create();

@@ -8,11 +8,11 @@ use App\Models\Cliente;
 use Faker\Generator as Faker;
 
 $factory->define(Prestador::class, function (Faker $faker) {
-    $funcao_id = factory(Funcao::class)->create();
-    $cliente_id = factory(Cliente::class)->create();
+    $funcao = factory(Funcao::class)->create();
+    $cliente = factory(Cliente::class)->create();
     return [
-        'codigo' => $faker->unique()->name,
-        'funcao_id' => $funcao_id->id,
-        'cliente_id' => $cliente_id->id,
+        'codigo' => $faker->unique()->numberBetween(1, 10000) . '',
+        'funcao_id' => $funcao->id,
+        'cliente_id' => $cliente->id,
     ];
 });

@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Regime::class, function (Faker $faker) {
     return [
-        'codigo' => $faker->numberBetween(1, 70),
+        'codigo' => $faker->unique()->numberBetween(1, 888),
         'descricao' => $faker->name,
     ];
 });

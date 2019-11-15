@@ -7,9 +7,11 @@ use App\Models\Setor;
 use Faker\Generator as Faker;
 
 $factory->define(Mesa::class, function (Faker $faker) {
-    $setor_id = factory(Setor::class)->create();
+    $setor = factory(Setor::class)->create();
+    $numero = $faker->unique()->numberBetween(1, 10000);
     return [
-        'setor_id' => $setor_id->id,
-        'numero' => $faker->numberBetween(1, 70),
+        'setor_id' => $setor->id,
+        'numero' => $numero,
+        'nome' => __('messages.table_number', ['number' => $numero]),
     ];
 });

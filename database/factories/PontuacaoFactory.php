@@ -7,9 +7,9 @@ use App\Models\Promocao;
 use Faker\Generator as Faker;
 
 $factory->define(Pontuacao::class, function (Faker $faker) {
-    $promocao_id = factory(Promocao::class)->create();
+    $promocao = factory(Promocao::class)->create();
     return [
-        'promocao_id' => $promocao_id->id,
+        'promocao_id' => $promocao->id,
         'quantidade' => $faker->numberBetween(1, 70),
     ];
 });

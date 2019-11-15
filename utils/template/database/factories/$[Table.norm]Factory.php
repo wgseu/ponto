@@ -43,7 +43,7 @@ $[field.else.if(currency)]
 $[field.else.if(float|double)]
         '$[field]' => 2.3,
 $[field.else.if(integer|bigint)]
-        '$[field]' => $faker->numberBetween(1, 70),
+        '$[field]' => $faker->$[field.if(unique)]unique()->$[field.end]numberBetween(1, 10000),
 $[field.else.if(blob)]
         '$[field]' => 0,
 $[field.else.if(boolean)]

@@ -8,11 +8,11 @@ use App\Models\Bairro;
 use Faker\Generator as Faker;
 
 $factory->define(Endereco::class, function (Faker $faker) {
-    $cidade_id = factory(Cidade::class)->create();
-    $bairro_id = factory(Bairro::class)->create();
+    $cidade = factory(Cidade::class)->create();
+    $bairro = factory(Bairro::class)->create();
     return [
-        'cidade_id' => $cidade_id->id,
-        'bairro_id' => $bairro_id->id,
+        'cidade_id' => $cidade->id,
+        'bairro_id' => $bairro->id,
         'logradouro' => $faker->unique()->name,
         'cep' => '87880000',
     ];

@@ -31,89 +31,16 @@ use App\Models\$[Table.norm];
 
 class $[Table.norm]Test extends TestCase
 {
-    public function testCreate$[Table.norm]()
+    public function testCreate()
     {
         $headers = PrestadorTest::auth();
-        $seed_$[table.unix] =  factory($[Table.norm]::class)->create();
-        $response = $this->graphfl('create_$[table.norm]', [
-            'input' => [
-$[field.each(all)]
-$[field.if(primary|default|null)]
-$[field.else.if(enum)]
-                '$[field]' => $[field.each(option)]$[field.if(first)]$[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end],
-$[field.else.if(blob)]
-                '$[field]' => 'testeimagem',
-$[field.else.if(currency)]
-                '$[field]' => 1.50,
-$[field.else.if(bigint)]
-                '$[field]' => 1,
-$[field.else.if(boolean)]
-                '$[field]' => true,
-$[field.else.if(double)]
-                '$[field]' => 1.0,
-$[field.else.if(text)]
-                '$[field]' => 'Teste',
-$[field.else.if(float)]
-                '$[field]' => 1.30,
-$[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
-$[field.else]
-                '$[field]' => '2016-12-25 12:15:00',
-$[field.end]
-$[field.else.if(time)]
-                '$[field]' => '12:15:00',
-$[field.else.if(date)]
-                '$[field]' => '2016-12-25',
-$[field.else.if(string)]
-                '$[field]' => 'Teste',
-$[field.else.if(reference)]
-                '$[field]' => $seed_$[table.unix]->$[field],
-$[field.else.if(integer)]
-                '$[field]' => 1,
-$[field.end]
-$[field.end]
-            ]
-        ], $headers);
-
-        $found_$[table.unix] = $[Table.norm]::findOrFail($response->json('data.Create$[Table.norm].id'));
-$[field.each(all)]
-$[field.if(primary|default|null)]
-$[field.else.if(enum)]
-        $this->assertEquals($[field.each(option)]$[field.if(first)]$[Table.norm]::$[FIELD.unix]_$[FIELD.option.norm]$[field.end]$[field.end], $found_$[table.unix]->$[field]);
-$[field.else.if(blob)]
-        $this->assertEquals('testeimagem', $found_$[table.unix]->$[field]);
-$[field.else.if(currency)]
-        $this->assertEquals(1.50, $found_$[table.unix]->$[field]);
-$[field.else.if(bigint)]
-        $this->assertEquals(1, $found_$[table.unix]->$[field]);
-$[field.else.if(boolean)]
-        $this->assertEquals(true, $found_$[table.unix]->$[field]);
-$[field.else.if(double)]
-        $this->assertEquals(1.0, $found_$[table.unix]->$[field]);
-$[field.else.if(text)]
-        $this->assertEquals('Teste', $found_$[table.unix]->$[field]);
-$[field.else.if(float)]
-        $this->assertEquals(1.30, $found_$[table.unix]->$[field]);
-$[field.else.if(datetime)]
-$[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
-$[field.else]
-        $this->assertEquals('2016-12-25 12:15:00', $found_$[table.unix]->$[field]);
-$[field.end]
-$[field.else.if(time)]
-        $this->assertEquals('12:15:00', $found_$[table.unix]->$[field]);
-$[field.else.if(date)]
-        $this->assertEquals('2016-12-25', $found_$[table.unix]->$[field]);
-$[field.else.if(string)]
-        $this->assertEquals('Teste', $found_$[table.unix]->$[field]);
-$[field.else.if(reference)]
-        $this->assertEquals($seed_$[table.unix]->$[field], $found_$[table.unix]->$[field]);
-$[field.else.if(integer)]
-        $this->assertEquals(1, $found_$[table.unix]->$[field]);
-$[field.end]
-$[field.end]
+        $$[table.unix]_data =  factory($[Table.norm]::class)->raw();
+        $response = $this->graphfl('create_$[table.norm]', ['input' => $$[table.unix]_data], $headers);
+        $$[table.unix] = $[Table.norm]::find($response->json('data.Create$[Table.norm].id'));
+        $this->assertNotNull($$[table.unix]);
     }
 
-    public function testUpdate$[Table.norm]()
+    public function testUpdate()
     {
         $headers = PrestadorTest::auth();
         $$[table.unix] = factory($[Table.norm]::class)->create();
@@ -193,7 +120,7 @@ $[field.end]
 $[field.end]
     }
 
-    public function testDelete$[Table.norm]()
+    public function testDelete()
     {
         $headers = PrestadorTest::auth();
         $$[table.unix]_to_delete = factory($[Table.norm]::class)->create();
@@ -214,11 +141,11 @@ $[table.else]
 $[table.end]
     }
 
-    public function testFind$[Table.norm]()
+    public function testFind()
     {
         $headers = PrestadorTest::auth();
         $$[table.unix] = factory($[Table.norm]::class)->create();
         $response = $this->graphfl('query_$[table.unix]', [ 'id' => $$[table.unix]->id ], $headers);
-        $this->assertEquals($$[table.unix]->id, $response->json('data.$[table.unix.plural].data.id'));
+        $this->assertEquals($$[table.unix]->id, $response->json('data.$[table.unix.plural].data.0.id'));
     }
 }

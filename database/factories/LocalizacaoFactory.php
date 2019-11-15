@@ -8,11 +8,11 @@ use App\Models\Bairro;
 use Faker\Generator as Faker;
 
 $factory->define(Localizacao::class, function (Faker $faker) {
-    $cliente_id = factory(Cliente::class)->create();
-    $bairro_id = factory(Bairro::class)->create();
+    $cliente = factory(Cliente::class)->create();
+    $bairro = factory(Bairro::class)->create();
     return [
-        'cliente_id' => $cliente_id->id,
-        'bairro_id' => $bairro_id->id,
+        'cliente_id' => $cliente->id,
+        'bairro_id' => $bairro->id,
         'logradouro' => $faker->name,
         'numero' => $faker->name,
     ];

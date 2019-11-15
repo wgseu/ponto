@@ -9,13 +9,13 @@ use App\Models\Tributacao;
 use Faker\Generator as Faker;
 
 $factory->define(Tributacao::class, function (Faker $faker) {
-    $origem_id = factory(Origem::class)->create();
-    $operacao_id = factory(Operacao::class)->create();
-    $imposto_id = factory(Imposto::class)->create();
+    $origem = factory(Origem::class)->create();
+    $operacao = factory(Operacao::class)->create();
+    $imposto = factory(Imposto::class)->create();
     return [
         'ncm' => '87881000',
-        'origem_id' => $origem_id->id,
-        'operacao_id' => $operacao_id->id,
-        'imposto_id' => $imposto_id->id,
+        'origem_id' => $origem->id,
+        'operacao_id' => $operacao->id,
+        'imposto_id' => $imposto->id,
     ];
 });

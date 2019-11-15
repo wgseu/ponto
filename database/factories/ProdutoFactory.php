@@ -8,12 +8,12 @@ use App\Models\Unidade;
 use Faker\Generator as Faker;
 
 $factory->define(Produto::class, function (Faker $faker) {
-    $categoria_id = factory(Categoria::class)->create();
-    $unidade_id = factory(Unidade::class)->create();
+    $categoria = factory(Categoria::class)->create();
+    $unidade = factory(Unidade::class)->create();
     return [
         'codigo' => $faker->unique()->numberBetween(1, 99999999),
-        'categoria_id' => $categoria_id->id,
-        'unidade_id' => $unidade_id->id,
+        'categoria_id' => $categoria->id,
+        'unidade_id' => $unidade->id,
         'descricao' => $faker->unique()->name,
     ];
 });

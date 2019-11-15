@@ -8,9 +8,9 @@ use Faker\Generator as Faker;
 use Illuminate\Support\Carbon;
 
 $factory->define(Viagem::class, function (Faker $faker) {
-    $responsavel_id = factory(Prestador::class)->create();
+    $responsavel = factory(Prestador::class)->create();
     return [
-        'responsavel_id' => $responsavel_id->id,
+        'responsavel_id' => $responsavel->id,
         'data_saida' => Carbon::now(),
     ];
 });

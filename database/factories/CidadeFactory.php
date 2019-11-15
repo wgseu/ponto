@@ -7,9 +7,9 @@ use App\Models\Estado;
 use Faker\Generator as Faker;
 
 $factory->define(Cidade::class, function (Faker $faker) {
-    $estado_id = factory(Estado::class)->create();
+    $estado = factory(Estado::class)->create();
     return [
-        'estado_id' => $estado_id->id,
+        'estado_id' => $estado->id,
         'nome' => $faker->unique()->name,
     ];
 });

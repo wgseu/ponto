@@ -8,10 +8,10 @@ use Faker\Generator as Faker;
 use Illuminate\Support\Carbon;
 
 $factory->define(Lista::class, function (Faker $faker) {
-    $encarregado_id = factory(Prestador::class)->create();
+    $encarregado = factory(Prestador::class)->create();
     return [
         'descricao' => $faker->name,
-        'encarregado_id' => $encarregado_id->id,
+        'encarregado_id' => $encarregado->id,
         'data_viagem' => Carbon::now(),
     ];
 });

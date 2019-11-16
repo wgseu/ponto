@@ -120,7 +120,7 @@ class GrupoTest extends TestCase
         $grupo->save();
     }
 
-    public function testValidateGrupoProdutoCannotQuantidadeMaximaLessPacote()
+    public function testReduzirQuantidadeMaxima()
     {
         $grupo = factory(Grupo::class)->create();
         factory(Pacote::class)->create([

@@ -29,13 +29,14 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Exceptions\SafeValidationException;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Contém todos as opções para a formação do produto final
  */
-class Pacote extends Model implements ValidateInterface
+class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
     use SoftDeletes;
@@ -135,8 +136,8 @@ class Pacote extends Model implements ValidateInterface
      * O produto do grupo deve ser igual ao pacote,
      * O grupo da propriedade deve ser igual ao grupo do pacote,
      * Não é permitido propriedade e produto,
+     * Propriedade e pacote não podem ser nulos;
      * Associação depende de uma propriedade,
-     * Para estar selecionado o pacote precisa estar disponível,
      * A associções não podem ter o mesmo grupo ou niveis interior ao grupo,
      * A quantidade minima e maxima não pode ser negativas,
      * A minima não pode ser maior que a maxima a menos que a maxima seja 0,
@@ -150,9 +151,10 @@ class Pacote extends Model implements ValidateInterface
         $errors = [];
         $pacote = $this->pacote;
         $produto = $this->produto;
-        $grupo = $this->grupo;
+        $grupo = Grupo::find($this->grupo_id);
         $propriedade = $this->propriedade;
         $associacao = $this->associacao;
+        $grupo_associado = is_null($associacao) ? null : $associacao->grupo;
         if ($pacote->tipo != Produto::TIPO_PACOTE) {
             $errors['pacote_id'] = __('messages.pacote_cannot_different_pacote');
         }
@@ -167,13 +169,16 @@ class Pacote extends Model implements ValidateInterface
         }
         if (!is_null($this->propriedade_id) && !is_null($this->produto_id)) {
             $errors['propriedade_id'] = __('messages.pacote_require_propriedade_or_produto');
-        } elseif (!is_null($this->associacao_id) && is_null($associacao->propriedade_id)) {
-            $errors['associacao_id'] =  __('messages.associacao_not_references_propriedade');
+        } elseif (is_null($this->propriedade_id) && is_null($this->produto_id)) {
+            $errors['associacao_id'] =  __('messages.propriedade_and_pacote_cannot_null');
         }
-        if ($this->selecionado && !$this->disponivel) {
-            $errors['selecionado'] = __('messages.item_cannot_available');
-        }
-        if (!is_null($associacao) && $associacao->grupo_id >= $this->grupo_id) {
+        if (
+            !is_null($associacao)
+            && ($grupo_associado->ordem > $grupo->ordem
+            || ($grupo_associado->ordem == $grupo->ordem
+                && $associacao->grupo_id >= $this->grupo_id
+            ))
+        ) {
             $errors['associacao_id'] = __('messages.item_cannot_equals_or_less_group');
         }
         if ($this->quantidade_minima < 0) {
@@ -189,21 +194,25 @@ class Pacote extends Model implements ValidateInterface
         ) {
             $errors['quantidade_maxima'] = __('messages.quantidade_maxima_cannot_greater_maxima_grupo');
         }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $oldPacote = $this->fresh();
         if (!is_null($this->associacao_id)) {
-            if (!is_null($associacao) && !is_null($associacao->associacao_id)) {
-                $errors['associacao_id'] = __('messagens.associacao_already');
-            } elseif ($this->id == $this->associacao_id) {
+            if ($this->id == $this->associacao_id) {
                 $errors['associacao_id'] = __('messagens.associacao_some');
             }
         }
-        if ($this->exists) {
-            $oldPacote = $this->fresh();
-            if ($this->pacote_id != $oldPacote->pacote_id) {
-                $errors['pacote_id'] = __('messages.cannot_update_pacote');
-            }
-            if ($this->grupo_id != $oldPacote->grupo_id) {
-                $errors['grupo_id'] = __('messages.cannot_update_grupo_pacote');
-            }
+        if ($this->pacote_id != $oldPacote->pacote_id) {
+            $errors['pacote_id'] = __('messages.cannot_update_pacote');
+        }
+        if ($this->grupo_id != $oldPacote->grupo_id) {
+            $errors['grupo_id'] = __('messages.cannot_update_grupo_pacote');
         }
         if (!empty($errors)) {
             throw SafeValidationException::withMessages($errors);

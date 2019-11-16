@@ -30,13 +30,14 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\SafeValidationException;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
  * formações de produtos
  */
-class Grupo extends Model implements ValidateInterface
+class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
     use SoftDeletes;
@@ -136,20 +137,26 @@ class Grupo extends Model implements ValidateInterface
         if ($this->quantidade_maxima < 0) {
             $errors['quantidade_maxima'] = __('messages.quantidade_maxima_cannot_negative');
         }
-        if ($this->exists) {
-            $oldGrupo = $this->fresh();
-            if ($oldGrupo->produto_id != $this->produto_id) {
-                $errors['produto_id'] = __('messages.produto_cannot_update');
-            }
-            if (
-                $oldGrupo->quantidade_maxima > $this->quantidade_maxima ||
-                $oldGrupo->quantidade_maxima == 0 &&
-                $this->quantidade_maxima != 0
-            ) {
-                $pacoteMaximo = Pacote::where('grupo_id', $this->id)->max('quantidade_maxima');
-                if (!is_null($pacoteMaximo) && $pacoteMaximo > $this->quantidade_maxima) {
-                    $errors['produto_id'] = __('messages.grupo_cannot_update_quantidade_maxima_less_group');
-                }
+        if (!empty($errors)) {
+            throw SafeValidationException::withMessages($errors);
+        }
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $oldGrupo = $this->fresh();
+        if ($oldGrupo->produto_id != $this->produto_id) {
+            $errors['produto_id'] = __('messages.produto_cannot_update');
+        }
+        if (
+            $oldGrupo->quantidade_maxima != $this->quantidade_maxima
+            && $this->tipo == Grupo::TIPO_INTEIRO
+            && $this->quantidade_maxima != 0
+        ) {
+            $pacoteMaximo = Pacote::where('grupo_id', $this->id)->max('quantidade_maxima');
+            if (!is_null($pacoteMaximo) && $pacoteMaximo > $this->quantidade_maxima) {
+                $errors['produto_id'] = __('messages.grupo_cannot_update_quantidade_maxima_less_group');
             }
         }
         if (!empty($errors)) {

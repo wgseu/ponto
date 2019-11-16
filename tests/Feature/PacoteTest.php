@@ -41,6 +41,7 @@ class PacoteTest extends TestCase
         $seed_pacote =  factory(Pacote::class)->create(['selecionado' => true]);
         $response = $this->graphfl('create_pacote', [
             'input' => [
+                'produto_id' => $seed_pacote->produto_id,
                 'pacote_id' => $seed_pacote->pacote_id,
                 'grupo_id' => $seed_pacote->grupo_id,
                 'acrescimo' => 1.50,
@@ -127,15 +128,8 @@ class PacoteTest extends TestCase
 
     public function testValidatePacoteNotAssociado()
     {
-        $associacao = factory(Pacote::class)->create();
         $this->expectException(SafeValidationException::class);
-        factory(Pacote::class)->create(['associacao_id' => $associacao->id]);
-    }
-
-    public function testValidatePacoteSelecionadoDiponivelCannotFalse()
-    {
-        $this->expectException(SafeValidationException::class);
-        factory(Pacote::class)->create(['selecionado' => true, 'disponivel' => false]);
+        factory(Pacote::class)->create(['associacao_id' => null, 'produto_id' => null]);
     }
 
     public function testValidatePacoteMinimoCannotNegative()
@@ -169,9 +163,10 @@ class PacoteTest extends TestCase
 
     public function testValidatePacoteCannotUpdatePacoteId()
     {
+        $grupo = factory(Grupo::class)->create();
         $pacote = factory(Pacote::class)->create();
-        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PACOTE]);
-        $pacote->pacote_id = $produto->id;
+        $pacote->grupo_id = $grupo->id;
+        $pacote->pacote_id = $grupo->produto_id;
         $this->expectException(SafeValidationException::class);
         $pacote->save();
     }
@@ -191,12 +186,14 @@ class PacoteTest extends TestCase
         $grupo = factory(Grupo::class)->create();
         $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
         $associacao = factory(Pacote::class)->create([
+            'produto_id' => null,
             'propriedade_id' => $propriedade->id,
             'grupo_id' => $grupo->id,
             'pacote_id' => $grupo->produto_id
         ]);
         $this->expectException(SafeValidationException::class);
         factory(Pacote::class)->create([
+            'produto_id' => null,
             'associacao_id' => $associacao->id,
             'propriedade_id' => $propriedade->id,
             'grupo_id' => $grupo->id,
@@ -204,25 +201,12 @@ class PacoteTest extends TestCase
         ]);
     }
 
-    public function testValidatePacoteCreateAssociacaoAlready()
-    {
-        $grupo = factory(Grupo::class)->create();
-        $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
-        $pacotePai = factory(Pacote::class)->create([
-            'propriedade_id' => $propriedade->id,
-            'grupo_id' => $grupo->id,
-            'pacote_id' => $grupo->produto_id
-        ]);
-        $subPacote = factory(Pacote::class)->create(['associacao_id' => $pacotePai->id]);
-        $this->expectException(SafeValidationException::class);
-        factory(Pacote::class)->create(['associacao_id' => $subPacote->id]);
-    }
-
     public function testValidatePacoteUpdateAssociacaoSome()
     {
         $grupo = factory(Grupo::class)->create();
         $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
         $pacotePai = factory(Pacote::class)->create([
+            'produto_id' => null,
             'propriedade_id' => $propriedade->id,
             'grupo_id' => $grupo->id,
             'pacote_id' => $grupo->produto_id

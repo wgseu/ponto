@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Acesso;
+use App\Models\Funcao;
+use App\Models\Permissao;
 use Illuminate\Database\Seeder;
 
 class AcessoSeeder extends Seeder
@@ -12,823 +14,927 @@ class AcessoSeeder extends Seeder
      */
     public function run()
     {
+        $funcao_admin = Funcao::where('descricao', __('messages.administrator'))->first();
+        $funcao_waiter = Funcao::where('descricao', __('messages.waiter'))->first();
+        $funcao_cash_operator = Funcao::where('descricao', __('messages.cash_operator'))->first();
+        $funcao_cooker = Funcao::where('descricao', __('messages.cooker'))->first();
+        $funcao_deliveryman = Funcao::where('descricao', __('messages.deliveryman'))->first();
+        $funcao_stockist = Funcao::where('descricao', __('messages.stockist'))->first();
+
+        $setor_view_permition = Permissao::where('descricao', __('messages.setor_view_permition'))->first();
+        $setor_create_permition = Permissao::where('descricao', __('messages.setor_create_permition'))->first();
+        $setor_update_permition = Permissao::where('descricao', __('messages.setor_update_permition'))->first();
+        $setor_delete_permition = Permissao::where('descricao', __('messages.setor_delete_permition'))->first();
+        $mesa_view_permition = Permissao::where('descricao', __('messages.mesa_view_permition'))->first();
+        $mesa_create_permition = Permissao::where('descricao', __('messages.mesa_create_permition'))->first();
+        $mesa_update_permition = Permissao::where('descricao', __('messages.mesa_update_permition'))->first();
+        $mesa_delete_permition = Permissao::where('descricao', __('messages.mesa_delete_permition'))->first();
+        $sessao_view_permition = Permissao::where('descricao', __('messages.sessao_view_permition'))->first();
+        $sessao_create_permition = Permissao::where('descricao', __('messages.sessao_create_permition'))->first();
+        $sessao_update_permition = Permissao::where('descricao', __('messages.sessao_update_permition'))->first();
+        $sessao_delete_permition = Permissao::where('descricao', __('messages.sessao_delete_permition'))->first();
+        $banco_view_permition = Permissao::where('descricao', __('messages.banco_view_permition'))->first();
+        $banco_create_permition = Permissao::where('descricao', __('messages.banco_create_permition'))->first();
+        $banco_update_permition = Permissao::where('descricao', __('messages.banco_update_permition'))->first();
+        $banco_delete_permition = Permissao::where('descricao', __('messages.banco_delete_permition'))->first();
+        $carteira_view_permition = Permissao::where('descricao', __('messages.carteira_view_permition'))->first();
+        $carteira_create_permition = Permissao::where('descricao', __('messages.carteira_create_permition'))->first();
+        $carteira_update_permition = Permissao::where('descricao', __('messages.carteira_update_permition'))->first();
+        $carteira_delete_permition = Permissao::where('descricao', __('messages.carteira_delete_permition'))->first();
+        $caixa_view_permition = Permissao::where('descricao', __('messages.caixa_view_permition'))->first();
+        $caixa_create_permition = Permissao::where('descricao', __('messages.caixa_create_permition'))->first();
+        $caixa_update_permition = Permissao::where('descricao', __('messages.caixa_update_permition'))->first();
+        $caixa_delete_permition = Permissao::where('descricao', __('messages.caixa_delete_permition'))->first();
+        $forma_view_permition = Permissao::where('descricao', __('messages.forma_view_permition'))->first();
+        $forma_create_permition = Permissao::where('descricao', __('messages.forma_create_permition'))->first();
+        $forma_update_permition = Permissao::where('descricao', __('messages.forma_update_permition'))->first();
+        $forma_delete_permition = Permissao::where('descricao', __('messages.forma_delete_permition'))->first();
+        $cartao_view_permition = Permissao::where('descricao', __('messages.cartao_view_permition'))->first();
+        $cartao_create_permition = Permissao::where('descricao', __('messages.cartao_create_permition'))->first();
+        $cartao_update_permition = Permissao::where('descricao', __('messages.cartao_update_permition'))->first();
+        $cartao_delete_permition = Permissao::where('descricao', __('messages.cartao_delete_permition'))->first();
+        $funcao_view_permition = Permissao::where('descricao', __('messages.funcao_view_permition'))->first();
+        $funcao_create_permition = Permissao::where('descricao', __('messages.funcao_create_permition'))->first();
+        $funcao_update_permition = Permissao::where('descricao', __('messages.funcao_update_permition'))->first();
+        $funcao_delete_permition = Permissao::where('descricao', __('messages.funcao_delete_permition'))->first();
+        $cliente_view_permition = Permissao::where('descricao', __('messages.cliente_view_permition'))->first();
+        $cliente_create_permition = Permissao::where('descricao', __('messages.cliente_create_permition'))->first();
+        $cliente_update_permition = Permissao::where('descricao', __('messages.cliente_update_permition'))->first();
+        $cliente_delete_permition = Permissao::where('descricao', __('messages.cliente_delete_permition'))->first();
+        $prestador_view_permition = Permissao::where('descricao', __('messages.prestador_view_permition'))->first();
+        $prestador_create_permition = Permissao::where('descricao', __('messages.prestador_create_permition'))->first();
+        $prestador_update_permition = Permissao::where('descricao', __('messages.prestador_update_permition'))->first();
+        $prestador_delete_permition = Permissao::where('descricao', __('messages.prestador_delete_permition'))->first();
+        $moeda_view_permition = Permissao::where('descricao', __('messages.moeda_view_permition'))->first();
+        $moeda_create_permition = Permissao::where('descricao', __('messages.moeda_create_permition'))->first();
+        $moeda_update_permition = Permissao::where('descricao', __('messages.moeda_update_permition'))->first();
+        $moeda_delete_permition = Permissao::where('descricao', __('messages.moeda_delete_permition'))->first();
+        $pais_view_permition = Permissao::where('descricao', __('messages.pais_view_permition'))->first();
+        $pais_create_permition = Permissao::where('descricao', __('messages.pais_create_permition'))->first();
+        $pais_update_permition = Permissao::where('descricao', __('messages.pais_update_permition'))->first();
+        $pais_delete_permition = Permissao::where('descricao', __('messages.pais_delete_permition'))->first();
+        $estado_view_permition = Permissao::where('descricao', __('messages.estado_view_permition'))->first();
+        $estado_create_permition = Permissao::where('descricao', __('messages.estado_create_permition'))->first();
+        $estado_update_permition = Permissao::where('descricao', __('messages.estado_update_permition'))->first();
+        $estado_delete_permition = Permissao::where('descricao', __('messages.estado_delete_permition'))->first();
+        $cidade_view_permition = Permissao::where('descricao', __('messages.cidade_view_permition'))->first();
+        $cidade_create_permition = Permissao::where('descricao', __('messages.cidade_create_permition'))->first();
+        $cidade_update_permition = Permissao::where('descricao', __('messages.cidade_update_permition'))->first();
+        $cidade_delete_permition = Permissao::where('descricao', __('messages.cidade_delete_permition'))->first();
+        $bairro_view_permition = Permissao::where('descricao', __('messages.bairro_view_permition'))->first();
+        $bairro_create_permition = Permissao::where('descricao', __('messages.bairro_create_permition'))->first();
+        $bairro_update_permition = Permissao::where('descricao', __('messages.bairro_update_permition'))->first();
+        $bairro_delete_permition = Permissao::where('descricao', __('messages.bairro_delete_permition'))->first();
+        $zona_view_permition = Permissao::where('descricao', __('messages.zona_view_permition'))->first();
+        $zona_create_permition = Permissao::where('descricao', __('messages.zona_create_permition'))->first();
+        $zona_update_permition = Permissao::where('descricao', __('messages.zona_update_permition'))->first();
+        $zona_delete_permition = Permissao::where('descricao', __('messages.zona_delete_permition'))->first();
+        $localizacao_view_permition = Permissao::where('descricao', __('messages.localizacao_view_permition'))->first();
+        $localizacao_create_permition = Permissao::where('descricao', __('messages.localizacao_create_permition'))->first();
+        $localizacao_update_permition = Permissao::where('descricao', __('messages.localizacao_update_permition'))->first();
+        $localizacao_delete_permition = Permissao::where('descricao', __('messages.localizacao_delete_permition'))->first();
+        $comanda_view_permition = Permissao::where('descricao', __('messages.comanda_view_permition'))->first();
+        $comanda_create_permition = Permissao::where('descricao', __('messages.comanda_create_permition'))->first();
+        $comanda_update_permition = Permissao::where('descricao', __('messages.comanda_update_permition'))->first();
+        $comanda_delete_permition = Permissao::where('descricao', __('messages.comanda_delete_permition'))->first();
+        $viagem_view_permition = Permissao::where('descricao', __('messages.viagem_view_permition'))->first();
+        $viagem_create_permition = Permissao::where('descricao', __('messages.viagem_create_permition'))->first();
+        $viagem_update_permition = Permissao::where('descricao', __('messages.viagem_update_permition'))->first();
+        $viagem_delete_permition = Permissao::where('descricao', __('messages.viagem_delete_permition'))->first();
+        $integracao_view_permition = Permissao::where('descricao', __('messages.integracao_view_permition'))->first();
+        $integracao_create_permition = Permissao::where('descricao', __('messages.integracao_create_permition'))->first();
+        $integracao_update_permition = Permissao::where('descricao', __('messages.integracao_update_permition'))->first();
+        $integracao_delete_permition = Permissao::where('descricao', __('messages.integracao_delete_permition'))->first();
+        $associacao_view_permition = Permissao::where('descricao', __('messages.associacao_view_permition'))->first();
+        $associacao_create_permition = Permissao::where('descricao', __('messages.associacao_create_permition'))->first();
+        $associacao_update_permition = Permissao::where('descricao', __('messages.associacao_update_permition'))->first();
+        $associacao_delete_permition = Permissao::where('descricao', __('messages.associacao_delete_permition'))->first();
+        $pedido_view_permition = Permissao::where('descricao', __('messages.pedido_view_permition'))->first();
+        $pedido_create_permition = Permissao::where('descricao', __('messages.pedido_create_permition'))->first();
+        $pedido_update_permition = Permissao::where('descricao', __('messages.pedido_update_permition'))->first();
+        $pedido_delete_permition = Permissao::where('descricao', __('messages.pedido_delete_permition'))->first();
+        $categoria_view_permition = Permissao::where('descricao', __('messages.categoria_view_permition'))->first();
+        $categoria_create_permition = Permissao::where('descricao', __('messages.categoria_create_permition'))->first();
+        $categoria_update_permition = Permissao::where('descricao', __('messages.categoria_update_permition'))->first();
+        $categoria_delete_permition = Permissao::where('descricao', __('messages.categoria_delete_permition'))->first();
+
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 3,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $setor_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 4,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $setor_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 5,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $mesa_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 6,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $mesa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 7,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $mesa_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 8,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $mesa_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 9,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $sessao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 10,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $sessao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 11,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $sessao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 12,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $sessao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 13,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $banco_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 14,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $banco_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 15,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $banco_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 16,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $banco_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 17,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $carteira_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 18,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $carteira_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 19,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $carteira_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 20,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $carteira_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 21,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $caixa_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 22,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $caixa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 23,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $caixa_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 24,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $caixa_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 25,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $forma_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 26,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $forma_create_permition->id,
         ]))->save();
         
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 27,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $forma_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 28,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $forma_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 29,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cartao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 30,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cartao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 31,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cartao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 32,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cartao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 33,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $funcao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 34,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $funcao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 35,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $funcao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 36,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $funcao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 37,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cliente_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 38,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cliente_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 39,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cliente_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 40,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cliente_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 41,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $prestador_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 42,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $prestador_create_permition->id,
         ]))->save();
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 43,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $prestador_update_permition->id,
         ]))->save();
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 44,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $prestador_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 45,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $moeda_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 46,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $moeda_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 47,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $moeda_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 48,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $moeda_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 49,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pais_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 50,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pais_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 51,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pais_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 52,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pais_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 53,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $estado_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 54,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $estado_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 55,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $estado_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 56,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $estado_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 57,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cidade_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 58,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cidade_create_permition->id,
         ]))->save();
 
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 59,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cidade_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 60,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $cidade_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 61,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $bairro_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 62,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $bairro_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 63,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $bairro_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 64,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $bairro_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 65,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $zona_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 66,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $zona_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 67,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $zona_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 68,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $zona_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 69,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $localizacao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 70,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $localizacao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 71,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $localizacao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 72,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $localizacao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 73,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $comanda_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 74,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $comanda_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 75,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $comanda_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 76,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $comanda_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 77,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $viagem_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 78,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $viagem_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 79,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $viagem_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 80,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $viagem_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 81,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $integracao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 82,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $integracao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 83,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $integracao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 84,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $integracao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 85,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $associacao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 86,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $associacao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 87,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $associacao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 88,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $associacao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 89,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pedido_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 90,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pedido_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 91,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pedido_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 92,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $pedido_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 93,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $categoria_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 94,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $categoria_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 95,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $categoria_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 1,
-            'permissao_id' => 96,
+            'funcao_id' => $funcao_admin->id,
+            'permissao_id' => $categoria_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' =>  $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 4,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' =>  $setor_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 6,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $mesa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 8,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $mesa_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 16,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $banco_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 21,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $caixa_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 22,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $caixa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 25,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $forma_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 44,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $prestador_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 53,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $estado_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 60,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $cidade_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 73,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $comanda_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 93,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $categoria_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 2,
-            'permissao_id' => 94,
+            'funcao_id' => $funcao_waiter->id,
+            'permissao_id' => $categoria_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' =>  $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 4,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' =>  $setor_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 5,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $mesa_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 6,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $mesa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 8,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $mesa_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 9,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $sessao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 11,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $sessao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 12,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $sessao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 13,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $banco_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 14,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $banco_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 16,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $banco_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 21,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $caixa_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 22,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $caixa_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 25,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $forma_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 26,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $forma_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 41,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $prestador_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 42,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $prestador_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 43,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $prestador_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 44,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $prestador_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 46,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $moeda_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 47,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $moeda_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 48,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $moeda_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 49,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $pais_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 51,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $pais_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 53,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $estado_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 58,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $cidade_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 59,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $cidade_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 60,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $cidade_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 70,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $localizacao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 73,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $comanda_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 76,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $comanda_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 79,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $viagem_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 84,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $integracao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 89,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $pedido_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 91,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $pedido_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 93,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $categoria_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 94,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $categoria_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 3,
-            'permissao_id' => 96,
+            'funcao_id' => $funcao_cash_operator->id,
+            'permissao_id' => $categoria_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 4,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_cooker->id,
+            'permissao_id' =>  $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 4,
-            'permissao_id' => 70,
+            'funcao_id' => $funcao_cooker->id,
+            'permissao_id' => $localizacao_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' =>  $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 42,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' => $prestador_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 45,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' => $moeda_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 65,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' => $zona_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 71,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' => $localizacao_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 6,
-            'permissao_id' => 95,
+            'funcao_id' => $funcao_deliveryman->id,
+            'permissao_id' => $categoria_update_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 1,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' =>  $setor_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 17,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $carteira_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 28,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $forma_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 29,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $cartao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 66,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $zona_create_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 72,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $localizacao_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 80,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $viagem_delete_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 81,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $integracao_view_permition->id,
         ]))->save();
 
         (new Acesso([
-            'funcao_id' => 7,
-            'permissao_id' => 96,
+            'funcao_id' => $funcao_stockist->id,
+            'permissao_id' => $categoria_delete_permition->id,
         ]))->save();
     }
 }

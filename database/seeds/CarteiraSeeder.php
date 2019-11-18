@@ -13,7 +13,6 @@ class CarteiraSeeder extends Seeder
     public function run()
     {
         (new Carteira([
-            'id' => 1,
             'tipo' => Carteira::TIPO_LOCAL,
             'descricao' => __('messages.wallet_1'),
             'ativa' => true,

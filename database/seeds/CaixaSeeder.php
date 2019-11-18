@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Caixa;
+use App\Models\Carteira;
 use Illuminate\Database\Seeder;
 
 class CaixaSeeder extends Seeder
@@ -13,8 +14,7 @@ class CaixaSeeder extends Seeder
     public function run()
     {
         (new Caixa([
-            'id' => 1,
-            'carteira_id' => 1,
+            'carteira_id' => Carteira::where('descricao', __('messages.wallet_1'))->first()->id,
             'descricao' => __('messages.cash'),
         ]))->save();
     }

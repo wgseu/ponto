@@ -176,14 +176,27 @@ class ContaTest extends TestCase
 
     public function testContaGrandSon()
     {
-        $contaPai = factory(Conta::class)->create();
         $old_conta = factory(Conta::class)->create();
-        $contaFilho = factory(Conta::class)->create([
+        $seed_conta = factory(Conta::class)->create([
             'conta_id' => $old_conta->id,
         ]);
-        $contaPai->conta_id = $contaFilho->id;
         $this->expectException(SafeValidationException::class);
-        $contaPai->save();
+        $conta = factory(Conta::class)->create([
+            'conta_id' => $seed_conta->id,
+        ]);
+    }
+
+    public function testAgrupamentoCancelado()
+    {
+        $seed_conta = factory(Conta::class)->create();
+        $conta = factory(Conta::class)->create([
+            'estado' => Conta::ESTADO_CANCELADA,
+            'agrupamento_id' => $seed_conta->id,
+        ]);
+        $this->expectException(SafeValidationException::class);
+        factory(Conta::class)->create([
+            'agrupamento_id' => $conta->id,
+        ]);
     }
 
     public function testContaEstadoPago()
@@ -262,6 +275,7 @@ class ContaTest extends TestCase
         $this->expectException(SafeValidationException::class);
         factory(Conta::class)->create([
             'pedido_id' => $pedido->id,
+            'estado' => Conta::ESTADO_CANCELADA,
         ]);
     }
 
@@ -283,27 +297,7 @@ class ContaTest extends TestCase
         $this->expectException(SafeValidationException::class);
         factory(Conta::class)->create([
             'modo' => Conta::MODO_DIARIO,
-            'frequencia' => 0,
-        ]);
-    }
-
-    public function testFrequenciaDiarioMaior()
-    {
-        $this->expectException(SafeValidationException::class);
-        factory(Conta::class)->create([
-            'modo' => Conta::MODO_DIARIO,
-            'frequencia' => 36,
-        ]);
-    }
-
-    public function testContaAgrupamentoCancelada()
-    {
-        $seed_conta = factory(Conta::class)->create([
-            'estado' => Conta::ESTADO_CANCELADA,
-        ]);
-        $this->expectException(SafeValidationException::class);
-        factory(Conta::class)->create([
-            'agrupamento_id' => $seed_conta->id,
+            'frequencia' => null,
         ]);
     }
 
@@ -376,7 +370,7 @@ class ContaTest extends TestCase
             'input' => [
                 'estado' => Conta::ESTADO_CANCELADA,
             ],
-            'recursive' => true,
+            'desagrupar' => true,
         ], $headers);
         $conta_pai->refresh();
         $conta1->refresh();
@@ -384,9 +378,7 @@ class ContaTest extends TestCase
         $pagamento1->refresh();
         $pagamento2->refresh();
         $this->assertEquals($conta_pai->estado, Conta::ESTADO_CANCELADA);
-        $this->assertEquals($conta1->estado, Conta::ESTADO_CANCELADA);
-        $this->assertEquals($conta2->estado, Conta::ESTADO_CANCELADA);
-        $this->assertEquals($pagamento1->estado, Pagamento::ESTADO_CANCELADO);
-        $this->assertEquals($pagamento2->estado, Pagamento::ESTADO_CANCELADO);
+        $this->assertEquals($conta1->agrupamento_id, null);
+        $this->assertEquals($conta2->agrupamento_id, null);
     }
 }

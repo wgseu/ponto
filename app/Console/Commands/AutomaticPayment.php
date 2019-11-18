@@ -9,6 +9,7 @@ use App\Models\Pagamento;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Exceptions\SafeValidationException;
 
 class AutomaticPayment extends Command
@@ -25,17 +26,7 @@ class AutomaticPayment extends Command
      *
      * @var string
      */
-    protected $description = 'Dailey payment in automatic debit';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Daily payment in automatic debit';
 
     /**
      * Execute the console command.
@@ -49,15 +40,15 @@ class AutomaticPayment extends Command
             ->where('estado', Conta::ESTADO_ATIVA)
             ->where('vencimento', '<=', Carbon::now())
             ->where('agrupamento_id', null)->get();
-        try {
-            DB::transaction(function () use ($contas) {
-                foreach ($contas as $conta) {
+        foreach ($contas as $conta) {
+            try {
+                DB::transaction(function () use ($conta) {
                     $empresa = Empresa::find(1);
                     $pais = $empresa->pais;
                     $pagamento = new Pagamento([
                         'carteira_id' => $conta->carteira_id,
                         'moeda_id' => $pais->moeda_id,
-                        'valor' => $conta->valor,
+                        'valor' => $conta->valor + $conta->acrescimo,
                         'lancado' => $conta->valor,
                         'estado' => Pagamento::ESTADO_PAGO,
                         'conta_id' => $conta->id,
@@ -82,14 +73,16 @@ class AutomaticPayment extends Command
                         'parcelas' => $conta->parcelas + 1,
                         'numero_parcela' => $conta->numero_parcela + 1,
                         'consolidado' => 0.00,
+                        'acrescimo' => 0.00,
                         'vencimento' => $vencimento,
                         'estado' => Conta::ESTADO_ATIVA,
                     ]);
                     $new_conta->save();
-                }
-            });
-        } catch (\Throwable $th) {
-            throw SafeValidationException::withMessages(['error' => $th->getMessage()]);
+                });
+            } catch (\Throwable $th) {
+                Log::error('AutomaticPayment: ' . $th->getMessage());
+                throw SafeValidationException::withMessages(['error' => $th->getMessage()]);
+            }
         }
     }
 }

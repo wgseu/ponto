@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             PropriedadeSeeder::class,
             PacoteSeeder::class,
             PaisSeeder::class,
+            ServicoSeeder::class,
+            FormasSeeder::class,
         ]);
     }
 }

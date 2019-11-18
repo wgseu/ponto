@@ -1,5 +1,9 @@
-mutation updateConta($id: ID!, $input: ContaUpdateInput!, $recursive: Boolean) {
-  UpdateConta(id: $id, input: $input, recursive: $recursive) {
+mutation updateConta(
+  $id: ID!
+  $input: ContaUpdateInput!
+  $desagrupar: Boolean
+) {
+  UpdateConta(id: $id, input: $input, desagrupar: $desagrupar) {
     id
     descricao
     valor

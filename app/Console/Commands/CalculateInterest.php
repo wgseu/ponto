@@ -6,6 +6,7 @@ use App\Models\Conta;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Exceptions\SafeValidationException;
 
 class CalculateInterest extends Command
@@ -25,16 +26,6 @@ class CalculateInterest extends Command
     protected $description = 'calculate interest on bills';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return mixed
@@ -47,22 +38,24 @@ class CalculateInterest extends Command
             ->where('tipo', Conta::TIPO_RECEITA)
             ->where('data_calculo', '<', $diaAnterior)
             ->orWhereNull('data_calculo')->get();
-        try {
-            DB::transaction(function () use ($contas) {
-                foreach ($contas as $conta) {
+        foreach ($contas as $conta) {
+            try {
+                DB::transaction(function () use ($conta) {
+                    $data_calculo = strtotime($conta->data_calculo);
                     $vencimento = strtotime("tomorrow", strtotime($conta->vencimento)) - 1;
-                    $dias = floor((time() - $vencimento) / (60 * 60 * 24));
+                    $data = !is_null($data_calculo) ? $data_calculo : $vencimento;
+                    $dias = floor((time() - $data) / (60 * 60 * 24));
                     $modo = $conta->formula == Conta::FORMULA_SIMPLES
-                    ? $conta->valor : $conta->acrescimo + $conta->valor;
+                        ? $conta->valor : $conta->acrescimo + $conta->valor;
                     $acrecismo = ($modo - $conta->consolidado) * $conta->juros * $dias;
-                    $conta->valor += $acrecismo;
                     $conta->acrescimo += $acrecismo;
-                    $conta->data_calculo = Carbon::now();
+                    $conta->data_calculo = Carbon::yesterday();
                     $conta->save();
-                }
-            });
-        } catch (\Throwable $th) {
-            throw SafeValidationException::withMessages(['error' => $th->getMessage()]);
+                });
+            } catch (\Throwable $th) {
+                Log::error('CalculateInterest: ' . $th->getMessage());
+                throw SafeValidationException::withMessages(['error' => $th->getMessage()]);
+            }
         }
     }
 }

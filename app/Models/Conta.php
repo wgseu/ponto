@@ -213,22 +213,25 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         $errors = [];
         if (!is_null($this->pedido_id)) {
             $pedido = $this->pedido;
-            if ($pedido->estado != Pedido::ESTADO_CANCELADO) {
+            if ($pedido->estado != Pedido::ESTADO_CANCELADO && $this->estado == Conta::ESTADO_CANCELADA) {
                 $errors['pedido_id'] = __('messages.account_not_canceled_order_open');
-            } elseif ($this->automatico == true && $this->tipo != Conta::TIPO_RECEITA) {
-                $errors['pedido_id'] = __('messages.automatic_order_not_recipe');
             }
         }
-        if (($this->modo == Conta::MODO_MENSAL || $this->modo == Conta::MODO_DIARIO) && $this->frequencia <= 0) {
+        if ($this->automatico == true && $this->tipo != Conta::TIPO_RECEITA) {
+            $errors['pedido_id'] = __('messages.automatic_order_not_recipe');
+        }
+        if (!is_null($this->modo) && ($this->frequencia < 0 || is_null($this->frequencia))) {
             $errors['frequencia'] = __('messages.frequency_lowest_zero');
-        } elseif ($this->modo == Conta::MODO_DIARIO && $this->frequencia > 31) {
-            $errors['frequencia'] = __('messages.frequency_higher', ['value' => $this->frequencia]);
         }
         if (is_null($this->carteira_id) && $this->automatico == true) {
             $errors['carteira_id'] = __('messages.wallet_null_not_automatic');
         }
-        $agrupamento = self::find($this->agrupamento_id);
-        if (!is_null($this->agrupamento_id) && $agrupamento->estado == Conta::ESTADO_CANCELADA) {
+        $agrupamento = $this->agrupamento;
+        if (
+            !is_null($agrupamento)
+            && $agrupamento->estado == Conta::ESTADO_CANCELADA
+            && !is_null($agrupamento->agrupamento_id)
+        ) {
             $errors['agrupamento_id'] = __('messages.grouping_already_canceled');
         }
         if (Number::isEqual($this->valor, 0)) {
@@ -251,16 +254,17 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         if ($this->juros < 0) {
             $errors['juros'] = __('messages.juros_cannot_negative');
         }
-        $conta_id = self::find($this->conta_id);
-        if (!is_null($conta_id)) {
-            if (!is_null($conta_id->conta_id)) {
-                $errors['conta_id'] = __('messages.account_have_conta_id');
-            }
+        $conta = $this->conta;
+        if (!is_null($conta) && !is_null($conta->conta_id)) {
+            $errors['conta_id'] = __('messages.account_have_conta_id');
         }
-        if ($this->tipo == self::TIPO_RECEITA && Number::isGreater($this->consolidado, $this->valor)) {
+        if ($this->tipo == self::TIPO_RECEITA && Number::isGreater($this->consolidado, $this->total())) {
             $errors['valor'] = __('messages.total_received_greater_account');
         }
-        if ($this->tipo == self::TIPO_DESPESA && Number::isGreater(-$this->consolidado, -$this->valor)) {
+        if (
+            $this->tipo == self::TIPO_DESPESA
+            && Number::isGreater(-$this->consolidado, (-$this->valor - $this->acrescimo))
+        ) {
             $errors['valor'] = __('messages.total_paid_greater_account');
         }
         if (!is_null($this->cliente_id) && $this->valor > 0) {
@@ -271,9 +275,9 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
                 if ($this->exists) {
                     $query->where('id', '<>', $this->id);
                 }
-                $utilizado = $query->sum('valor - consolidado');
-                if ($this->valor + $utilizado > $cliente->limite_compra) {
-                    $restante = ($this->valor + $utilizado) - $cliente->limite_compra;
+                $utilizado = $query->sum('valor + acrescimo - consolidado');
+                if ($this->total() + $utilizado > $cliente->limite_compra) {
+                    $restante = ($this->total() + $utilizado) - $cliente->limite_compra;
                     $errors['valor'] = __(
                         'messages.account_no_limit',
                         [
@@ -294,7 +298,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
     public function onUpdate()
     {
         $errors = [];
-        $old_conta = self::find($this->id);
+        $old_conta = $this->fresh();
         if ($old_conta->estado == self::ESTADO_PAGA && $this->estado != self::ESTADO_CANCELADA) {
             $errors['id'] = __('messages.account_cannot_changed_consolidated');
         }
@@ -303,9 +307,9 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         }
         if (
             ($this->estado == self::ESTADO_PAGA
-                && !Number::isEqual($this->consolidado, $this->valor))
+                && !Number::isEqual($this->consolidado, $this->total()))
             || ($old_conta->estado == self::ESTADO_PAGA
-                && !Number::isEqual($old_conta->consolidado, $this->valor))
+                && !Number::isEqual($old_conta->consolidado, $this->total()))
         ) {
             $errors['id'] = __('messages.account_cannot_changed_total');
         }
@@ -321,30 +325,34 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         }
     }
 
-    public function cancel($recursive = false)
+    public function cancel($desagrupar = false)
     {
-        DB::transaction(function () use ($recursive) {
-            $this->internalCancel($recursive);
+        DB::transaction(function () use ($desagrupar) {
+            $this->internalCancel($desagrupar);
         });
     }
 
-    private function internalCancel($recursive)
+    private function internalCancel($desagrupar)
     {
-        $this->estado = self::ESTADO_CANCELADA;
-        $this->save();
         $pagamentos = Pagamento::where('conta_id', $this->id)
             ->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
         foreach ($pagamentos as $pagamento) {
             $pagamento->cancel();
         }
-        $contas = self::where('agrupamento_id', $this->id)
-            ->where('estado', '<>', self::ESTADO_CANCELADA)->get();
-        foreach ($contas as $conta) {
-            $conta->agrupamento_id = null;
-            $conta->save();
-            if ($recursive) {
-                $conta->internalCancel($recursive);
+        if ($desagrupar) {
+            $contas = self::where('agrupamento_id', $this->id)
+                ->where('estado', '<>', self::ESTADO_CANCELADA)->get();
+            foreach ($contas as $conta) {
+                $conta->agrupamento_id = null;
+                $conta->save();
             }
         }
+        $this->estado = self::ESTADO_CANCELADA;
+        $this->save();
+    }
+
+    public function total()
+    {
+        return $this->valor + $this->acrescimo;
     }
 }

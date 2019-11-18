@@ -58,7 +58,7 @@ class UpdateContaMutation extends Mutation
                 'description' => 'Código da conta',
             ],
             'input' => ['type' => Type::nonNull(GraphQL::type('ContaUpdateInput'))],
-            'recursive' => [
+            'desagrupar' => [
                 'type' => Type::boolean(),
                 'description' => 'Cancelamento de todas as contas agrupadas',
             ],
@@ -71,7 +71,7 @@ class UpdateContaMutation extends Mutation
         $conta->fill($args['input']);
         if ($conta->estado == Conta::ESTADO_CANCELADA) {
             $conta->refresh();
-            $conta->cancel($args['recursive'] ?? false);
+            $conta->cancel($args['desagrupar'] ?? false);
         } else {
             $conta->save();
         }

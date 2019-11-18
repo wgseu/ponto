@@ -18,11 +18,6 @@ class FormasSeeder extends Seeder
             'descricao' => __('messages.money'),
             'tipo' => __('messages.money'),
             'carteira_id' => $carteira->id,
-            'min_parcelas' => null,
-            'max_parcelas' => null,
-            'parcelas_sem_juros' => null,
-            'juros' => null,
-            'ativa' => 'Y',
         ]))->save();
         (new Forma([
             'descricao' => __('messages.credit'),
@@ -32,7 +27,7 @@ class FormasSeeder extends Seeder
             'max_parcelas' => 1,
             'parcelas_sem_juros' => 1,
             'juros' => 2.5,
-            'ativa' => 'Y',
+            'ativa' => true,
         ]))->save();
         (new Forma([
             'descricao' => __('messages.debit'),
@@ -42,47 +37,27 @@ class FormasSeeder extends Seeder
             'max_parcelas' => 1,
             'parcelas_sem_juros' => 1,
             'juros' => 2.5,
-            'ativa' => 'Y',
+            'ativa' => true,
         ]))->save();
         (new Forma([
             'descricao' => __('messages.vale'),
             'tipo' => __('messages.vale'),
             'carteira_id' => $carteira->id,
-            'min_parcelas' => null,
-            'max_parcelas' => null,
-            'parcelas_sem_juros' => null,
-            'juros' => null,
-            'ativa' => 'N',
         ]))->save();
         (new Forma([
             'descricao' => __('messages.bank_check'),
             'tipo' => __('messages.bank_check'),
             'carteira_id' => $carteira->id,
-            'min_parcelas' => null,
-            'max_parcelas' => null,
-            'parcelas_sem_juros' => null,
-            'juros' => null,
-            'ativa' => 'N',
         ]))->save();
         (new Forma([
             'descricao' => __('messages.account'),
             'tipo' => __('messages.crediario'),
             'carteira_id' => $carteira->id,
-            'min_parcelas' => null,
-            'max_parcelas' => null,
-            'parcelas_sem_juros' => null,
-            'juros' => null,
-            'ativa' => 'N',
         ]))->save();
         (new Forma([
             'descricao' => __('messages.saldo'),
             'tipo' => __('messages.saldo'),
             'carteira_id' => $carteira->id,
-            'min_parcelas' => null,
-            'max_parcelas' => null,
-            'parcelas_sem_juros' => null,
-            'juros' => null,
-            'ativa' => 'N',
         ]))->save();
     }
 }

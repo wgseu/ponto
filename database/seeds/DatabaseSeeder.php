@@ -30,7 +30,9 @@ class DatabaseSeeder extends Seeder
             PacoteSeeder::class,
             PaisSeeder::class,
             ServicoSeeder::class,
+            CarteiraSeeder::class,
             FormasSeeder::class,
+            PrestadorSeeder::class,
         ]);
     }
 }

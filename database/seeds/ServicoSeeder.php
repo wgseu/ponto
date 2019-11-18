@@ -16,19 +16,19 @@ class ServicoSeeder extends Seeder
             'nome' => __('messages.discount'),
             'descricao' => __('messages.discount_description'),
             'tipo' => __('messages.rate'),
-            'obrigatorio' => 'N',
-            'valor' => 0,
-            'individual' => 'N',
-            'ativo' => 'Y',
+            'obrigatorio' => false,
+            'valor' => 1,
+            'individual' => false,
+            'ativo' => true,
         ]))->save();
         (new Servico([
             'nome' => __('messages.delivery'),
             'descricao' => __('messages.delivery_description'),
             'tipo' => __('messages.rate'),
-            'obrigatorio' => 'N',
-            'valor' => 0,
-            'individual' => 'N',
-            'ativo' => 'Y',
+            'obrigatorio' => false,
+            'valor' => 1,
+            'individual' => false,
+            'ativo' => true,
         ]))->save();
     }
 }

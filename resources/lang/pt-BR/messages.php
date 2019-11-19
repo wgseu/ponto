@@ -740,5 +740,6 @@ return [
     'grupo_cannot_update_quantidade_maxima_less_group' => 'A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote',
     'classificacaopai_already' => 'Classificação inválida',
     'categoriapai_already' => 'Categoria inválida',
-    'propriedade_and_pacote_cannot_null' => 'Propriedade e pacote não podem ser nulos'
+    'propriedade_and_pacote_cannot_null' => 'Propriedade e pacote não podem ser nulos',
+    'update_ordem_invalid' => 'Não é possível alterar a ordem deste grupo',
 ];

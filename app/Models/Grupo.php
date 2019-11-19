@@ -120,6 +120,7 @@ class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
      * A quantidade minima e maxima não pode ser negativas,
      * Depois de casdastrado não pode alterar o produto do grupo,
      * A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote.
+     * Se o grupo está associado a um pacote a alteração da ordem não pode ser superior a ordem do grupo associado;
      */
     public function validate()
     {
@@ -146,6 +147,24 @@ class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
     {
         $errors = [];
         $oldGrupo = $this->fresh();
+        $ordem = self::select('1')
+            ->from('pacotes as p')
+            ->leftJoin('pacotes as a', 'a.id', '=', 'p.associacao_id')
+            ->leftJoin('grupos', 'grupos.id', '=', 'p.grupo_id')
+            ->where('a.id', '<>', null)
+            ->where('a.grupo_id', '=', $this->id)
+            ->where(function ($query) {
+                $query->where('grupos.ordem', '<', $this->ordem)
+                ->orWhere(function ($query) {
+                    $query->where('grupos.ordem', '=', $this->ordem)
+                    ->where('grupos.id', '<=', $this->id);
+                });
+            })
+            ->count();
+
+        if ($ordem > 0) {
+            $errors['produto_id'] = __('messages.update_ordem_invalid');
+        }
         if ($oldGrupo->produto_id != $this->produto_id) {
             $errors['produto_id'] = __('messages.produto_cannot_update');
         }

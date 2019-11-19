@@ -31,6 +31,7 @@ use Tests\TestCase;
 use App\Models\Grupo;
 use App\Models\Pacote;
 use App\Models\Produto;
+use App\Models\Propriedade;
 
 class GrupoTest extends TestCase
 {
@@ -129,6 +130,22 @@ class GrupoTest extends TestCase
             'pacote_id' => $grupo->produto_id
         ]);
         $grupo->quantidade_maxima = 6;
+        $this->expectException(SafeValidationException::class);
+        $grupo->save();
+    }
+
+    public function testAumentarOrdemGrupoAssociado()
+    {
+        $grupo = factory(Grupo::class)->create();
+        $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
+        $associacao = factory(Pacote::class)->create([
+            'produto_id' => null,
+            'propriedade_id' => $propriedade->id,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $pacote = factory(Pacote::class)->create(['associacao_id' => $associacao->id]);
+        $grupo->ordem = 3;
         $this->expectException(SafeValidationException::class);
         $grupo->save();
     }

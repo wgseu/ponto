@@ -1386,7 +1386,7 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('setor_id')->nullable();
             $table->unsignedInteger('caixa_id')->nullable();
             $table->string('nome', 100);
-            $table->enum('tipo', ['computador', 'tablet', 'navegador'])->default('computador');
+            $table->enum('tipo', ['computador', 'tablet', 'navegador', 'smartphone'])->default('computador');
             $table->string('descricao', 45)->nullable();
             $table->text('opcoes')->nullable();
             $table->string('serial', 45);

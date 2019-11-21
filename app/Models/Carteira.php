@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\SafeValidationException;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira
@@ -117,5 +118,29 @@ class Carteira extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->carteira_id)) {
+            $carteirapai = $this->carteira;
+            if (is_null($carteirapai)) {
+                $errors['carteira_id'] = __('messages.carteirapai_not_found');
+            } elseif (!is_null($carteirapai->carteira_id)) {
+                $errors['carteira_id'] = __('messages.carteirapai_already');
+            } elseif ($carteirapai->id == $this->id) {
+                $errors['carteira_id'] = __('messages.carteirapai_same');
+            }
+        }
+        if ($this->tipo == self::TIPO_BANCARIA && is_null($this->banco_id)) {
+            $errors['banco_id'] = __('messages.bank_null');
+        }
+        if ($this->tipo == self::TIPO_FINANCEIRA && !is_null($this->banco_id)) {
+            $errors['banco_id'] = __('messages.bank_not_be_informed');
+        }
+        if ($this->tipo == self::TIPO_BANCARIA && is_null($this->agencia)) {
+            $errors['agencia'] = __('messages.agency_null');
+        }
+        if ($this->tipo == self::TIPO_BANCARIA && is_null($this->conta)) {
+            $errors['conta'] = __('messages.account_null');
+        }
+        return $errors;
     }
 }

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,7 @@ class Dispositivo extends Model implements ValidateInterface
     public const TIPO_COMPUTADOR = 'computador';
     public const TIPO_TABLET = 'tablet';
     public const TIPO_NAVEGADOR = 'navegador';
+    public const TIPO_SMARTPHONE = 'smartphone';
 
     /**
      * The table associated with the model.
@@ -57,6 +59,13 @@ class Dispositivo extends Model implements ValidateInterface
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * Setting model
+     *
+     * @var Settings
+     */
+    public $options;
 
     /**
      * The attributes that are mass assignable.
@@ -82,6 +91,22 @@ class Dispositivo extends Model implements ValidateInterface
     protected $attributes = [
         'tipo' => self::TIPO_COMPUTADOR,
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->options = new Settings();
+    }
+
+    public function loadEntries()
+    {
+        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+    }
+
+    public function applyEntries()
+    {
+        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+    }
 
     /**
      * Setor em que o dispositivo está instalado/será usado

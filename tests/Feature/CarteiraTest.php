@@ -27,18 +27,23 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Banco;
 use App\Models\Carteira;
+use App\Exceptions\ValidationException;
 
 class CarteiraTest extends TestCase
 {
     public function testCreateCarteira()
     {
         $headers = PrestadorTest::auth();
-        $seed_carteira =  factory(Carteira::class)->create();
+        $banco = factory(Banco::class)->create();
         $response = $this->graphfl('create_carteira', [
             'input' => [
                 'tipo' => Carteira::TIPO_BANCARIA,
                 'descricao' => 'Teste',
+                'banco_id' => $banco->id,
+                'agencia' => '0000-1',
+                'conta' => '22333-5',
             ]
         ], $headers);
 
@@ -78,5 +83,65 @@ class CarteiraTest extends TestCase
         $carteira = factory(Carteira::class)->create();
         $response = $this->graphfl('query_carteira', [ 'id' => $carteira->id ], $headers);
         $this->assertEquals($carteira->id, $response->json('data.carteiras.data.0.id'));
+    }
+
+    public function testCarteiraPaiNaoEncontrada()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'carteira_id' => 99,
+        ]);
+    }
+
+    public function testCarteiraPaiAgrupada()
+    {
+        $seed_carteira = factory(Carteira::class)->create();
+        $old_carteira = factory(Carteira::class)->create([
+            'carteira_id' => $seed_carteira->id,
+        ]);
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'carteira_id' => $old_carteira->id,
+        ]);
+    }
+
+    public function testCarteiraIguais()
+    {
+        $carteira = factory(Carteira::class)->create();
+        $carteira->carteira_id = $carteira->id;
+        $this->expectException(ValidationException::class);
+        $carteira->save();
+    }
+
+    public function testTipoBancarioBancoNull()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'banco_id' => null,
+        ]);
+    }
+
+    public function testFinanceiroComBancoId()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'tipo' => Carteira::TIPO_FINANCEIRA,
+        ]);
+    }
+
+    public function testTipoBancarioAgenciaNull()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'agencia' => null,
+        ]);
+    }
+
+    public function testTipoBancarioContaNull()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Carteira::class)->create([
+            'conta' => null,
+        ]);
     }
 }

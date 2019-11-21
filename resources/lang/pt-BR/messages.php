@@ -772,4 +772,11 @@ return [
     'crediario' => 'Crediario',
     'saldo' => 'Saldo',
     'cash_drawer_number' => 'Gaveta do Caixa :number',
+    'carteirapai_not_found' => 'Carteira agrupada não existe',
+    'carteirapai_already' => 'Carteira já pertence a outra carteira',
+    'carteirapai_same' => 'Não permitido agrupar a mesma carteira',
+    'bank_null' => 'O banco não foi informado',
+    'bank_not_be_informed' => 'O banco não pode ser informado',
+    'agency_null' => 'A agência não pode ser vazia',
+    'account_null' => 'A conta não pode ser vazia',
 ];

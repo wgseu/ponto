@@ -64,7 +64,10 @@ class UpdateDispositivoMutation extends Mutation
     public function resolve($root, $args)
     {
         $dispositivo = Dispositivo::findOrFail($args['id']);
+        $dispositivo->loadEntries();
         $dispositivo->fill($args['input']);
+        $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
+        $dispositivo->applyEntries();
         $dispositivo->save();
         return $dispositivo;
     }

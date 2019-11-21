@@ -64,27 +64,17 @@ class Item extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
-        'pedido_id',
-        'prestador_id',
         'produto_id',
         'servico_id',
         'item_id',
         'pagamento_id',
-        'descricao',
-        'composicao',
         'preco',
         'quantidade',
-        'subtotal',
-        'comissao',
-        'total',
-        'preco_venda',
-        'preco_compra',
         'detalhes',
         'estado',
         'cancelado',
         'motivo',
         'desperdicado',
-        'data_processamento',
     ];
 
     /**
@@ -146,6 +136,34 @@ class Item extends Model implements ValidateInterface
     public function pagamento()
     {
         return $this->belongsTo('App\Models\Pagamento', 'pagamento_id');
+    }
+
+    /**
+     * Calcula a comissão do item
+     *
+     * @param Prestador $prestador
+     * @return self
+     */
+    public function calculate($prestador = null)
+    {
+        if ((is_null($prestador) || $prestador->id != $this->prestador_id) && !is_null($this->prestador_id)) {
+            $prestador = $this->$prestador;
+        }
+        $produto = $this->produto;
+        if (!is_null($produto)) {
+            $this->preco_venda = $produto->preco_venda;
+        }
+        $servico = $this->servico;
+        if (!is_null($servico)) {
+            $this->preco_venda = $servico->valor;
+        }
+        $this->subtotal = $this->preco * $this->quantidade;
+        if (!is_null($prestador) && !is_null($produto)) {
+            $comissao = $this->subtotal * ($prestador->porcentagem / 100);
+            $this->comissao = $produto->cobrar_servico ? $comissao : 0;
+        }
+        $this->total = $this->subtotal + $this->comissao;
+        return $this;
     }
 
     public function validate()

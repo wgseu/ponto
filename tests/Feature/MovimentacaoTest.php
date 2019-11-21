@@ -65,15 +65,6 @@ class MovimentacaoTest extends TestCase
         $this->assertEquals('2016-12-28 12:30:00', $movimentacao->data_abertura);
     }
 
-    public function testDeleteMovimentacao()
-    {
-        $headers = PrestadorTest::auth();
-        $movimentacao_to_delete = factory(Movimentacao::class)->create();
-        $this->graphfl('delete_movimentacao', ['id' => $movimentacao_to_delete->id], $headers);
-        $movimentacao = Movimentacao::find($movimentacao_to_delete->id);
-        $this->assertNull($movimentacao);
-    }
-
     public function testFindMovimentacao()
     {
         $headers = PrestadorTest::auth();

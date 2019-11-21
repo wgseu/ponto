@@ -99,7 +99,10 @@ class ComandaTest extends TestCase
     public function testValidateComandaCancelarComandaPedido()
     {
         $comanda = factory(Comanda::class)->create();
-        $pedido = factory(Pedido::class)->create(['comanda_id' => $comanda->id]);
+        factory(Pedido::class)->create([
+            'comanda_id' => $comanda->id,
+            'tipo' => Pedido::TIPO_COMANDA
+        ]);
         $comanda->ativa = false;
         $this->expectException(ValidationException::class);
         $comanda->save();

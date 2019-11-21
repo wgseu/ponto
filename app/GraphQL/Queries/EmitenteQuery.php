@@ -29,14 +29,9 @@ declare(strict_types=1);
 namespace App\GraphQL\Queries;
 
 use App\Models\Emitente;
-use App\GraphQL\Utils\Filter;
-use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class EmitenteQuery extends Query
@@ -52,28 +47,11 @@ class EmitenteQuery extends Query
 
     public function type(): Type
     {
-        return GraphQL::paginate('Emitente');
+        return GraphQL::type('Emitente');
     }
 
-    public function args(): array
+    public function resolve()
     {
-        return [
-            'filter' => ['name' => 'filter', 'type' => GraphQL::type('EmitenteFilter')],
-            'order' => ['name' => 'order', 'type' => GraphQL::type('EmitenteOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
-            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
-        ];
-    }
-
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
-    {
-        /** @var SelectFields $fields */
-        $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Emitente::with($fields->getRelations())->select($fields->getSelect())
-        );
-        return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        return Emitente::find('1');
     }
 }

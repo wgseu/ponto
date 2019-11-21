@@ -42,9 +42,9 @@ class PagamentoInput extends InputType
     public function fields(): array
     {
         return [
-            'carteira_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Carteira de destino do valor',
+            'id' => [
+                'type' => Type::id(),
+                'description' => 'Identificador do pagamento no banco',
             ],
             'moeda_id' => [
                 'type' => Type::nonNull(Type::id()),
@@ -56,27 +56,14 @@ class PagamentoInput extends InputType
                     ' zero para os pagamentos filhos, restante de antecipação e taxas são' .
                     ' filhos do valor antecipado',
             ],
-            'agrupamento_id' => [
-                'type' => Type::id(),
-                'description' => 'Permite antecipar recebimentos de cartões, um pagamento agrupado é' .
-                    ' internamente tratado como desativado',
-            ],
             'movimentacao_id' => [
                 'type' => Type::id(),
                 'description' => 'Movimentação do caixa quando for pagamento de pedido ou quando a conta' .
                     ' for paga do caixa',
             ],
-            'funcionario_id' => [
-                'type' => Type::id(),
-                'description' => 'Funcionário que lançou o pagamento no sistema',
-            ],
             'forma_id' => [
                 'type' => Type::id(),
                 'description' => 'Forma da pagamento do pedido',
-            ],
-            'pedido_id' => [
-                'type' => Type::id(),
-                'description' => 'Pedido que foi pago',
             ],
             'conta_id' => [
                 'type' => Type::id(),
@@ -86,21 +73,17 @@ class PagamentoInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Cartão em que foi pago, para forma de pagamento em cartão',
             ],
-            'cheque_id' => [
-                'type' => Type::id(),
+            'cheque' => [
+                'type' => GraphQL::type('ChequeUpdateInput'),
                 'description' => 'Cheque em que foi pago',
             ],
-            'crediario_id' => [
-                'type' => Type::id(),
+            'crediario' => [
+                'type' => GraphQL::type('ContaUpdateInput'),
                 'description' => 'Conta que foi utilizada como pagamento do pedido',
             ],
-            'credito_id' => [
-                'type' => Type::id(),
+            'credito' => [
+                'type' => GraphQL::type('CreditoUpdateInput'),
                 'description' => 'Crédito que foi utilizado para pagar o pedido',
-            ],
-            'valor' => [
-                'type' => Type::nonNull(Type::float()),
-                'description' => 'Valor pago ou recebido na moeda informada no momento do recebimento',
             ],
             'numero_parcela' => [
                 'type' => Type::int(),

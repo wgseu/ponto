@@ -27,13 +27,17 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
+use App\Util\Number;
+use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informações do pedido de venda
  */
-class Pedido extends Model implements ValidateInterface
+class Pedido extends Model implements ValidateInterface, ValidateInsertInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -86,25 +90,12 @@ class Pedido extends Model implements ValidateInterface
         'associacao_id',
         'tipo',
         'estado',
-        'servicos',
-        'produtos',
-        'comissao',
-        'subtotal',
-        'descontos',
-        'total',
-        'pago',
-        'troco',
-        'lancado',
         'pessoas',
         'cpf',
         'email',
         'descricao',
-        'fechador_id',
-        'data_impressao',
         'motivo',
-        'data_entrega',
         'data_agendamento',
-        'data_conclusao',
     ];
 
     /**
@@ -113,7 +104,7 @@ class Pedido extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
-        'tipo' => self::TIPO_MESA,
+        'tipo' => self::TIPO_BALCAO,
         'estado' => self::ESTADO_ABERTO,
         'servicos' => 0,
         'produtos' => 0,
@@ -209,7 +200,253 @@ class Pedido extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'fechador_id');
     }
 
+    /**
+     * Informa quem fechou o pedido e imprimiu a conta
+     */
+    public function itens()
+    {
+        return $this->hasMany('App\Models\Item', 'pedido_id')->where('cancelado', false);
+    }
+
+    /**
+     * Devolve a lista de todos os pagamentos não cancelados
+     */
+    public function pagamentos()
+    {
+        return $this->hasMany('App\Models\Pagamento', 'pedido_id')
+            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
+    }
+
+    /**
+     * Devolve a lista de promessa de pagamentos, inclui troco
+     */
+    public function lancados()
+    {
+        return $this->pagamentos()
+            ->where('estado', '<>', Pagamento::ESTADO_PAGO);
+    }
+
+    /**
+     * Lista de pagamentos já aprovados, inclui troco
+     */
+    public function pagos()
+    {
+        return $this->pagamentos()
+            ->where('estado', Pagamento::ESTADO_PAGO);
+    }
+
+    /**
+     * Lista de lançamento de trocos
+     */
+    public function trocos()
+    {
+        return $this->pagamentos()
+            ->where('lancado', '<', 0);
+    }
+
+    /**
+     * Informa a permissão necessária para criar ou adicionar itens no pedido
+     *
+     * @param string $tipo tipo de pedido
+     * @return string nome de acesso
+     */
+    public static function tipoAccess($tipo)
+    {
+        switch ($tipo) {
+            case self::TIPO_MESA:
+                return 'pedido:type:table';
+            case self::TIPO_COMANDA:
+                return 'pedido:type:card';
+            case self::TIPO_ENTREGA:
+                return 'pedido:type:delivery';
+            default:
+                return 'pedido:type:counter';
+        }
+    }
+
+    public function payChanges()
+    {
+        $trocos = $this->trocos()
+            ->where('estado', '<>', Pagamento::ESTADO_PAGO)->get();
+        foreach ($trocos as $troco) {
+            $troco->update(['estado' => Pagamento::ESTADO_PAGO]);
+        }
+    }
+
+    public function totalize()
+    {
+        $this->servicos = (float)$this->itens()->whereNotNull('servico_id')->sum('subtotal');
+        $this->produtos = (float)$this->itens()->whereNotNull('produto_id')->sum('subtotal');
+        $this->comissao = (float)$this->itens()->sum('comissao');
+        $this->subtotal = $this->servicos + $this->produtos + $this->comissao;
+        $this->descontos = (float)$this->itens()->where('subtotal', '<', 0)->sum('subtotal');
+        $this->total = $this->subtotal + $this->descontos;
+        $this->pago = (float)$this->pagos()->sum('lancado');
+        $this->troco = (float)$this->trocos()->sum('lancado');
+        $this->lancado = (float)$this->lancados()->sum('lancado');
+        return $this;
+    }
+
+    /**
+     * Cancela os itens e pagamentos
+     *
+     * @return void
+     */
+    protected function cancel()
+    {
+        $pagamentos = $this->pagamentos()->get();
+        foreach ($pagamentos as $pagamento) {
+            $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
+        }
+        $itens = $this->itens;
+        foreach ($itens as $item) {
+            $item->update(['cancelado' => true]);
+        }
+    }
+
     public function validate()
     {
+        $errors = [];
+        if (
+            !Validator::checkCNPJ($this->cpf) &&
+            !Validator::checkCPF($this->cpf, true)
+        ) {
+            $errors['cpf'] = __('messages.cpf_invalid', 'CPF');
+        } elseif (
+            !Validator::checkCPF($this->cpf) &&
+            !Validator::checkCNPJ($this->cpf, true)
+        ) {
+            $errors['cpf'] = __('messages.cpf_invalid', 'CNPJ');
+        }
+        if (!Validator::checkEmail($this->email, true)) {
+            $errors['email'] = __('messages.invalid_email');
+        }
+        // não pode entregar sem um cliente
+        if ($this->tipo == self::TIPO_ENTREGA && is_null($this->cliente_id)) {
+            $errors['cliente_id'] = __('messages.delivery_without_customer');
+        }
+        // só entrega pode ter endereço no pedido
+        if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->localizacao_id)) {
+            $errors['localizacao_id'] = __('messages.non_delivery_with_address');
+        }
+        // só pedido para entrega pode ser entregue
+        if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->entrega_id)) {
+            $errors['entrega_id'] = __('messages.non_delivery_delivering');
+        }
+        // nãp pode sair para entrega sem o entregador
+        if (
+            in_array($this->estado, [self::ESTADO_ENTREGA, self::ESTADO_CONCLUIDO]) &&
+            !is_null($this->localizacao_id) &&
+            is_null($this->entrega_id)
+        ) {
+            $errors['entrega_id'] = __('messages.delivering_without_deliveryman');
+        }
+        // só entrega se tiver endereço
+        if (is_null($this->localizacao_id) && !is_null($this->entrega_id)) {
+            $errors['entrega_id'] = __('messages.delivering_without_address');
+        }
+        if ($this->tipo == self::TIPO_MESA && is_null($this->mesa_id)) {
+            $errors['mesa_id'] = __('messages.table_without_local');
+        }
+        if ($this->tipo != self::TIPO_COMANDA && !is_null($this->comanda_id)) {
+            $errors['comanda_id'] = __('messages.other_order_as_card');
+        }
+        if (!in_array($this->tipo, [self::TIPO_COMANDA, self::TIPO_MESA]) && !is_null($this->mesa_id)) {
+            $errors['mesa_id'] = __('messages.other_order_as_table');
+        }
+        // só um pedido por mesa
+        if (!is_null($this->mesa_id)) {
+            $other = self::where('mesa_id', $this->mesa_id)
+                ->where('estado', '<>', self::ESTADO_CANCELADO)
+                ->where('estado', '<>', self::ESTADO_CONCLUIDO);
+            // não pode criar uma comanda em uma mesa já aberta
+            if ($this->tipo == self::TIPO_COMANDA) {
+                $other->where('tipo', '<>', self::TIPO_COMANDA);
+            }
+            if ($this->exists) {
+                $other->where('id', '<>', $this->id);
+            }
+            if ($other->exists()) {
+                $errors['mesa_id'] = __('messages.table_already_open');
+            }
+        }
+        // só um pedido por comanda
+        if ($this->tipo == self::TIPO_COMANDA && !is_null($this->comanda_id)) {
+            $other = self::where('comanda_id', $this->comanda_id)
+                ->where('estado', '<>', self::ESTADO_CANCELADO)
+                ->where('estado', '<>', self::ESTADO_CONCLUIDO);
+            if ($this->exists) {
+                $other->where('id', '<>', $this->id);
+            }
+            if ($other->exists()) {
+                $errors['comanda_id'] = __('messages.card_already_open');
+            }
+        }
+        return $errors;
+    }
+
+    public function onInsert()
+    {
+        $errors = [];
+        // um pedido deve ser criado aberto
+        if ($this->estado != self::ESTADO_ABERTO) {
+            $errors['estado'] = __('messages.order_mustbe_open');
+        }
+        return $errors;
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old = $this->fresh();
+        // não pode alterar pedido cancelado
+        if ($old->estado == self::ESTADO_CANCELADO) {
+            $errors['estado'] = __('messages.order_already_cancelled');
+        } elseif ($this->estado == self::ESTADO_CANCELADO) {
+            $this->cancel();
+        }
+        if ($this->tipo == self::TIPO_ENTREGA) {
+            // não pode entregar sem endereço
+            if (
+                is_null($this->localizacao_id) &&
+                $this->estado == self::ESTADO_ENTREGA
+            ) {
+                $errors['estado'] = __('messages.cannot_delivery_togo');
+            }
+            // precisa entregar antes de concluir
+            if (
+                !is_null($this->localizacao_id) &&
+                $old->estado != self::ESTADO_ENTREGA &&
+                $this->estado == self::ESTADO_CONCLUIDO
+            ) {
+                $errors['estado'] = __('messages.order_not_delivered');
+            }
+            // precisa estar pago ou com promessa de pagamento
+            if (!Number::isEqual($this->total, $this->pago + $this->lancado)) {
+                $errors['pago'] = __('messages.order_incomplete_payment');
+            }
+        }
+        if (in_array($this->tipo, [self::TIPO_ENTREGA, self::TIPO_BALCAO])) {
+            // no balcão ou entrega precisa ter algum item no pedido
+            if (!$this->itens()->exists()) {
+                $errors['total'] = __('messages.no_item_added');
+            }
+        }
+        // só fecha conta de mesas e comandas
+        if (
+            !in_array($this->tipo, [self::TIPO_MESA, self::TIPO_COMANDA]) &&
+            $this->estado == self::ESTADO_FECHADO
+        ) {
+            $errors['estado'] = __('messages.only_pause_local_order');
+        }
+        // ao fechar o pedido, não pode ter pagamento pendente
+        if ($this->estado == self::ESTADO_CONCLUIDO && !Number::isEqual($this->lancado, 0)) {
+            $errors['lancado'] = __('messages.order_payment_pending');
+        }
+        // ao fechar o pedido, tudo precisa estar pago, inclusive o troco entregue
+        if ($this->estado == self::ESTADO_CONCLUIDO && !Number::isEqual($this->total, $this->pago)) {
+            $errors['pago'] = __('messages.order_unpaid');
+        }
+        return $errors;
     }
 }

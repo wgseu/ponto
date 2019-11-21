@@ -222,6 +222,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.pizza_dough'),
             'tipo' => Produto::TIPO_COMPOSICAO,
             'divisivel' => true,
+            'disponivel' => false,
         ]))->save();
         (new Produto([
             'codigo' => '22',

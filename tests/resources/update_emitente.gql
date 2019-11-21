@@ -1,5 +1,5 @@
-mutation updateEmitente($id: ID!, $input: EmitenteUpdateInput!) {
-  UpdateEmitente(id: $id, input: $input) {
+mutation updateEmitente($input: EmitenteUpdateInput!) {
+  UpdateEmitente(input: $input) {
     id
   }
 }

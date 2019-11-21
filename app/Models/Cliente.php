@@ -203,6 +203,14 @@ class Cliente extends User implements
         return $this->belongsTo('App\Models\Cliente', 'empresa_id');
     }
 
+    /**
+     * Retorna o cadastro como funcionário desse cliente
+     */
+    public function prestador()
+    {
+        return $this->hasOne('App\Models\Prestador', 'cliente_id');
+    }
+
     public function validate()
     {
         $errors = [];

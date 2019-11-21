@@ -73,13 +73,26 @@ class PedidoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador do cliente do pedido',
             ],
+            'cliente' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Cliente do pedido',
+            ],
             'localizacao_id' => [
                 'type' => Type::id(),
                 'description' => 'Endereço de entrega do pedido, se não informado na venda entrega, o' .
                     ' pedido será para viagem',
             ],
+            'localizacao' => [
+                'type' => GraphQL::type('Localizacao'),
+                'description' => 'Endereço de entrega do pedido, se não informado na venda entrega, o' .
+                    ' pedido será para viagem',
+            ],
             'entrega_id' => [
                 'type' => Type::id(),
+                'description' => 'Informa em qual entrega esse pedido foi despachado',
+            ],
+            'entrega' => [
+                'type' => GraphQL::type('Viagem'),
                 'description' => 'Informa em qual entrega esse pedido foi despachado',
             ],
             'associacao_id' => [
@@ -164,7 +177,7 @@ class PedidoType extends GraphQLType
             ],
             'data_entrega' => [
                 'type' => GraphQL::type('DateTime'),
-                'description' => 'Data e hora que o entregador saiu para entregar esse pedido',
+                'description' => 'Data e hora que o pedido foi entregue ao cliente',
             ],
             'data_agendamento' => [
                 'type' => GraphQL::type('DateTime'),

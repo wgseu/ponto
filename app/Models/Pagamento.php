@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Pagamentos de contas e pedidos
@@ -64,28 +65,17 @@ class Pagamento extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
-        'carteira_id',
         'moeda_id',
         'pagamento_id',
-        'agrupamento_id',
         'movimentacao_id',
-        'funcionario_id',
         'forma_id',
-        'pedido_id',
-        'conta_id',
         'cartao_id',
-        'cheque_id',
-        'crediario_id',
-        'credito_id',
-        'valor',
         'numero_parcela',
         'parcelas',
         'lancado',
         'codigo',
         'detalhes',
         'estado',
-        'data_pagamento',
-        'data_compensacao',
     ];
 
     /**
@@ -205,6 +195,37 @@ class Pagamento extends Model implements ValidateInterface
     public function credito()
     {
         return $this->belongsTo('App\Models\Credito', 'credito_id');
+    }
+
+    /**
+     * Calcula o valor na moeda escolhida e preenche outras informações
+     *
+     * @return self
+     */
+    public function calculate()
+    {
+        $cartao = $this->cartao;
+        $this->carteira_id = null;
+        if (!is_null($cartao)) {
+            $this->carteira_id = $cartao->carteira_id;
+        }
+        $forma = $this->forma;
+        if (!is_null($forma) && is_null($this->carteira_id)) {
+            $this->carteira_id = $forma->carteira_id;
+        }
+        $moeda = $this->moeda;
+        $this->valor = $moeda->conversao * $this->lancado;
+        if ($this->estado == self::ESTADO_PAGO) {
+            $this->data_pagamento = Carbon::now();
+            $this->data_compensacao = $this->data_pagamento;
+            if (!is_null($cartao)) {
+                $this->data_compensacao = $this->data_pagamento->addDays($cartao->dias_repasse);
+            }
+        } else {
+            $this->data_pagamento = null;
+            $this->data_compensacao = null;
+        }
+        return $this;
     }
 
     public function validate()

@@ -42,6 +42,14 @@ class PedidoInput extends InputType
     public function fields(): array
     {
         return [
+            'itens' => [
+                'type' => Type::listOf(GraphQL::type('ItemUpdateInput')),
+                'description' => 'Itens do pedido a serem adicionados ou alterados',
+            ],
+            'pagamentos' => [
+                'type' => Type::listOf(GraphQL::type('PagamentoUpdateInput')),
+                'description' => 'Pagamentos do pedido a serem adicionados ou alterados',
+            ],
             'pedido_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas' .
@@ -59,10 +67,6 @@ class PedidoInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Identificador da sessão de vendas',
             ],
-            'prestador_id' => [
-                'type' => Type::id(),
-                'description' => 'Prestador que criou esse pedido',
-            ],
             'cliente_id' => [
                 'type' => Type::id(),
                 'description' => 'Identificador do cliente do pedido',
@@ -76,9 +80,9 @@ class PedidoInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Informa em qual entrega esse pedido foi despachado',
             ],
-            'associacao_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa se o pedido veio de uma integração e se está associado',
+            'entrega' => [
+                'type' => GraphQL::type('ViagemUpdateInput'),
+                'description' => 'Informa em qual entrega esse pedido foi despachado',
             ],
             'tipo' => [
                 'type' => GraphQL::type('PedidoTipo'),
@@ -91,42 +95,6 @@ class PedidoInput extends InputType
                     ' saiu para entrega. Fechado: O cliente pediu a conta e está pronto para' .
                     ' pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi' .
                     ' cancelado com os itens e pagamentos',
-            ],
-            'servicos' => [
-                'type' => Type::float(),
-                'description' => 'Valor total dos serviços desse pedido',
-            ],
-            'produtos' => [
-                'type' => Type::float(),
-                'description' => 'Valor total dos produtos do pedido sem a comissão',
-            ],
-            'comissao' => [
-                'type' => Type::float(),
-                'description' => 'Valor total da comissão desse pedido',
-            ],
-            'subtotal' => [
-                'type' => Type::float(),
-                'description' => 'Subtotal do pedido sem os descontos',
-            ],
-            'descontos' => [
-                'type' => Type::float(),
-                'description' => 'Total de descontos realizado nesse pedido',
-            ],
-            'total' => [
-                'type' => Type::float(),
-                'description' => 'Total do pedido já com descontos',
-            ],
-            'pago' => [
-                'type' => Type::float(),
-                'description' => 'Valor já pago do pedido',
-            ],
-            'troco' => [
-                'type' => Type::float(),
-                'description' => 'Troco do cliente',
-            ],
-            'lancado' => [
-                'type' => Type::float(),
-                'description' => 'Valor lançado para pagar, mas não foi pago ainda',
             ],
             'pessoas' => [
                 'type' => Type::int(),
@@ -147,30 +115,14 @@ class PedidoInput extends InputType
                 'description' => 'Detalhes da reserva ou do pedido',
                 'rules' => ['max:255'],
             ],
-            'fechador_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa quem fechou o pedido e imprimiu a conta',
-            ],
-            'data_impressao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de impressão da conta do cliente',
-            ],
             'motivo' => [
                 'type' => Type::string(),
                 'description' => 'Informa o motivo do cancelamento',
                 'rules' => ['max:200'],
             ],
-            'data_entrega' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data e hora que o entregador saiu para entregar esse pedido',
-            ],
             'data_agendamento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de agendamento do pedido',
-            ],
-            'data_conclusao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de finalização do pedido',
             ],
         ];
     }

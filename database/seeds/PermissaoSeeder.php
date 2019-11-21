@@ -487,6 +487,26 @@ class PermissaoSeeder extends Seeder
         ]))->save();
         (new Permissao([
             'funcionalidade_id' => 59,
+            'nome' => 'pedido:type:table',
+            'descricao' => __('messages.pedido_type_table_permition'),
+        ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 59,
+            'nome' => 'pedido:type:card',
+            'descricao' => __('messages.pedido_type_card_permition'),
+        ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 59,
+            'nome' => 'pedido:type:counter',
+            'descricao' => __('messages.pedido_type_counter_permition'),
+        ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 59,
+            'nome' => 'pedido:type:delivery',
+            'descricao' => __('messages.pedido_type_delivery_permition'),
+        ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 59,
             'nome' => 'pedido:update',
             'descricao' => __('messages.pedido_update_permition'),
         ]))->save();

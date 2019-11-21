@@ -26,44 +26,77 @@
 
 namespace Tests\Feature;
 
-use App\Models\Mesa;
+use App\Models\Item;
+use App\Models\Localizacao;
+use App\Models\Pagamento;
 use Tests\TestCase;
 use App\Models\Pedido;
+use App\Models\Sessao;
+use App\Models\Viagem;
 
 class PedidoTest extends TestCase
 {
-    public function testCreatePedido()
+    public function testCreateDeliveryFromCustomer()
     {
-        $headers = PrestadorTest::auth();
-        $seed_pedido =  factory(Pedido::class)->create();
+        $prestador = EmpresaTest::createOwner()->prestador;
+        $prestador_headers = PrestadorTest::auth($prestador);
+        $localizacao = factory(Localizacao::class)->create();
+        $cliente = $localizacao->cliente;
+        $headers = ClienteTest::auth($cliente);
+        $itens = [
+            factory(Item::class)->raw(),
+            factory(Item::class)->raw(),
+        ];
+        $total = array_reduce($itens, function ($prev, $item) {
+            return $prev + $item['preco'] * $item['quantidade'];
+        }, 0);
+        $pagamentos = [
+            factory(Pagamento::class)->raw(['lancado' => $total + 10]),
+            factory(Pagamento::class)->raw(['lancado' => -10]),
+        ];
         $response = $this->graphfl('create_pedido', [
             'input' => [
-                'tipo' => Pedido::TIPO_BALCAO,
-                'sessao_id' => $seed_pedido->sessao_id,
+                'tipo' => Pedido::TIPO_ENTREGA,
+                'cliente_id' => $cliente->id,
+                'localizacao_id' => $localizacao->id,
+                'itens' => $itens,
+                'pagamentos' => $pagamentos,
             ]
         ], $headers);
+        $pedido = Pedido::findOrFail($response->json('data.CreatePedido.id'));
+        $this->assertEquals(Pedido::TIPO_ENTREGA, $pedido->tipo);
 
-        $found_pedido = Pedido::findOrFail($response->json('data.CreatePedido.id'));
-        $this->assertEquals(Pedido::TIPO_BALCAO, $found_pedido->tipo);
-    }
-
-    public function testUpdatePedido()
-    {
-        $headers = PrestadorTest::auth();
-        $pedido = factory(Pedido::class)->create();
-        $mesa = factory(Mesa::class)->create();
+        $entrega = factory(Viagem::class)->raw();
         $this->graphfl(
             'update_pedido',
             [
                 'id' => $pedido->id,
                 'input' => [
-                    'mesa_id' => $mesa->id,
+                    'estado' => Pedido::ESTADO_ENTREGA,
+                    'entrega' => $entrega,
                 ]
             ],
-            $headers
+            $prestador_headers
         );
-        $pedido->refresh();
-        $this->assertEquals($mesa->id, $pedido->mesa_id);
+
+        $pagamentos = array_map(
+            function ($pagamento) {
+                return ['id' => $pagamento->id, 'estado' => Pagamento::ESTADO_PAGO];
+            },
+            $pedido->lancados()->get()->all()
+        );
+        factory(Sessao::class)->create();
+        $this->graphfl(
+            'update_pedido',
+            [
+                'id' => $pedido->id,
+                'input' => [
+                    'estado' => Pedido::ESTADO_CONCLUIDO,
+                    'pagamentos' => $pagamentos,
+                ]
+            ],
+            $prestador_headers
+        );
     }
 
     public function testFindPedido()

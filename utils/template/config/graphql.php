@@ -101,8 +101,8 @@ $[table.end]
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
-
 $[table.each]
+
                 'Create$[Table.norm]' => 'App\GraphQL\Mutations\Create$[Table.norm]Mutation',
                 'Update$[Table.norm]' => 'App\GraphQL\Mutations\Update$[Table.norm]Mutation',
                 'Delete$[Table.norm]' => 'App\GraphQL\Mutations\Delete$[Table.norm]Mutation',

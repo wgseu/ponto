@@ -43,6 +43,10 @@ class ItemInput extends InputType
     public function fields(): array
     {
         return [
+            'id' => [
+                'type' => Type::id(),
+                'description' => 'Identificador do item no banco',
+            ],
             'pedido_id' => [
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido a qual pertence esse item',
@@ -67,16 +71,6 @@ class ItemInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Informa se esse item foi pago e qual foi o lançamento',
             ],
-            'descricao' => [
-                'type' => Type::string(),
-                'description' => 'Sobrescreve a descrição do produto na exibição',
-                'rules' => ['max:200'],
-            ],
-            'composicao' => [
-                'type' => Type::string(),
-                'description' => 'Informa a composição escolhida',
-                'rules' => ['max:65535'],
-            ],
             'preco' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Preço do produto já com desconto',
@@ -84,26 +78,6 @@ class ItemInput extends InputType
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Quantidade de itens vendidos',
-            ],
-            'subtotal' => [
-                'type' => Type::nonNull(Type::float()),
-                'description' => 'Subtotal do item sem comissão',
-            ],
-            'comissao' => [
-                'type' => Type::float(),
-                'description' => 'Valor total de comissão cobrada nesse item da venda',
-            ],
-            'total' => [
-                'type' => Type::nonNull(Type::float()),
-                'description' => 'Total a pagar do item com a comissão',
-            ],
-            'preco_venda' => [
-                'type' => Type::nonNull(Type::float()),
-                'description' => 'Preço de normal do produto no momento da venda',
-            ],
-            'preco_compra' => [
-                'type' => Type::float(),
-                'description' => 'Preço de compra do produto calculado automaticamente na hora da venda',
             ],
             'detalhes' => [
                 'type' => Type::string(),
@@ -126,10 +100,6 @@ class ItemInput extends InputType
             'desperdicado' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se o item foi cancelado por conta de desperdício',
-            ],
-            'data_processamento' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data do processamento do item',
             ],
         ];
     }

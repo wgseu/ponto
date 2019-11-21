@@ -30,6 +30,7 @@ namespace App\GraphQL\Types;
 
 use App\Models\Pais;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class PaisType extends GraphQLType
@@ -62,6 +63,10 @@ class PaisType extends GraphQLType
             'moeda_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa a moeda principal do país',
+            ],
+            'moeda' => [
+                'type' => GraphQL::type('Moeda'),
+                'description' => 'Moeda principal do país',
             ],
             'idioma' => [
                 'type' => Type::string(),

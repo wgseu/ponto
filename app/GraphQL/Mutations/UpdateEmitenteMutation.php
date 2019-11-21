@@ -53,17 +53,13 @@ class UpdateEmitenteMutation extends Mutation
     public function args(): array
     {
         return [
-            'id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Identificador do emitente, sempre 1',
-            ],
             'input' => ['type' => Type::nonNull(GraphQL::type('EmitenteUpdateInput'))],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $emitente = Emitente::findOrFail($args['id']);
+        $emitente = Emitente::find('1') ?? new Emitente();
         $emitente->fill($args['input']);
         $emitente->save();
         return $emitente;

@@ -71,15 +71,6 @@ class EstoqueTest extends TestCase
         $this->assertEquals(5, $estoque->quantidade);
     }
 
-    public function testDeleteEstoque()
-    {
-        $headers = PrestadorTest::auth();
-        $estoque_to_delete = factory(Estoque::class)->create();
-        $this->graphfl('delete_estoque', ['id' => $estoque_to_delete->id], $headers);
-        $estoque = Estoque::find($estoque_to_delete->id);
-        $this->assertNull($estoque);
-    }
-
     public function testFindEstoque()
     {
         $headers = PrestadorTest::auth();
@@ -90,7 +81,8 @@ class EstoqueTest extends TestCase
 
     public function testValidateDoisAtributosEstoque()
     {
-        $transacao = factory(Item::class)->create();
+        $transacao = factory(Item::class)->make()->calculate();
+        $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['transacao_id' => $transacao->id]);
     }
@@ -116,7 +108,8 @@ class EstoqueTest extends TestCase
 
     public function testValidateSaidaProdutoPositiva()
     {
-        $transacao = factory(Item::class)->create();
+        $transacao = factory(Item::class)->make()->calculate();
+        $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create([
             'requisito_id' => null,
@@ -155,7 +148,8 @@ class EstoqueTest extends TestCase
 
     public function testBelongToTransacao()
     {
-        $transacao = factory(Item::class)->create();
+        $transacao = factory(Item::class)->make()->calculate();
+        $transacao->save();
         $estoque = factory(Estoque::class)->create([
             'requisito_id' => null,
             'transacao_id' => $transacao->id,

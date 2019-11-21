@@ -475,7 +475,7 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('localizacao_id')->nullable();
             $table->unsignedInteger('entrega_id')->nullable();
             $table->unsignedInteger('associacao_id')->nullable();
-            $table->enum('tipo', ['mesa', 'comanda', 'balcao', 'entrega'])->default('mesa');
+            $table->enum('tipo', ['mesa', 'comanda', 'balcao', 'entrega'])->default('balcao');
             $table->enum(
                 'estado',
                 [

@@ -28,7 +28,6 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Emitente;
-use App\Models\Regime;
 
 class EmitenteTest extends TestCase
 {
@@ -42,14 +41,14 @@ class EmitenteTest extends TestCase
             ]
         ], $headers);
         $emitente->refresh();
-        $this->assertEquals(1, $emitente->id);
+        $this->assertEquals('1', $emitente->id);
     }
 
     public function testFindEmitente()
     {
         $headers = PrestadorTest::auth();
         $emitente = factory(Emitente::class)->create();
-        $response = $this->graphfl('query_emitente', [ 'id' => $emitente->id ], $headers);
-        $this->assertEquals($emitente->id, $response->json('data.emitentes.data.0.id'));
+        $response = $this->graphfl('query_emitente', [], $headers);
+        $this->assertEquals($emitente->id, $response->json('data.emitente.id'));
     }
 }

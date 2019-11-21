@@ -38,9 +38,8 @@ class ContaTest extends TestCase
         $response = $this->graphfl('create_conta', [
             'input' => [
                 'classificacao_id' => $seed_conta->classificacao_id,
-                'funcionario_id' => $seed_conta->funcionario_id,
                 'descricao' => 'Teste',
-                'valor' => 1.50,
+                'valor' => -1.50,
                 'vencimento' => '2016-12-25 12:15:00',
                 'data_emissao' => '2016-12-25 12:15:00',
             ]
@@ -48,9 +47,8 @@ class ContaTest extends TestCase
 
         $found_conta = Conta::findOrFail($response->json('data.CreateConta.id'));
         $this->assertEquals($seed_conta->classificacao_id, $found_conta->classificacao_id);
-        $this->assertEquals($seed_conta->funcionario_id, $found_conta->funcionario_id);
         $this->assertEquals('Teste', $found_conta->descricao);
-        $this->assertEquals(1.50, $found_conta->valor);
+        $this->assertEquals(-1.50, $found_conta->valor);
         $this->assertEquals('2016-12-25 12:15:00', $found_conta->vencimento);
         $this->assertEquals('2016-12-25 12:15:00', $found_conta->data_emissao);
     }

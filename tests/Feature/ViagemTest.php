@@ -34,43 +34,19 @@ use Illuminate\Support\Carbon;
 
 class ViagemTest extends TestCase
 {
-    public function testCreateViagem()
-    {
-        $headers = PrestadorTest::auth();
-        $seed_viagem =  factory(Viagem::class)->create();
-        $response = $this->graphfl('create_viagem', [
-            'input' => [
-                'responsavel_id' => $seed_viagem->responsavel_id,
-                'data_saida' => '2016-12-25 12:15:00',
-            ]
-        ], $headers);
-
-        $found_viagem = Viagem::findOrFail($response->json('data.CreateViagem.id'));
-        $this->assertEquals($seed_viagem->responsavel_id, $found_viagem->responsavel_id);
-        $this->assertEquals('2016-12-25 12:15:00', $found_viagem->data_saida);
-    }
-
     public function testUpdateViagem()
     {
+        $prestador = factory(Prestador::class)->create();
         $headers = PrestadorTest::auth();
         $viagem = factory(Viagem::class)->create();
         $this->graphfl('update_viagem', [
             'id' => $viagem->id,
             'input' => [
-                'data_saida' => '2016-12-28 12:30:00',
+                'responsavel_id' => $prestador->id,
             ]
         ], $headers);
         $viagem->refresh();
-        $this->assertEquals('2016-12-28 12:30:00', $viagem->data_saida);
-    }
-
-    public function testDeleteViagem()
-    {
-        $headers = PrestadorTest::auth();
-        $viagem_to_delete = factory(Viagem::class)->create();
-        $this->graphfl('delete_viagem', ['id' => $viagem_to_delete->id], $headers);
-        $viagem = Viagem::find($viagem_to_delete->id);
-        $this->assertNull($viagem);
+        $this->assertEquals($prestador->id, $viagem->responsavel_id);
     }
 
     public function testFindViagem()

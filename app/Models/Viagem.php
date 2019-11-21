@@ -38,7 +38,7 @@ class Viagem extends Model implements ValidateInterface
     use ModelEvents;
 
     public const UPDATED_AT = 'data_atualizacao';
-    public const CREATED_AT = null;
+    public const CREATED_AT = 'data_saida';
 
     /**
      * The table associated with the model.
@@ -59,7 +59,6 @@ class Viagem extends Model implements ValidateInterface
         'quilometragem',
         'distancia',
         'data_chegada',
-        'data_saida',
     ];
 
     /**

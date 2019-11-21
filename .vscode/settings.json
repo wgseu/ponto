@@ -1,6 +1,6 @@
 {
     "better-phpunit.phpunitBinary": "${workspaceFolder}/vendor/bin/phpunit",
-    "better-phpunit.commandSuffix": "",
+    "better-phpunit.commandSuffix": "--no-coverage",
     "phpcs.standard": "PSR12",
     "coverage-gutters.coverageFileNames": ["clover.xml"],
     "coverage-gutters.ignoredPathGlobs": "{node_modules,vendor,storage}/**",

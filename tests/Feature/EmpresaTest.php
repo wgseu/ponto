@@ -29,9 +29,26 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Empresa;
 use App\Models\Cliente;
+use App\Models\Prestador;
 
 class EmpresaTest extends TestCase
 {
+    /**
+     * Cria um proprietário para a empresa
+     *
+     * @return Cliente
+     */
+    public static function createOwner()
+    {
+        $cliente_empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
+        $empresa = Empresa::find('1');
+        $empresa->empresa_id = $cliente_empresa->id;
+        $empresa->save();
+        $cliente = factory(Cliente::class)->create(['empresa_id' => $cliente_empresa->id]);
+        factory(Prestador::class)->create(['cliente_id' => $cliente->id]);
+        return $cliente;
+    }
+
     public function testUpdateEmpresa()
     {
         $headers = PrestadorTest::auth();

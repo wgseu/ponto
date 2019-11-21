@@ -95,12 +95,10 @@ class Conta extends Model implements ValidateInterface
      */
     protected $fillable = [
         'classificacao_id',
-        'funcionario_id',
         'conta_id',
         'agrupamento_id',
         'carteira_id',
         'cliente_id',
-        'pedido_id',
         'tipo',
         'descricao',
         'valor',

@@ -46,10 +46,6 @@ class ContaInput extends InputType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Classificação da conta',
             ],
-            'funcionario_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Funcionário que lançou a conta',
-            ],
             'conta_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa a conta principal',
@@ -69,10 +65,6 @@ class ContaInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Cliente a qual a conta pertence',
             ],
-            'pedido_id' => [
-                'type' => Type::id(),
-                'description' => 'Pedido da qual essa conta foi gerada',
-            ],
             'tipo' => [
                 'type' => GraphQL::type('ContaTipo'),
                 'description' => 'Tipo de conta se receita ou despesa',
@@ -85,10 +77,6 @@ class ContaInput extends InputType
             'valor' => [
                 'type' => Type::nonNull(Type::float()),
                 'description' => 'Valor da conta',
-            ],
-            'consolidado' => [
-                'type' => Type::float(),
-                'description' => 'Valor pago ou recebido da conta',
             ],
             'fonte' => [
                 'type' => GraphQL::type('ContaFonte'),
@@ -151,10 +139,6 @@ class ContaInput extends InputType
             'estado' => [
                 'type' => GraphQL::type('ContaEstado'),
                 'description' => 'Informa o estado da conta',
-            ],
-            'data_calculo' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data do último cálculo de acréscimo por atraso de pagamento',
             ],
             'data_emissao' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

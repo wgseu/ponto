@@ -40,7 +40,7 @@ class Validator
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
         // Verifica se nenhuma das sequências abaixo foi digitada, caso seja, retorna falso
-        if (preg_match($pattern, $cpf)) {
+        if (is_null($cpf) || preg_match($pattern, $cpf)) {
             return false;
         }
         for ($t = 9; $t < 11; $t++) {
@@ -66,7 +66,7 @@ class Validator
         }
         // Somente Brasil
         $pattern = '/^0+$|^1+$|^2+$|^3+$|^4+$|^5+$|^6+$|^7+$|^8+$|^9+$/';
-        if (preg_match($pattern, $cnpj)) {
+        if (is_null($cnpj) || preg_match($pattern, $cnpj)) {
             return false;
         }
         $calcular = 0;
@@ -122,5 +122,32 @@ class Validator
         $ncm = Filter::unmask($ncm, $mask);
         $mask_len = strlen(Filter::digits($mask));
         return strlen($ncm) == $mask_len;
+    }
+
+    /**
+     * Check if IP address is valid
+     * @param  [type]  $value IP address to test
+     * @param  boolean $empty    allow empty IP address as valid
+     * @return boolean           True if IP address is valid or false otherwise
+     */
+    public static function checkIP($value, $empty = false)
+    {
+        if (is_null($value) && $empty) {
+            return true;
+        }
+        return filter_var($value, FILTER_VALIDATE_IP) !== false;
+    }
+    /**
+     * Check if E-mail is valid
+     * @param  string  $value E-mail to check
+     * @param  boolean $empty allow empty E-mail as valid
+     * @return boolean        True if E-mail is valid or false otherwise
+     */
+    public static function checkEmail($value, $empty = false)
+    {
+        if (is_null($value) && $empty) {
+            return true;
+        }
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 }

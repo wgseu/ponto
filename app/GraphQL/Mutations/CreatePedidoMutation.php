@@ -28,8 +28,16 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Exceptions\Exception;
+use App\Models\Cheque;
+use App\Models\Conta;
+use App\Models\Credito;
+use App\Models\Item;
+use App\Models\Pagamento;
 use App\Models\Pedido;
+use App\Models\Prestador;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -42,7 +50,13 @@ class CreatePedidoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('pedido:create');
+        $cliente_id = $args['input']['cliente_id'] ?? null;
+        $access = Pedido::tipoAccess($args['input']['tipo'] ?? Pedido::TIPO_BALCAO);
+        return Auth::check() && (
+            $cliente_id == Auth::user()->id
+            || Auth::user()->can('pedido:create')
+            || Auth::user()->can($access)
+        );
     }
 
     public function type(): Type
@@ -57,11 +71,188 @@ class CreatePedidoMutation extends Mutation
         ];
     }
 
+    /**
+     * Atualiza a lista de pedidos recalculando os totais
+     *
+     * @param Pedido[] $pedidos
+     * @return void
+     */
+    protected function updateOrders($pedidos)
+    {
+        foreach ($pedidos as $pedido) {
+            $pedido->totalize();
+            $pedido->save();
+        }
+    }
+
+    /**
+     * Insere ou atualiza os itens do pedido
+     *
+     * @param array $data_itens
+     * @param Pedido $pedido
+     * @param Prestador $prestador
+     * @param int $funcionario_id
+     * @return Item[]
+     */
+    protected function saveItems($data_itens, $pedido, $prestador, $funcionario_id)
+    {
+        $index = 0;
+        $itens = [];
+        $itens_ids = [];
+        $pedidos_afetados = [];
+        foreach ($data_itens as $item_data) {
+            $item = new Item();
+            $cancelamento = $item_data['cancelado'] ?? false;
+            if (isset($item_data['id'])) {
+                // permite mover um item de uma mesa para outra
+                $query = Item::where('cancelado', false);
+                if ($cancelamento) {
+                    // só deixa cancelar itens desse pedido
+                    $query->where('pedido_id', $pedido->id);
+                }
+                $item = $query->findOrFail($item_data['id']);
+                if ($item->pedido_id != $pedido->id && !isset($pedidos_afetados[$item->pedido_id])) {
+                    $pedidos_afetados[$item->pedido_id] = Pedido::findOrFail($item->pedido_id);
+                }
+            }
+            if ($cancelamento) {
+                $item_data = ['cancelado' => true];
+            }
+            $item->fill($item_data);
+            if (!$cancelamento) {
+                $item->pedido_id = $pedido->id;
+                $item->prestador_id = $funcionario_id;
+                // remapeia subitens
+                if (isset($item_data['pagamento_id'])) {
+                    if (!isset($itens_ids[$item_data['pagamento_id']])) {
+                        throw new Exception(__('messages.subitem_not_found'));
+                    }
+                    $item->item_id = $itens_ids[$item_data['pagamento_id']];
+                }
+                // calcula os totais e a comissão do funcionário
+                $item->calculate($prestador);
+            }
+            $item->save();
+            $itens[] = $item;
+            $itens_ids[$index] = $item->id;
+            $index++;
+        }
+        $this->updateOrders($pedidos_afetados);
+        return $itens;
+    }
+
+    private function payWithBalance($pagamento, $data, $pedido, $funcionario_id)
+    {
+        $credito = new Credito($data);
+        // não deixa o cliente gastar os crédito de outro
+        if (is_null($funcionario_id)) {
+            $credito->cliente_id = Auth::user()->id;
+        } else {
+            $credito->cliente_id = $credito->cliente_id ?? $pedido->cliente_id ?? Auth::user()->id;
+        }
+        $credito->save();
+        $pagamento->credito_id = $credito->id;
+    }
+
+    private function payCreateAccount($pagamento, $data, $pedido, $funcionario_id)
+    {
+        $crediario = new Conta($data);
+        $crediario->cliente_id = $crediario->cliente_id ?? $pedido->cliente_id ?? Auth::user()->id;
+        $crediario->pedido_id = $pedido->id;
+        $crediario->funcionario_id = $funcionario_id;
+        $crediario->save();
+        $pagamento->crediario_id = $crediario->id;
+    }
+
+    private function payWithCheck($pagamento, $data, $pedido)
+    {
+        $cheque = new Cheque($data);
+        $cheque->cliente_id = $cheque->cliente_id ?? $pedido->cliente_id ?? Auth::user()->id;
+        $cheque->save();
+        $pagamento->cheque_id = $cheque->id;
+    }
+
+    protected function savePayments($data_pagamentos, $pedido, $funcionario_id)
+    {
+        // guarda as associações de pagamentos parcelados
+        $index = 0;
+        $pagamentos_ids = [];
+        $pagamentos = [];
+        foreach ($data_pagamentos as $pagamento_data) {
+            $pagamento = new Pagamento();
+            if (isset($pagamento_data['id'])) {
+                $pagamento = $pedido->pagamentos()->where('id', $pagamento_data['id'])->firstOrFail();
+            }
+            $cancelamento = ($pagamento_data['estado'] ?? null) == Pagamento::ESTADO_CANCELADO;
+            if ($cancelamento) {
+                $pagamento_data = ['estado' => Pagamento::ESTADO_CANCELADO];
+            }
+            $pagamento->fill($pagamento_data);
+            if (!$cancelamento) {
+                $pagamento->pedido_id = $pedido->id;
+                $pagamento->funcionario_id = $funcionario_id;
+                // cria objetos do pagamento como conta, desconto do crédito e folha de cheque
+                if (isset($pagamento_data['credito'])) {
+                    $this->payWithBalance($pagamento, $pagamento_data['credito'], $pedido, $funcionario_id);
+                } elseif (is_null($funcionario_id)) {
+                    // não cadastra conta e nem cheque
+                } elseif (isset($pagamento_data['crediario'])) {
+                    $this->payCreateAccount($pagamento, $pagamento_data['crediario'], $pedido, $funcionario_id);
+                } elseif (isset($pagamento_data['cheque'])) {
+                    $this->payWithCheck($pagamento, $pagamento_data['cheque'], $pedido);
+                }
+                // remapeia pagamentos parcelados
+                if (isset($pagamento_data['pagamento_id'])) {
+                    if (!isset($pagamentos_ids[$pagamento_data['pagamento_id']])) {
+                        throw new Exception(__('messages.sub_payment_not_found'));
+                    }
+                    $pagamento->pagamento_id = $pagamentos_ids[$pagamento_data['pagamento_id']];
+                }
+                // calcula carteira, valor da moeda e outros
+                $pagamento->calculate();
+            }
+            $pagamento->save();
+            $pagamentos_ids[$index] = $pagamento->id;
+            $pagamentos[] = $pagamento;
+            $index++;
+        }
+        return $pagamentos;
+    }
+
     public function resolve($root, $args)
     {
-        $pedido = new Pedido();
-        $pedido->fill($args['input']);
-        $pedido->save();
+        $input = $args['input'];
+        $pedido = new Pedido($input);
+        DB::transaction(function () use ($pedido, $input) {
+            // o pedido pode ser feito por cliente final ou funcionário
+            $funcionario_id = null;
+            $prestador = null;
+            $access = Pedido::tipoAccess($pedido->tipo);
+            $employee_access = Auth::user()->can('pedido:create') || Auth::user()->can($access);
+            if ($employee_access) {
+                $prestador = Auth::user()->prestador;
+                $funcionario_id = is_null($prestador) ? null : $prestador->id;
+            }
+            if (
+                empty($input['itens'] ?? null) &&
+                in_array($pedido->tipo, [Pedido::TIPO_BALCAO, Pedido::TIPO_ENTREGA])
+            ) {
+                throw new Exception(__('messages.no_item_added'));
+            }
+            $pedido->prestador_id = $funcionario_id;
+            $pedido->save();
+            $itens = $input['itens'] ?? [];
+            $this->saveItems($itens, $pedido, $funcionario_id, $prestador);
+            $pagamentos = $input['pagamentos'] ?? [];
+            $this->savePayments($pagamentos, $pedido, $funcionario_id);
+            $pedido->totalize();
+            if ($pedido->tipo == Pedido::TIPO_BALCAO) {
+                $pedido->estado = Pedido::ESTADO_CONCLUIDO;
+            } elseif ($pedido->tipo == Pedido::TIPO_ENTREGA && !$employee_access) {
+                $pedido->estado = Pedido::ESTADO_AGENDADO;
+            }
+            $pedido->save();
+        });
         return $pedido;
     }
 }

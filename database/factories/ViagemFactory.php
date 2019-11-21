@@ -11,6 +11,5 @@ $factory->define(Viagem::class, function (Faker $faker) {
     $responsavel = factory(Prestador::class)->create();
     return [
         'responsavel_id' => $responsavel->id,
-        'data_saida' => Carbon::now(),
     ];
 });

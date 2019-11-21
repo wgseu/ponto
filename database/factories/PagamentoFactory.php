@@ -4,16 +4,16 @@
 
 use App\Models\Pagamento;
 use App\Models\Carteira;
+use App\Models\Forma;
 use App\Models\Moeda;
 use Faker\Generator as Faker;
 
 $factory->define(Pagamento::class, function (Faker $faker) {
-    $carteira = factory(Carteira::class)->create();
     $moeda = factory(Moeda::class)->create();
+    $forma = factory(Forma::class)->create();
     return [
-        'carteira_id' => $carteira->id,
         'moeda_id' => $moeda->id,
-        'valor' => 4.50,
+        'forma_id' => $forma->id,
         'lancado' => 4.50,
     ];
 });

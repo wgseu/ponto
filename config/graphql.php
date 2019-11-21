@@ -152,16 +152,12 @@ return [
                 'acessos' => 'App\GraphQL\Queries\AcessoQuery',
                 'catalogos' => 'App\GraphQL\Queries\CatalogoQuery',
                 'resumos' => 'App\GraphQL\Queries\ResumoQuery',
-                'formacoes' => 'App\GraphQL\Queries\FormacaoQuery',
                 'enderecos' => 'App\GraphQL\Queries\EnderecoQuery',
                 'horarios' => 'App\GraphQL\Queries\HorarioQuery',
                 'patrimonios' => 'App\GraphQL\Queries\PatrimonioQuery',
-                'juncoes' => 'App\GraphQL\Queries\JuncaoQuery',
                 'regimes' => 'App\GraphQL\Queries\RegimeQuery',
-                'emitentes' => 'App\GraphQL\Queries\EmitenteQuery',
                 'notas' => 'App\GraphQL\Queries\NotaQuery',
                 'eventos' => 'App\GraphQL\Queries\EventoQuery',
-                'pontuacoes' => 'App\GraphQL\Queries\PontuacaoQuery',
                 'telefones' => 'App\GraphQL\Queries\TelefoneQuery',
                 'observacoes' => 'App\GraphQL\Queries\ObservacaoQuery',
                 'cupons' => 'App\GraphQL\Queries\CupomQuery',
@@ -174,6 +170,7 @@ return [
 
                 'empresa' => 'App\GraphQL\Queries\EmpresaQuery',
                 'sistema' => 'App\GraphQL\Queries\SistemaQuery',
+                'emitente' => 'App\GraphQL\Queries\EmitenteQuery',
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
@@ -181,196 +178,243 @@ return [
                 'CreateSetor' => 'App\GraphQL\Mutations\CreateSetorMutation',
                 'UpdateSetor' => 'App\GraphQL\Mutations\UpdateSetorMutation',
                 'DeleteSetor' => 'App\GraphQL\Mutations\DeleteSetorMutation',
+
                 'CreateMesa' => 'App\GraphQL\Mutations\CreateMesaMutation',
                 'UpdateMesa' => 'App\GraphQL\Mutations\UpdateMesaMutation',
                 'DeleteMesa' => 'App\GraphQL\Mutations\DeleteMesaMutation',
-                'CreateSessao' => 'App\GraphQL\Mutations\CreateSessaoMutation',
-                'UpdateSessao' => 'App\GraphQL\Mutations\UpdateSessaoMutation',
-                'DeleteSessao' => 'App\GraphQL\Mutations\DeleteSessaoMutation',
+
                 'CreateBanco' => 'App\GraphQL\Mutations\CreateBancoMutation',
                 'UpdateBanco' => 'App\GraphQL\Mutations\UpdateBancoMutation',
                 'DeleteBanco' => 'App\GraphQL\Mutations\DeleteBancoMutation',
+
                 'CreateCarteira' => 'App\GraphQL\Mutations\CreateCarteiraMutation',
                 'UpdateCarteira' => 'App\GraphQL\Mutations\UpdateCarteiraMutation',
                 'DeleteCarteira' => 'App\GraphQL\Mutations\DeleteCarteiraMutation',
+
                 'CreateCaixa' => 'App\GraphQL\Mutations\CreateCaixaMutation',
                 'UpdateCaixa' => 'App\GraphQL\Mutations\UpdateCaixaMutation',
                 'DeleteCaixa' => 'App\GraphQL\Mutations\DeleteCaixaMutation',
+
                 'CreateForma' => 'App\GraphQL\Mutations\CreateFormaMutation',
                 'UpdateForma' => 'App\GraphQL\Mutations\UpdateFormaMutation',
                 'DeleteForma' => 'App\GraphQL\Mutations\DeleteFormaMutation',
+
                 'CreateCartao' => 'App\GraphQL\Mutations\CreateCartaoMutation',
                 'UpdateCartao' => 'App\GraphQL\Mutations\UpdateCartaoMutation',
                 'DeleteCartao' => 'App\GraphQL\Mutations\DeleteCartaoMutation',
+
                 'CreateFuncao' => 'App\GraphQL\Mutations\CreateFuncaoMutation',
                 'UpdateFuncao' => 'App\GraphQL\Mutations\UpdateFuncaoMutation',
                 'DeleteFuncao' => 'App\GraphQL\Mutations\DeleteFuncaoMutation',
+
                 'CreateCliente' => 'App\GraphQL\Mutations\CreateClienteMutation',
                 'UpdateCliente' => 'App\GraphQL\Mutations\UpdateClienteMutation',
                 'DeleteCliente' => 'App\GraphQL\Mutations\DeleteClienteMutation',
+
                 'CreatePrestador' => 'App\GraphQL\Mutations\CreatePrestadorMutation',
                 'UpdatePrestador' => 'App\GraphQL\Mutations\UpdatePrestadorMutation',
                 'DeletePrestador' => 'App\GraphQL\Mutations\DeletePrestadorMutation',
+
                 'CreateMoeda' => 'App\GraphQL\Mutations\CreateMoedaMutation',
                 'UpdateMoeda' => 'App\GraphQL\Mutations\UpdateMoedaMutation',
                 'DeleteMoeda' => 'App\GraphQL\Mutations\DeleteMoedaMutation',
+
                 'CreatePais' => 'App\GraphQL\Mutations\CreatePaisMutation',
                 'UpdatePais' => 'App\GraphQL\Mutations\UpdatePaisMutation',
                 'DeletePais' => 'App\GraphQL\Mutations\DeletePaisMutation',
+
                 'CreateEstado' => 'App\GraphQL\Mutations\CreateEstadoMutation',
                 'UpdateEstado' => 'App\GraphQL\Mutations\UpdateEstadoMutation',
                 'DeleteEstado' => 'App\GraphQL\Mutations\DeleteEstadoMutation',
+
                 'CreateCidade' => 'App\GraphQL\Mutations\CreateCidadeMutation',
                 'UpdateCidade' => 'App\GraphQL\Mutations\UpdateCidadeMutation',
                 'DeleteCidade' => 'App\GraphQL\Mutations\DeleteCidadeMutation',
+
                 'CreateBairro' => 'App\GraphQL\Mutations\CreateBairroMutation',
                 'UpdateBairro' => 'App\GraphQL\Mutations\UpdateBairroMutation',
                 'DeleteBairro' => 'App\GraphQL\Mutations\DeleteBairroMutation',
+
                 'CreateZona' => 'App\GraphQL\Mutations\CreateZonaMutation',
                 'UpdateZona' => 'App\GraphQL\Mutations\UpdateZonaMutation',
                 'DeleteZona' => 'App\GraphQL\Mutations\DeleteZonaMutation',
+
                 'CreateLocalizacao' => 'App\GraphQL\Mutations\CreateLocalizacaoMutation',
                 'UpdateLocalizacao' => 'App\GraphQL\Mutations\UpdateLocalizacaoMutation',
                 'DeleteLocalizacao' => 'App\GraphQL\Mutations\DeleteLocalizacaoMutation',
+
                 'CreateComanda' => 'App\GraphQL\Mutations\CreateComandaMutation',
                 'UpdateComanda' => 'App\GraphQL\Mutations\UpdateComandaMutation',
                 'DeleteComanda' => 'App\GraphQL\Mutations\DeleteComandaMutation',
-                'CreateViagem' => 'App\GraphQL\Mutations\CreateViagemMutation',
+
                 'UpdateViagem' => 'App\GraphQL\Mutations\UpdateViagemMutation',
-                'DeleteViagem' => 'App\GraphQL\Mutations\DeleteViagemMutation',
                 'UpdateIntegracao' => 'App\GraphQL\Mutations\UpdateIntegracaoMutation',
                 'UpdateAssociacao' => 'App\GraphQL\Mutations\UpdateAssociacaoMutation',
+
                 'CreatePedido' => 'App\GraphQL\Mutations\CreatePedidoMutation',
                 'UpdatePedido' => 'App\GraphQL\Mutations\UpdatePedidoMutation',
+
                 'CreateCategoria' => 'App\GraphQL\Mutations\CreateCategoriaMutation',
                 'UpdateCategoria' => 'App\GraphQL\Mutations\UpdateCategoriaMutation',
                 'DeleteCategoria' => 'App\GraphQL\Mutations\DeleteCategoriaMutation',
+
                 'CreateUnidade' => 'App\GraphQL\Mutations\CreateUnidadeMutation',
                 'UpdateUnidade' => 'App\GraphQL\Mutations\UpdateUnidadeMutation',
                 'DeleteUnidade' => 'App\GraphQL\Mutations\DeleteUnidadeMutation',
+
                 'CreateOrigem' => 'App\GraphQL\Mutations\CreateOrigemMutation',
                 'UpdateOrigem' => 'App\GraphQL\Mutations\UpdateOrigemMutation',
                 'DeleteOrigem' => 'App\GraphQL\Mutations\DeleteOrigemMutation',
+
                 'CreateOperacao' => 'App\GraphQL\Mutations\CreateOperacaoMutation',
                 'UpdateOperacao' => 'App\GraphQL\Mutations\UpdateOperacaoMutation',
                 'DeleteOperacao' => 'App\GraphQL\Mutations\DeleteOperacaoMutation',
+
                 'CreateImposto' => 'App\GraphQL\Mutations\CreateImpostoMutation',
                 'UpdateImposto' => 'App\GraphQL\Mutations\UpdateImpostoMutation',
                 'DeleteImposto' => 'App\GraphQL\Mutations\DeleteImpostoMutation',
+
                 'CreateTributacao' => 'App\GraphQL\Mutations\CreateTributacaoMutation',
                 'UpdateTributacao' => 'App\GraphQL\Mutations\UpdateTributacaoMutation',
                 'DeleteTributacao' => 'App\GraphQL\Mutations\DeleteTributacaoMutation',
+
                 'CreateProduto' => 'App\GraphQL\Mutations\CreateProdutoMutation',
                 'UpdateProduto' => 'App\GraphQL\Mutations\UpdateProdutoMutation',
                 'DeleteProduto' => 'App\GraphQL\Mutations\DeleteProdutoMutation',
+
                 'CreateServico' => 'App\GraphQL\Mutations\CreateServicoMutation',
                 'UpdateServico' => 'App\GraphQL\Mutations\UpdateServicoMutation',
                 'DeleteServico' => 'App\GraphQL\Mutations\DeleteServicoMutation',
+
                 'CreateClassificacao' => 'App\GraphQL\Mutations\CreateClassificacaoMutation',
                 'UpdateClassificacao' => 'App\GraphQL\Mutations\UpdateClassificacaoMutation',
                 'DeleteClassificacao' => 'App\GraphQL\Mutations\DeleteClassificacaoMutation',
+
                 'CreateConta' => 'App\GraphQL\Mutations\CreateContaMutation',
                 'UpdateConta' => 'App\GraphQL\Mutations\UpdateContaMutation',
                 'DeleteConta' => 'App\GraphQL\Mutations\DeleteContaMutation',
+
                 'CreateMovimentacao' => 'App\GraphQL\Mutations\CreateMovimentacaoMutation',
                 'UpdateMovimentacao' => 'App\GraphQL\Mutations\UpdateMovimentacaoMutation',
-                'DeleteMovimentacao' => 'App\GraphQL\Mutations\DeleteMovimentacaoMutation',
-                'CreateCredito' => 'App\GraphQL\Mutations\CreateCreditoMutation',
-                'UpdateCredito' => 'App\GraphQL\Mutations\UpdateCreditoMutation',
-                'DeleteCredito' => 'App\GraphQL\Mutations\DeleteCreditoMutation',
-                'CreateCheque' => 'App\GraphQL\Mutations\CreateChequeMutation',
+
                 'UpdateCheque' => 'App\GraphQL\Mutations\UpdateChequeMutation',
-                'DeleteCheque' => 'App\GraphQL\Mutations\DeleteChequeMutation',
-                'CreatePagamento' => 'App\GraphQL\Mutations\CreatePagamentoMutation',
                 'UpdatePagamento' => 'App\GraphQL\Mutations\UpdatePagamentoMutation',
-                'DeletePagamento' => 'App\GraphQL\Mutations\DeletePagamentoMutation',
-                'CreateItem' => 'App\GraphQL\Mutations\CreateItemMutation',
-                'UpdateItem' => 'App\GraphQL\Mutations\UpdateItemMutation',
                 'UpdateModulo' => 'App\GraphQL\Mutations\UpdateModuloMutation',
+
                 'CreateComposicao' => 'App\GraphQL\Mutations\CreateComposicaoMutation',
                 'UpdateComposicao' => 'App\GraphQL\Mutations\UpdateComposicaoMutation',
                 'DeleteComposicao' => 'App\GraphQL\Mutations\DeleteComposicaoMutation',
+
                 'CreateFornecedor' => 'App\GraphQL\Mutations\CreateFornecedorMutation',
                 'UpdateFornecedor' => 'App\GraphQL\Mutations\UpdateFornecedorMutation',
                 'DeleteFornecedor' => 'App\GraphQL\Mutations\DeleteFornecedorMutation',
+
                 'CreateLista' => 'App\GraphQL\Mutations\CreateListaMutation',
                 'UpdateLista' => 'App\GraphQL\Mutations\UpdateListaMutation',
                 'DeleteLista' => 'App\GraphQL\Mutations\DeleteListaMutation',
+
                 'CreateCompra' => 'App\GraphQL\Mutations\CreateCompraMutation',
                 'UpdateCompra' => 'App\GraphQL\Mutations\UpdateCompraMutation',
                 'DeleteCompra' => 'App\GraphQL\Mutations\DeleteCompraMutation',
+
                 'CreateRequisito' => 'App\GraphQL\Mutations\CreateRequisitoMutation',
                 'UpdateRequisito' => 'App\GraphQL\Mutations\UpdateRequisitoMutation',
                 'DeleteRequisito' => 'App\GraphQL\Mutations\DeleteRequisitoMutation',
+
                 'CreateEstoque' => 'App\GraphQL\Mutations\CreateEstoqueMutation',
                 'UpdateEstoque' => 'App\GraphQL\Mutations\UpdateEstoqueMutation',
-                'DeleteEstoque' => 'App\GraphQL\Mutations\DeleteEstoqueMutation',
+
                 'CreateGrupo' => 'App\GraphQL\Mutations\CreateGrupoMutation',
                 'UpdateGrupo' => 'App\GraphQL\Mutations\UpdateGrupoMutation',
                 'DeleteGrupo' => 'App\GraphQL\Mutations\DeleteGrupoMutation',
+
                 'CreatePropriedade' => 'App\GraphQL\Mutations\CreatePropriedadeMutation',
                 'UpdatePropriedade' => 'App\GraphQL\Mutations\UpdatePropriedadeMutation',
                 'DeletePropriedade' => 'App\GraphQL\Mutations\DeletePropriedadeMutation',
+
                 'CreatePacote' => 'App\GraphQL\Mutations\CreatePacoteMutation',
                 'UpdatePacote' => 'App\GraphQL\Mutations\UpdatePacoteMutation',
                 'DeletePacote' => 'App\GraphQL\Mutations\DeletePacoteMutation',
+
                 'CreateDispositivo' => 'App\GraphQL\Mutations\CreateDispositivoMutation',
                 'UpdateDispositivo' => 'App\GraphQL\Mutations\UpdateDispositivoMutation',
                 'DeleteDispositivo' => 'App\GraphQL\Mutations\DeleteDispositivoMutation',
+
                 'CreateImpressora' => 'App\GraphQL\Mutations\CreateImpressoraMutation',
                 'UpdateImpressora' => 'App\GraphQL\Mutations\UpdateImpressoraMutation',
                 'DeleteImpressora' => 'App\GraphQL\Mutations\DeleteImpressoraMutation',
+
                 'CreatePromocao' => 'App\GraphQL\Mutations\CreatePromocaoMutation',
                 'UpdatePromocao' => 'App\GraphQL\Mutations\UpdatePromocaoMutation',
                 'DeletePromocao' => 'App\GraphQL\Mutations\DeletePromocaoMutation',
+
                 'CreateAcesso' => 'App\GraphQL\Mutations\CreateAcessoMutation',
                 'UpdateAcesso' => 'App\GraphQL\Mutations\UpdateAcessoMutation',
                 'DeleteAcesso' => 'App\GraphQL\Mutations\DeleteAcessoMutation',
+
                 'CreateCatalogo' => 'App\GraphQL\Mutations\CreateCatalogoMutation',
                 'UpdateCatalogo' => 'App\GraphQL\Mutations\UpdateCatalogoMutation',
                 'DeleteCatalogo' => 'App\GraphQL\Mutations\DeleteCatalogoMutation',
+
                 'UpdateSistema' => 'App\GraphQL\Mutations\UpdateSistemaMutation',
+
                 'CreateResumo' => 'App\GraphQL\Mutations\CreateResumoMutation',
                 'UpdateResumo' => 'App\GraphQL\Mutations\UpdateResumoMutation',
+
                 'CreateEndereco' => 'App\GraphQL\Mutations\CreateEnderecoMutation',
                 'UpdateEndereco' => 'App\GraphQL\Mutations\UpdateEnderecoMutation',
                 'DeleteEndereco' => 'App\GraphQL\Mutations\DeleteEnderecoMutation',
+
                 'CreateHorario' => 'App\GraphQL\Mutations\CreateHorarioMutation',
                 'UpdateHorario' => 'App\GraphQL\Mutations\UpdateHorarioMutation',
                 'DeleteHorario' => 'App\GraphQL\Mutations\DeleteHorarioMutation',
+
                 'CreatePatrimonio' => 'App\GraphQL\Mutations\CreatePatrimonioMutation',
                 'UpdatePatrimonio' => 'App\GraphQL\Mutations\UpdatePatrimonioMutation',
                 'DeletePatrimonio' => 'App\GraphQL\Mutations\DeletePatrimonioMutation',
+
                 'CreateJuncao' => 'App\GraphQL\Mutations\CreateJuncaoMutation',
                 'UpdateJuncao' => 'App\GraphQL\Mutations\UpdateJuncaoMutation',
+
                 'CreateRegime' => 'App\GraphQL\Mutations\CreateRegimeMutation',
                 'UpdateRegime' => 'App\GraphQL\Mutations\UpdateRegimeMutation',
                 'DeleteRegime' => 'App\GraphQL\Mutations\DeleteRegimeMutation',
+
                 'UpdateEmitente' => 'App\GraphQL\Mutations\UpdateEmitenteMutation',
+
                 'CreateNota' => 'App\GraphQL\Mutations\CreateNotaMutation',
                 'UpdateNota' => 'App\GraphQL\Mutations\UpdateNotaMutation',
+
                 'UpdateEmpresa' => 'App\GraphQL\Mutations\UpdateEmpresaMutation',
+
                 'CreateTelefone' => 'App\GraphQL\Mutations\CreateTelefoneMutation',
                 'UpdateTelefone' => 'App\GraphQL\Mutations\UpdateTelefoneMutation',
                 'DeleteTelefone' => 'App\GraphQL\Mutations\DeleteTelefoneMutation',
+
                 'CreateObservacao' => 'App\GraphQL\Mutations\CreateObservacaoMutation',
                 'UpdateObservacao' => 'App\GraphQL\Mutations\UpdateObservacaoMutation',
                 'DeleteObservacao' => 'App\GraphQL\Mutations\DeleteObservacaoMutation',
+
                 'CreateCupom' => 'App\GraphQL\Mutations\CreateCupomMutation',
                 'UpdateCupom' => 'App\GraphQL\Mutations\UpdateCupomMutation',
                 'DeleteCupom' => 'App\GraphQL\Mutations\DeleteCupomMutation',
+
                 'CreateMetrica' => 'App\GraphQL\Mutations\CreateMetricaMutation',
                 'UpdateMetrica' => 'App\GraphQL\Mutations\UpdateMetricaMutation',
                 'DeleteMetrica' => 'App\GraphQL\Mutations\DeleteMetricaMutation',
+
                 'CreateAvaliacao' => 'App\GraphQL\Mutations\CreateAvaliacaoMutation',
                 'UpdateAvaliacao' => 'App\GraphQL\Mutations\UpdateAvaliacaoMutation',
                 'DeleteAvaliacao' => 'App\GraphQL\Mutations\DeleteAvaliacaoMutation',
+
                 'CreateCozinha' => 'App\GraphQL\Mutations\CreateCozinhaMutation',
                 'UpdateCozinha' => 'App\GraphQL\Mutations\UpdateCozinhaMutation',
                 'DeleteCozinha' => 'App\GraphQL\Mutations\DeleteCozinhaMutation',
+
                 'CreateCardapio' => 'App\GraphQL\Mutations\CreateCardapioMutation',
                 'UpdateCardapio' => 'App\GraphQL\Mutations\UpdateCardapioMutation',
                 'DeleteCardapio' => 'App\GraphQL\Mutations\DeleteCardapioMutation',
+
                 'UpdateNotificacao' => 'App\GraphQL\Mutations\UpdateNotificacaoMutation',
             ],
             'middleware' => [],
@@ -388,9 +432,6 @@ return [
     // ]
     //
     'types' => [
-        'Date' => 'App\GraphQL\Types\DateType',
-        'DateTime' => 'App\GraphQL\Types\DateTimeType',
-
         'IdFilter' => 'App\GraphQL\Filters\IdFilter',
         'StringFilter' => 'App\GraphQL\Filters\StringFilter',
         'NumberFilter' => 'App\GraphQL\Filters\NumberFilter',
@@ -399,8 +440,6 @@ return [
         'DateRangeFilter' => 'App\GraphQL\Filters\DateRangeFilter',
 
         'OrderByEnum' => 'App\GraphQL\Enums\OrderByEnum',
-
-        'ClienteAuth' => 'App\GraphQL\Types\ClienteAuthType',
 
         'SetorFilter' => 'App\GraphQL\Filters\SetorFilter',
         'MesaFilter' => 'App\GraphQL\Filters\MesaFilter',
@@ -459,16 +498,12 @@ return [
         'AcessoFilter' => 'App\GraphQL\Filters\AcessoFilter',
         'CatalogoFilter' => 'App\GraphQL\Filters\CatalogoFilter',
         'ResumoFilter' => 'App\GraphQL\Filters\ResumoFilter',
-        'FormacaoFilter' => 'App\GraphQL\Filters\FormacaoFilter',
         'EnderecoFilter' => 'App\GraphQL\Filters\EnderecoFilter',
         'HorarioFilter' => 'App\GraphQL\Filters\HorarioFilter',
         'PatrimonioFilter' => 'App\GraphQL\Filters\PatrimonioFilter',
-        'JuncaoFilter' => 'App\GraphQL\Filters\JuncaoFilter',
         'RegimeFilter' => 'App\GraphQL\Filters\RegimeFilter',
-        'EmitenteFilter' => 'App\GraphQL\Filters\EmitenteFilter',
         'NotaFilter' => 'App\GraphQL\Filters\NotaFilter',
         'EventoFilter' => 'App\GraphQL\Filters\EventoFilter',
-        'PontuacaoFilter' => 'App\GraphQL\Filters\PontuacaoFilter',
         'TelefoneFilter' => 'App\GraphQL\Filters\TelefoneFilter',
         'ObservacaoFilter' => 'App\GraphQL\Filters\ObservacaoFilter',
         'CupomFilter' => 'App\GraphQL\Filters\CupomFilter',
@@ -513,8 +548,6 @@ return [
         'PromocaoFuncaoClienteFilter' => 'App\GraphQL\Filters\PromocaoFuncaoClienteFilter',
         'HorarioModoFilter' => 'App\GraphQL\Filters\HorarioModoFilter',
         'PatrimonioEstadoFilter' => 'App\GraphQL\Filters\PatrimonioEstadoFilter',
-        'JuncaoEstadoFilter' => 'App\GraphQL\Filters\JuncaoEstadoFilter',
-        'EmitenteAmbienteFilter' => 'App\GraphQL\Filters\EmitenteAmbienteFilter',
         'NotaTipoFilter' => 'App\GraphQL\Filters\NotaTipoFilter',
         'NotaAmbienteFilter' => 'App\GraphQL\Filters\NotaAmbienteFilter',
         'NotaAcaoFilter' => 'App\GraphQL\Filters\NotaAcaoFilter',
@@ -583,16 +616,12 @@ return [
         'AcessoOrder' => 'App\GraphQL\Ordering\AcessoOrder',
         'CatalogoOrder' => 'App\GraphQL\Ordering\CatalogoOrder',
         'ResumoOrder' => 'App\GraphQL\Ordering\ResumoOrder',
-        'FormacaoOrder' => 'App\GraphQL\Ordering\FormacaoOrder',
         'EnderecoOrder' => 'App\GraphQL\Ordering\EnderecoOrder',
         'HorarioOrder' => 'App\GraphQL\Ordering\HorarioOrder',
         'PatrimonioOrder' => 'App\GraphQL\Ordering\PatrimonioOrder',
-        'JuncaoOrder' => 'App\GraphQL\Ordering\JuncaoOrder',
         'RegimeOrder' => 'App\GraphQL\Ordering\RegimeOrder',
-        'EmitenteOrder' => 'App\GraphQL\Ordering\EmitenteOrder',
         'NotaOrder' => 'App\GraphQL\Ordering\NotaOrder',
         'EventoOrder' => 'App\GraphQL\Ordering\EventoOrder',
-        'PontuacaoOrder' => 'App\GraphQL\Ordering\PontuacaoOrder',
         'TelefoneOrder' => 'App\GraphQL\Ordering\TelefoneOrder',
         'ObservacaoOrder' => 'App\GraphQL\Ordering\ObservacaoOrder',
         'CupomOrder' => 'App\GraphQL\Ordering\CupomOrder',
@@ -746,6 +775,11 @@ return [
         'AvaliacaoUpdateInput' => 'App\GraphQL\Inputs\AvaliacaoUpdateInput',
         'CozinhaUpdateInput' => 'App\GraphQL\Inputs\CozinhaUpdateInput',
         'CardapioUpdateInput' => 'App\GraphQL\Inputs\CardapioUpdateInput',
+
+        'Date' => 'App\GraphQL\Types\DateType',
+        'DateTime' => 'App\GraphQL\Types\DateTimeType',
+
+        'ClienteAuth' => 'App\GraphQL\Types\ClienteAuthType',
 
         'Setor' => 'App\GraphQL\Types\SetorType',
         'Mesa' => 'App\GraphQL\Types\MesaType',
@@ -924,10 +958,10 @@ return [
      */
     'graphiql' => [
         'prefix'     => '/graphiql',
-        'controller' => \Rebing\GraphQL\GraphQLController::class.'@graphiql',
+        'controller' => \Rebing\GraphQL\GraphQLController::class . '@graphiql',
         'middleware' => [],
         'view'       => 'graphql::graphiql',
-        'display'    => env('ENABLE_GRAPHIQL', true),
+        'display'    => env('ENABLE_GRAPHIQL', false),
     ],
 
     /*

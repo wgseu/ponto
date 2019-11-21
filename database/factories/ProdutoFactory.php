@@ -11,9 +11,11 @@ $factory->define(Produto::class, function (Faker $faker) {
     $categoria = factory(Categoria::class)->create();
     $unidade = factory(Unidade::class)->create();
     return [
+        'tipo' => Produto::TIPO_COMPOSICAO,
         'codigo' => $faker->unique()->numberBetween(1, 99999999),
         'categoria_id' => $categoria->id,
         'unidade_id' => $unidade->id,
         'descricao' => $faker->unique()->name,
+        'preco_venda' => $faker->randomFloat(2, 3, 10),
     ];
 });

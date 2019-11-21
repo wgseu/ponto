@@ -26,14 +26,19 @@
 
 namespace App\Models;
 
+use App\Util\Mask;
+use App\Util\Number;
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\ValidationException;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends Model implements ValidateInterface
+class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -127,7 +132,7 @@ class Conta extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
-        'tipo' => self::TIPO_DESPESA,
+        'tipo' => self::TIPO_RECEITA,
         'consolidado' => 0,
         'fonte' => self::FONTE_FIXA,
         'numero_parcela' => 1,
@@ -203,5 +208,142 @@ class Conta extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->pedido_id)) {
+            $pedido = $this->pedido;
+            if ($pedido->estado != Pedido::ESTADO_CANCELADO && $this->estado == Conta::ESTADO_CANCELADA) {
+                $errors['pedido_id'] = __('messages.account_not_canceled_order_open');
+            }
+        }
+        if ($this->automatico == true && $this->tipo != Conta::TIPO_DESPESA) {
+            $errors['pedido_id'] = __('messages.automatic_order_not_recipe');
+        }
+        if ($this->frequencia < 0) {
+            $errors['frequencia'] = __('messages.frequency_lowest_zero');
+        }
+        if (is_null($this->carteira_id) && $this->automatico == true) {
+            $errors['carteira_id'] = __('messages.wallet_null_not_automatic');
+        }
+        $agrupamento = $this->agrupamento;
+        if (
+            !is_null($agrupamento)
+            && $agrupamento->estado == Conta::ESTADO_CANCELADA
+        ) {
+            $errors['agrupamento_id'] = __('messages.grouping_already_canceled');
+        }
+        if (Number::isEqual($this->valor, 0)) {
+            $errors['valor'] = __('messages.valor_cannot_zero');
+        } elseif ($this->valor < 0 && $this->tipo == self::TIPO_RECEITA) {
+            $errors['valor'] = __('messages.receita_negativa');
+        } elseif ($this->valor > 0 && $this->tipo == self::TIPO_DESPESA) {
+            $errors['valor'] = __('messages.despesa_positiva');
+        }
+        if ($this->tipo == self::TIPO_RECEITA && $this->acrescimo < 0) {
+            $errors['acrescimo'] = __('messages.acrescimo_cannot_negative');
+        } elseif ($this->tipo == self::TIPO_DESPESA && $this->acrescimo > 0) {
+            $errors['acrescimo'] = __('messages.acrescimo_cannot_positive');
+        }
+        if ($this->tipo == self::TIPO_RECEITA && $this->multa < 0) {
+            $errors['multa'] = __('messages.multa_cannot_negative');
+        } elseif ($this->tipo == self::TIPO_DESPESA && $this->multa > 0) {
+            $errors['multa'] = __('messages.multa_cannot_positive');
+        }
+        if ($this->juros < 0) {
+            $errors['juros'] = __('messages.juros_cannot_negative');
+        }
+        $conta = $this->conta;
+        if (!is_null($conta) && !is_null($conta->conta_id)) {
+            $errors['conta_id'] = __('messages.account_have_conta_id');
+        }
+        if ($this->tipo == self::TIPO_RECEITA && Number::isGreater($this->consolidado, $this->total())) {
+            $errors['valor'] = __('messages.total_received_greater_account');
+        }
+        if (
+            $this->tipo == self::TIPO_DESPESA
+            && Number::isGreater(-$this->consolidado, (-$this->valor - $this->acrescimo))
+        ) {
+            $errors['valor'] = __('messages.total_paid_greater_account');
+        }
+        $cliente = $this->cliente;
+        if (!is_null($this->cliente_id) && $this->tipo == self::TIPO_RECEITA && $cliente->limite_compra > 0) {
+            $query = self::where('cliente_id', $this->cliente_id)
+                ->where('estado', self::ESTADO_ATIVA);
+            if ($this->exists) {
+                $query->where('id', '<>', $this->id);
+            }
+            $utilizado = $query->sum('valor + acrescimo - consolidado');
+            if ($this->total() + $utilizado > $cliente->limite_compra) {
+                $restante = ($this->total() + $utilizado) - $cliente->limite_compra;
+                $errors['valor'] = __(
+                    'messages.account_no_limit',
+                    [
+                        'customer' => $cliente->getNomeCompleto(),
+                        'remaining' => Mask::money($restante, true),
+                        'used' => Mask::money($utilizado, true),
+                        'limit' => Mask::money($cliente->limite_compra, true)
+                    ]
+                );
+            }
+        }
+        return $errors;
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old = $this->fresh();
+        if ($old->estado == self::ESTADO_PAGA && $this->estado != self::ESTADO_CANCELADA) {
+            $errors['id'] = __('messages.account_cannot_changed_consolidated');
+        }
+        if ($old->estado == self::ESTADO_CANCELADA) {
+            $errors['id'] = __('messages.account_cannot_changed_canceled');
+        }
+        if (
+            ($this->estado == self::ESTADO_PAGA
+                && !Number::isEqual($this->consolidado, $this->total()))
+            || ($old->estado == self::ESTADO_PAGA
+                && !Number::isEqual($old->consolidado, $this->total()))
+        ) {
+            $errors['id'] = __('messages.account_cannot_changed_total');
+        }
+        if (
+            !is_null($old->agrupamento_id)
+            && !is_null($this->agrupamento_id)
+            && $this->estado != Conta::ESTADO_CANCELADA
+        ) {
+            $errors['agrupamento_id'] = __('messages.grouping_no_change');
+        }
+        return $errors;
+    }
+
+    public function cancel($desagrupar = false)
+    {
+        DB::transaction(function () use ($desagrupar) {
+            $this->internalCancel($desagrupar);
+        });
+    }
+
+    private function internalCancel($desagrupar)
+    {
+        $pagamentos = Pagamento::where('conta_id', $this->id)
+            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
+        foreach ($pagamentos as $pagamento) {
+            $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
+        }
+        if ($desagrupar) {
+            $contas = self::where('agrupamento_id', $this->id)
+                ->where('estado', '<>', self::ESTADO_CANCELADA)->get();
+            foreach ($contas as $conta) {
+                $conta->agrupamento_id = null;
+                $conta->save();
+            }
+        }
+        $this->estado = self::ESTADO_CANCELADA;
+        $this->save();
+    }
+
+    public function total()
+    {
+        return $this->valor + $this->acrescimo;
     }
 }

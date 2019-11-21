@@ -1,8 +1,14 @@
-mutation updateConta($id: ID!, $input: ContaUpdateInput!) {
-  UpdateConta(id: $id, input: $input) {
+mutation updateConta(
+  $id: ID!
+  $input: ContaUpdateInput!
+  $desagrupar: Boolean
+) {
+  UpdateConta(id: $id, input: $input, desagrupar: $desagrupar) {
+    id
     descricao
     valor
     vencimento
     data_emissao
+    estado
   }
 }

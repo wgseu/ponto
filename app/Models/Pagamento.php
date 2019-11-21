@@ -228,7 +228,26 @@ class Pagamento extends Model implements ValidateInterface
         return $this;
     }
 
+    protected function cancel()
+    {
+        // TODO: reduzir carteira
+        // TODO: cancelar crediário
+        // TODO: cancelar uso de crédito
+        // TODO: cancelar emissão de cheque
+    }
+
     public function validate()
     {
+    }
+
+    public function onUpdate()
+    {
+        $erros = [];
+        $old = $this->fresh();
+        if ($old->estado == self::ESTADO_CANCELADO) {
+            $erros['estado'] = __('messages.payment_already_cancelled');
+        } elseif ($this->estado == self::ESTADO_CANCELADO) {
+            $this->cancel();
+        }
     }
 }

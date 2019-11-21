@@ -26,24 +26,37 @@
 
 namespace App\Util;
 
+use App\Models\Empresa;
+use App\Models\Moeda;
+use App\Models\Pais;
+
 /**
- * Common function type float
+ * Filter values to secure save on database
  */
-class Number
+class Mask
 {
     /**
-     * Compare if value is iqual zero
+     * Convert float value into money format from user country
+     * @param float  $value  money value
+     * @param boolean $format format money adding symbol to number
+     * @param Moeda $currency curency of value
+     * @return string          money into readable format
      */
-    public static function isEqual($value, $compare, $delta = 0.005)
+    public static function money($value, $format = false, $currency = null)
     {
-        return $compare < ($value + $delta) && ($value - $delta) < $compare;
-    }
-
-    /**
-     * Verify if value is bigger zero
-     */
-    public static function isGreater($value, $compare, $delta = 0.005)
-    {
-        return $value > ($compare + $delta);
+        $value = round($value, 2);
+        $empresa = Empresa::find(1);
+        /** @var Pais $pais */
+        $pais = $empresa->pais;
+        $sep = $pais->entries->getEntry('currency', 'separator', '.');
+        $dec = $pais->entries->getEntry('currency', 'decimal', ',');
+        $number =  number_format($value, 2, $dec, $sep);
+        if ($format) {
+            if (is_null($currency)) {
+                $currency = $pais->moeda;
+            }
+            return __($currency->formato, ['value' => $number]);
+        }
+        return $number;
     }
 }

@@ -99,6 +99,9 @@ downgrade:
 seeds:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan db:seed
 
+queue:
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan schedule:run
+
 dump:
 	@mkdir -p $(DB_DUMPS_DIR)
 	@docker exec $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q db) mysqldump -B "$(DB_DATABASE)" -u"$(DB_ROOT_USER)" -p"$(DB_ROOT_PASSWORD)" --add-drop-database > $(DB_DUMPS_DIR)/db.sql

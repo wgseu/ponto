@@ -294,7 +294,7 @@ class Pedido extends Model implements ValidateInterface, ValidateInsertInterface
      */
     protected function cancel()
     {
-        $pagamentos = $this->pagamentos()->get();
+        $pagamentos = $this->pagamentos;
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
         }

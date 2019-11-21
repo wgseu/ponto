@@ -30,8 +30,8 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Conta;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateContaMutation extends Mutation
@@ -58,6 +58,10 @@ class UpdateContaMutation extends Mutation
                 'description' => 'Código da conta',
             ],
             'input' => ['type' => Type::nonNull(GraphQL::type('ContaUpdateInput'))],
+            'desagrupar' => [
+                'type' => Type::boolean(),
+                'description' => 'Cancelamento de todas as contas agrupadas',
+            ],
         ];
     }
 
@@ -65,7 +69,12 @@ class UpdateContaMutation extends Mutation
     {
         $conta = Conta::findOrFail($args['id']);
         $conta->fill($args['input']);
-        $conta->save();
+        if ($conta->estado == Conta::ESTADO_CANCELADA) {
+            $conta->refresh();
+            $conta->cancel($args['desagrupar'] ?? false);
+        } else {
+            $conta->save();
+        }
         return $conta;
     }
 }

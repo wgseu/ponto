@@ -64,7 +64,11 @@ class UpdateImpressoraMutation extends Mutation
     public function resolve($root, $args)
     {
         $impressora = Impressora::findOrFail($args['id']);
+        $impressora->loadOptions();
+        $impressora->opcoes = null;
         $impressora->fill($args['input']);
+        $impressora->options->addValues(json_decode($impressora->opcoes ?? '{}', true));
+        $impressora->applyOptions();
         $impressora->save();
         return $impressora;
     }

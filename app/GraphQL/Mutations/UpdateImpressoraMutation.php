@@ -67,7 +67,7 @@ class UpdateImpressoraMutation extends Mutation
         $impressora->loadOptions();
         $impressora->opcoes = null;
         $impressora->fill($args['input']);
-        $impressora->opcoes->addValues(json_decode($impressora->opcoes ?? '{}', true));
+        $impressora->options->addValues(json_decode($impressora->opcoes ?? '{}', true));
         $impressora->applyOptions();
         $impressora->save();
         return $impressora;

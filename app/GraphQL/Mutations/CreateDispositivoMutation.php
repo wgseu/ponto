@@ -63,7 +63,7 @@ class CreateDispositivoMutation extends Mutation
         $dispositivo->opcoes = null;
         $dispositivo->fill($args['input']);
         $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
-        $dispositivo->applyEntries();
+        $dispositivo->applyOptions();
         $dispositivo->save();
         return $dispositivo;
     }

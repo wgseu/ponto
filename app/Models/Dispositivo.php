@@ -98,12 +98,12 @@ class Dispositivo extends Model implements ValidateInterface
         $this->options = new Settings();
     }
 
-    public function loadEntries()
+    public function loadOptions()
     {
         $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
     }
 
-    public function applyEntries()
+    public function applyOptions()
     {
         $this->opcoes = base64_encode(json_encode($this->options->getValues()));
     }

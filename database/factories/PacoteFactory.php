@@ -8,11 +8,12 @@ use App\Models\Grupo;
 use Faker\Generator as Faker;
 
 $factory->define(Pacote::class, function (Faker $faker) {
-    $pacote = factory(Produto::class)->create();
-    $grupo = factory(Grupo::class)->create();
+    $grupo_id = factory(Grupo::class)->create();
+    $produto = factory(Produto::class)->create();
     return [
-        'pacote_id' => $pacote->id,
-        'grupo_id' => $grupo->id,
+        'produto_id' => $produto->id,
+        'pacote_id' => $grupo_id->produto->id,
+        'grupo_id' => $grupo_id->id,
         'acrescimo' => 4.50,
     ];
 });

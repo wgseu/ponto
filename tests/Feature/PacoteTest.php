@@ -26,20 +26,26 @@
 
 namespace Tests\Feature;
 
+use App\Models\Grupo;
 use Tests\TestCase;
 use App\Models\Pacote;
+use App\Models\Produto;
+use App\Models\Propriedade;
+use App\Exceptions\ValidationException;
 
 class PacoteTest extends TestCase
 {
     public function testCreatePacote()
     {
         $headers = PrestadorTest::auth();
-        $seed_pacote =  factory(Pacote::class)->create();
+        $seed_pacote =  factory(Pacote::class)->create(['selecionado' => true]);
         $response = $this->graphfl('create_pacote', [
             'input' => [
+                'produto_id' => $seed_pacote->produto_id,
                 'pacote_id' => $seed_pacote->pacote_id,
                 'grupo_id' => $seed_pacote->grupo_id,
                 'acrescimo' => 1.50,
+                'selecionado' => true,
             ]
         ], $headers);
 
@@ -79,5 +85,135 @@ class PacoteTest extends TestCase
         $pacote = factory(Pacote::class)->create();
         $response = $this->graphfl('query_pacote', [ 'id' => $pacote->id ], $headers);
         $this->assertEquals($pacote->id, $response->json('data.pacotes.data.0.id'));
+    }
+
+    public function testValidatePacoteTipoInvalidoPacote()
+    {
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PRODUTO]);
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['pacote_id' => $produto->id]);
+    }
+
+    public function testValidatePacoteProdutoTipoInvalido()
+    {
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PACOTE]);
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['produto_id' => $produto->id]);
+    }
+
+    public function testValidatePacoteDifferentPacoteGrupo()
+    {
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PACOTE]);
+        $grupo = factory(Grupo::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['pacote_id' => $produto->id, 'grupo_id' => $grupo->id]);
+    }
+
+    public function testValidateGrupoPacoteDifferentGrupoPropriedade()
+    {
+        $propriedade = factory(Propriedade::class)->create();
+        $grupo = factory(Grupo::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['propriedade_id' => $propriedade->id, 'grupo_id' => $grupo->id]);
+    }
+
+    public function testValidateGrupoPacoteRerefencesProdutoAndPropriedade()
+    {
+        $propriedade = factory(Propriedade::class)->create();
+        $produto = factory(Produto::class)->create(['tipo' => Produto::TIPO_PACOTE]);
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['propriedade_id' => $propriedade->id, 'produto_id' => $produto->id]);
+    }
+
+
+    public function testValidatePacoteNotAssociado()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['associacao_id' => null, 'produto_id' => null]);
+    }
+
+    public function testValidatePacoteMinimoCannotNegative()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['quantidade_minima' => -9]);
+    }
+
+    public function testValidatePacoteMaxinoCannotNegative()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['quantidade_maxima' => -9]);
+    }
+
+    public function testValidatePacoteMininoCannotGreaterMaximo()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create(['quantidade_maxima' => 3, 'quantidade_minima' => 5]);
+    }
+
+    public function testValidateQuantidadeMaximaPacoteCannotGreaterGrupo()
+    {
+        $grupo = factory(Grupo::class)->create(['quantidade_maxima' => 3, 'tipo' => Grupo::TIPO_INTEIRO]);
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create([
+            'quantidade_maxima' => 5,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+    }
+
+    public function testValidatePacoteCannotUpdatePacoteId()
+    {
+        $grupo = factory(Grupo::class)->create();
+        $pacote = factory(Pacote::class)->create();
+        $pacote->grupo_id = $grupo->id;
+        $pacote->pacote_id = $grupo->produto_id;
+        $this->expectException(ValidationException::class);
+        $pacote->save();
+    }
+
+
+    public function testValidatePacoteCannotUpdateGrupoId()
+    {
+        $pacote = factory(Pacote::class)->create();
+        $grupo = factory(Grupo::class)->create();
+        $pacote->grupo_id = $grupo->id;
+        $this->expectException(ValidationException::class);
+        $pacote->save();
+    }
+
+    public function testValidatePacoteAssociateIgualsGrup()
+    {
+        $grupo = factory(Grupo::class)->create();
+        $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
+        $associacao = factory(Pacote::class)->create([
+            'produto_id' => null,
+            'propriedade_id' => $propriedade->id,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $this->expectException(ValidationException::class);
+        factory(Pacote::class)->create([
+            'produto_id' => null,
+            'associacao_id' => $associacao->id,
+            'propriedade_id' => $propriedade->id,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+    }
+
+    public function testValidatePacoteUpdateAssociacaoSome()
+    {
+        $grupo = factory(Grupo::class)->create();
+        $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
+        $pacotePai = factory(Pacote::class)->create([
+            'produto_id' => null,
+            'propriedade_id' => $propriedade->id,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $pacote = factory(Pacote::class)->create(['associacao_id' => $pacotePai->id]);
+        $pacote->associacao_id = $pacote->id;
+        $this->expectException(ValidationException::class);
+        $pacote->save();
     }
 }

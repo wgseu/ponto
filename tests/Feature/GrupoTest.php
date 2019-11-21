@@ -26,10 +26,12 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Grupo;
+use App\Models\Pacote;
 use App\Models\Produto;
+use App\Models\Propriedade;
+use App\Exceptions\ValidationException;
 
 class GrupoTest extends TestCase
 {
@@ -115,6 +117,35 @@ class GrupoTest extends TestCase
         $produto = factory(Produto::class)->create();
         $grupo = factory(Grupo::class)->create();
         $grupo->produto_id = $produto->id;
+        $this->expectException(ValidationException::class);
+        $grupo->save();
+    }
+
+    public function testReduzirQuantidadeMaxima()
+    {
+        $grupo = factory(Grupo::class)->create();
+        factory(Pacote::class)->create([
+            'quantidade_maxima' => 10,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $grupo->quantidade_maxima = 6;
+        $this->expectException(ValidationException::class);
+        $grupo->save();
+    }
+
+    public function testAumentarOrdemGrupoAssociado()
+    {
+        $grupo = factory(Grupo::class)->create();
+        $propriedade = factory(Propriedade::class)->create(['grupo_id' => $grupo->id]);
+        $associacao = factory(Pacote::class)->create([
+            'produto_id' => null,
+            'propriedade_id' => $propriedade->id,
+            'grupo_id' => $grupo->id,
+            'pacote_id' => $grupo->produto_id
+        ]);
+        $pacote = factory(Pacote::class)->create(['associacao_id' => $associacao->id]);
+        $grupo->ordem = 3;
         $this->expectException(ValidationException::class);
         $grupo->save();
     }

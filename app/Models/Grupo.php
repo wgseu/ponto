@@ -29,14 +29,14 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Grupos de pacotes, permite criar grupos como Tamanho, Sabores para
  * formações de produtos
  */
-class Grupo extends Model implements ValidateInterface
+class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
 {
     use ModelEvents;
     use SoftDeletes;
@@ -113,11 +113,13 @@ class Grupo extends Model implements ValidateInterface
 
     /**
      * Regras:
-     * Os grupos são formados apenas por pacotes;
+     * Os grupos são formados apenas por pacotes,
      * A quantidade minima não pode ser maior que a maxima a menos que a maxima seja zero,
-     * Se a quantidade maxima for zero não a liminte para produtos do grupo.
+     * Se a quantidade maxima for zero não a liminte para produtos do grupo,
      * A quantidade minima e maxima não pode ser negativas,
-     * epois de casdastrado não pode alterar o produto do grupo.
+     * Depois de casdastrado não pode alterar o produto do grupo,
+     * A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote.
+     * Se o grupo está associado a um pacote a alteração da ordem não pode ser superior a ordem do grupo associado;
      */
     public function validate()
     {
@@ -135,10 +137,42 @@ class Grupo extends Model implements ValidateInterface
         if ($this->quantidade_maxima < 0) {
             $errors['quantidade_maxima'] = __('messages.quantidade_maxima_cannot_negative');
         }
-        if ($this->exists) {
-            $oldGrupo = $this->fresh();
-            if ($oldGrupo->produto_id != $this->produto_id) {
-                $errors['produto_id'] = __('messages.produto_cannot_update');
+        return $errors;
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $old = $this->fresh();
+        $ordem = self::select('1')
+            ->from('pacotes as p')
+            ->leftJoin('pacotes as a', 'a.id', '=', 'p.associacao_id')
+            ->leftJoin('grupos', 'grupos.id', '=', 'p.grupo_id')
+            ->where('a.id', '<>', null)
+            ->where('a.grupo_id', '=', $this->id)
+            ->where(function ($query) {
+                $query->where('grupos.ordem', '<', $this->ordem)
+                ->orWhere(function ($query) {
+                    $query->where('grupos.ordem', '=', $this->ordem)
+                    ->where('grupos.id', '<=', $this->id);
+                });
+            })
+            ->count();
+
+        if ($ordem > 0) {
+            $errors['produto_id'] = __('messages.update_ordem_invalid');
+        }
+        if ($old->produto_id != $this->produto_id) {
+            $errors['produto_id'] = __('messages.produto_cannot_update');
+        }
+        if (
+            $old->quantidade_maxima != $this->quantidade_maxima
+            && $this->tipo == Grupo::TIPO_INTEIRO
+            && $this->quantidade_maxima != 0
+        ) {
+            $pacoteMaximo = Pacote::where('grupo_id', $this->id)->max('quantidade_maxima');
+            if (!is_null($pacoteMaximo) && $pacoteMaximo > $this->quantidade_maxima) {
+                $errors['produto_id'] = __('messages.grupo_cannot_update_quantidade_maxima_less_group');
             }
         }
         return $errors;

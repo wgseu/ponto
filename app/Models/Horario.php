@@ -27,13 +27,15 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa o horário de funcionamento do estabelecimento
  */
-class Horario extends Model implements ValidateInterface
+class Horario extends Model implements ValidateInterface, ValidateUpdateInterface, ValidateInsertInterface
 {
     use ModelEvents;
 
@@ -45,6 +47,11 @@ class Horario extends Model implements ValidateInterface
     public const MODO_FUNCIONAMENTO = 'funcionamento';
     public const MODO_OPERACAO = 'operacao';
     public const MODO_ENTREGA = 'entrega';
+
+    /**
+     * Total number of minutes in one day
+     */
+    public const MINUTES_PER_DAY = 1440;
 
     /**
      * The table associated with the model.
@@ -105,7 +112,97 @@ class Horario extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
     }
 
+    /**
+     * Regras:
+     * Função e prestador não podem ser selecionados juntos,
+     * A data de inicio não pode ser maior que o fim,
+     * O inicio, o fim, a entrega minima, e a entrega maxima não podem ser negativo,
+     * A entrega minima não pode ser maior que a entrega maxima,
+     * Horário de inicio e fim não podem ser sobrescritos com o mesmo modo, função, ou prestador,
+     * Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas.
+     */
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->funcao_id) && !is_null($this->prestador_id)) {
+            $errors['funcao_id'] = __('messages.multiple_selections');
+        }
+        if ($this->inicio >= $this->fim) {
+            $errors['inicio'] = __('messages.invalid_interval_funcionamento');
+        } elseif (!$this->fechado && $this->inicio < self::MINUTES_PER_DAY) {
+            $errors['inicio'] = __('messages.inicio_invalid');
+        } elseif (!$this->fechado && $this->fim >= self::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = __('messages.fim_invalid');
+        }
+        if (
+            !is_null($this->entrega_minima)
+            && $this->entrega_minima > $this->entrega_maxima
+            && $this->entrega_maxima != 0
+        ) {
+            $errors['entrega_minima'] = __('messages.interval_entrega_invalid');
+        } elseif (!is_null($this->entrega_minima) && $this->entrega_minima < 0) {
+            $errors['entrega_minima'] = __('messages.entrega_minima_cannot_negative');
+        }
+        if (
+            $this->fechado
+            && ((!is_null($this->funcao_id)
+            || !is_null($this->prestador_id))
+            || $this->modo != self::MODO_FUNCIONAMENTO
+            )
+        ) {
+            $errors['entrega_maxima'] = __('messages.close_invalid');
+        }
+        return $errors;
+    }
+
+    public function onInsert()
+    {
+        $errors = [];
+        $horario = self::where('modo', $this->modo)
+            ->when($this->funcao_id, function ($query) {
+                return $query->where('funcao_id', $this->funcao_id);
+            })
+            ->when($this->prestador_id, function ($query) {
+                return $query->where('prestador_id', $this->prestador_id);
+            })
+            ->where('fechado', $this->fechado)
+            ->get();
+        if (!is_null($horario)) {
+            foreach ($horario as $h) {
+                if ($h->inicio >= $this->inicio && $h->inicio <= $this->fim) {
+                    $errors['fim'] = __('messages.interval_existing');
+                } elseif ($h->inicio <= $this->inicio && $h->fim >= $this->inicio) {
+                    $errors['inicio'] = __('messages.horario_existing');
+                }
+            }
+        }
+        return $errors;
+    }
+
+    public function onUpdate()
+    {
+        $errors = [];
+        $horario = self::where('modo', $this->modo)
+            ->when($this->funcao_id, function ($query) {
+                return $query->where('funcao_id', $this->funcao_id);
+            })
+            ->when($this->prestador_id, function ($query) {
+                return $query->where('prestador_id', $this->prestador_id);
+            })
+            ->where('fechado', $this->fechado)
+            ->get();
+
+        if (!is_null($horario)) {
+            foreach ($horario as $h) {
+                if ($h->id != $this->id) {
+                    if ($h->inicio >= $this->inicio && $h->inicio <= $this->fim) {
+                        $errors['fim'] = __('messages.interval_existing');
+                    } elseif ($h->inicio <= $this->inicio && $h->fim >= $this->inicio) {
+                        $errors['inicio'] = __('messages.horario_existing');
+                    }
+                }
+            }
+        }
+        return $errors;
     }
 }

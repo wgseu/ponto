@@ -29,7 +29,6 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\SafeValidationException;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira

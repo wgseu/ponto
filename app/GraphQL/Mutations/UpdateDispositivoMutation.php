@@ -65,6 +65,7 @@ class UpdateDispositivoMutation extends Mutation
     {
         $dispositivo = Dispositivo::findOrFail($args['id']);
         $dispositivo->loadOptions();
+        $dispositivo->opcoes = null;
         $dispositivo->fill($args['input']);
         $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
         $dispositivo->applyOptions();

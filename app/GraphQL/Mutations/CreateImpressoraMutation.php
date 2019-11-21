@@ -60,7 +60,10 @@ class CreateImpressoraMutation extends Mutation
     public function resolve($root, $args)
     {
         $impressora = new Impressora();
+        $impressora->opcoes = null;
         $impressora->fill($args['input']);
+        $impressora->options->addValues(json_decode($impressora->opcoes ?? '{}', true));
+        $impressora->applyOptions();
         $impressora->save();
         return $impressora;
     }

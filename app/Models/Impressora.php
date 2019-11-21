@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,13 @@ class Impressora extends Model implements ValidateInterface
     public $timestamps = false;
 
     /**
+     * Setting model
+     *
+     * @var Settings
+     */
+    public $options;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -85,6 +93,22 @@ class Impressora extends Model implements ValidateInterface
         'colunas' => 48,
         'avanco' => 6,
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->options = new Settings();
+    }
+
+    public function loadOptions()
+    {
+        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+    }
+
+    public function applyOptions()
+    {
+        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+    }
 
     /**
      * Dispositivo que contém a impressora

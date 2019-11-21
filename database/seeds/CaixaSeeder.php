@@ -14,7 +14,7 @@ class CaixaSeeder extends Seeder
     public function run()
     {
         (new Caixa([
-            'carteira_id' => Carteira::where('descricao', __('messages.wallet_1'))->first()->id,
+            'carteira_id' => Carteira::where('descricao', __('messages.cash_drawer_number', ['number' => 1]))->first()->id,
             'descricao' => __('messages.cash'),
         ]))->save();
     }

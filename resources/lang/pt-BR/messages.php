@@ -772,7 +772,7 @@ return [
     'crediario' => 'Crediario',
     'saldo' => 'Saldo',
     'cash_drawer_number' => 'Gaveta do Caixa :number',
-    'multiple_selections' => 'Seleção Inválida',
+    'invalid_selections_funcao_prestador' => 'Função e prestador não podem ser selecionados juntos',
     'invalid_interval_funcionamento' => 'O intervalo de Funcionamento é inválido',
     'inicio_invalid' => 'O horario de inicio é invalido',
     'fim_invalid' => 'O horario de fim é invalido',

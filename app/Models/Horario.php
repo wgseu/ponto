@@ -27,15 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
-use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa o horário de funcionamento do estabelecimento
  */
-class Horario extends Model implements ValidateInterface, ValidateUpdateInterface, ValidateInsertInterface
+class Horario extends Model implements ValidateInterface
 {
     use ModelEvents;
 
@@ -124,8 +122,28 @@ class Horario extends Model implements ValidateInterface, ValidateUpdateInterfac
     public function validate()
     {
         $errors = [];
+        $horario = self::where('modo', $this->modo)
+            ->when($this->funcao_id, function ($query) {
+                return $query->where('funcao_id', $this->funcao_id);
+            })
+            ->when($this->prestador_id, function ($query) {
+                return $query->where('prestador_id', $this->prestador_id);
+            })
+            ->when($this->id, function ($query) {
+                return $query->where('id', '<>', $this->id);
+            })
+            ->where(function ($query) {
+                $query->where('inicio', '>=', $this->inicio)
+                ->where('inicio', '<=', $this->fim)
+                ->orWhere(function ($query) {
+                    $query->where('inicio', '<=', $this->inicio)
+                    ->where('fim', '>=', $this->inicio);
+                });
+            })
+            ->where('fechado', $this->fechado)
+            ->count('id');
         if (!is_null($this->funcao_id) && !is_null($this->prestador_id)) {
-            $errors['funcao_id'] = __('messages.multiple_selections');
+            $errors['funcao_id'] = __('messages.invalid_selections_funcao_prestador');
         }
         if ($this->inicio >= $this->fim) {
             $errors['inicio'] = __('messages.invalid_interval_funcionamento');
@@ -145,63 +163,14 @@ class Horario extends Model implements ValidateInterface, ValidateUpdateInterfac
         }
         if (
             $this->fechado
-            && ((!is_null($this->funcao_id)
-            || !is_null($this->prestador_id))
-            || $this->modo != self::MODO_FUNCIONAMENTO
-            )
+            && (!is_null($this->funcao_id)
+            || !is_null($this->prestador_id)
+            || $this->modo != self::MODO_FUNCIONAMENTO)
         ) {
             $errors['entrega_maxima'] = __('messages.close_invalid');
         }
-        return $errors;
-    }
-
-    public function onInsert()
-    {
-        $errors = [];
-        $horario = self::where('modo', $this->modo)
-            ->when($this->funcao_id, function ($query) {
-                return $query->where('funcao_id', $this->funcao_id);
-            })
-            ->when($this->prestador_id, function ($query) {
-                return $query->where('prestador_id', $this->prestador_id);
-            })
-            ->where('fechado', $this->fechado)
-            ->get();
-        if (!is_null($horario)) {
-            foreach ($horario as $h) {
-                if ($h->inicio >= $this->inicio && $h->inicio <= $this->fim) {
-                    $errors['fim'] = __('messages.interval_existing');
-                } elseif ($h->inicio <= $this->inicio && $h->fim >= $this->inicio) {
-                    $errors['inicio'] = __('messages.horario_existing');
-                }
-            }
-        }
-        return $errors;
-    }
-
-    public function onUpdate()
-    {
-        $errors = [];
-        $horario = self::where('modo', $this->modo)
-            ->when($this->funcao_id, function ($query) {
-                return $query->where('funcao_id', $this->funcao_id);
-            })
-            ->when($this->prestador_id, function ($query) {
-                return $query->where('prestador_id', $this->prestador_id);
-            })
-            ->where('fechado', $this->fechado)
-            ->get();
-
-        if (!is_null($horario)) {
-            foreach ($horario as $h) {
-                if ($h->id != $this->id) {
-                    if ($h->inicio >= $this->inicio && $h->inicio <= $this->fim) {
-                        $errors['fim'] = __('messages.interval_existing');
-                    } elseif ($h->inicio <= $this->inicio && $h->fim >= $this->inicio) {
-                        $errors['inicio'] = __('messages.horario_existing');
-                    }
-                }
-            }
+        if ($horario > 0) {
+            $errors['inicio'] = __('messages.horario_existing');
         }
         return $errors;
     }

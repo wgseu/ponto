@@ -779,4 +779,7 @@ return [
     'bank_not_be_informed' => 'O banco não pode ser informado',
     'agency_null' => 'A agência não pode ser vazia',
     'account_null' => 'A conta não pode ser vazia',
+    'error_selection_multiple_product' => 'Produto, composição, pacote não podem ser selecionados juntos, sendo obrigatória a escolha de um',
+    'total_cannot_negativo' => 'O Deconto não pode ser superior ao preço de venda do produto',
+    'cliente_cannot_associated_integracao' => 'Um cliente não pode se associar a uma integração',
 ];

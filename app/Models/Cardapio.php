@@ -127,7 +127,36 @@ class Cardapio extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Integracao', 'integracao_id');
     }
 
+    /**
+     * Regras:
+     * Produto, composição, pacote não podem ser selecionados juntos, sendo obrigatória a escolha de um,
+     * O Deconto não pode ser superior ao preço de venda do produto,
+     * Cliente e integração não podem ser selecinados juntos, escolha opcional.
+     */
     public function validate()
     {
+        $errors = [];
+        $produto = $this->produto;
+        $count = 0;
+        if (!is_null($this->produto_id)) {
+            $count += 1;
+        }
+        if (!is_null($this->composicao_id)) {
+            $count += 1;
+        }
+        if (!is_null($this->pacote_id)) {
+            $count += 1;
+        }
+
+        if ($count != 1) {
+            $errors['produto_id'] = __('messages.error_selection_multiple_product');
+        }
+        if (!is_null($produto) && $produto->preco_venda + $this->acrescimo < 0) {
+            $errors['acrescimo'] = __('messages.total_cannot_negativo');
+        }
+        if (!is_null($this->cliente_id) && !is_null($this->integracao_id)) {
+            $errors['cliente_id'] = __('messages.cliente_cannot_associated_integracao');
+        }
+        return $errors;
     }
 }

@@ -26,8 +26,14 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Cardapio;
+use App\Models\Cliente;
+use App\Models\Composicao;
+use App\Models\Integracao;
+use App\Models\Pacote;
+use App\Models\Produto;
 
 class CardapioTest extends TestCase
 {
@@ -48,7 +54,13 @@ class CardapioTest extends TestCase
     public function testUpdateCardapio()
     {
         $headers = PrestadorTest::auth();
-        $cardapio = factory(Cardapio::class)->create();
+        $pacote = factory(Pacote::class)->create();
+        $integracao = factory(Integracao::class)->create();
+        $cardapio = factory(Cardapio::class)->create([
+            'pacote_id' => $pacote->id,
+            'produto_id' => null,
+            'integracao_id' => $integracao->id
+        ]);
         $this->graphfl('update_cardapio', [
             'id' => $cardapio->id,
             'input' => [
@@ -56,6 +68,8 @@ class CardapioTest extends TestCase
             ]
         ], $headers);
         $cardapio->refresh();
+        $this->assertEquals($pacote->id, $cardapio->pacote->id);
+        $this->assertEquals($integracao->id, $cardapio->integracao->id);
         $this->assertEquals(1, $cardapio->id);
     }
 
@@ -71,8 +85,39 @@ class CardapioTest extends TestCase
     public function testFindCardapio()
     {
         $headers = PrestadorTest::auth();
-        $cardapio = factory(Cardapio::class)->create();
+        $composicao = factory(Composicao::class)->create();
+        $cliente = factory(Cliente::class)->create();
+        $cardapio = factory(Cardapio::class)->create([
+            'composicao_id' => $composicao->id,
+            'produto_id' => null,
+            'cliente_id' => $cliente->id
+        ]);
         $response = $this->graphfl('query_cardapio', [ 'id' => $cardapio->id ], $headers);
+        $this->assertEquals($composicao->id, $cardapio->composicao->id);
+        $this->assertEquals($cliente->id, $cardapio->cliente->id);
         $this->assertEquals($cardapio->id, $response->json('data.cardapios.data.0.id'));
+    }
+
+    public function testInserirProdutoEPacote()
+    {
+        $produto = factory(Produto::class)->create();
+        $pacote = factory(Pacote::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Cardapio::class)->create(['pacote_id' => $pacote->id, 'produto_id' => $produto->id]);
+    }
+
+    public function testDescontoMaiorQuePrecoVenda()
+    {
+        $produto = factory(Produto::class)->create(['preco_venda' => 10]);
+        $this->expectException(ValidationException::class);
+        factory(Cardapio::class)->create(['produto_id' => $produto->id, 'acrescimo' => -11]);
+    }
+
+    public function testInserirClienteEIntegracao()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $integracao = factory(Integracao::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Cardapio::class)->create(['cliente_id' => $cliente->id, 'integracao_id' => $integracao->id]);
     }
 }

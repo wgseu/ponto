@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             CarteiraSeeder::class,
             // CaixaSeeder::class,
             FormaSeeder::class,
-            // CartaoSeeder::class,
+            CartaoSeeder::class,
             UnidadeSeeder::class,
             // ClassificacaoSeeder::class,
             ServicoSeeder::class,

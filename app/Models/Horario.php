@@ -129,12 +129,14 @@ class Horario extends Model implements ValidateInterface
             ->when($this->prestador_id, function ($query) {
                 return $query->where('prestador_id', $this->prestador_id);
             })
-            ->when($this->id, function ($query) {
+            ->when($this->exists, function ($query) {
                 return $query->where('id', '<>', $this->id);
             })
             ->where(function ($query) {
-                $query->where('inicio', '>=', $this->inicio)
-                ->where('inicio', '<=', $this->fim)
+                $query->where(function ($query) {
+                    $query->where('inicio', '>=', $this->inicio)
+                    ->where('inicio', '<=', $this->fim);
+                })
                 ->orWhere(function ($query) {
                     $query->where('inicio', '<=', $this->inicio)
                     ->where('fim', '>=', $this->inicio);

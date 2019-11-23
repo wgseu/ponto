@@ -33,7 +33,7 @@ class OrigemTest extends TestCase
 {
     public function testCreateOrigem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_origem =  factory(Origem::class)->create();
         $response = $this->graphfl('create_origem', [
             'input' => [
@@ -49,7 +49,7 @@ class OrigemTest extends TestCase
 
     public function testUpdateOrigem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $origem = factory(Origem::class)->create();
         $this->graphfl('update_origem', [
             'id' => $origem->id,
@@ -65,7 +65,7 @@ class OrigemTest extends TestCase
 
     public function testDeleteOrigem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $origem_to_delete = factory(Origem::class)->create();
         $this->graphfl('delete_origem', ['id' => $origem_to_delete->id], $headers);
         $origem = Origem::find($origem_to_delete->id);
@@ -74,7 +74,7 @@ class OrigemTest extends TestCase
 
     public function testFindOrigem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $origem = factory(Origem::class)->create();
         $response = $this->graphfl('query_origem', [ 'id' => $origem->id ], $headers);
         $this->assertEquals($origem->id, $response->json('data.origens.data.0.id'));

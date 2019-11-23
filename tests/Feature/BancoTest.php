@@ -33,7 +33,7 @@ class BancoTest extends TestCase
 {
     public function testCreateBanco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_banco =  factory(Banco::class)->create();
         $response = $this->graphfl('create_banco', [
             'input' => [
@@ -51,7 +51,7 @@ class BancoTest extends TestCase
 
     public function testUpdateBanco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $banco = factory(Banco::class)->create();
         $this->graphfl('update_banco', [
             'id' => $banco->id,
@@ -69,7 +69,7 @@ class BancoTest extends TestCase
 
     public function testDeleteBanco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $banco_to_delete = factory(Banco::class)->create();
         $this->graphfl('delete_banco', ['id' => $banco_to_delete->id], $headers);
         $banco = Banco::find($banco_to_delete->id);
@@ -78,7 +78,7 @@ class BancoTest extends TestCase
 
     public function testFindBanco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $banco = factory(Banco::class)->create();
         $response = $this->graphfl('query_banco', [ 'id' => $banco->id ], $headers);
         $this->assertEquals($banco->id, $response->json('data.bancos.data.0.id'));

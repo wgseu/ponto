@@ -33,7 +33,7 @@ class AssociacaoTest extends TestCase
 {
     public function testUpdateAssociacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $associacao = factory(Associacao::class)->create();
         $this->graphfl('update_associacao', [
             'id' => $associacao->id,
@@ -71,7 +71,7 @@ class AssociacaoTest extends TestCase
 
     public function testFindAssociacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $associacao = factory(Associacao::class)->create();
         $response = $this->graphfl('query_associacao', [ 'id' => $associacao->id ], $headers);
         $this->assertEquals($associacao->id, $response->json('data.associacoes.data.0.id'));

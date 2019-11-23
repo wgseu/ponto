@@ -42,7 +42,7 @@ class ContaTest extends TestCase
 {
     public function testCreateConta()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $classificacao = factory(Classificacao::class)->create();
         $response = $this->graphfl('create_conta', [
             'input' => [
@@ -66,7 +66,7 @@ class ContaTest extends TestCase
 
     public function testUpdateConta()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $conta = factory(Conta::class)->create();
         $this->graphfl('update_conta', [
             'id' => $conta->id,
@@ -86,7 +86,7 @@ class ContaTest extends TestCase
 
     public function testDeleteConta()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $conta_to_delete = factory(Conta::class)->create();
         $this->graphfl('delete_conta', ['id' => $conta_to_delete->id], $headers);
         $conta = Conta::find($conta_to_delete->id);
@@ -95,7 +95,7 @@ class ContaTest extends TestCase
 
     public function testFindConta()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $conta = factory(Conta::class)->create();
         $response = $this->graphfl('query_conta', [ 'id' => $conta->id ], $headers);
         $this->assertEquals($conta->id, $response->json('data.contas.data.0.id'));
@@ -315,7 +315,7 @@ class ContaTest extends TestCase
             'conta_id' => $conta_pai->id,
             'data_pagamento' => Carbon::now(),
         ]);
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->graphfl('update_conta', [
             'id' => $conta_pai->id,
             'input' => [
@@ -360,7 +360,7 @@ class ContaTest extends TestCase
             'conta_id' => $conta2->id,
             'data_pagamento' => Carbon::now(),
         ]);
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->graphfl('update_conta', [
             'id' => $conta_pai->id,
             'input' => [

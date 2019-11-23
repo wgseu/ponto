@@ -62,8 +62,10 @@ abstract class TestCase extends BaseTestCase
         if ($this->app) {
             $this->callBeforeApplicationDestroyedCallbacks();
         }
+        auth()->check() && auth()->logout();
+        auth()->guard()->unsetToken();
         // limpa os unique do faker
-        factory(Sistema::class)->make();
+        app('Faker\Generator')->unique(true);
         $this->app = null;
         parent::tearDown();
     }

@@ -35,7 +35,7 @@ class CatalogoTest extends TestCase
 {
     public function testCreateCatalogo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $produto_id = factory(Produto::class)->create();
         $fornecedor_id = factory(Fornecedor::class)->create();
         $response = $this->graphfl('create_catalogo', [
@@ -54,7 +54,7 @@ class CatalogoTest extends TestCase
 
     public function testUpdateCatalogo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $catalogo = factory(Catalogo::class)->create();
         $this->graphfl('update_catalogo', [
             'id' => $catalogo->id,
@@ -68,7 +68,7 @@ class CatalogoTest extends TestCase
 
     public function testDeleteCatalogo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $catalogo_to_delete = factory(Catalogo::class)->create();
         $this->graphfl('delete_catalogo', ['id' => $catalogo_to_delete->id], $headers);
         $catalogo = Catalogo::find($catalogo_to_delete->id);
@@ -77,7 +77,7 @@ class CatalogoTest extends TestCase
 
     public function testFindCatalogo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $catalogo = factory(Catalogo::class)->create();
         $response = $this->graphfl('query_catalogo', [ 'id' => $catalogo->id ], $headers);
         $this->assertEquals($catalogo->id, $response->json('data.catalogos.data.0.id'));

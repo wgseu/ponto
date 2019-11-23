@@ -46,14 +46,6 @@ class EstoqueInput extends InputType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que entrou no estoque',
             ],
-            'requisito_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa de qual compra originou essa entrada em estoque',
-            ],
-            'transacao_id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do item que gerou a saída desse produto do estoque',
-            ],
             'fornecedor_id' => [
                 'type' => Type::id(),
                 'description' => 'Fornecedor do produto',
@@ -61,10 +53,6 @@ class EstoqueInput extends InputType
             'setor_id' => [
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Setor de onde o produto foi inserido ou retirado',
-            ],
-            'prestador_id' => [
-                'type' => Type::id(),
-                'description' => 'Prestador que inseriu/retirou o produto do estoque',
             ],
             'quantidade' => [
                 'type' => Type::nonNull(Type::float()),
@@ -91,11 +79,6 @@ class EstoqueInput extends InputType
                 'type' => Type::string(),
                 'description' => 'Detalhes da inserção ou retirada do estoque',
                 'rules' => ['max:100'],
-            ],
-            'reservado' => [
-                'type' => Type::boolean(),
-                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas' .
-                    ' reservados',
             ],
             'cancelado' => [
                 'type' => Type::boolean(),

@@ -42,9 +42,8 @@ class Dispositivo extends Model implements ValidateInterface
      * Tipo de dispositivo
      */
     public const TIPO_COMPUTADOR = 'computador';
-    public const TIPO_TABLET = 'tablet';
     public const TIPO_NAVEGADOR = 'navegador';
-    public const TIPO_SMARTPHONE = 'smartphone';
+    public const TIPO_MOVEL = 'movel';
 
     /**
      * The table associated with the model.

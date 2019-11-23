@@ -11,7 +11,7 @@ class ZonaTest extends TestCase
 {
     public function testCreateZona()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_zona =  factory(Zona::class)->create();
         $response = $this->graphfl('create_zona', [
             'input' => [
@@ -29,7 +29,7 @@ class ZonaTest extends TestCase
 
     public function testFindZona()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $zona = factory(Zona::class)->create();
         $response = $this->graphfl('query_zona', ['id' => $zona->id], $headers);
 
@@ -42,7 +42,7 @@ class ZonaTest extends TestCase
 
     public function testUpdateZona()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $zona = factory(Zona::class)->create();
         $this->graphfl('update_zona', [
             'id' => $zona->id,
@@ -60,7 +60,7 @@ class ZonaTest extends TestCase
     
     public function testDeleteZona()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $zona_to_delete = factory(Zona::class)->create();
         $this->graphfl('delete_zona', ['id' => $zona_to_delete->id], $headers);
         $zona = Zona::find($zona_to_delete->id);

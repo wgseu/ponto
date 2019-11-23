@@ -33,7 +33,7 @@ class ObservacaoTest extends TestCase
 {
     public function testCreateObservacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_observacao =  factory(Observacao::class)->create();
         $response = $this->graphfl('create_observacao', [
             'input' => [
@@ -49,7 +49,7 @@ class ObservacaoTest extends TestCase
 
     public function testUpdateObservacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $observacao = factory(Observacao::class)->create();
         $this->graphfl('update_observacao', [
             'id' => $observacao->id,
@@ -63,7 +63,7 @@ class ObservacaoTest extends TestCase
 
     public function testDeleteObservacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $observacao_to_delete = factory(Observacao::class)->create();
         $this->graphfl('delete_observacao', ['id' => $observacao_to_delete->id], $headers);
         $observacao = Observacao::find($observacao_to_delete->id);
@@ -72,7 +72,7 @@ class ObservacaoTest extends TestCase
 
     public function testFindObservacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $observacao = factory(Observacao::class)->create();
         $response = $this->graphfl('query_observacao', [ 'id' => $observacao->id ], $headers);
         $this->assertEquals($observacao->id, $response->json('data.observacoes.data.0.id'));

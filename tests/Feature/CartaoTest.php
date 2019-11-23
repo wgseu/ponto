@@ -36,7 +36,7 @@ class CartaoTest extends TestCase
 {
     public function testCreateCartao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_cartao =  factory(Cartao::class)->create();
         $response = $this->graphfl('create_cartao', [
             'input' => [
@@ -52,7 +52,7 @@ class CartaoTest extends TestCase
 
     public function testFindCartao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $carteira = factory(Carteira::class)->create();
         $cartao = factory(Cartao::class)->create(['carteira_id' => $carteira->id]);
         $response = $this->graphfl('query_cartao', [
@@ -70,7 +70,7 @@ class CartaoTest extends TestCase
 
     public function testUpdateCartao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cartao = factory(Cartao::class)->create();
         $this->graphfl('update_cartao', [
             'id' => $cartao->id,
@@ -84,7 +84,7 @@ class CartaoTest extends TestCase
 
     public function testDeleteCartao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cartao_to_delete = factory(Cartao::class)->create();
         $this->graphfl('delete_cartao', ['id' => $cartao_to_delete->id], $headers);
         $cartao = Cartao::find($cartao_to_delete->id);

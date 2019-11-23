@@ -36,7 +36,7 @@ class ListaTest extends TestCase
 {
     public function testCreateLista()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_lista =  factory(Lista::class)->create();
         $response = $this->graphfl('create_lista', [
             'input' => [
@@ -54,7 +54,7 @@ class ListaTest extends TestCase
 
     public function testUpdateLista()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $lista = factory(Lista::class)->create();
         $this->graphfl('update_lista', [
             'id' => $lista->id,
@@ -68,7 +68,7 @@ class ListaTest extends TestCase
 
     public function testDeleteLista()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $lista_to_delete = factory(Lista::class)->create();
         $this->graphfl('delete_lista', ['id' => $lista_to_delete->id], $headers);
         $lista = Lista::find($lista_to_delete->id);
@@ -77,7 +77,7 @@ class ListaTest extends TestCase
 
     public function testFindLista()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $viagem = factory(Viagem::class)->create();
         $lista = factory(Lista::class)->create(['viagem_id' => $viagem->id]);
         $response = $this->graphfl('query_lista', [ 'id' => $lista->id ], $headers);

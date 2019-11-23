@@ -10,7 +10,7 @@ class CategoriaTest extends TestCase
 {
     public function testCreateCategoria()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('create_categoria', [
             'input' => [
                 'descricao' => 'Teste',
@@ -24,7 +24,7 @@ class CategoriaTest extends TestCase
 
     public function testFindCategoria()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $categoria = factory(Categoria::class)->create();
         $response = $this->graphfl('query_categoria', [
             'id' => $categoria->id,
@@ -38,7 +38,7 @@ class CategoriaTest extends TestCase
 
     public function testUpdateCategoria()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $categoria = factory(Categoria::class)->create();
         $this->graphfl('update_categoria', [
             'id' => $categoria->id,
@@ -60,7 +60,7 @@ class CategoriaTest extends TestCase
     
     public function testDeleteCategoria()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $categoria_to_delete = factory(Categoria::class)->create();
         $this->graphfl('delete_categoria', ['id' => $categoria_to_delete->id], $headers);
         $bairro = Categoria::find($categoria_to_delete->id);

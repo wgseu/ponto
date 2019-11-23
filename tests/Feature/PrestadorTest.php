@@ -43,23 +43,24 @@ class PrestadorTest extends TestCase
     {
         $prestador = $prestador ?: factory(Prestador::class)->create();
         $user = $prestador->cliente()->first();
-        $token = auth()->fromUser($user);
-        return [
-            'Authorization' => "Bearer $token",
-        ];
+        return ClienteTest::auth($user);
     }
 
     /**
-     * TODO: remove me
+     * Obtém os headers de autenticação do proprietárop
+     *
+     * @param Cliente $cliente opcional
+     * @return array
      */
-    public function testNothing()
+    public static function authOwner($cliente = null)
     {
-        $this->assertTrue(true);
+        $prestador = EmpresaTest::createOwner($cliente)->prestador;
+        return self::auth($prestador);
     }
 
     public function testCreatePrestador()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $funcao_id = factory(Funcao::class)->create();
         $cliente_id = factory(Cliente::class)->create();
         $response = $this->graphfl('create_prestador', [
@@ -78,7 +79,7 @@ class PrestadorTest extends TestCase
 
     public function testUpdatePrestador()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $prestador = factory(Prestador::class)->create();
         $this->graphfl('update_prestador', [
             'id' => $prestador->id,
@@ -92,7 +93,7 @@ class PrestadorTest extends TestCase
 
     public function testDeletePrestador()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $prestador_to_delete = factory(Prestador::class)->create();
         $this->graphfl('delete_prestador', ['id' => $prestador_to_delete->id], $headers);
         $prestador = Prestador::find($prestador_to_delete->id);
@@ -101,7 +102,7 @@ class PrestadorTest extends TestCase
 
     public function testQueryPrestador()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $prestador = factory(Prestador::class)->create();
         $response = $this->graphfl('query_prestador', ['id' => $prestador->id], $headers);
         $this->assertEquals($prestador->id, $response->json('data.prestadores.data.0.id'));
@@ -114,7 +115,7 @@ class PrestadorTest extends TestCase
             'login' => ''
         ]);
         $cliente_id->save();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_prestador', [
             'input' => [
@@ -132,7 +133,7 @@ class PrestadorTest extends TestCase
         $cliente_id->tipo = Cliente::TIPO_JURIDICA;
         $cliente_id->cpf = '54557802000126';
         $cliente_id->save();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_prestador', [
             'input' => [

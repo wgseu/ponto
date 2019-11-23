@@ -143,6 +143,7 @@ class Cliente extends User implements
     public function getJWTCustomClaims()
     {
         return [
+            'iss' => null,
             'uid' => null,
             'typ' => 'access',
         ];
@@ -174,6 +175,7 @@ class Cliente extends User implements
     public function createValidateToken()
     {
         $customClaims = [
+            'iss' => null,
             'uid' => $this->id,
             'sub' => null,
             'typ' => 'check',
@@ -186,6 +188,7 @@ class Cliente extends User implements
     public function createRefreshToken()
     {
         $customClaims = [
+            'iss' => null,
             'uid' => $this->id,
             'sub' => null,
             'typ' => 'refresh',
@@ -277,6 +280,13 @@ class Cliente extends User implements
      */
     public function hasPermissionTo(string $permissao)
     {
-        return $this->isOwner() || true;
+        if ($this->isOwner()) {
+            return true;
+        }
+        $prestador = $this->prestador;
+        if (is_null($prestador)) {
+            return false;
+        }
+        return $prestador->funcao->hasPermissionTo($permissao);
     }
 }

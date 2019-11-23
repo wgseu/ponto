@@ -33,7 +33,7 @@ class ProdutoTest extends TestCase
 {
     public function testCreateProduto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_produto =  factory(Produto::class)->create();
         $response = $this->graphfl('create_produto', [
             'input' => [
@@ -53,7 +53,7 @@ class ProdutoTest extends TestCase
 
     public function testUpdateProduto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $produto = factory(Produto::class)->create();
         $this->graphfl('update_produto', [
             'id' => $produto->id,
@@ -69,7 +69,7 @@ class ProdutoTest extends TestCase
 
     public function testDeleteProduto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $produto_to_delete = factory(Produto::class)->create();
         $this->graphfl('delete_produto', ['id' => $produto_to_delete->id], $headers);
         $produto_to_delete->refresh();
@@ -79,7 +79,7 @@ class ProdutoTest extends TestCase
 
     public function testFindProduto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $produto = factory(Produto::class)->create();
         $response = $this->graphfl('query_produto', [ 'id' => $produto->id ], $headers);
         $this->assertEquals($produto->id, $response->json('data.produtos.data.0.id'));

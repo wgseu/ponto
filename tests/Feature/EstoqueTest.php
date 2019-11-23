@@ -40,13 +40,12 @@ class EstoqueTest extends TestCase
 {
     public function testCreateEstoque()
     {
-        $headers = PrestadorTest::auth();
-        $seed_estoque =  factory(Estoque::class)->create();
+        $headers = PrestadorTest::authOwner();
+        $seed_estoque =  factory(Estoque::class)->make();
         $response = $this->graphfl('create_estoque', [
             'input' => [
                 'produto_id' => $seed_estoque->produto_id,
                 'setor_id' => $seed_estoque->setor_id,
-                'requisito_id' => $seed_estoque->requisito_id,
                 'quantidade' => 1.0,
             ]
         ], $headers);
@@ -59,7 +58,7 @@ class EstoqueTest extends TestCase
 
     public function testUpdateEstoque()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $estoque = factory(Estoque::class)->create();
         $this->graphfl('update_estoque', [
             'id' => $estoque->id,
@@ -73,7 +72,7 @@ class EstoqueTest extends TestCase
 
     public function testFindEstoque()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $estoque = factory(Estoque::class)->create();
         $response = $this->graphfl('query_estoque', [ 'id' => $estoque->id ], $headers);
         $this->assertEquals($estoque->id, $response->json('data.estoques.data.0.id'));
@@ -150,11 +149,16 @@ class EstoqueTest extends TestCase
     {
         $transacao = factory(Item::class)->make()->calculate();
         $transacao->save();
-        $estoque = factory(Estoque::class)->create([
+        $estoque = factory(Estoque::class)->make([
             'requisito_id' => null,
             'transacao_id' => $transacao->id,
-            'quantidade' => -2
+            'quantidade' => -2,
         ]);
+        factory(Estoque::class)->create([
+            'setor_id' => $estoque->setor_id,
+            'produto_id' => $estoque->produto_id,
+        ]);
+        $estoque->save();
         $result = $estoque->transacao;
         $expected = Item::find($estoque->transacao_id);
         $this->assertEquals($expected, $result);

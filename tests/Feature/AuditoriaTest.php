@@ -34,7 +34,7 @@ class AuditoriaTest extends TestCase
 {
     public function testFindAuditoria()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $auditoria = factory(Auditoria::class)->create();
         $response = $this->graphfl('query_auditoria', [ 'id' => $auditoria->id ], $headers);
         $this->assertEquals($auditoria->id, $response->json('data.auditorias.data.0.id'));

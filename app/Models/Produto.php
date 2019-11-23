@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Models\Item;
 use App\Concerns\ModelEvents;
+use App\Exceptions\Exception;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -111,6 +112,19 @@ class Produto extends Model implements ValidateInterface
     ];
 
     /**
+     * Retorna o nome abreviado do produto
+     *
+     * @return string
+     */
+    public function abreviado()
+    {
+        if ($this->abreviacao == '') {
+            return $this->descricao;
+        }
+        return $this->abreviacao;
+    }
+
+    /**
      * Categoria do produto, permite a rápida localização ao utilizar tablets
      */
     public function categoria()
@@ -149,6 +163,60 @@ class Produto extends Model implements ValidateInterface
     public function tributacao()
     {
         return $this->belongsTo('App\Models\Tributacao', 'tributacao_id');
+    }
+
+    /**
+     * Retorna todas as composições ativas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function composicoes()
+    {
+        return $this->hasMany('App\Models\Composicao', 'composicao_id')
+            ->where('ativa', true);
+    }
+
+    /**
+     * Retorna os grupos do pacote na ordem correta
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function grupos()
+    {
+        return $this->hasMany('App\Models\Grupo', 'produto_id')
+            ->orderBy('ordem', 'asc')
+            ->orderBy('id', 'asc');
+    }
+
+    /**
+     * Informa quanto desse produto tem no setor de estoque
+     *
+     * @param int $setor_id retorna estoque desse setor
+     * @return float
+     */
+    public function estoqueSetor($setor_id = null)
+    {
+        $contagem = Contagem::where('produto_id', $this->id)
+            ->where('setor_id', $setor_id ?? $this->setor_preparo_id)->first();
+        return is_null($contagem) ? 0 : $contagem->quantidade;
+    }
+
+    /**
+     * Produz a quantidade de composição informada
+     *
+     * @param float $quantidade
+     * @param int $prestador_id funcionário que está produzindo essa composição
+     * @return Estoque
+     */
+    public function produzir($quantidade, $prestador_id = null)
+    {
+        $estoque = new Estoque([
+            'prestador_id' => $prestador_id,
+            'quantidade' => $quantidade,
+            'produto_id' => $this->id,
+        ]);
+        $estoque->produzir();
+        return $estoque;
     }
 
     public function validate()

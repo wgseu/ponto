@@ -33,7 +33,7 @@ class AvaliacaoTest extends TestCase
 {
     public function testCreateAvaliacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_avaliacao =  factory(Avaliacao::class)->create();
         $response = $this->graphfl('create_avaliacao', [
             'input' => [
@@ -51,7 +51,7 @@ class AvaliacaoTest extends TestCase
 
     public function testUpdateAvaliacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $avaliacao = factory(Avaliacao::class)->create();
         $this->graphfl('update_avaliacao', [
             'id' => $avaliacao->id,
@@ -67,7 +67,7 @@ class AvaliacaoTest extends TestCase
 
     public function testDeleteAvaliacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $avaliacao_to_delete = factory(Avaliacao::class)->create();
         $this->graphfl('delete_avaliacao', ['id' => $avaliacao_to_delete->id], $headers);
         $avaliacao = Avaliacao::find($avaliacao_to_delete->id);
@@ -76,7 +76,7 @@ class AvaliacaoTest extends TestCase
 
     public function testFindAvaliacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $avaliacao = factory(Avaliacao::class)->create();
         $response = $this->graphfl('query_avaliacao', [ 'id' => $avaliacao->id ], $headers);
         $this->assertEquals($avaliacao->id, $response->json('data.avaliacoes.data.0.id'));

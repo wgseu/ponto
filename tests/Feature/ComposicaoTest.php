@@ -34,7 +34,7 @@ class ComposicaoTest extends TestCase
 {
     public function testCreateComposicao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $composicao_id = factory(Produto::class)->create();
         $produto_id = factory(Produto::class)->create();
         $response = $this->graphfl('create_composicao', [
@@ -53,7 +53,7 @@ class ComposicaoTest extends TestCase
 
     public function testUpdateComposicao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $composicao = factory(Composicao::class)->create();
         $this->graphfl('update_composicao', [
             'id' => $composicao->id,
@@ -67,7 +67,7 @@ class ComposicaoTest extends TestCase
 
     public function testDeleteComposicao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $composicao_to_delete = factory(Composicao::class)->create();
         $this->graphfl('delete_composicao', ['id' => $composicao_to_delete->id], $headers);
         $composicao = Composicao::find($composicao_to_delete->id);
@@ -76,7 +76,7 @@ class ComposicaoTest extends TestCase
 
     public function testFindComposicao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $composicao = factory(Composicao::class)->create();
         $response = $this->graphfl('query_composicao', [ 'id' => $composicao->id ], $headers);
         $this->assertEquals($composicao->id, $response->json('data.composicoes.data.0.id'));

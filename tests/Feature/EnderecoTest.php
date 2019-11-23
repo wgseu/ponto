@@ -36,7 +36,7 @@ class EnderecoTest extends TestCase
 {
     public function testCreateEndereco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_endereco =  factory(Endereco::class)->create();
         $response = $this->graphfl('create_endereco', [
             'input' => [
@@ -56,7 +56,7 @@ class EnderecoTest extends TestCase
 
     public function testUpdateEndereco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $endereco = factory(Endereco::class)->create();
         $this->graphfl('update_endereco', [
             'id' => $endereco->id,
@@ -73,7 +73,7 @@ class EnderecoTest extends TestCase
 
     public function testDeleteEndereco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $endereco_to_delete = factory(Endereco::class)->create();
         $this->graphfl('delete_endereco', ['id' => $endereco_to_delete->id], $headers);
         $endereco = Endereco::find($endereco_to_delete->id);
@@ -82,7 +82,7 @@ class EnderecoTest extends TestCase
 
     public function testFindEndereco()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $endereco = factory(Endereco::class)->create();
         $response = $this->graphfl('query_endereco', [ 'id' => $endereco->id ], $headers);
         $this->assertEquals($endereco->id, $response->json('data.enderecos.data.0.id'));

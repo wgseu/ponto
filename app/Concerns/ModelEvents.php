@@ -29,6 +29,8 @@ namespace App\Concerns;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Builder;
 use App\Exceptions\ValidationException;
+use App\Interfaces\AfterInsertInterface;
+use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
 
@@ -53,7 +55,12 @@ trait ModelEvents
             $errors = $this->onInsert();
             $this->checkErrors($errors);
         }
-        return parent::performInsert($query);
+        $result = parent::performInsert($query);
+        if ($this instanceof AfterInsertInterface) {
+            $errors = $this->afterInsert();
+            $this->checkErrors($errors);
+        }
+        return $result;
     }
 
     /**
@@ -85,6 +92,11 @@ trait ModelEvents
             $errors = $this->onUpdate();
             $this->checkErrors($errors);
         }
-        return parent::performUpdate($query);
+        $result = parent::performUpdate($query);
+        if ($this instanceof AfterUpdateInterface) {
+            $errors = $this->afterUpdate();
+            $this->checkErrors($errors);
+        }
+        return $result;
     }
 }

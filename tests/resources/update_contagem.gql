@@ -1,5 +1,0 @@
-mutation updateContagem($id: ID!, $input: ContagemUpdateInput!) {
-  UpdateContagem(id: $id, input: $input) {
-    quantidade
-  }
-}

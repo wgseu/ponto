@@ -77,6 +77,8 @@ class CreateInitialTables extends Migration
             $table->string('descricao', 100);
             $table->string('conta', 100)->nullable();
             $table->string('agencia', 200)->nullable();
+            $table->decimal('saldo', 19, 4)->default(0);
+            $table->decimal('lancado', 19, 4)->default(0);
             $table->decimal('transacao', 19, 4)->default(0);
             $table->decimal('limite', 19, 4)->nullable();
             $table->string('token', 250)->nullable();
@@ -1017,7 +1019,7 @@ class CreateInitialTables extends Migration
             $table->decimal('comissao', 19, 4)->default(0);
             $table->decimal('total', 19, 4);
             $table->decimal('preco_venda', 19, 4);
-            $table->decimal('preco_compra', 19, 4)->default(0);
+            $table->decimal('custo_aproximado', 19, 4)->default(0);
             $table->string('detalhes', 255)->nullable();
             $table->enum(
                 'estado',
@@ -1257,6 +1259,7 @@ class CreateInitialTables extends Migration
 
         Schema::create('estoques', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('producao_id')->nullable();
             $table->unsignedInteger('produto_id');
             $table->unsignedInteger('requisito_id')->nullable();
             $table->unsignedInteger('transacao_id')->nullable();
@@ -1269,7 +1272,6 @@ class CreateInitialTables extends Migration
             $table->dateTime('fabricacao')->nullable();
             $table->dateTime('vencimento')->nullable();
             $table->string('detalhes', 100)->nullable();
-            $table->boolean('reservado')->default(false);
             $table->boolean('cancelado')->default(false);
             $table->dateTime('data_movimento');
 
@@ -1280,6 +1282,11 @@ class CreateInitialTables extends Migration
             $table->index(['setor_id']);
             $table->index(['requisito_id']);
             $table->index(['data_movimento']);
+            $table->index(['producao_id']);
+            $table->foreign('producao_id')
+                ->references('id')->on('estoques')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->foreign('produto_id')
                 ->references('id')->on('produtos')
                 ->onUpdate('cascade')
@@ -1386,7 +1393,7 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('setor_id')->nullable();
             $table->unsignedInteger('caixa_id')->nullable();
             $table->string('nome', 100);
-            $table->enum('tipo', ['computador', 'tablet', 'navegador', 'smartphone'])->default('computador');
+            $table->enum('tipo', ['computador', 'navegador', 'movel'])->default('computador');
             $table->string('descricao', 45)->nullable();
             $table->text('opcoes')->nullable();
             $table->string('serial', 45);

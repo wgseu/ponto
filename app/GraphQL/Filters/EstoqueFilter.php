@@ -44,6 +44,9 @@ class EstoqueFilter extends InputType
             'id' => [
                 'type' => Type::id(),
             ],
+            'producao_id' => [
+                'type' => GraphQL::type('IdFilter'),
+            ],
             'produto_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],
@@ -79,9 +82,6 @@ class EstoqueFilter extends InputType
             ],
             'detalhes' => [
                 'type' => GraphQL::type('StringFilter'),
-            ],
-            'reservado' => [
-                'type' => Type::boolean(),
             ],
             'cancelado' => [
                 'type' => Type::boolean(),

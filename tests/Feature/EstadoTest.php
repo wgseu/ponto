@@ -34,7 +34,7 @@ class EstadoTest extends TestCase
 {
     public function testCreateEstado()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_estado =  factory(Estado::class)->create();
         $response = $this->graphfl('create_estado', [
             'input' => [
@@ -52,7 +52,7 @@ class EstadoTest extends TestCase
 
     public function testUpdateEstado()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $estado = factory(Estado::class)->create();
         $this->graphfl('update_estado', [
             'id' => $estado->id,
@@ -68,7 +68,7 @@ class EstadoTest extends TestCase
 
     public function testDeleteEstado()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $estado_to_delete = factory(Estado::class)->create();
         $this->graphfl('delete_estado', ['id' => $estado_to_delete->id], $headers);
         $estado = Estado::find($estado_to_delete->id);
@@ -77,7 +77,7 @@ class EstadoTest extends TestCase
 
     public function testFindEstado()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $estado = factory(Estado::class)->create();
         $response = $this->graphfl('query_estado', [ 'id' => $estado->id ], $headers);
         $this->assertEquals($estado->id, $response->json('data.estados.data.0.id'));

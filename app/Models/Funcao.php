@@ -61,6 +61,24 @@ class Funcao extends Model implements ValidateInterface
         'remuneracao',
     ];
 
+
+    public function acessos()
+    {
+        return $this->hasMany('App\Models\Acesso', 'funcao_id');
+    }
+
+    /**
+     * Verifica se a função tem acesso para a permissão informada
+     *
+     * @param string $permissao
+     * @return boolean
+     */
+    public function hasPermissionTo(string $permissao)
+    {
+        $permissao = Permissao::where('nome', $permissao)->firstOrFail();
+        return $this->acessos()->where('permissao_id', $permissao->id)->exists();
+    }
+
     /**
      * Regras:
      * A remuração não pode ser negativa;

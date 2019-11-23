@@ -33,7 +33,7 @@ class CupomTest extends TestCase
 {
     public function testCreateCupom()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_cupom =  factory(Cupom::class)->create();
         $response = $this->graphfl('create_cupom', [
             'input' => [
@@ -57,7 +57,7 @@ class CupomTest extends TestCase
 
     public function testUpdateCupom()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cupom = factory(Cupom::class)->create();
         $this->graphfl('update_cupom', [
             'id' => $cupom->id,
@@ -81,7 +81,7 @@ class CupomTest extends TestCase
 
     public function testDeleteCupom()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cupom_to_delete = factory(Cupom::class)->create();
         $this->graphfl('delete_cupom', ['id' => $cupom_to_delete->id], $headers);
         $cupom = Cupom::find($cupom_to_delete->id);
@@ -90,7 +90,7 @@ class CupomTest extends TestCase
 
     public function testFindCupom()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cupom = factory(Cupom::class)->create();
         $response = $this->graphfl('query_cupom', [ 'id' => $cupom->id ], $headers);
         $this->assertEquals($cupom->id, $response->json('data.cupons.data.0.id'));

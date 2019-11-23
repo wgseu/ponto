@@ -245,6 +245,16 @@ class Pedido extends Model implements ValidateInterface, ValidateInsertInterface
     }
 
     /**
+     * Informa se o pedido está finalizado por conclusão ou cancelamento
+     *
+     * @return bool
+     */
+    public function finished()
+    {
+        return in_array($this->estado, [self::ESTADO_CONCLUIDO, self::ESTADO_CANCELADO]);
+    }
+
+    /**
      * Informa a permissão necessária para criar ou adicionar itens no pedido
      *
      * @param string $tipo tipo de pedido
@@ -301,6 +311,23 @@ class Pedido extends Model implements ValidateInterface, ValidateInsertInterface
         $itens = $this->itens;
         foreach ($itens as $item) {
             $item->update(['cancelado' => true]);
+        }
+    }
+
+    /**
+     * Retira do estoque os itens que ainda não foram reservados
+     *
+     * @return void
+     */
+    protected function reserveProducts()
+    {
+        $itens = $this->itens()->where('reservado', false)
+            ->whereNotNull('produto_id')->get();
+        foreach ($itens as $item) {
+            $produto = $item->produto;
+            if ($produto->tipo != Produto::TIPO_PACOTE) {
+                $item->reservar();
+            }
         }
     }
 
@@ -388,9 +415,12 @@ class Pedido extends Model implements ValidateInterface, ValidateInsertInterface
     public function onInsert()
     {
         $errors = [];
-        // um pedido deve ser criado aberto
-        if ($this->estado != self::ESTADO_ABERTO) {
-            $errors['estado'] = __('messages.order_mustbe_open');
+        if (is_null($this->prestador_id) && $this->estado != self::ESTADO_AGENDADO) {
+            $errors['estado'] = __('messages.order_mustbe_scheduled');
+        }
+        // um pedido deve ser criado aberto ou agendado
+        if (!in_array($this->estado, [self::ESTADO_ABERTO, self::ESTADO_AGENDADO])) {
+            $errors['estado'] = __('messages.order_mustbe_open_scheduled');
         }
         return $errors;
     }
@@ -404,6 +434,8 @@ class Pedido extends Model implements ValidateInterface, ValidateInsertInterface
             $errors['estado'] = __('messages.order_already_cancelled');
         } elseif ($this->estado == self::ESTADO_CANCELADO) {
             $this->cancel();
+        } elseif ($old->estado == self::ESTADO_AGENDADO && $this->estado != self::ESTADO_CANCELADO) {
+            $this->reserveProducts();
         }
         if ($this->tipo == self::TIPO_ENTREGA) {
             // não pode entregar sem endereço

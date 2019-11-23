@@ -36,7 +36,7 @@ class CaixaTest extends TestCase
 {
     public function testCreateCaixa()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $carteira =  factory(Carteira::class)->create(['tipo' => Carteira::TIPO_LOCAL]);
         $response = $this->graphfl('create_caixa', [
             'input' => [
@@ -52,7 +52,7 @@ class CaixaTest extends TestCase
 
     public function testUpdateCaixa()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $caixa = factory(Caixa::class)->create();
         $this->graphfl('update_caixa', [
             'id' => $caixa->id,
@@ -66,7 +66,7 @@ class CaixaTest extends TestCase
 
     public function testDeleteCaixa()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $caixa_to_delete = factory(Caixa::class)->create();
         $this->graphfl('delete_caixa', ['id' => $caixa_to_delete->id], $headers);
         $caixa = Caixa::find($caixa_to_delete->id);
@@ -75,7 +75,7 @@ class CaixaTest extends TestCase
 
     public function testFindCaixa()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $caixa = factory(Caixa::class)->create();
         $response = $this->graphfl('query_caixa', [ 'id' => $caixa->id ], $headers);
         $this->assertEquals($caixa->id, $response->json('data.caixas.data.0.id'));

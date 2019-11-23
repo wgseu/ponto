@@ -32,7 +32,7 @@ class FuncionalidadeTest extends TestCase
 {
     public function testFindFuncionalidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('query_funcionalidade', [ 'id' => 74 ], $headers);
         $this->assertEquals(7, $response->json('data.funcionalidades.data.0.modulo_id'));
     }

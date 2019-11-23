@@ -33,7 +33,7 @@ class OperacaoTest extends TestCase
 {
     public function testCreateOperacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_operacao =  factory(Operacao::class)->create();
         $response = $this->graphfl('create_operacao', [
             'input' => [
@@ -49,7 +49,7 @@ class OperacaoTest extends TestCase
 
     public function testUpdateOperacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $operacao = factory(Operacao::class)->create();
         $this->graphfl('update_operacao', [
             'id' => $operacao->id,
@@ -65,7 +65,7 @@ class OperacaoTest extends TestCase
 
     public function testDeleteOperacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $operacao_to_delete = factory(Operacao::class)->create();
         $this->graphfl('delete_operacao', ['id' => $operacao_to_delete->id], $headers);
         $operacao = Operacao::find($operacao_to_delete->id);
@@ -74,7 +74,7 @@ class OperacaoTest extends TestCase
 
     public function testFindOperacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $operacao = factory(Operacao::class)->create();
         $response = $this->graphfl('query_operacao', [ 'id' => $operacao->id ], $headers);
         $this->assertEquals($operacao->id, $response->json('data.operacoes.data.0.id'));

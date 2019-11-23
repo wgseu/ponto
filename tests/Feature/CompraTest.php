@@ -33,7 +33,7 @@ class CompraTest extends TestCase
 {
     public function testCreateCompra()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_compra =  factory(Compra::class)->create();
         $response = $this->graphfl('create_compra', [
             'input' => [
@@ -51,7 +51,7 @@ class CompraTest extends TestCase
 
     public function testUpdateCompra()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $compra = factory(Compra::class)->create();
         $this->graphfl('update_compra', [
             'id' => $compra->id,
@@ -65,7 +65,7 @@ class CompraTest extends TestCase
 
     public function testDeleteCompra()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $compra_to_delete = factory(Compra::class)->create();
         $this->graphfl('delete_compra', ['id' => $compra_to_delete->id], $headers);
         $compra = Compra::find($compra_to_delete->id);
@@ -74,7 +74,7 @@ class CompraTest extends TestCase
 
     public function testFindCompra()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $compra = factory(Compra::class)->create();
         $response = $this->graphfl('query_compra', [ 'id' => $compra->id ], $headers);
         $this->assertEquals($compra->id, $response->json('data.compras.data.0.id'));

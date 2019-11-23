@@ -35,7 +35,7 @@ class AcessoTest extends TestCase
 {
     public function testCreateAcesso()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $funcao =  factory(Funcao::class)->create();
         $permissao =  Permissao::first();
         $response = $this->graphfl('create_acesso', [
@@ -52,7 +52,7 @@ class AcessoTest extends TestCase
 
     public function testUpdateAcesso()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $funcao =  factory(Funcao::class)->create();
         $acesso = factory(Acesso::class)->create();
         $this->graphfl('update_acesso', [
@@ -67,7 +67,7 @@ class AcessoTest extends TestCase
 
     public function testDeleteAcesso()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $acesso_to_delete = factory(Acesso::class)->create();
         $this->graphfl('delete_acesso', ['id' => $acesso_to_delete->id], $headers);
         $acesso = Acesso::find($acesso_to_delete->id);
@@ -76,7 +76,7 @@ class AcessoTest extends TestCase
 
     public function testFindAcesso()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $acesso = factory(Acesso::class)->create();
         $response = $this->graphfl('query_acesso', [ 'id' => $acesso->id ], $headers);
         $this->assertEquals($acesso->id, $response->json('data.acessos.data.0.id'));

@@ -35,7 +35,7 @@ class CidadeTest extends TestCase
 {
     public function testCreateCidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_cidade =  factory(Cidade::class)->create(['cep' => '87540000']);
         $response = $this->graphfl('create_cidade', [
             'input' => [
@@ -51,7 +51,7 @@ class CidadeTest extends TestCase
 
     public function testUpdateCidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cidade = factory(Cidade::class)->create();
         $this->graphfl('update_cidade', [
             'id' => $cidade->id,
@@ -65,7 +65,7 @@ class CidadeTest extends TestCase
 
     public function testDeleteCidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cidade_to_delete = factory(Cidade::class)->create(['cep' => '87880-000']);
         $this->graphfl('delete_cidade', ['id' => $cidade_to_delete->id], $headers);
         $cidade = Cidade::find($cidade_to_delete->id);
@@ -74,7 +74,7 @@ class CidadeTest extends TestCase
 
     public function testFindCidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cidade = factory(Cidade::class)->create();
         $response = $this->graphfl('query_cidade', [ 'id' => $cidade->id ], $headers);
         $this->assertEquals($cidade->id, $response->json('data.cidades.data.0.id'));

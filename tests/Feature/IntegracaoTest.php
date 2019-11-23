@@ -33,7 +33,7 @@ class IntegracaoTest extends TestCase
 {
     public function testUpdateIntegracao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $integracao = factory(Integracao::class)->create();
         $this->graphfl('update_integracao', [
             'id' => $integracao->id,
@@ -47,7 +47,7 @@ class IntegracaoTest extends TestCase
 
     public function testFindIntegracao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $integracao = factory(Integracao::class)->create();
         $response = $this->graphfl('query_integracao', [ 'id' => $integracao->id ], $headers);
         $this->assertEquals($integracao->id, $response->json('data.integracoes.data.0.id'));

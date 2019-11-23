@@ -26,95 +26,83 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Filters;
+namespace App\GraphQL\Inputs;
 
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class ItemFilter extends InputType
+class SubitemInput extends InputType
 {
     protected $attributes = [
-        'name' => 'ItemFilter',
+        'name' => 'SubitemInput',
+        'description' => 'Subitens de um pacote montado',
     ];
 
     public function fields(): array
     {
         return [
+            'formacoes' => [
+                'type' => Type::listOf(GraphQL::type('FormacaoUpdateInput')),
+                'description' => 'Lista contendo a formação do item',
+            ],
             'id' => [
                 'type' => Type::id(),
+                'description' => 'Identificador do item no banco',
             ],
             'pedido_id' => [
-                'type' => GraphQL::type('IdFilter'),
+                'type' => Type::nonNull(Type::id()),
+                'description' => 'Pedido a qual pertence esse item',
             ],
             'prestador_id' => [
-                'type' => GraphQL::type('IdFilter'),
+                'type' => Type::id(),
+                'description' => 'Prestador que lançou esse item no pedido',
             ],
             'produto_id' => [
-                'type' => GraphQL::type('IdFilter'),
+                'type' => Type::id(),
+                'description' => 'Produto vendido',
             ],
             'servico_id' => [
-                'type' => GraphQL::type('IdFilter'),
+                'type' => Type::id(),
+                'description' => 'Serviço cobrado ou taxa',
             ],
             'item_id' => [
-                'type' => GraphQL::type('IdFilter'),
+                'type' => Type::id(),
+                'description' => 'Pacote em que esse item faz parte',
             ],
             'pagamento_id' => [
-                'type' => GraphQL::type('IdFilter'),
-            ],
-            'descricao' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'composicao' => [
-                'type' => GraphQL::type('StringFilter'),
+                'type' => Type::id(),
+                'description' => 'Informa se esse item foi pago e qual foi o lançamento',
             ],
             'preco' => [
-                'type' => GraphQL::type('NumberFilter'),
+                'type' => Type::nonNull(Type::float()),
+                'description' => 'Preço do produto já com desconto',
             ],
             'quantidade' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'subtotal' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'comissao' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'total' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'preco_venda' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'custo_aproximado' => [
-                'type' => GraphQL::type('NumberFilter'),
+                'type' => Type::nonNull(Type::float()),
+                'description' => 'Quantidade de itens vendidos',
             ],
             'detalhes' => [
-                'type' => GraphQL::type('StringFilter'),
+                'type' => Type::string(),
+                'description' => 'Observações do item pedido, Ex.: bem gelado, mal passado',
+                'rules' => ['max:255'],
             ],
             'estado' => [
-                'type' => GraphQL::type('ItemEstadoFilter'),
+                'type' => GraphQL::type('ItemEstado'),
+                'description' => 'Estado de preparo e envio do produto',
             ],
             'cancelado' => [
                 'type' => Type::boolean(),
+                'description' => 'Informa se o item foi cancelado',
             ],
             'motivo' => [
-                'type' => GraphQL::type('StringFilter'),
+                'type' => Type::string(),
+                'description' => 'Informa o motivo do item ser cancelado',
+                'rules' => ['max:200'],
             ],
             'desperdicado' => [
                 'type' => Type::boolean(),
-            ],
-            'reservado' => [
-                'type' => Type::boolean(),
-            ],
-            'data_processamento' => [
-                'type' => GraphQL::type('DateFilter'),
-            ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateFilter'),
-            ],
-            'data_lancamento' => [
-                'type' => GraphQL::type('DateFilter'),
+                'description' => 'Informa se o item foi cancelado por conta de desperdício',
             ],
         ];
     }

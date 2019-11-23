@@ -35,7 +35,7 @@ class ImpressoraTest extends TestCase
 {
     public function testCreateImpressora()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $dispositivo_id = factory(Dispositivo::class)->create();
         $setor_id = factory(Setor::class)->create();
         $response = $this->graphfl('create_impressora', [
@@ -56,7 +56,7 @@ class ImpressoraTest extends TestCase
 
     public function testUpdateImpressora()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $impressora = factory(Impressora::class)->create();
         $this->graphfl('update_impressora', [
             'id' => $impressora->id,
@@ -72,7 +72,7 @@ class ImpressoraTest extends TestCase
 
     public function testDeleteImpressora()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $impressora_to_delete = factory(Impressora::class)->create();
         $this->graphfl('delete_impressora', ['id' => $impressora_to_delete->id], $headers);
         $impressora = Impressora::find($impressora_to_delete->id);
@@ -81,7 +81,7 @@ class ImpressoraTest extends TestCase
 
     public function testFindImpressora()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $impressora = factory(Impressora::class)->create();
         $response = $this->graphfl('query_impressora', [ 'id' => $impressora->id ], $headers);
         $this->assertEquals($impressora->id, $response->json('data.impressoras.data.0.id'));

@@ -32,7 +32,7 @@ class PermissaoTest extends TestCase
 {
     public function testFindPermissao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('query_permissao', [ 'nome' => 'acesso:view' ], $headers);
         $this->assertEquals('acesso:view', $response->json('data.permissoes.data.0.nome'));
     }

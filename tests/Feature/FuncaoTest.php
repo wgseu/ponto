@@ -34,7 +34,7 @@ class FuncaoTest extends TestCase
 {
     public function testCreateFuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_funcao =  factory(Funcao::class)->create();
         $response = $this->graphfl('create_funcao', [
             'input' => [
@@ -50,7 +50,7 @@ class FuncaoTest extends TestCase
 
     public function testUpdateFuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $funcao = factory(Funcao::class)->create();
         $this->graphfl('update_funcao', [
             'id' => $funcao->id,
@@ -66,7 +66,7 @@ class FuncaoTest extends TestCase
 
     public function testDeleteFuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $funcao_to_delete = factory(Funcao::class)->create();
         $this->graphfl('delete_funcao', ['id' => $funcao_to_delete->id], $headers);
         $funcao = Funcao::find($funcao_to_delete->id);
@@ -74,7 +74,7 @@ class FuncaoTest extends TestCase
     }
     public function testFindFuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $credito = factory(Funcao::class)->create();
         $response = $this->graphfl('query_funcao', [
             'id' => $credito->id,

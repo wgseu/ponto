@@ -39,7 +39,7 @@ class CardapioTest extends TestCase
 {
     public function testCreateCardapio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_cardapio =  factory(Cardapio::class)->create();
         $response = $this->graphfl('create_cardapio', [
             'input' => [
@@ -53,7 +53,7 @@ class CardapioTest extends TestCase
 
     public function testUpdateCardapio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pacote = factory(Pacote::class)->create();
         $integracao = factory(Integracao::class)->create();
         $cardapio = factory(Cardapio::class)->create([
@@ -75,7 +75,7 @@ class CardapioTest extends TestCase
 
     public function testDeleteCardapio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cardapio_to_delete = factory(Cardapio::class)->create();
         $this->graphfl('delete_cardapio', ['id' => $cardapio_to_delete->id], $headers);
         $cardapio = Cardapio::find($cardapio_to_delete->id);
@@ -84,7 +84,7 @@ class CardapioTest extends TestCase
 
     public function testFindCardapio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $composicao = factory(Composicao::class)->create();
         $cliente = factory(Cliente::class)->create();
         $cardapio = factory(Cardapio::class)->create([

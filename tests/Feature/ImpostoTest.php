@@ -33,7 +33,7 @@ class ImpostoTest extends TestCase
 {
     public function testCreateImposto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_imposto =  factory(Imposto::class)->create();
         $response = $this->graphfl('create_imposto', [
             'input' => [
@@ -55,7 +55,7 @@ class ImpostoTest extends TestCase
 
     public function testUpdateImposto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $imposto = factory(Imposto::class)->create();
         $this->graphfl('update_imposto', [
             'id' => $imposto->id,
@@ -77,7 +77,7 @@ class ImpostoTest extends TestCase
 
     public function testDeleteImposto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $imposto_to_delete = factory(Imposto::class)->create();
         $this->graphfl('delete_imposto', ['id' => $imposto_to_delete->id], $headers);
         $imposto = Imposto::find($imposto_to_delete->id);
@@ -86,7 +86,7 @@ class ImpostoTest extends TestCase
 
     public function testFindImposto()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $imposto = factory(Imposto::class)->create();
         $response = $this->graphfl('query_imposto', [ 'id' => $imposto->id ], $headers);
         $this->assertEquals($imposto->id, $response->json('data.impostos.data.0.id'));

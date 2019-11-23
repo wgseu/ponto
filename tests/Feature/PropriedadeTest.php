@@ -34,7 +34,7 @@ class PropriedadeTest extends TestCase
 {
     public function testCreatePropriedade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_propriedade =  factory(Propriedade::class)->create();
         $response = $this->graphfl('create_propriedade', [
             'input' => [
@@ -50,7 +50,7 @@ class PropriedadeTest extends TestCase
 
     public function testUpdatePropriedade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $propriedade = factory(Propriedade::class)->create();
         $this->graphfl('update_propriedade', [
             'id' => $propriedade->id,
@@ -64,7 +64,7 @@ class PropriedadeTest extends TestCase
 
     public function testDeletePropriedade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $propriedade_to_delete = factory(Propriedade::class)->create();
         $this->graphfl('delete_propriedade', ['id' => $propriedade_to_delete->id], $headers);
         $propriedade = Propriedade::find($propriedade_to_delete->id);
@@ -73,7 +73,7 @@ class PropriedadeTest extends TestCase
 
     public function testFindPropriedade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $propriedade = factory(Propriedade::class)->create();
         $response = $this->graphfl('query_propriedade', [ 'id' => $propriedade->id ], $headers);
         $this->assertEquals($propriedade->id, $response->json('data.propriedades.data.0.id'));

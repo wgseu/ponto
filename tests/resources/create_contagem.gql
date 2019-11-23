@@ -1,8 +1,0 @@
-mutation createContagem($input: ContagemInput!) {
-  CreateContagem(input: $input) {
-    id
-    produto_id
-    setor_id
-    quantidade
-  }
-}

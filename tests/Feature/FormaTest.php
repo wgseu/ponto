@@ -33,7 +33,7 @@ class FormaTest extends TestCase
 {
     public function testCreateForma()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_forma =  factory(Forma::class)->create();
         $response = $this->graphfl('create_forma', [
             'input' => [
@@ -51,7 +51,7 @@ class FormaTest extends TestCase
 
     public function testUpdateForma()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $forma = factory(Forma::class)->create();
         $this->graphfl('update_forma', [
             'id' => $forma->id,
@@ -67,7 +67,7 @@ class FormaTest extends TestCase
 
     public function testDeleteForma()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $forma_to_delete = factory(Forma::class)->create();
         $this->graphfl('delete_forma', ['id' => $forma_to_delete->id], $headers);
         $forma = Forma::find($forma_to_delete->id);
@@ -76,7 +76,7 @@ class FormaTest extends TestCase
 
     public function testFindForma()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $forma = factory(Forma::class)->create();
         $response = $this->graphfl('query_forma', [ 'id' => $forma->id ], $headers);
         $this->assertEquals($forma->id, $response->json('data.formas.data.0.id'));

@@ -36,10 +36,17 @@ use App\Models\Viagem;
 
 class PedidoTest extends TestCase
 {
+    public function testFindPedido()
+    {
+        $headers = PrestadorTest::authOwner();
+        $pedido = factory(Pedido::class)->create();
+        $response = $this->graphfl('query_pedido', [ 'id' => $pedido->id ], $headers);
+        $this->assertEquals($pedido->id, $response->json('data.pedidos.data.0.id'));
+    }
+
     public function testCreateDeliveryFromCustomer()
     {
-        $prestador = EmpresaTest::createOwner()->prestador;
-        $prestador_headers = PrestadorTest::auth($prestador);
+        $prestador_headers = PrestadorTest::authOwner();
         $localizacao = factory(Localizacao::class)->create();
         $cliente = $localizacao->cliente;
         $headers = ClienteTest::auth($cliente);
@@ -57,6 +64,7 @@ class PedidoTest extends TestCase
         $response = $this->graphfl('create_pedido', [
             'input' => [
                 'tipo' => Pedido::TIPO_ENTREGA,
+                'estado' => Pedido::ESTADO_AGENDADO,
                 'cliente_id' => $cliente->id,
                 'localizacao_id' => $localizacao->id,
                 'itens' => $itens,
@@ -97,13 +105,5 @@ class PedidoTest extends TestCase
             ],
             $prestador_headers
         );
-    }
-
-    public function testFindPedido()
-    {
-        $headers = PrestadorTest::auth();
-        $pedido = factory(Pedido::class)->create();
-        $response = $this->graphfl('query_pedido', [ 'id' => $pedido->id ], $headers);
-        $this->assertEquals($pedido->id, $response->json('data.pedidos.data.0.id'));
     }
 }

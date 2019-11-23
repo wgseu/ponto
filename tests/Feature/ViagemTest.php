@@ -37,7 +37,7 @@ class ViagemTest extends TestCase
     public function testUpdateViagem()
     {
         $prestador = factory(Prestador::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $viagem = factory(Viagem::class)->create();
         $this->graphfl('update_viagem', [
             'id' => $viagem->id,
@@ -51,7 +51,7 @@ class ViagemTest extends TestCase
 
     public function testFindViagem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $viagem = factory(Viagem::class)->create();
         $response = $this->graphfl('query_viagem', [ 'id' => $viagem->id ], $headers);
 

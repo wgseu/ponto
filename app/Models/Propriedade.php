@@ -60,6 +60,19 @@ class Propriedade extends Model implements ValidateInterface
     ];
 
     /**
+     * Retorna o nome abreviado do produto
+     *
+     * @return string
+     */
+    public function abreviado()
+    {
+        if ($this->abreviacao == '') {
+            return $this->nome;
+        }
+        return $this->abreviacao;
+    }
+
+    /**
      * Grupo que possui essa propriedade como item de um pacote
      */
     public function grupo()

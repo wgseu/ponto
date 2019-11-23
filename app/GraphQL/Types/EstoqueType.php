@@ -48,6 +48,10 @@ class EstoqueType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador da entrada no estoque',
             ],
+            'producao_id' => [
+                'type' => Type::id(),
+                'description' => 'Informa o que foi produzido através dessa saida de estoque',
+            ],
             'produto_id' => [
                 'type' => Type::id(),
                 'description' => 'Produto que entrou no estoque',
@@ -95,11 +99,6 @@ class EstoqueType extends GraphQLType
             'detalhes' => [
                 'type' => Type::string(),
                 'description' => 'Detalhes da inserção ou retirada do estoque',
-            ],
-            'reservado' => [
-                'type' => Type::boolean(),
-                'description' => 'Informa se os produtos foram retirados do estoque ou se estão apenas' .
-                    ' reservados',
             ],
             'cancelado' => [
                 'type' => Type::boolean(),

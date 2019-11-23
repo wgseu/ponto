@@ -34,7 +34,7 @@ class SetorTest extends TestCase
 {
     public function testCreateSetor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_setor =  factory(Setor::class)->create();
         $response = $this->graphfl('create_setor', [
             'input' => [
@@ -48,7 +48,7 @@ class SetorTest extends TestCase
 
     public function testFindSetor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $setor = factory(Setor::class)->create();
         $response = $this->graphfl('query_setor', [
             'id' => $setor->id,
@@ -66,7 +66,7 @@ class SetorTest extends TestCase
 
     public function testUpdateSetor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $setor = factory(Setor::class)->create();
         $this->graphfl('update_setor', [
             'id' => $setor->id,
@@ -80,7 +80,7 @@ class SetorTest extends TestCase
 
     public function testDeleteSetor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $setor_to_delete = factory(Setor::class)->create();
         $this->graphfl('delete_setor', ['id' => $setor_to_delete->id], $headers);
         $setor = Setor::find($setor_to_delete->id);

@@ -37,7 +37,7 @@ class GrupoTest extends TestCase
 {
     public function testCreateGrupo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_grupo =  factory(Grupo::class)->create();
         $response = $this->graphfl('create_grupo', [
             'input' => [
@@ -55,7 +55,7 @@ class GrupoTest extends TestCase
 
     public function testUpdateGrupo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $grupo = factory(Grupo::class)->create();
         $this->graphfl('update_grupo', [
             'id' => $grupo->id,
@@ -71,7 +71,7 @@ class GrupoTest extends TestCase
 
     public function testDeleteGrupo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $grupo_to_delete = factory(Grupo::class)->create();
         $this->graphfl('delete_grupo', ['id' => $grupo_to_delete->id], $headers);
         $grupo_to_delete->refresh();
@@ -81,7 +81,7 @@ class GrupoTest extends TestCase
 
     public function testFindGrupo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $grupo = factory(Grupo::class)->create();
         $response = $this->graphfl('query_grupo', [ 'id' => $grupo->id ], $headers);
         $this->assertEquals($grupo->id, $response->json('data.grupos.data.0.id'));

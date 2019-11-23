@@ -33,7 +33,7 @@ class RegimeTest extends TestCase
 {
     public function testCreateRegime()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_regime =  factory(Regime::class)->create();
         $response = $this->graphfl('create_regime', [
             'input' => [
@@ -49,7 +49,7 @@ class RegimeTest extends TestCase
 
     public function testUpdateRegime()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $regime = factory(Regime::class)->create();
         $this->graphfl('update_regime', [
             'id' => $regime->id,
@@ -65,7 +65,7 @@ class RegimeTest extends TestCase
 
     public function testDeleteRegime()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $regime_to_delete = factory(Regime::class)->create();
         $this->graphfl('delete_regime', ['id' => $regime_to_delete->id], $headers);
         $regime = Regime::find($regime_to_delete->id);
@@ -74,7 +74,7 @@ class RegimeTest extends TestCase
 
     public function testFindRegime()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $regime = factory(Regime::class)->create();
         $response = $this->graphfl('query_regime', [ 'id' => $regime->id ], $headers);
         $this->assertEquals($regime->id, $response->json('data.regimes.data.0.id'));

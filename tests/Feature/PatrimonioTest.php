@@ -36,7 +36,7 @@ class PatrimonioTest extends TestCase
 {
     public function testCreatePatrimonio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_patrimonio =  factory(Patrimonio::class)->create();
         $response = $this->graphfl('create_patrimonio', [
             'input' => [
@@ -56,7 +56,7 @@ class PatrimonioTest extends TestCase
 
     public function testUpdatePatrimonio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $patrimonio = factory(Patrimonio::class)->create();
         $this->graphfl('update_patrimonio', [
             'id' => $patrimonio->id,
@@ -74,7 +74,7 @@ class PatrimonioTest extends TestCase
 
     public function testDeletePatrimonio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $patrimonio_to_delete = factory(Patrimonio::class)->create();
         $this->graphfl('delete_patrimonio', ['id' => $patrimonio_to_delete->id], $headers);
         $patrimonio = Patrimonio::find($patrimonio_to_delete->id);
@@ -83,7 +83,7 @@ class PatrimonioTest extends TestCase
 
     public function testFindPatrimonio()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $fornecedor = factory(Fornecedor::class)->create();
         $patrimonio = factory(Patrimonio::class)->create(['fornecedor_id' => $fornecedor->id]);
         $response = $this->graphfl('query_patrimonio', [ 'id' => $patrimonio->id ], $headers);

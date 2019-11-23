@@ -33,7 +33,7 @@ class $[Table.norm]Test extends TestCase
 {
     public function testCreate()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $$[table.unix]_data =  factory($[Table.norm]::class)->raw();
         $response = $this->graphfl('create_$[table.norm]', ['input' => $$[table.unix]_data], $headers);
         $$[table.unix] = $[Table.norm]::find($response->json('data.Create$[Table.norm].id'));
@@ -42,7 +42,7 @@ class $[Table.norm]Test extends TestCase
 
     public function testUpdate()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $$[table.unix] = factory($[Table.norm]::class)->create();
         $this->graphfl('update_$[table.unix]', [
             'id' => $$[table.unix]->id,
@@ -122,7 +122,7 @@ $[field.end]
 
     public function testDelete()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $$[table.unix]_to_delete = factory($[Table.norm]::class)->create();
         $this->graphfl('delete_$[table.unix]', ['id' => $$[table.unix]_to_delete->id], $headers);
 $[table.exists(data_arquivado|data_desativada)]
@@ -143,7 +143,7 @@ $[table.end]
 
     public function testFind()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $$[table.unix] = factory($[Table.norm]::class)->create();
         $response = $this->graphfl('query_$[table.unix]', [ 'id' => $$[table.unix]->id ], $headers);
         $this->assertEquals($$[table.unix]->id, $response->json('data.$[table.unix.plural].data.0.id'));

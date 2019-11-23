@@ -33,7 +33,7 @@ class ResumoTest extends TestCase
 {
     public function testCreateResumo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_resumo =  factory(Resumo::class)->create();
         $response = $this->graphfl('create_resumo', [
             'input' => [
@@ -51,7 +51,7 @@ class ResumoTest extends TestCase
 
     public function testUpdateResumo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $resumo = factory(Resumo::class)->create();
         $this->graphfl('update_resumo', [
             'id' => $resumo->id,
@@ -65,7 +65,7 @@ class ResumoTest extends TestCase
 
     public function testFindResumo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $resumo = factory(Resumo::class)->create();
         $response = $this->graphfl('query_resumo', [ 'id' => $resumo->id ], $headers);
         $this->assertEquals($resumo->id, $response->json('data.resumos.data.0.id'));

@@ -33,7 +33,7 @@ class MesaTest extends TestCase
 {
     public function testCreate()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $mesa_data =  factory(Mesa::class)->raw();
         $response = $this->graphfl('create_mesa', ['input' => $mesa_data], $headers);
         $mesa = Mesa::find($response->json('data.CreateMesa.id'));
@@ -42,7 +42,7 @@ class MesaTest extends TestCase
 
     public function testUpdate()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $mesa = factory(Mesa::class)->create();
         $this->graphfl('update_mesa', [
             'id' => $mesa->id,
@@ -58,7 +58,7 @@ class MesaTest extends TestCase
 
     public function testDelete()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $mesa_to_delete = factory(Mesa::class)->create();
         $this->graphfl('delete_mesa', ['id' => $mesa_to_delete->id], $headers);
         $mesa = $mesa_to_delete->fresh();
@@ -67,7 +67,7 @@ class MesaTest extends TestCase
 
     public function testFind()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $mesa = factory(Mesa::class)->create();
         $response = $this->graphfl('query_mesa', [ 'id' => $mesa->id ], $headers);
         $this->assertEquals($mesa->id, $response->json('data.mesas.data.0.id'));

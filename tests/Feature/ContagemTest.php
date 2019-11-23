@@ -35,7 +35,7 @@ class ContagemTest extends TestCase
 {
     public function testFindContagem()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $contagem = factory(Contagem::class)->create();
         $response = $this->graphfl('query_contagem', [ 'id' => $contagem->id ], $headers);
         $this->assertEquals($contagem->id, $response->json('data.contagens.data.0.id'));

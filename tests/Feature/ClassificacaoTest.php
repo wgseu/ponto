@@ -10,7 +10,7 @@ class ClassificacaoTest extends TestCase
 {
     public function testCreateClassificacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_classificacao =  factory(Classificacao::class)->create();
         $response = $this->graphfl('create_classificacao', [
             'input' => [
@@ -25,7 +25,7 @@ class ClassificacaoTest extends TestCase
 
     public function testFindClassificacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $classificacao = factory(Classificacao::class)->create();
         $response = $this->graphfl('query_classificacao', [
             'id' => $classificacao->id,
@@ -39,7 +39,7 @@ class ClassificacaoTest extends TestCase
 
     public function testUpdateClassificacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $classificacao = factory(Classificacao::class)->create();
         $this->graphfl('update_classificacao', [
             'id' => $classificacao->id,
@@ -56,7 +56,7 @@ class ClassificacaoTest extends TestCase
     
     public function testDeleteClassificacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $classificacao_to_delete = factory(Classificacao::class)->create();
         $this->graphfl('delete_classificacao', ['id' => $classificacao_to_delete->id], $headers);
         $classificacao = Classificacao::find($classificacao_to_delete->id);

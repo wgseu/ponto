@@ -33,7 +33,7 @@ class CozinhaTest extends TestCase
 {
     public function testCreateCozinha()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_cozinha =  factory(Cozinha::class)->create();
         $response = $this->graphfl('create_cozinha', [
             'input' => [
@@ -47,7 +47,7 @@ class CozinhaTest extends TestCase
 
     public function testUpdateCozinha()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cozinha = factory(Cozinha::class)->create();
         $this->graphfl('update_cozinha', [
             'id' => $cozinha->id,
@@ -61,7 +61,7 @@ class CozinhaTest extends TestCase
 
     public function testDeleteCozinha()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cozinha_to_delete = factory(Cozinha::class)->create();
         $this->graphfl('delete_cozinha', ['id' => $cozinha_to_delete->id], $headers);
         $cozinha = Cozinha::find($cozinha_to_delete->id);
@@ -70,7 +70,7 @@ class CozinhaTest extends TestCase
 
     public function testFindCozinha()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cozinha = factory(Cozinha::class)->create();
         $response = $this->graphfl('query_cozinha', [ 'id' => $cozinha->id ], $headers);
         $this->assertEquals($cozinha->id, $response->json('data.cozinhas.data.0.id'));

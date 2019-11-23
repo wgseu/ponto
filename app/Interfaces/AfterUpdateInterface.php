@@ -24,31 +24,12 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace Tests\Feature;
+namespace App\Interfaces;
 
-use App\Models\Modulo;
-use Tests\TestCase;
-
-class ModuloTest extends TestCase
+/**
+ * Valida regras de negócio após atualizar um model já existente no banco
+ */
+interface AfterUpdateInterface
 {
-    public function testUpdateModulo()
-    {
-        $headers = PrestadorTest::authOwner();
-        $modulo = Modulo::find(1);
-        $this->graphfl('update_modulo', [
-            'id' => $modulo->id,
-            'input' => [
-                'habilitado' => false,
-            ]
-        ], $headers);
-        $modulo->refresh();
-        $this->assertEquals(0, $modulo->habilitado);
-    }
-
-    public function testFindModulo()
-    {
-        $headers = PrestadorTest::authOwner();
-        $response = $this->graphfl('query_modulo', [ 'id' => 8 ], $headers);
-        $this->assertEquals(8, $response->json('data.modulos.data.0.id'));
-    }
+    public function afterUpdate();
 }

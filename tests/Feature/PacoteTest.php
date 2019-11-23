@@ -37,7 +37,7 @@ class PacoteTest extends TestCase
 {
     public function testCreatePacote()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_pacote =  factory(Pacote::class)->create(['selecionado' => true]);
         $response = $this->graphfl('create_pacote', [
             'input' => [
@@ -57,7 +57,7 @@ class PacoteTest extends TestCase
 
     public function testUpdatePacote()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pacote = factory(Pacote::class)->create();
         $this->graphfl('update_pacote', [
             'id' => $pacote->id,
@@ -71,7 +71,7 @@ class PacoteTest extends TestCase
 
     public function testDeletePacote()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pacote_to_delete = factory(Pacote::class)->create();
         $this->graphfl('delete_pacote', ['id' => $pacote_to_delete->id], $headers);
         $pacote_to_delete->refresh();
@@ -81,7 +81,7 @@ class PacoteTest extends TestCase
 
     public function testFindPacote()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pacote = factory(Pacote::class)->create();
         $response = $this->graphfl('query_pacote', [ 'id' => $pacote->id ], $headers);
         $this->assertEquals($pacote->id, $response->json('data.pacotes.data.0.id'));

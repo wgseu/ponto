@@ -37,7 +37,7 @@ class TributacaoTest extends TestCase
 {
     public function testCreateTributacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_tributacao =  factory(Tributacao::class)->create();
         $response = $this->graphfl('create_tributacao', [
             'input' => [
@@ -57,7 +57,7 @@ class TributacaoTest extends TestCase
 
     public function testUpdateTributacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $tributacao = factory(Tributacao::class)->create();
         $this->graphfl('update_tributacao', [
             'id' => $tributacao->id,
@@ -71,7 +71,7 @@ class TributacaoTest extends TestCase
 
     public function testDeleteTributacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $tributacao_to_delete = factory(Tributacao::class)->create();
         $this->graphfl('delete_tributacao', ['id' => $tributacao_to_delete->id], $headers);
         $tributacao = Tributacao::find($tributacao_to_delete->id);
@@ -80,7 +80,7 @@ class TributacaoTest extends TestCase
 
     public function testFindTributacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $tributacao = factory(Tributacao::class)->create(['ncm' => '8752.10.00']);
         $response = $this->graphfl('query_tributacao', [ 'id' => $tributacao->id ], $headers);
         $this->assertEquals($tributacao->id, $response->json('data.tributacoes.data.0.id'));

@@ -51,7 +51,7 @@ class ClienteTest extends TestCase
 
     public function testCreateCliente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cliente_data =  factory(Cliente::class)->make(['nome' => 'Teste']);
         $response = $this->graphfl('create_cliente', [
             'input' => $cliente_data,
@@ -102,7 +102,7 @@ class ClienteTest extends TestCase
 
     public function testUpdateCliente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cliente = factory(Cliente::class)->create();
         $this->graphfl('update_cliente', [
             'id' => $cliente->id,
@@ -116,7 +116,7 @@ class ClienteTest extends TestCase
 
     public function testDeleteCliente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cliente_to_delete = factory(Cliente::class)->create();
         $this->graphfl('delete_cliente', ['id' => $cliente_to_delete->id], $headers);
         $cliente = Cliente::find($cliente_to_delete->id);
@@ -125,7 +125,7 @@ class ClienteTest extends TestCase
 
     public function testFindCliente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cliente = factory(Cliente::class)->create();
         $response = $this->graphfl('query_cliente', [ 'id' => $cliente->id ], $headers);
         $this->assertEquals($cliente->id, $response->json('data.clientes.data.0.id'));

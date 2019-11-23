@@ -33,7 +33,7 @@ class SessaoTest extends TestCase
 {
     public function testFindSessao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $sessao = factory(Sessao::class)->create();
         $response = $this->graphfl('query_sessao', [ 'id' => $sessao->id ], $headers);
         $this->assertEquals($sessao->id, $response->json('data.sessoes.data.0.id'));

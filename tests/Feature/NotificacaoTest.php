@@ -46,7 +46,7 @@ class NotificacaoTest extends TestCase
 
     public function testMarkReadByOther()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $notificacao = factory(Notificacao::class)->create();
         $this->assertNull($notificacao->data_visualizacao);
         $this->expectException('\Exception');

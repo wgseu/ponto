@@ -12,7 +12,7 @@ class MoedaTest extends TestCase
 {
     public function testCreateMoeda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('create_moeda', [
             'input' => [
                 'nome' => 'Cruzado',
@@ -34,7 +34,7 @@ class MoedaTest extends TestCase
 
     public function testFindMoeda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $moeda = factory(Moeda::class)->create();
         $response = $this->graphfl('query_moeda', [
             'id' => $moeda->id,
@@ -47,7 +47,7 @@ class MoedaTest extends TestCase
     
     public function testUpdateMoeda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $moeda = factory(Moeda::class)->create();
         $this->graphfl('update_moeda', [
             'id' => $moeda->id,
@@ -65,7 +65,7 @@ class MoedaTest extends TestCase
     
     public function testDeleteMoeda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $moeda_to_delete = factory(Moeda::class)->create();
         $this->graphfl('delete_moeda', ['id' => $moeda_to_delete->id], $headers);
         $moeda = Moeda::find($moeda_to_delete->id);

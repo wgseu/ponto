@@ -33,7 +33,7 @@ class EmitenteTest extends TestCase
 {
     public function testUpdateEmitente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $emitente = factory(Emitente::class)->create();
         $this->graphfl('update_emitente', [
             'id' => $emitente->id,
@@ -46,7 +46,7 @@ class EmitenteTest extends TestCase
 
     public function testFindEmitente()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $emitente = factory(Emitente::class)->create();
         $response = $this->graphfl('query_emitente', [], $headers);
         $this->assertEquals($emitente->id, $response->json('data.emitente.id'));

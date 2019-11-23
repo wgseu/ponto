@@ -33,7 +33,7 @@ class UnidadeTest extends TestCase
 {
     public function testCreateUnidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_unidade =  factory(Unidade::class)->create();
         $response = $this->graphfl('create_unidade', [
             'input' => [
@@ -49,7 +49,7 @@ class UnidadeTest extends TestCase
 
     public function testUpdateUnidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $unidade = factory(Unidade::class)->create();
         $this->graphfl('update_unidade', [
             'id' => $unidade->id,
@@ -65,7 +65,7 @@ class UnidadeTest extends TestCase
 
     public function testDeleteUnidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $unidade_to_delete = factory(Unidade::class)->create();
         $this->graphfl('delete_unidade', ['id' => $unidade_to_delete->id], $headers);
         $unidade = Unidade::find($unidade_to_delete->id);
@@ -74,7 +74,7 @@ class UnidadeTest extends TestCase
 
     public function testFindUnidade()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $unidade = factory(Unidade::class)->create();
         $response = $this->graphfl('query_unidade', [ 'id' => $unidade->id ], $headers);
         $this->assertEquals($unidade->id, $response->json('data.unidades.data.0.id'));

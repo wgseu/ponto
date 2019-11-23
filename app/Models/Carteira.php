@@ -95,6 +95,8 @@ class Carteira extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
+        'saldo' => 0,
+        'lancado' => 0,
         'transacao' => 0,
         'ativa' => true,
     ];

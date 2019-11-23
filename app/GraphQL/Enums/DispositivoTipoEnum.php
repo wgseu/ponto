@@ -38,8 +38,8 @@ class DispositivoTipoEnum extends EnumType
         'description' => 'Tipo de dispositivo',
         'values' => [
             Dispositivo::TIPO_COMPUTADOR => Dispositivo::TIPO_COMPUTADOR,
-            Dispositivo::TIPO_TABLET => Dispositivo::TIPO_TABLET,
             Dispositivo::TIPO_NAVEGADOR => Dispositivo::TIPO_NAVEGADOR,
+            Dispositivo::TIPO_MOVEL => Dispositivo::TIPO_MOVEL,
         ],
     ];
 }

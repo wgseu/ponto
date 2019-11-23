@@ -38,7 +38,7 @@ class RequisitoTest extends TestCase
 {
     public function testCreateRequisito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_requisito =  factory(Requisito::class)->create();
         $response = $this->graphfl('create_requisito', [
             'input' => [
@@ -54,7 +54,7 @@ class RequisitoTest extends TestCase
 
     public function testUpdateRequisito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $requisito = factory(Requisito::class)->create();
         $produto = factory(Produto::class)->create();
         $this->graphfl('update_requisito', [
@@ -69,7 +69,7 @@ class RequisitoTest extends TestCase
 
     public function testDeleteRequisito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $requisito_to_delete = factory(Requisito::class)->create();
         $this->graphfl('delete_requisito', ['id' => $requisito_to_delete->id], $headers);
         $requisito = Requisito::find($requisito_to_delete->id);
@@ -78,7 +78,7 @@ class RequisitoTest extends TestCase
 
     public function testFindRequisito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $requisito = factory(Requisito::class)->create();
         $response = $this->graphfl('query_requisito', [ 'id' => $requisito->id ], $headers);
 

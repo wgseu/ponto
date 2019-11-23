@@ -34,7 +34,7 @@ class JuncaoTest extends TestCase
 {
     public function testCreateJuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_juncao =  factory(Juncao::class)->create();
         $response = $this->graphfl('create_juncao', [
             'input' => [
@@ -50,7 +50,7 @@ class JuncaoTest extends TestCase
 
     public function testUpdateJuncao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $juncao = factory(Juncao::class)->create();
         $mesa = factory(Mesa::class)->create();
         $this->graphfl('update_juncao', [

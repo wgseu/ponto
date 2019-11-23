@@ -62,6 +62,12 @@ class CarteiraOrder extends InputType
             'agencia' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'saldo' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'lancado' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'transacao' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

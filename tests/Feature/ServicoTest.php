@@ -33,7 +33,7 @@ class ServicoTest extends TestCase
 {
     public function testCreateServico()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('create_servico', [
             'input' => [
                 'nome' => 'Teste',
@@ -51,7 +51,7 @@ class ServicoTest extends TestCase
 
     public function testUpdateServico()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $servico = factory(Servico::class)->create();
         $this->graphfl('update_servico', [
             'id' => $servico->id,
@@ -69,7 +69,7 @@ class ServicoTest extends TestCase
 
     public function testDeleteServico()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $servico_to_delete = factory(Servico::class)->create();
         $this->graphfl('delete_servico', ['id' => $servico_to_delete->id], $headers);
         $servico = Servico::find($servico_to_delete->id);
@@ -78,7 +78,7 @@ class ServicoTest extends TestCase
 
     public function testFindServico()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $servico = factory(Servico::class)->create();
         $response = $this->graphfl('query_servico', [ 'id' => $servico->id ], $headers);
         $this->assertEquals($servico->id, $response->json('data.servicos.data.0.id'));

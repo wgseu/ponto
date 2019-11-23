@@ -35,7 +35,7 @@ class ComandaTest extends TestCase
 {
     public function testCreateComanda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_comanda =  factory(Comanda::class)->create();
         $response = $this->graphfl('create_comanda', [
             'input' => [
@@ -51,7 +51,7 @@ class ComandaTest extends TestCase
 
     public function testFindComanda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $comanda = factory(Comanda::class)->create();
         $response = $this->graphfl('query_comanda', [
             'id' => $comanda->id,
@@ -73,7 +73,7 @@ class ComandaTest extends TestCase
 
     public function testUpdateComanda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $comanda = factory(Comanda::class)->create();
         $this->graphfl('update_comanda', [
             'id' => $comanda->id,
@@ -89,7 +89,7 @@ class ComandaTest extends TestCase
 
     public function testDeleteComanda()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $comanda_to_delete = factory(Comanda::class)->create();
         $this->graphfl('delete_comanda', ['id' => $comanda_to_delete->id], $headers);
         $comanda = Comanda::find($comanda_to_delete->id);

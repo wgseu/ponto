@@ -33,7 +33,7 @@ class DispositivoTest extends TestCase
 {
     public function testCreateDispositivo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_dispositivo =  factory(Dispositivo::class)->create();
         $response = $this->graphfl('create_dispositivo', [
             'input' => [
@@ -49,7 +49,7 @@ class DispositivoTest extends TestCase
 
     public function testUpdateDispositivo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $dispositivo = factory(Dispositivo::class)->create();
         $this->graphfl('update_dispositivo', [
             'id' => $dispositivo->id,
@@ -65,7 +65,7 @@ class DispositivoTest extends TestCase
 
     public function testDeleteDispositivo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $dispositivo_to_delete = factory(Dispositivo::class)->create();
         $this->graphfl('delete_dispositivo', ['id' => $dispositivo_to_delete->id], $headers);
         $dispositivo = Dispositivo::find($dispositivo_to_delete->id);
@@ -74,7 +74,7 @@ class DispositivoTest extends TestCase
 
     public function testFindDispositivo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $dispositivo = factory(Dispositivo::class)->create();
         $response = $this->graphfl('query_dispositivo', [ 'id' => $dispositivo->id ], $headers);
         $this->assertEquals($dispositivo->id, $response->json('data.dispositivos.data.0.id'));

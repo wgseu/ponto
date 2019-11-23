@@ -33,7 +33,7 @@ class MetricaTest extends TestCase
 {
     public function testCreateMetrica()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_metrica =  factory(Metrica::class)->create();
         $response = $this->graphfl('create_metrica', [
             'input' => [
@@ -51,7 +51,7 @@ class MetricaTest extends TestCase
 
     public function testUpdateMetrica()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $metrica = factory(Metrica::class)->create();
         $this->graphfl('update_metrica', [
             'id' => $metrica->id,
@@ -69,7 +69,7 @@ class MetricaTest extends TestCase
 
     public function testDeleteMetrica()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $metrica_to_delete = factory(Metrica::class)->create();
         $this->graphfl('delete_metrica', ['id' => $metrica_to_delete->id], $headers);
         $metrica_to_delete->refresh();
@@ -79,7 +79,7 @@ class MetricaTest extends TestCase
 
     public function testFindMetrica()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $metrica = factory(Metrica::class)->create();
         $response = $this->graphfl('query_metrica', [ 'id' => $metrica->id ], $headers);
         $this->assertEquals($metrica->id, $response->json('data.metricas.data.0.id'));

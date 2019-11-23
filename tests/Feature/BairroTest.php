@@ -11,7 +11,7 @@ class BairroTest extends TestCase
 {
     public function testCreateBairro()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_bairro =  factory(Bairro::class)->create();
         $response = $this->graphfl('create_bairro', [
             'input' => [
@@ -30,7 +30,7 @@ class BairroTest extends TestCase
 
     public function testFindBairro()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $bairro = factory(Bairro::class)->create();
         $response = $this->graphfl('query_bairro', [
             'id' => $bairro->id,
@@ -48,7 +48,7 @@ class BairroTest extends TestCase
 
     public function testUpdateBairro()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $bairro = factory(Bairro::class)->create();
         $this->graphfl('update_bairro', [
             'id' => $bairro->id,
@@ -70,7 +70,7 @@ class BairroTest extends TestCase
     
     public function testDeleteBairro()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $bairro_to_delete = factory(Bairro::class)->create();
         $this->graphfl('delete_bairro', ['id' => $bairro_to_delete->id], $headers);
         $bairro = Bairro::find($bairro_to_delete->id);

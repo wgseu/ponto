@@ -37,7 +37,7 @@ class LocalizacaoTest extends TestCase
 {
     public function testCreateLocalizacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_localizacao =  factory(Localizacao::class)->create();
         $response = $this->graphfl('create_localizacao', [
             'input' => [
@@ -57,7 +57,7 @@ class LocalizacaoTest extends TestCase
 
     public function testUpdateLocalizacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $localizacao = factory(Localizacao::class)->create();
         $this->graphfl('update_localizacao', [
             'id' => $localizacao->id,
@@ -73,7 +73,7 @@ class LocalizacaoTest extends TestCase
 
     public function testDeleteLocalizacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $localizacao_to_delete = factory(Localizacao::class)->create();
         $this->graphfl('delete_localizacao', ['id' => $localizacao_to_delete->id], $headers);
         $localizacao_to_delete->refresh();
@@ -83,7 +83,7 @@ class LocalizacaoTest extends TestCase
 
     public function testFindLocalizacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $localizacao = factory(Localizacao::class)->create();
         $response = $this->graphfl('query_localizacao', [ 'id' => $localizacao->id ], $headers);
         $this->assertEquals($localizacao->id, $response->json('data.localizacoes.data.0.id'));

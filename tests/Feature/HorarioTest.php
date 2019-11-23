@@ -33,7 +33,7 @@ class HorarioTest extends TestCase
 {
     public function testCreateHorario()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_horario =  factory(Horario::class)->create();
         $response = $this->graphfl('create_horario', [
             'input' => [
@@ -49,7 +49,7 @@ class HorarioTest extends TestCase
 
     public function testUpdateHorario()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $horario = factory(Horario::class)->create();
         $this->graphfl('update_horario', [
             'id' => $horario->id,
@@ -65,7 +65,7 @@ class HorarioTest extends TestCase
 
     public function testDeleteHorario()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $horario_to_delete = factory(Horario::class)->create();
         $this->graphfl('delete_horario', ['id' => $horario_to_delete->id], $headers);
         $horario = Horario::find($horario_to_delete->id);
@@ -74,7 +74,7 @@ class HorarioTest extends TestCase
 
     public function testFindHorario()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $horario = factory(Horario::class)->create();
         $response = $this->graphfl('query_horario', [ 'id' => $horario->id ], $headers);
         $this->assertEquals($horario->id, $response->json('data.horarios.data.0.id'));

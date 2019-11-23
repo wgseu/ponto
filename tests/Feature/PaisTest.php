@@ -33,7 +33,7 @@ class PaisTest extends TestCase
 {
     public function testCreatePais()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_pais =  factory(Pais::class)->create();
         $response = $this->graphfl('create_pais', [
             'input' => [
@@ -55,7 +55,7 @@ class PaisTest extends TestCase
 
     public function testUpdatePais()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pais = factory(Pais::class)->create();
         $this->graphfl('update_pais', [
             'id' => $pais->id,
@@ -80,7 +80,7 @@ class PaisTest extends TestCase
 
     public function testDeletePais()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pais_to_delete = factory(Pais::class)->create();
         $this->graphfl('delete_pais', ['id' => $pais_to_delete->id], $headers);
         $pais = Pais::find($pais_to_delete->id);
@@ -89,7 +89,7 @@ class PaisTest extends TestCase
 
     public function testFindPais()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $pais = factory(Pais::class)->create();
         $response = $this->graphfl('query_pais', [ 'id' => $pais->id ], $headers);
         $this->assertEquals($pais->id, $response->json('data.paises.data.0.id'));

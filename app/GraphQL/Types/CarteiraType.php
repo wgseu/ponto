@@ -74,6 +74,14 @@ class CarteiraType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Número da agência da conta bancária ou site da carteira financeira',
             ],
+            'saldo' => [
+                'type' => Type::float(),
+                'description' => 'Saldo pago dessa carteira',
+            ],
+            'lancado' => [
+                'type' => Type::float(),
+                'description' => 'Total de lançamentos nessa carteira',
+            ],
             'transacao' => [
                 'type' => Type::float(),
                 'description' => 'Valor cobrado pela operadora de pagamento para cada transação',

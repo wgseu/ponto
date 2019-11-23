@@ -35,7 +35,7 @@ class CarteiraTest extends TestCase
 {
     public function testCreateCarteira()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $banco = factory(Banco::class)->create();
         $response = $this->graphfl('create_carteira', [
             'input' => [
@@ -54,7 +54,7 @@ class CarteiraTest extends TestCase
 
     public function testUpdateCarteira()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $carteira = factory(Carteira::class)->create();
         $this->graphfl('update_carteira', [
             'id' => $carteira->id,
@@ -70,7 +70,7 @@ class CarteiraTest extends TestCase
 
     public function testDeleteCarteira()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $carteira_to_delete = factory(Carteira::class)->create();
         $this->graphfl('delete_carteira', ['id' => $carteira_to_delete->id], $headers);
         $carteira = Carteira::find($carteira_to_delete->id);
@@ -79,7 +79,7 @@ class CarteiraTest extends TestCase
 
     public function testFindCarteira()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $carteira = factory(Carteira::class)->create();
         $response = $this->graphfl('query_carteira', [ 'id' => $carteira->id ], $headers);
         $this->assertEquals($carteira->id, $response->json('data.carteiras.data.0.id'));

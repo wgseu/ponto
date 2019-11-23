@@ -35,7 +35,7 @@ class FornecedorTest extends TestCase
 {
     public function testCreateFornecedor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_fornecedor =  factory(Cliente::class)->create();
         $response = $this->graphfl('create_fornecedor', [
             'input' => [
@@ -49,7 +49,7 @@ class FornecedorTest extends TestCase
 
     public function testUpdateFornecedor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $fornecedor = factory(Fornecedor::class)->create();
         $empresa = factory(Cliente::class)->create();
         $this->graphfl('update_fornecedor', [
@@ -64,7 +64,7 @@ class FornecedorTest extends TestCase
 
     public function testDeleteFornecedor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $fornecedor_to_delete = factory(Fornecedor::class)->create();
         $this->graphfl('delete_fornecedor', ['id' => $fornecedor_to_delete->id], $headers);
         $fornecedor = Fornecedor::find($fornecedor_to_delete->id);
@@ -73,7 +73,7 @@ class FornecedorTest extends TestCase
 
     public function testFindFornecedor()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $fornecedor = factory(Fornecedor::class)->create();
         $response = $this->graphfl('query_fornecedor', [ 'id' => $fornecedor->id ], $headers);
         $this->assertEquals($fornecedor->id, $response->json('data.fornecedores.data.0.id'));

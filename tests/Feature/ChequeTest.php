@@ -36,7 +36,7 @@ class ChequeTest extends TestCase
 {
     public function testFindCheque()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cheque = factory(Cheque::class)->create();
         $response = $this->graphfl('query_cheque', ['id' => $cheque->id], $headers);
 
@@ -48,7 +48,7 @@ class ChequeTest extends TestCase
 
     public function testUpdateCheque()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $cheque = factory(Cheque::class)->create();
         $this->graphfl('update_cheque', [
             'id' => $cheque->id,

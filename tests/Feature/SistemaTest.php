@@ -35,7 +35,7 @@ class SistemaTest extends TestCase
 {
     public function testUpdateSistema()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $sistema = Sistema::find('1');
         $data = [
             'auto_sair' => true,
@@ -52,7 +52,7 @@ class SistemaTest extends TestCase
 
     public function testFindSistema()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
         Empresa::find('1')->update(['empresa_id' => $empresa->id]);
         $response = $this->graphfl('query_sistema', [], $headers);

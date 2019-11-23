@@ -33,7 +33,7 @@ class TelefoneTest extends TestCase
 {
     public function testCreateTelefone()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_telefone =  factory(Telefone::class)->create();
         $response = $this->graphfl('create_telefone', [
             'input' => [
@@ -51,7 +51,7 @@ class TelefoneTest extends TestCase
 
     public function testUpdateTelefone()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $telefone = factory(Telefone::class)->create();
         $this->graphfl('update_telefone', [
             'id' => $telefone->id,
@@ -65,7 +65,7 @@ class TelefoneTest extends TestCase
 
     public function testDeleteTelefone()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $telefone_to_delete = factory(Telefone::class)->create();
         $this->graphfl('delete_telefone', ['id' => $telefone_to_delete->id], $headers);
         $telefone = Telefone::find($telefone_to_delete->id);
@@ -74,7 +74,7 @@ class TelefoneTest extends TestCase
 
     public function testFindTelefone()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $telefone = factory(Telefone::class)->create();
         $response = $this->graphfl('query_telefone', [ 'id' => $telefone->id ], $headers);
         $this->assertEquals($telefone->id, $response->json('data.telefones.data.0.id'));

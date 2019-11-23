@@ -11,7 +11,7 @@ class CreditoTest extends TestCase
 {
     public function testFindCredito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $credito = factory(Credito::class)->create();
         $response = $this->graphfl('query_credito', [
             'id' => $credito->id,

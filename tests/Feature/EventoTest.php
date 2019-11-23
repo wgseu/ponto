@@ -33,7 +33,7 @@ class EventoTest extends TestCase
 {
     public function testFindEvento()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $evento = factory(Evento::class)->create();
         $response = $this->graphfl('query_evento', [ 'id' => $evento->id ], $headers);
         $this->assertEquals($evento->id, $response->json('data.eventos.data.0.id'));

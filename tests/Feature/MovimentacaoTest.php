@@ -33,7 +33,7 @@ class MovimentacaoTest extends TestCase
 {
     public function testCreateMovimentacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_movimentacao =  factory(Movimentacao::class)->create();
         $response = $this->graphfl('create_movimentacao', [
             'input' => [
@@ -53,7 +53,7 @@ class MovimentacaoTest extends TestCase
 
     public function testUpdateMovimentacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $movimentacao = factory(Movimentacao::class)->create();
         $this->graphfl('update_movimentacao', [
             'id' => $movimentacao->id,
@@ -67,7 +67,7 @@ class MovimentacaoTest extends TestCase
 
     public function testFindMovimentacao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $movimentacao = factory(Movimentacao::class)->create();
         $response = $this->graphfl('query_movimentacao', [ 'id' => $movimentacao->id ], $headers);
         $this->assertEquals($movimentacao->id, $response->json('data.movimentacoes.data.0.id'));

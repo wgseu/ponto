@@ -105,9 +105,9 @@ class ItemType extends GraphQLType
                 'type' => Type::float(),
                 'description' => 'Preço de normal do produto no momento da venda',
             ],
-            'preco_compra' => [
+            'custo_aproximado' => [
                 'type' => Type::float(),
-                'description' => 'Preço de compra do produto calculado automaticamente na hora da venda',
+                'description' => 'Custo aproximado do produto',
             ],
             'detalhes' => [
                 'type' => Type::string(),

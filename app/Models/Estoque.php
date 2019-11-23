@@ -27,13 +27,19 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Exceptions\Exception;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Estoque de produtos por setor
  */
-class Estoque extends Model implements ValidateInterface
+class Estoque extends Model implements
+    ValidateInterface,
+    ValidateInsertInterface,
+    ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -53,6 +59,7 @@ class Estoque extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
+        'producao_id',
         'produto_id',
         'requisito_id',
         'transacao_id',
@@ -65,7 +72,6 @@ class Estoque extends Model implements ValidateInterface
         'fabricacao',
         'vencimento',
         'detalhes',
-        'reservado',
         'cancelado',
     ];
 
@@ -76,7 +82,6 @@ class Estoque extends Model implements ValidateInterface
      */
     protected $attributes = [
         'preco_compra' => 0,
-        'reservado' => false,
         'cancelado' => false,
     ];
 
@@ -129,6 +134,142 @@ class Estoque extends Model implements ValidateInterface
     }
 
     /**
+     * Produz e retira do estoque a quantidade informada
+     *
+     * @return void
+     */
+    public function consumir()
+    {
+        $produto = $this->produto;
+        if ($produto->tipo == Produto::TIPO_PACOTE) {
+            throw new Exception(__('messages.cannot_consume_package'));
+        }
+        $formacoes = $this->transacao->formacoes()->whereNotNull('composicao_id')->get()->all();
+        $custo_aproximado = $this->baixar($formacoes);
+        $item = $this->transacao;
+        $item->custo_aproximado += $custo_aproximado;
+        $item->save();
+    }
+
+    /**
+     * Produz uma composição para ser vendida posteriormente
+     *
+     * @return void
+     */
+    public function produzir()
+    {
+        $produto = $this->produto;
+        if ($produto->tipo != Produto::TIPO_COMPOSICAO) {
+            throw new Exception(__('messages.only_produce_composition'));
+        }
+        if (is_null($produto->setor_estoque_id)) {
+            throw new Exception(__('messages.production_without_sector'));
+        }
+        $this->setor_id = $produto->setor_estoque_id;
+        $this->save();
+        // baixa o estoque dos ingredientes
+        $custo_aproximado = $this->baixar();
+        $this->preco_compra = $custo_aproximado;
+        $this->save();
+    }
+
+    /**
+     * Baixa do estoque composições e produtos
+     *
+     * @param Formacao[] $formacoes formação
+     * @return float custo aproximado da formação
+     */
+    protected function baixar($formacoes = [])
+    {
+        // cria conjunto de composições a serem retiradas ou adicionadas
+        $opcionais = [];
+        foreach ($formacoes as $formacao) {
+            $opcionais[$formacao->composicao_id] = true;
+        }
+        $custo_aproximado = 0;
+        $stack = new \SplStack();
+        // simula o primeiro produto como uma composição
+        $composicao = new Composicao([
+            'produto_id' => $this->produto_id,
+            'quantidade' => $this->quantidade,
+        ]);
+        $stack->push($composicao);
+        while (!$stack->isEmpty()) {
+            $composicao = $stack->pop();
+            $produto = $composicao->produto;
+            // verifica se essa composição deve ser produzida ou se já tem no estoque
+            $produce = $produto->tipo == Produto::TIPO_COMPOSICAO && (
+                $produto->estoqueSetor() < $composicao->quantidade ||
+                !empty($opcionais) ||
+                is_null($produto->setor_estoque_id)
+            );
+            if ($produce) {
+                // empilha todas as composições que não foram retiradas na venda
+                $composicoes = $produto->composicoes;
+                foreach ($composicoes as $child_composition) {
+                    // aplica a quantidade em profundidade
+                    $child_composition->quantidade = $child_composition->quantidade * $composicao->quantidade;
+                    $existe = isset($opcionais[$child_composition->id]);
+                    if ($existe && $child_composition->tipo != Composicao::TIPO_ADICIONAL) {
+                        unset($opcionais[$child_composition->id]);
+                    } elseif ($existe && $child_composition->tipo == Composicao::TIPO_ADICIONAL) {
+                        unset($opcionais[$child_composition->id]);
+                        $stack->push($child_composition);
+                    } elseif ($child_composition->tipo != Composicao::TIPO_ADICIONAL) {
+                        $stack->push($child_composition);
+                    }
+                }
+                continue;
+            }
+            // o composto é um produto ou composição produzida
+            $estoque = new Estoque([
+                'producao_id' => $this->id,
+                'setor_id' => $produto->setor_estoque_id,
+                'produto_id' => $produto->id,
+                'quantidade' => -$composicao->quantidade,
+                'transacao_id' => $this->transacao_id,
+                'prestador_id' => $this->prestador_id,
+                'preco_compra' => $produto->custo_medio,
+            ]);
+            $estoque->save();
+            $custo_aproximado += ($composicao->quantidade * $produto->custo_medio) / $this->quantidade;
+        }
+        return $custo_aproximado;
+    }
+
+    /**
+     * Atualiza a contagem do produto
+     *
+     * @return void
+     */
+    protected function updateCounting()
+    {
+        $decrement = 0;
+        if ($this->exists) {
+            $old = $this->fresh();
+            if ($old->quantidade == $this->quantidade && !$this->cancelado) {
+                return;
+            }
+            $decrement = $old->quantidade;
+        }
+        if ($this->cancelado) {
+            $quantidade = -$decrement;
+        } else {
+            $quantidade = $this->quantidade - $decrement;
+        }
+        $contagem = Contagem::firstOrCreate(
+            [
+                'setor_id' => $this->setor_id,
+                'produto_id' => $this->produto_id,
+            ],
+            [ 'quantidade' => 0 ]
+        );
+        $contagem->increment('quantidade', $quantidade);
+        $produto = $this->produto;
+        $produto->increment('estoque', $quantidade);
+    }
+
+    /**
      * Regras:
      *
      * É obrigatório informar apenas um requisito ou uma transação;
@@ -141,29 +282,52 @@ class Estoque extends Model implements ValidateInterface
      */
     public function validate()
     {
-        $errors = [];
         $produto = $this->produto;
         if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
-            $errors['requisito_id'] = __('messages.one_required_requisito_or_transacao');
+            return ['requisito_id' => __('messages.one_required_requisito_or_transacao')];
         }
         if ($produto->tipo == Produto::TIPO_PACOTE) {
-            $errors['produto_id'] = __('messages.tipo_product_cannot_pacote');
+            return ['produto_id' => __('messages.tipo_product_cannot_pacote')];
         }
         if (fmod($this->quantidade, 1) > 0 && !$produto->divisivel) {
-            $errors['produto_id'] = __('messages.produto_indivisible');
+            return ['produto_id' => __('messages.produto_indivisible')];
         }
         if (!is_null($this->requisito_id) && $this->quantidade <= 0) {
-            $errors['requisito_id'] = __('messages.quantidade_cannot_less_0');
+            return ['requisito_id' => __('messages.quantidade_cannot_less_0')];
         }
         if (!is_null($this->transacao_id) && $this->quantidade >= 0) {
-            $errors['transacao_id'] = __('messages.quantidade_cannot_greater_0');
+            return ['transacao_id' => __('messages.quantidade_cannot_greater_0')];
         }
-        if (!$this->exists && $this->cancelado) {
-            $errors['cancelado'] = __('messages.estoque_new_canceled');
+        if (!is_null($this->producao_id) && $this->quantidade >= 0) {
+            return ['transacao_id' => __('messages.composition_cannot_insert')];
         }
         if ($this->preco_compra < 0) {
-            $errors['preco_compra'] = __('messages.valor_compra_negative');
+            return ['preco_compra' => __('messages.valor_compra_negative')];
         }
-        return $errors;
+    }
+
+    public function onInsert()
+    {
+        if ($this->cancelado) {
+            return ['cancelado' => __('messages.estoque_new_canceled')];
+        }
+        $produto = $this->produto;
+        if ($this->quantidade < 0 && $produto->estoqueSetor($this->setor_id) < -$this->quantidade) {
+            $setor = $this->setor;
+            return ['quantidade' => __('messages.low_stock', [
+                'product' => $produto->descricao,
+                'sector' => $setor->nome,
+            ])];
+        }
+        $this->updateCounting();
+    }
+
+    public function onUpdate()
+    {
+        $old = $this->fresh();
+        if ($old->cancelado) {
+            return ['cancelado' => __('messages.estoque_already_canceled')];
+        }
+        $this->updateCounting();
     }
 }

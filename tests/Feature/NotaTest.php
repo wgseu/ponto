@@ -33,7 +33,7 @@ class NotaTest extends TestCase
 {
     public function testCreateNota()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_nota =  factory(Nota::class)->create();
         $response = $this->graphfl('create_nota', [
             'input' => [
@@ -65,7 +65,7 @@ class NotaTest extends TestCase
 
     public function testUpdateNota()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $nota = factory(Nota::class)->create();
         $this->graphfl('update_nota', [
             'id' => $nota->id,
@@ -97,7 +97,7 @@ class NotaTest extends TestCase
 
     public function testFindNota()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $nota = factory(Nota::class)->create();
         $response = $this->graphfl('query_nota', [ 'id' => $nota->id ], $headers);
         $this->assertEquals($nota->id, $response->json('data.notas.data.0.id'));

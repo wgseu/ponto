@@ -38,7 +38,7 @@ class PromocaoTest extends TestCase
 {
     public function testCreatePromocao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_promocao = factory(Promocao::class)->create();
         $response = $this->graphfl('create_promocao', [
             'input' => [
@@ -57,7 +57,7 @@ class PromocaoTest extends TestCase
 
     public function testUpdatePromocao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $promocao = factory(Promocao::class)->create();
         $this->graphfl('update_promocao', [
             'id' => $promocao->id,
@@ -75,7 +75,7 @@ class PromocaoTest extends TestCase
 
     public function testDeletePromocao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $promocao_to_delete = factory(Promocao::class)->create();
         $this->graphfl('delete_promocao', ['id' => $promocao_to_delete->id], $headers);
         $promocao_to_delete->refresh();
@@ -85,7 +85,7 @@ class PromocaoTest extends TestCase
 
     public function testFindPromocao()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $promocao = factory(Promocao::class)->create();
         $response = $this->graphfl('query_promocao', [ 'id' => $promocao->id ], $headers);
         $this->assertEquals($promocao->id, $response->json('data.promocoes.data.0.id'));
@@ -94,7 +94,7 @@ class PromocaoTest extends TestCase
     public function testTipoCategoria()
     {
         $seed_promocao = factory(Promocao::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
@@ -109,7 +109,7 @@ class PromocaoTest extends TestCase
     public function testTipoProduto()
     {
         $seed_produto = factory(Produto::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->graphfl('create_promocao', [
             'input' => [
                 'inicio' => 1700,
@@ -132,7 +132,7 @@ class PromocaoTest extends TestCase
     public function testTipoServico()
     {
         $seed_servico = factory(Servico::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->graphfl('create_promocao', [
             'input' => [
                 'inicio' => 1700,
@@ -154,7 +154,7 @@ class PromocaoTest extends TestCase
 
     public function testTipoNulo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
@@ -169,7 +169,7 @@ class PromocaoTest extends TestCase
     {
         $seed_produto = factory(Produto::class)->create();
         $seed_servico = factory(Servico::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
@@ -185,7 +185,7 @@ class PromocaoTest extends TestCase
     public function testTipoServicoNuloBairro()
     {
         $seed_bairro = factory(Bairro::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
@@ -200,7 +200,7 @@ class PromocaoTest extends TestCase
     public function testBairroVazio()
     {
         $seed_zona = factory(Zona::class)->create();
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
             'input' => [
@@ -214,7 +214,7 @@ class PromocaoTest extends TestCase
 
     public function testInicioMaiorFim()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_categoria = factory(Categoria::class)->create();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
@@ -230,7 +230,7 @@ class PromocaoTest extends TestCase
 
     public function testPromocaoInicioConflito()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_promocao = factory(Promocao::class)->create();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
@@ -246,7 +246,7 @@ class PromocaoTest extends TestCase
 
     public function testPontoNegativo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_categoria = factory(Categoria::class)->create();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [
@@ -262,7 +262,7 @@ class PromocaoTest extends TestCase
 
     public function testPontoPositivo()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_promocao = factory(Promocao::class)->create();
         $seed_categoria = factory(Categoria::class)->create();
         $this->expectException('Exception');
@@ -280,7 +280,7 @@ class PromocaoTest extends TestCase
 
     public function testValorAgendamento()
     {
-        $headers = PrestadorTest::auth();
+        $headers = PrestadorTest::authOwner();
         $seed_categoria = factory(Categoria::class)->create();
         $this->expectException('Exception');
         $this->graphfl('create_promocao', [

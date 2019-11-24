@@ -813,4 +813,7 @@ return [
         'mas apenas :found foram selecionados no grupo ":group" do pacote ":package"',
     'group_max_items_exceded' => 'O máximo de itens para o grupo ":group" é :max, ' .
         'foram selecionados :found no pacote ":package"',
+    'movement' => 'Movimentações do caixa',
+    'payment' => 'Pagamento de contas',
+    'cash_number' => 'Caixa :number',
 ];

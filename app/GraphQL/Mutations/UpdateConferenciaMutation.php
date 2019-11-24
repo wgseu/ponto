@@ -24,64 +24,48 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace App\Models;
+declare(strict_types=1);
 
-use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
+namespace App\GraphQL\Mutations;
 
-/**
- * Sessão de trabalho do dia, permite que vários caixas sejam abertos
- * utilizando uma mesma sessão
- */
-class Sessao extends Model implements ValidateInterface
+use App\Models\Conferencia;
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\Auth;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+
+class UpdateConferenciaMutation extends Mutation
 {
-    use ModelEvents;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'sessoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'cozinha_id',
-        'data_inicio',
-        'data_termino',
-        'aberta',
-    ];
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
     protected $attributes = [
-        'aberta' => true,
+        'name' => 'UpdateConferencia',
     ];
 
-    /**
-     * Remo de cozinha que será trabalhado nessa sessão
-     */
-    public function cozinha()
+    public function authorize(array $args): bool
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return Auth::check() && Auth::user()->can('conferencia:update');
     }
 
-    public function validate()
+    public function type(): Type
     {
+        return GraphQL::type('Conferencia');
+    }
+
+    public function args(): array
+    {
+        return [
+            'id' => [
+                'type' => Type::nonNull(Type::id()),
+                'description' => 'Identificador da conferência',
+            ],
+            'input' => ['type' => Type::nonNull(GraphQL::type('ConferenciaUpdateInput'))],
+        ];
+    }
+
+    public function resolve($root, $args)
+    {
+        $conferencia = Conferencia::findOrFail($args['id']);
+        $conferencia->fill($args['input']);
+        $conferencia->save();
+        return $conferencia;
     }
 }

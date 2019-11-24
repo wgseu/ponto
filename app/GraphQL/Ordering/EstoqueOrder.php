@@ -44,10 +44,13 @@ class EstoqueOrder extends InputType
             'id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'producao_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'produto_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
-            'requisito_id' => [
+            'compra_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'transacao_id' => [
@@ -78,9 +81,6 @@ class EstoqueOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'detalhes' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
-            'reservado' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'cancelado' => [

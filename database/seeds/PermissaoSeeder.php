@@ -1649,5 +1649,11 @@ class PermissaoSeeder extends Seeder
             'nome' => 'contagem:delete',
             'descricao' => __('messages.contagem_delete_permition'),
         ]))->save();
+
+        (new Permissao([
+            'funcionalidade_id' => 9,
+            'nome' => 'saldo:view',
+            'descricao' => __('messages.saldo_view_permition'),
+        ]))->save();
     }
 }

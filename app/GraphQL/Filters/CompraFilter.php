@@ -53,6 +53,9 @@ class CompraFilter extends InputType
             'fornecedor_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],
+            'conta_id' => [
+                'type' => GraphQL::type('IdFilter'),
+            ],
             'documento_url' => [
                 'type' => GraphQL::type('StringFilter'),
             ],

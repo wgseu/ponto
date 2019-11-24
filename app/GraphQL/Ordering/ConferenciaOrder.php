@@ -26,47 +26,44 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Ordering;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class CompraInput extends InputType
+class ConferenciaOrder extends InputType
 {
     protected $attributes = [
-        'name' => 'CompraInput',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
+        'name' => 'ConferenciaOrder',
+        'description' => 'Conferência diária de produto em cada setor',
     ];
 
     public function fields(): array
     {
         return [
+            'id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'funcionario_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'numero' => [
-                'type' => Type::string(),
-                'description' => 'Informa o número fiscal da compra',
-                'rules' => ['max:100'],
+                'type' => GraphQL::type('OrderByEnum'),
             ],
-            'comprador_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Informa o funcionário que comprou os produtos da lista',
+            'produto_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
             ],
-            'fornecedor_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Fornecedor em que os produtos foram compras',
+            'setor_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
             ],
-            'conta_id' => [
-                'type' => Type::id(),
-                'description' => 'Conta que foi gerada para essa compra',
+            'quantidade' => [
+                'type' => GraphQL::type('OrderByEnum'),
             ],
-            'documento_url' => [
-                'type' => Type::string(),
-                'description' => 'Informa o nome do documento no servidor do sistema',
-                'rules' => ['max:200'],
+            'conferido' => [
+                'type' => GraphQL::type('OrderByEnum'),
             ],
-            'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Informa da data de finalização da compra',
+            'data_conferencia' => [
+                'type' => GraphQL::type('OrderByEnum'),
             ],
         ];
     }

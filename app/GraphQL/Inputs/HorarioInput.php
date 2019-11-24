@@ -57,6 +57,10 @@ class HorarioInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Permite informar o horário de prestação de serviço para esse prestador',
             ],
+            'cozinha_id' => [
+                'type' => Type::id(),
+                'description' => 'Ramo ou tipo de cozinha do restaurante que funcionará nesse horário',
+            ],
             'inicio' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Início do horário de funcionamento em minutos contando a partir de' .

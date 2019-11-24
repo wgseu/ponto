@@ -1,0 +1,9 @@
+query ($id: ID!) {
+  saldos (filter: { id: $id }, order: { id: asc }) {
+    data {
+      id
+      valor
+    }
+    total
+  }
+}

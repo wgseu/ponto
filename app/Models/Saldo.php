@@ -31,10 +31,9 @@ use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Sessão de trabalho do dia, permite que vários caixas sejam abertos
- * utilizando uma mesma sessão
+ * Saldos dos pagamentos para cada carteira e moeda
  */
-class Sessao extends Model implements ValidateInterface
+class Saldo extends Model implements ValidateInterface
 {
     use ModelEvents;
 
@@ -43,7 +42,7 @@ class Sessao extends Model implements ValidateInterface
      *
      * @var string
      */
-    protected $table = 'sessoes';
+    protected $table = 'saldos';
 
     /**
      * Indicates if the model should be timestamped.
@@ -58,10 +57,9 @@ class Sessao extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
-        'cozinha_id',
-        'data_inicio',
-        'data_termino',
-        'aberta',
+        'moeda_id',
+        'carteira_id',
+        'valor',
     ];
 
     /**
@@ -70,15 +68,23 @@ class Sessao extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
-        'aberta' => true,
+        'valor' => 0,
     ];
 
     /**
-     * Remo de cozinha que será trabalhado nessa sessão
+     * Moeda do valor do saldo
      */
-    public function cozinha()
+    public function moeda()
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return $this->belongsTo('App\Models\Moeda', 'moeda_id');
+    }
+
+    /**
+     * Carteira que contém o saldo
+     */
+    public function carteira()
+    {
+        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
     }
 
     public function validate()

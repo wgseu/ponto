@@ -31,26 +31,21 @@ use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Sessão de trabalho do dia, permite que vários caixas sejam abertos
- * utilizando uma mesma sessão
+ * Conferência diária de produto em cada setor
  */
-class Sessao extends Model implements ValidateInterface
+class Conferencia extends Model implements ValidateInterface
 {
     use ModelEvents;
+
+    public const UPDATED_AT = null;
+    public const CREATED_AT = 'data_conferencia';
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sessoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    protected $table = 'conferencias';
 
     /**
      * The attributes that are mass assignable.
@@ -58,27 +53,34 @@ class Sessao extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
-        'cozinha_id',
-        'data_inicio',
-        'data_termino',
-        'aberta',
+        'numero',
+        'produto_id',
+        'setor_id',
+        'conferido',
     ];
 
     /**
-     * The model's default values for attributes.
-     *
-     * @var array
+     * Funcionário que está realizando a conferẽncia do estoque
      */
-    protected $attributes = [
-        'aberta' => true,
-    ];
-
-    /**
-     * Remo de cozinha que será trabalhado nessa sessão
-     */
-    public function cozinha()
+    public function funcionario()
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return $this->belongsTo('App\Models\Prestador', 'funcionario_id');
+    }
+
+    /**
+     * Produto que está sendo conferido nesse setor
+     */
+    public function produto()
+    {
+        return $this->belongsTo('App\Models\Produto', 'produto_id');
+    }
+
+    /**
+     * Setor em que o produto está localizado
+     */
+    public function setor()
+    {
+        return $this->belongsTo('App\Models\Setor', 'setor_id');
     }
 
     public function validate()

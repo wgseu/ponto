@@ -53,6 +53,9 @@ class CompraOrder extends InputType
             'fornecedor_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'conta_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'documento_url' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

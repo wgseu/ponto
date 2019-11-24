@@ -45,6 +45,9 @@ class SessaoOrder extends InputType
             'id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'cozinha_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'data_inicio' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

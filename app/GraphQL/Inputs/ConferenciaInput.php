@@ -32,41 +32,31 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
-class CompraInput extends InputType
+class ConferenciaInput extends InputType
 {
     protected $attributes = [
-        'name' => 'CompraInput',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
+        'name' => 'ConferenciaInput',
+        'description' => 'Conferência diária de produto em cada setor',
     ];
 
     public function fields(): array
     {
         return [
             'numero' => [
-                'type' => Type::string(),
-                'description' => 'Informa o número fiscal da compra',
-                'rules' => ['max:100'],
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'Número da conferência, incrementado todo dia',
             ],
-            'comprador_id' => [
+            'produto_id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'Informa o funcionário que comprou os produtos da lista',
+                'description' => 'Produto que está sendo conferido nesse setor',
             ],
-            'fornecedor_id' => [
+            'setor_id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'Fornecedor em que os produtos foram compras',
+                'description' => 'Setor em que o produto está localizado',
             ],
-            'conta_id' => [
-                'type' => Type::id(),
-                'description' => 'Conta que foi gerada para essa compra',
-            ],
-            'documento_url' => [
-                'type' => Type::string(),
-                'description' => 'Informa o nome do documento no servidor do sistema',
-                'rules' => ['max:200'],
-            ],
-            'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Informa da data de finalização da compra',
+            'conferido' => [
+                'type' => Type::nonNull(Type::float()),
+                'description' => 'Quantidade conferida do produto nesse setor',
             ],
         ];
     }

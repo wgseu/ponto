@@ -1,0 +1,12 @@
+mutation createConferencia($input: ConferenciaInput!) {
+  CreateConferencia(input: $input) {
+    id
+    funcionario_id
+    numero
+    produto_id
+    setor_id
+    quantidade
+    conferido
+    data_conferencia
+  }
+}

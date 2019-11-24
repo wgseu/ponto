@@ -69,6 +69,7 @@ class Horario extends Model implements ValidateInterface
         'modo',
         'funcao_id',
         'prestador_id',
+        'cozinha_id',
         'inicio',
         'fim',
         'mensagem',
@@ -103,6 +104,14 @@ class Horario extends Model implements ValidateInterface
     public function prestador()
     {
         return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+    }
+
+    /**
+     * Ramo ou tipo de cozinha do restaurante que funcionará nesse horário
+     */
+    public function cozinha()
+    {
+        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
     }
 
     public function validate()

@@ -27,14 +27,19 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
  * Pagamentos de contas e pedidos
  */
-class Pagamento extends Model implements ValidateInterface
+class Pagamento extends Model implements
+    ValidateInterface,
+    ValidateInsertInterface,
+    ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -198,6 +203,16 @@ class Pagamento extends Model implements ValidateInterface
     }
 
     /**
+     * Informa se o pagamento foi aprovado
+     *
+     * @return bool
+     */
+    public function pago()
+    {
+        return $this->estado == self::ESTADO_PAGO && is_null($this->agrupamento_id);
+    }
+
+    /**
      * Calcula o valor na moeda escolhida e preenche outras informações
      *
      * @return self
@@ -220,6 +235,8 @@ class Pagamento extends Model implements ValidateInterface
             $this->data_compensacao = $this->data_pagamento;
             if (!is_null($cartao)) {
                 $this->data_compensacao = $this->data_pagamento->addDays($cartao->dias_repasse);
+            } elseif (!is_null($this->cheque_id)) {
+                $this->data_compensacao = null;
             }
         } else {
             $this->data_pagamento = null;
@@ -228,9 +245,45 @@ class Pagamento extends Model implements ValidateInterface
         return $this;
     }
 
+    /**
+     * Atualiza a contagem do produto
+     *
+     * @return void
+     */
+    protected function updateWallet()
+    {
+        $old_valor = 0;
+        if ($this->exists) {
+            $old = $this->fresh();
+            if (
+                $old->pago() == $this->pago() &&
+                ($old->valor == $this->valor || !$this->pago())
+            ) {
+                return;
+            }
+            if ($old->pago()) {
+                $old_valor = $old->valor;
+            }
+        } elseif (!$this->pago()) {
+            return;
+        }
+        if (!$this->pago()) {
+            $valor = -$old_valor;
+        } else {
+            $valor = $this->valor - $old_valor;
+        }
+        $saldo = Saldo::firstOrCreate(
+            [
+                'moeda_id' => $this->moeda_id,
+                'carteira_id' => $this->carteira_id,
+            ],
+            [ 'valor' => 0 ]
+        );
+        $saldo->increment('valor', $valor);
+    }
+
     protected function cancel()
     {
-        // TODO: reduzir carteira
         // TODO: cancelar crediário
         // TODO: cancelar uso de crédito
         // TODO: cancelar emissão de cheque
@@ -238,16 +291,27 @@ class Pagamento extends Model implements ValidateInterface
 
     public function validate()
     {
+        if (is_null($this->data_pagamento) && $this->pago()) {
+            return ['data_pagamento' => __('messages.no_payment_date')];
+        }
+    }
+
+    public function onInsert()
+    {
+        if ($this->estado == self::ESTADO_CANCELADO) {
+            return ['estado' => __('messages.payment_inserting_cancelled')];
+        }
+        $this->updateWallet();
     }
 
     public function onUpdate()
     {
-        $erros = [];
         $old = $this->fresh();
         if ($old->estado == self::ESTADO_CANCELADO) {
-            $erros['estado'] = __('messages.payment_already_cancelled');
+            return ['estado' => __('messages.payment_already_cancelled')];
         } elseif ($this->estado == self::ESTADO_CANCELADO) {
             $this->cancel();
         }
+        $this->updateWallet();
     }
 }

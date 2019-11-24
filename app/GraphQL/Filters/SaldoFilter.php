@@ -26,47 +26,32 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Filters;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class CompraInput extends InputType
+class SaldoFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'CompraInput',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
+        'name' => 'SaldoFilter',
     ];
 
     public function fields(): array
     {
         return [
-            'numero' => [
-                'type' => Type::string(),
-                'description' => 'Informa o número fiscal da compra',
-                'rules' => ['max:100'],
-            ],
-            'comprador_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Informa o funcionário que comprou os produtos da lista',
-            ],
-            'fornecedor_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Fornecedor em que os produtos foram compras',
-            ],
-            'conta_id' => [
+            'id' => [
                 'type' => Type::id(),
-                'description' => 'Conta que foi gerada para essa compra',
             ],
-            'documento_url' => [
-                'type' => Type::string(),
-                'description' => 'Informa o nome do documento no servidor do sistema',
-                'rules' => ['max:200'],
+            'moeda_id' => [
+                'type' => GraphQL::type('IdFilter'),
             ],
-            'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Informa da data de finalização da compra',
+            'carteira_id' => [
+                'type' => GraphQL::type('IdFilter'),
+            ],
+            'valor' => [
+                'type' => GraphQL::type('NumberFilter'),
             ],
         ];
     }

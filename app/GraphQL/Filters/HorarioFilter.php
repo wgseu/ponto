@@ -53,6 +53,9 @@ class HorarioFilter extends InputType
             'prestador_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],
+            'cozinha_id' => [
+                'type' => GraphQL::type('IdFilter'),
+            ],
             'inicio' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],

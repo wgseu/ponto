@@ -24,38 +24,18 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-declare(strict_types=1);
+namespace Tests\Feature;
 
-namespace App\GraphQL\Filters;
+use Tests\TestCase;
+use App\Models\Saldo;
 
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\InputType;
-use Rebing\GraphQL\Support\Facades\GraphQL;
-
-class SessaoFilter extends InputType
+class SaldoTest extends TestCase
 {
-    protected $attributes = [
-        'name' => 'SessaoFilter',
-    ];
-
-    public function fields(): array
+    public function testFind()
     {
-        return [
-            'id' => [
-                'type' => Type::id(),
-            ],
-            'cozinha_id' => [
-                'type' => GraphQL::type('IdFilter'),
-            ],
-            'data_inicio' => [
-                'type' => GraphQL::type('DateFilter'),
-            ],
-            'data_termino' => [
-                'type' => GraphQL::type('DateFilter'),
-            ],
-            'aberta' => [
-                'type' => Type::boolean(),
-            ],
-        ];
+        $headers = PrestadorTest::authOwner();
+        $saldo = factory(Saldo::class)->create();
+        $response = $this->graphfl('query_saldo', [ 'id' => $saldo->id ], $headers);
+        $this->assertEquals($saldo->valor, $response->json('data.saldos.data.0.valor'));
     }
 }

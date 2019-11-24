@@ -28,17 +28,17 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Types;
 
-use App\Models\Compra;
+use App\Models\Conferencia;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class CompraType extends GraphQLType
+class ConferenciaType extends GraphQLType
 {
     protected $attributes = [
-        'name' => 'Compra',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
-        'model' => Compra::class,
+        'name' => 'Conferencia',
+        'description' => 'Conferência diária de produto em cada setor',
+        'model' => Conferencia::class,
     ];
 
     public function fields(): array
@@ -46,31 +46,35 @@ class CompraType extends GraphQLType
         return [
             'id' => [
                 'type' => Type::id(),
-                'description' => 'Identificador da compra',
+                'description' => 'Identificador da conferência',
+            ],
+            'funcionario_id' => [
+                'type' => Type::id(),
+                'description' => 'Funcionário que está realizando a conferẽncia do estoque',
             ],
             'numero' => [
-                'type' => Type::string(),
-                'description' => 'Informa o número fiscal da compra',
+                'type' => Type::int(),
+                'description' => 'Número da conferência, incrementado todo dia',
             ],
-            'comprador_id' => [
+            'produto_id' => [
                 'type' => Type::id(),
-                'description' => 'Informa o funcionário que comprou os produtos da lista',
+                'description' => 'Produto que está sendo conferido nesse setor',
             ],
-            'fornecedor_id' => [
+            'setor_id' => [
                 'type' => Type::id(),
-                'description' => 'Fornecedor em que os produtos foram compras',
+                'description' => 'Setor em que o produto está localizado',
             ],
-            'conta_id' => [
-                'type' => Type::id(),
-                'description' => 'Conta que foi gerada para essa compra',
+            'quantidade' => [
+                'type' => Type::float(),
+                'description' => 'Quantidade registrada do produto nesse setor',
             ],
-            'documento_url' => [
-                'type' => Type::string(),
-                'description' => 'Informa o nome do documento no servidor do sistema',
+            'conferido' => [
+                'type' => Type::float(),
+                'description' => 'Quantidade conferida do produto nesse setor',
             ],
-            'data_compra' => [
+            'data_conferencia' => [
                 'type' => GraphQL::type('DateTime'),
-                'description' => 'Informa da data de finalização da compra',
+                'description' => 'Data em que a conferência foi realizada',
             ],
         ];
     }

@@ -125,13 +125,16 @@ class PedidoOrder extends InputType
             'motivo' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'data_conclusao' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'data_pronto' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'data_entrega' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_agendamento' => [
-                'type' => GraphQL::type('OrderByEnum'),
-            ],
-            'data_conclusao' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_criacao' => [

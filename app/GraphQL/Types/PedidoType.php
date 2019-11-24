@@ -175,17 +175,21 @@ class PedidoType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Informa o motivo do cancelamento',
             ],
+            'data_conclusao' => [
+                'type' => GraphQL::type('DateTime'),
+                'description' => 'Data de finalização do pedido',
+            ],
+            'data_pronto' => [
+                'type' => Type::int(),
+                'description' => 'Data e hora em que todos os itens do pedido foram marcados como pronto',
+            ],
             'data_entrega' => [
                 'type' => GraphQL::type('DateTime'),
-                'description' => 'Data e hora que o pedido foi entregue ao cliente',
+                'description' => 'Data e hora que o pedido foi entregue no endereço informado pelo cliente',
             ],
             'data_agendamento' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de agendamento do pedido',
-            ],
-            'data_conclusao' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de finalização do pedido',
             ],
             'data_criacao' => [
                 'type' => GraphQL::type('DateTime'),

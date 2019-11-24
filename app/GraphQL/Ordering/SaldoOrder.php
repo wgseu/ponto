@@ -24,64 +24,35 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace App\Models;
+declare(strict_types=1);
 
-use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
+namespace App\GraphQL\Ordering;
 
-/**
- * Sessão de trabalho do dia, permite que vários caixas sejam abertos
- * utilizando uma mesma sessão
- */
-class Sessao extends Model implements ValidateInterface
+use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+
+class SaldoOrder extends InputType
 {
-    use ModelEvents;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'sessoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'cozinha_id',
-        'data_inicio',
-        'data_termino',
-        'aberta',
-    ];
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
     protected $attributes = [
-        'aberta' => true,
+        'name' => 'SaldoOrder',
+        'description' => 'Saldos dos pagamentos para cada carteira e moeda',
     ];
 
-    /**
-     * Remo de cozinha que será trabalhado nessa sessão
-     */
-    public function cozinha()
+    public function fields(): array
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
-    }
-
-    public function validate()
-    {
+        return [
+            'id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'moeda_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'carteira_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'valor' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+        ];
     }
 }

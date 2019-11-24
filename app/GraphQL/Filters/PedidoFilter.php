@@ -125,13 +125,16 @@ class PedidoFilter extends InputType
             'motivo' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
+            'data_conclusao' => [
+                'type' => GraphQL::type('DateFilter'),
+            ],
+            'data_pronto' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
             'data_entrega' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_agendamento' => [
-                'type' => GraphQL::type('DateFilter'),
-            ],
-            'data_conclusao' => [
                 'type' => GraphQL::type('DateFilter'),
             ],
             'data_criacao' => [

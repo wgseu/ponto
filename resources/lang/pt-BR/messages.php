@@ -668,7 +668,6 @@ return [
     'estoque_new_canceled' => 'O estoque não pode ser criado cancelado',
     'quantidade_cannot_greater_0' => 'A saída de mercadorias requer uma quantidade menor que zero',
     'quantidade_cannot_less_0' => 'A entrada de mercadorias requer uma quantidade maior que zero',
-    'one_required_requisito_or_transacao' => 'É obrigátorio informar ou um requisito ou uma transação',
     'negative_entry' => 'A origem dessa saída de estoque não pode ser uma venda ou retirada',
     'produto_required_pacote' => ' Os grupos são formados apenas por pacotes',
     'localizacao_tipo_required_apartamento' => 'Se o tipo de Localização for apartamento o atributo é obrigatório',

@@ -56,7 +56,7 @@ class EstoqueType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Produto que entrou no estoque',
             ],
-            'requisito_id' => [
+            'compra_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa de qual compra originou essa entrada em estoque',
             ],

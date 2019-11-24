@@ -53,6 +53,9 @@ class HorarioOrder extends InputType
             'prestador_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'cozinha_id' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'inicio' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

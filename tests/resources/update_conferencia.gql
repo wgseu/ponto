@@ -1,0 +1,8 @@
+mutation updateConferencia($id: ID!, $input: ConferenciaUpdateInput!) {
+  UpdateConferencia(id: $id, input: $input) {
+    numero
+    quantidade
+    conferido
+    data_conferencia
+  }
+}

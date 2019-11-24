@@ -62,12 +62,6 @@ class CarteiraFilter extends InputType
             'agencia' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
-            'saldo' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
-            'lancado' => [
-                'type' => GraphQL::type('NumberFilter'),
-            ],
             'transacao' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],

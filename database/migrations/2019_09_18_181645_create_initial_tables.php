@@ -45,8 +45,17 @@ class CreateInitialTables extends Migration
                 ->onDelete('restrict');
         });
 
+        Schema::create('cozinhas', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('nome', 50);
+            $table->string('descricao', 255)->nullable();
+
+            $table->unique(['nome']);
+        });
+
         Schema::create('sessoes', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('cozinha_id');
             $table->dateTime('data_inicio');
             $table->dateTime('data_termino')->nullable();
             $table->boolean('aberta')->default(true);
@@ -54,6 +63,11 @@ class CreateInitialTables extends Migration
             $table->index(['aberta']);
             $table->index(['data_inicio']);
             $table->index(['data_termino']);
+            $table->index(['cozinha_id']);
+            $table->foreign('cozinha_id')
+                ->references('id')->on('cozinhas')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
         });
 
         Schema::create('bancos', function (Blueprint $table) {
@@ -77,8 +91,6 @@ class CreateInitialTables extends Migration
             $table->string('descricao', 100);
             $table->string('conta', 100)->nullable();
             $table->string('agencia', 200)->nullable();
-            $table->decimal('saldo', 19, 4)->default(0);
-            $table->decimal('lancado', 19, 4)->default(0);
             $table->decimal('transacao', 19, 4)->default(0);
             $table->decimal('limite', 19, 4)->nullable();
             $table->string('token', 250)->nullable();
@@ -505,9 +517,10 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('fechador_id')->nullable();
             $table->dateTime('data_impressao')->nullable();
             $table->string('motivo', 200)->nullable();
+            $table->dateTime('data_conclusao')->nullable();
+            $table->integer('data_pronto')->nullable();
             $table->dateTime('data_entrega')->nullable();
             $table->dateTime('data_agendamento')->nullable();
-            $table->dateTime('data_conclusao')->nullable();
             $table->dateTime('data_criacao');
 
             $table->unique(['associacao_id']);
@@ -1180,38 +1193,19 @@ class CreateInitialTables extends Migration
                 ->onDelete('restrict');
         });
 
-        Schema::create('listas', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('descricao', 100);
-            $table->enum('estado', ['analise', 'fechada', 'comprada'])->default('analise');
-            $table->unsignedInteger('encarregado_id');
-            $table->unsignedInteger('viagem_id')->nullable();
-            $table->dateTime('data_viagem');
-            $table->dateTime('data_cadastro');
-
-            $table->index(['encarregado_id']);
-            $table->index(['viagem_id']);
-            $table->foreign('encarregado_id')
-                ->references('id')->on('prestadores')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
-            $table->foreign('viagem_id')
-                ->references('id')->on('viagens')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
-        });
-
         Schema::create('compras', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('numero', 64)->nullable();
+            $table->string('numero', 100)->nullable();
             $table->unsignedInteger('comprador_id');
             $table->unsignedInteger('fornecedor_id');
-            $table->string('documento_url', 150)->nullable();
+            $table->unsignedInteger('conta_id')->nullable();
+            $table->string('documento_url', 200)->nullable();
             $table->dateTime('data_compra');
 
             $table->unique(['numero']);
             $table->index(['fornecedor_id']);
             $table->index(['comprador_id']);
+            $table->index(['conta_id']);
             $table->foreign('comprador_id')
                 ->references('id')->on('prestadores')
                 ->onUpdate('cascade')
@@ -1220,39 +1214,8 @@ class CreateInitialTables extends Migration
                 ->references('id')->on('fornecedores')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
-        });
-
-        Schema::create('requisitos', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('lista_id');
-            $table->unsignedInteger('produto_id');
-            $table->unsignedInteger('compra_id')->nullable();
-            $table->unsignedInteger('fornecedor_id')->nullable();
-            $table->double('quantidade')->default(0);
-            $table->double('comprado')->default(0);
-            $table->decimal('preco_maximo', 19, 4)->default(0);
-            $table->decimal('preco', 19, 4)->default(0);
-            $table->string('observacoes', 100)->nullable();
-            $table->dateTime('data_recolhimento')->nullable();
-
-            $table->index(['lista_id']);
-            $table->index(['produto_id']);
-            $table->index(['fornecedor_id']);
-            $table->index(['compra_id']);
-            $table->foreign('lista_id')
-                ->references('id')->on('listas')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreign('produto_id')
-                ->references('id')->on('produtos')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreign('compra_id')
-                ->references('id')->on('compras')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
-            $table->foreign('fornecedor_id')
-                ->references('id')->on('fornecedores')
+            $table->foreign('conta_id')
+                ->references('id')->on('contas')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
@@ -1261,7 +1224,7 @@ class CreateInitialTables extends Migration
             $table->increments('id');
             $table->unsignedInteger('producao_id')->nullable();
             $table->unsignedInteger('produto_id');
-            $table->unsignedInteger('requisito_id')->nullable();
+            $table->unsignedInteger('compra_id')->nullable();
             $table->unsignedInteger('transacao_id')->nullable();
             $table->unsignedInteger('fornecedor_id')->nullable();
             $table->unsignedInteger('setor_id');
@@ -1280,9 +1243,9 @@ class CreateInitialTables extends Migration
             $table->index(['fornecedor_id']);
             $table->index(['prestador_id']);
             $table->index(['setor_id']);
-            $table->index(['requisito_id']);
             $table->index(['data_movimento']);
             $table->index(['producao_id']);
+            $table->index(['compra_id']);
             $table->foreign('producao_id')
                 ->references('id')->on('estoques')
                 ->onUpdate('cascade')
@@ -1291,8 +1254,8 @@ class CreateInitialTables extends Migration
                 ->references('id')->on('produtos')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->foreign('requisito_id')
-                ->references('id')->on('requisitos')
+            $table->foreign('compra_id')
+                ->references('id')->on('compras')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreign('transacao_id')
@@ -1609,6 +1572,62 @@ class CreateInitialTables extends Migration
                 ->onDelete('restrict');
         });
 
+        Schema::create('listas', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('descricao', 100);
+            $table->enum('estado', ['analise', 'fechada', 'comprada'])->default('analise');
+            $table->unsignedInteger('encarregado_id');
+            $table->unsignedInteger('viagem_id')->nullable();
+            $table->dateTime('data_viagem');
+            $table->dateTime('data_cadastro');
+
+            $table->index(['encarregado_id']);
+            $table->index(['viagem_id']);
+            $table->foreign('encarregado_id')
+                ->references('id')->on('prestadores')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->foreign('viagem_id')
+                ->references('id')->on('viagens')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+        });
+
+        Schema::create('requisitos', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('lista_id');
+            $table->unsignedInteger('produto_id');
+            $table->unsignedInteger('compra_id')->nullable();
+            $table->unsignedInteger('fornecedor_id')->nullable();
+            $table->double('quantidade')->default(0);
+            $table->double('comprado')->default(0);
+            $table->decimal('preco_maximo', 19, 4)->default(0);
+            $table->decimal('preco', 19, 4)->default(0);
+            $table->string('observacoes', 100)->nullable();
+            $table->dateTime('data_recolhimento')->nullable();
+
+            $table->index(['lista_id']);
+            $table->index(['produto_id']);
+            $table->index(['fornecedor_id']);
+            $table->index(['compra_id']);
+            $table->foreign('lista_id')
+                ->references('id')->on('listas')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('produto_id')
+                ->references('id')->on('produtos')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('compra_id')
+                ->references('id')->on('compras')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->foreign('fornecedor_id')
+                ->references('id')->on('fornecedores')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+        });
+
         Schema::create('enderecos', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cidade_id');
@@ -1634,6 +1653,7 @@ class CreateInitialTables extends Migration
             $table->enum('modo', ['funcionamento', 'operacao', 'entrega'])->default('funcionamento');
             $table->unsignedInteger('funcao_id')->nullable();
             $table->unsignedInteger('prestador_id')->nullable();
+            $table->unsignedInteger('cozinha_id')->nullable();
             $table->integer('inicio');
             $table->integer('fim');
             $table->string('mensagem', 200)->nullable();
@@ -1643,6 +1663,7 @@ class CreateInitialTables extends Migration
 
             $table->index(['prestador_id']);
             $table->index(['funcao_id']);
+            $table->index(['cozinha_id']);
             $table->foreign('funcao_id')
                 ->references('id')->on('funcoes')
                 ->onUpdate('cascade')
@@ -1651,6 +1672,10 @@ class CreateInitialTables extends Migration
                 ->references('id')->on('prestadores')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreign('cozinha_id')
+                ->references('id')->on('cozinhas')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
         });
 
         Schema::create('patrimonios', function (Blueprint $table) {
@@ -1998,14 +2023,6 @@ class CreateInitialTables extends Migration
                 ->onDelete('cascade');
         });
 
-        Schema::create('cozinhas', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('nome', 50);
-            $table->string('descricao', 255)->nullable();
-
-            $table->unique(['nome']);
-        });
-
         Schema::create('cardapios', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('produto_id')->nullable();
@@ -2104,6 +2121,51 @@ class CreateInitialTables extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
+        Schema::create('saldos', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('moeda_id');
+            $table->unsignedInteger('carteira_id');
+            $table->decimal('valor', 19, 4)->default(0);
+
+            $table->unique(['moeda_id', 'carteira_id']);
+            $table->index(['carteira_id']);
+            $table->foreign('moeda_id')
+                ->references('id')->on('moedas')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->foreign('carteira_id')
+                ->references('id')->on('carteiras')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+        });
+
+        Schema::create('conferencias', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('funcionario_id');
+            $table->integer('numero');
+            $table->unsignedInteger('produto_id');
+            $table->unsignedInteger('setor_id');
+            $table->double('quantidade');
+            $table->double('conferido');
+            $table->dateTime('data_conferencia');
+
+            $table->unique(['produto_id', 'setor_id', 'numero']);
+            $table->index(['setor_id']);
+            $table->index(['funcionario_id']);
+            $table->foreign('funcionario_id')
+                ->references('id')->on('prestadores')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->foreign('produto_id')
+                ->references('id')->on('produtos')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreign('setor_id')
+                ->references('id')->on('setores')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+        });
         Schema::enableForeignKeyConstraints();
 
         if (env('APP_ENV') == 'testing') {
@@ -2129,6 +2191,7 @@ class CreateInitialTables extends Migration
         Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('setores');
         Schema::dropIfExists('mesas');
+        Schema::dropIfExists('cozinhas');
         Schema::dropIfExists('sessoes');
         Schema::dropIfExists('bancos');
         Schema::dropIfExists('carteiras');
@@ -2171,9 +2234,7 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('auditorias');
         Schema::dropIfExists('composicoes');
         Schema::dropIfExists('fornecedores');
-        Schema::dropIfExists('listas');
         Schema::dropIfExists('compras');
-        Schema::dropIfExists('requisitos');
         Schema::dropIfExists('estoques');
         Schema::dropIfExists('grupos');
         Schema::dropIfExists('propriedades');
@@ -2186,6 +2247,8 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('sistemas');
         Schema::dropIfExists('resumos');
         Schema::dropIfExists('formacoes');
+        Schema::dropIfExists('listas');
+        Schema::dropIfExists('requisitos');
         Schema::dropIfExists('enderecos');
         Schema::dropIfExists('horarios');
         Schema::dropIfExists('patrimonios');
@@ -2201,10 +2264,11 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('cupons');
         Schema::dropIfExists('metricas');
         Schema::dropIfExists('avaliacoes');
-        Schema::dropIfExists('cozinhas');
         Schema::dropIfExists('cardapios');
         Schema::dropIfExists('contagens');
         Schema::dropIfExists('notificacoes');
+        Schema::dropIfExists('saldos');
+        Schema::dropIfExists('conferencias');
         Schema::enableForeignKeyConstraints();
     }
 }

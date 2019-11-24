@@ -24,64 +24,18 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace App\Models;
+declare(strict_types=1);
 
-use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
+namespace App\GraphQL\Inputs;
 
-/**
- * Sessão de trabalho do dia, permite que vários caixas sejam abertos
- * utilizando uma mesma sessão
- */
-class Sessao extends Model implements ValidateInterface
+use App\Concerns\OptionalFields;
+
+class ConferenciaUpdateInput extends ConferenciaInput
 {
-    use ModelEvents;
+    use OptionalFields;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'sessoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'cozinha_id',
-        'data_inicio',
-        'data_termino',
-        'aberta',
-    ];
-
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
     protected $attributes = [
-        'aberta' => true,
+        'name' => 'ConferenciaUpdateInput',
+        'description' => 'Conferência diária de produto em cada setor',
     ];
-
-    /**
-     * Remo de cozinha que será trabalhado nessa sessão
-     */
-    public function cozinha()
-    {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
-    }
-
-    public function validate()
-    {
-    }
 }

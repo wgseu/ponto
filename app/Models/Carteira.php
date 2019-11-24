@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Informa uma conta bancária ou uma carteira financeira
@@ -36,11 +37,12 @@ use Illuminate\Database\Eloquent\Model;
 class Carteira extends Model implements ValidateInterface
 {
     use ModelEvents;
+    use SoftDeletes;
 
     /**
-     * Tipo de carteira, 'Bancaria' para conta bancária, 'Financeira' para
-     * carteira financeira da empresa ou de sites de pagamentos, 'Credito' para
-     * cartão de crédito e 'Local' para caixas e cofres locais
+     * Tipo de carteira, Bancaria: para conta bancária, Financeira: para
+     * carteira financeira da empresa ou de sites de pagamentos, Credito: para
+     * cartão de crédito e Local: para caixas e cofres locais
      */
     public const TIPO_BANCARIA = 'bancaria';
     public const TIPO_FINANCEIRA = 'financeira';
@@ -52,6 +54,8 @@ class Carteira extends Model implements ValidateInterface
      */
     public const AMBIENTE_TESTE = 'teste';
     public const AMBIENTE_PRODUCAO = 'producao';
+
+    public const DELETED_AT = 'data_desativada';
 
     /**
      * The table associated with the model.
@@ -86,7 +90,6 @@ class Carteira extends Model implements ValidateInterface
         'logo_url',
         'cor',
         'ativa',
-        'data_desativada',
     ];
 
     /**
@@ -95,8 +98,6 @@ class Carteira extends Model implements ValidateInterface
      * @var array
      */
     protected $attributes = [
-        'saldo' => 0,
-        'lancado' => 0,
         'transacao' => 0,
         'ativa' => true,
     ];

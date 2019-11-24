@@ -61,7 +61,7 @@ class Estoque extends Model implements
     protected $fillable = [
         'producao_id',
         'produto_id',
-        'requisito_id',
+        'compra_id',
         'transacao_id',
         'fornecedor_id',
         'setor_id',
@@ -86,6 +86,14 @@ class Estoque extends Model implements
     ];
 
     /**
+     * Informa o que foi produzido através dessa saida de estoque
+     */
+    public function producao()
+    {
+        return $this->belongsTo('App\Models\Estoque', 'producao_id');
+    }
+
+    /**
      * Produto que entrou no estoque
      */
     public function produto()
@@ -96,9 +104,9 @@ class Estoque extends Model implements
     /**
      * Informa de qual compra originou essa entrada em estoque
      */
-    public function requisito()
+    public function compra()
     {
-        return $this->belongsTo('App\Models\Requisito', 'requisito_id');
+        return $this->belongsTo('App\Models\Compra', 'compra_id');
     }
 
     /**
@@ -283,17 +291,14 @@ class Estoque extends Model implements
     public function validate()
     {
         $produto = $this->produto;
-        if (!is_null($this->requisito_id) && !is_null($this->transacao_id)) {
-            return ['requisito_id' => __('messages.one_required_requisito_or_transacao')];
-        }
         if ($produto->tipo == Produto::TIPO_PACOTE) {
             return ['produto_id' => __('messages.tipo_product_cannot_pacote')];
         }
         if (fmod($this->quantidade, 1) > 0 && !$produto->divisivel) {
             return ['produto_id' => __('messages.produto_indivisible')];
         }
-        if (!is_null($this->requisito_id) && $this->quantidade <= 0) {
-            return ['requisito_id' => __('messages.quantidade_cannot_less_0')];
+        if (!is_null($this->compra_id) && $this->quantidade <= 0) {
+            return ['compra_id' => __('messages.quantidade_cannot_less_0')];
         }
         if (!is_null($this->transacao_id) && $this->quantidade >= 0) {
             return ['transacao_id' => __('messages.quantidade_cannot_greater_0')];

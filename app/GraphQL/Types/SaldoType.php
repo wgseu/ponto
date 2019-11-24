@@ -26,47 +26,38 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Inputs;
+namespace App\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use App\Models\Saldo;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class CompraInput extends InputType
+class SaldoType extends GraphQLType
 {
     protected $attributes = [
-        'name' => 'CompraInput',
-        'description' => 'Compras realizadas em uma lista num determinado fornecedor',
+        'name' => 'Saldo',
+        'description' => 'Saldos dos pagamentos para cada carteira e moeda',
+        'model' => Saldo::class,
     ];
 
     public function fields(): array
     {
         return [
-            'numero' => [
-                'type' => Type::string(),
-                'description' => 'Informa o número fiscal da compra',
-                'rules' => ['max:100'],
-            ],
-            'comprador_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Informa o funcionário que comprou os produtos da lista',
-            ],
-            'fornecedor_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Fornecedor em que os produtos foram compras',
-            ],
-            'conta_id' => [
+            'id' => [
                 'type' => Type::id(),
-                'description' => 'Conta que foi gerada para essa compra',
+                'description' => 'Identificador do saldo',
             ],
-            'documento_url' => [
-                'type' => Type::string(),
-                'description' => 'Informa o nome do documento no servidor do sistema',
-                'rules' => ['max:200'],
+            'moeda_id' => [
+                'type' => Type::id(),
+                'description' => 'Moeda do valor do saldo',
             ],
-            'data_compra' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Informa da data de finalização da compra',
+            'carteira_id' => [
+                'type' => Type::id(),
+                'description' => 'Carteira que contém o saldo',
+            ],
+            'valor' => [
+                'type' => Type::float(),
+                'description' => 'Valor do saldo total da carteira e moeda',
             ],
         ];
     }

@@ -37,7 +37,10 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Informações do pedido de venda
  */
-class Pedido extends Model implements ValidateInterface, ValidateInsertInterface, ValidateUpdateInterface
+class Pedido extends Model implements
+    ValidateInterface,
+    ValidateInsertInterface,
+    ValidateUpdateInterface
 {
     use ModelEvents;
 

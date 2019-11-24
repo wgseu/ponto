@@ -60,6 +60,7 @@ class Compra extends Model implements ValidateInterface
         'numero',
         'comprador_id',
         'fornecedor_id',
+        'conta_id',
         'documento_url',
         'data_compra',
     ];
@@ -78,6 +79,14 @@ class Compra extends Model implements ValidateInterface
     public function fornecedor()
     {
         return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+    }
+
+    /**
+     * Conta que foi gerada para essa compra
+     */
+    public function conta()
+    {
+        return $this->belongsTo('App\Models\Conta', 'conta_id');
     }
 
     public function validate()

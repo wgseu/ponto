@@ -167,6 +167,8 @@ return [
                 'cardapios' => 'App\GraphQL\Queries\CardapioQuery',
                 'contagens' => 'App\GraphQL\Queries\ContagemQuery',
                 'notificacoes' => 'App\GraphQL\Queries\NotificacaoQuery',
+                'saldos' => 'App\GraphQL\Queries\SaldoQuery',
+                'conferencias' => 'App\GraphQL\Queries\ConferenciaQuery',
 
                 'empresa' => 'App\GraphQL\Queries\EmpresaQuery',
                 'sistema' => 'App\GraphQL\Queries\SistemaQuery',
@@ -416,6 +418,9 @@ return [
                 'DeleteCardapio' => 'App\GraphQL\Mutations\DeleteCardapioMutation',
 
                 'UpdateNotificacao' => 'App\GraphQL\Mutations\UpdateNotificacaoMutation',
+
+                'CreateConferencia' => 'App\GraphQL\Mutations\CreateConferenciaMutation',
+                'UpdateConferencia' => 'App\GraphQL\Mutations\UpdateConferenciaMutation',
             ],
             'middleware' => [],
             'method'     => ['get', 'post'],
@@ -513,6 +518,8 @@ return [
         'CardapioFilter' => 'App\GraphQL\Filters\CardapioFilter',
         'ContagemFilter' => 'App\GraphQL\Filters\ContagemFilter',
         'NotificacaoFilter' => 'App\GraphQL\Filters\NotificacaoFilter',
+        'SaldoFilter' => 'App\GraphQL\Filters\SaldoFilter',
+        'ConferenciaFilter' => 'App\GraphQL\Filters\ConferenciaFilter',
 
         'CarteiraTipoFilter' => 'App\GraphQL\Filters\CarteiraTipoFilter',
         'CarteiraAmbienteFilter' => 'App\GraphQL\Filters\CarteiraAmbienteFilter',
@@ -631,6 +638,8 @@ return [
         'CardapioOrder' => 'App\GraphQL\Ordering\CardapioOrder',
         'ContagemOrder' => 'App\GraphQL\Ordering\ContagemOrder',
         'NotificacaoOrder' => 'App\GraphQL\Ordering\NotificacaoOrder',
+        'SaldoOrder' => 'App\GraphQL\Ordering\SaldoOrder',
+        'ConferenciaOrder' => 'App\GraphQL\Ordering\ConferenciaOrder',
 
         'SetorInput' => 'App\GraphQL\Inputs\SetorInput',
         'MesaInput' => 'App\GraphQL\Inputs\MesaInput',
@@ -704,6 +713,7 @@ return [
         'AvaliacaoInput' => 'App\GraphQL\Inputs\AvaliacaoInput',
         'CozinhaInput' => 'App\GraphQL\Inputs\CozinhaInput',
         'CardapioInput' => 'App\GraphQL\Inputs\CardapioInput',
+        'ConferenciaInput' => 'App\GraphQL\Inputs\ConferenciaInput',
 
         'SetorUpdateInput' => 'App\GraphQL\Inputs\SetorUpdateInput',
         'MesaUpdateInput' => 'App\GraphQL\Inputs\MesaUpdateInput',
@@ -777,6 +787,7 @@ return [
         'AvaliacaoUpdateInput' => 'App\GraphQL\Inputs\AvaliacaoUpdateInput',
         'CozinhaUpdateInput' => 'App\GraphQL\Inputs\CozinhaUpdateInput',
         'CardapioUpdateInput' => 'App\GraphQL\Inputs\CardapioUpdateInput',
+        'ConferenciaUpdateInput' => 'App\GraphQL\Inputs\ConferenciaUpdateInput',
 
         'Date' => 'App\GraphQL\Types\DateType',
         'DateTime' => 'App\GraphQL\Types\DateTimeType',
@@ -861,6 +872,8 @@ return [
         'Cardapio' => 'App\GraphQL\Types\CardapioType',
         'Contagem' => 'App\GraphQL\Types\ContagemType',
         'Notificacao' => 'App\GraphQL\Types\NotificacaoType',
+        'Saldo' => 'App\GraphQL\Types\SaldoType',
+        'Conferencia' => 'App\GraphQL\Types\ConferenciaType',
 
         'ClienteVerify' => 'App\GraphQL\Types\ClienteVerifyType',
 

@@ -34,12 +34,10 @@ make update
 make migrate
 ```
 
-   [PHP]: <http://www.php.net/>
-   [Nginx]: <https://nginx.org/>
-   [MySQL]: <https://dev.mysql.com/downloads/mysql/>
-   [Composer]: <https://getcomposer.org/>
-   [Docker]: <https://www.docker.com/>
-   [Node.js]: <http://nodejs.org>
+Armazenar imagens e documentos locais
+```sh
+php artisan storage:link
+```
 
 Antes de fazer commit, rodar os comandos abaixo com sucesso
 ```sh
@@ -63,3 +61,10 @@ Roda o container e aguarda
 ```sh
 docker run -it -e CONTAINER_ROLE=app gcr.io/upheld-setting-221119/grandchef-product:beta
 ```
+
+   [PHP]: <http://www.php.net/>
+   [Nginx]: <https://nginx.org/>
+   [MySQL]: <https://dev.mysql.com/downloads/mysql/>
+   [Composer]: <https://getcomposer.org/>
+   [Docker]: <https://www.docker.com/>
+   [Node.js]: <http://nodejs.org>

@@ -87,7 +87,7 @@ class ItemOrder extends InputType
             'preco_venda' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
-            'preco_compra' => [
+            'custo_aproximado' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'detalhes' => [

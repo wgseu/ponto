@@ -46,6 +46,10 @@ class EstoqueInput extends InputType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Produto que entrou no estoque',
             ],
+            'compra_id' => [
+                'type' => Type::id(),
+                'description' => 'Informa de qual compra originou essa entrada em estoque',
+            ],
             'fornecedor_id' => [
                 'type' => Type::id(),
                 'description' => 'Fornecedor do produto',

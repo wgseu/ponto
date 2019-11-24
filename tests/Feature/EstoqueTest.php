@@ -32,7 +32,7 @@ use App\Models\Fornecedor;
 use App\Models\Item;
 use App\Models\Prestador;
 use App\Models\Produto;
-use App\Models\Requisito;
+use App\Models\Compra;
 use App\Models\Setor;
 use App\Exceptions\ValidationException;
 
@@ -111,7 +111,7 @@ class EstoqueTest extends TestCase
         $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create([
-            'requisito_id' => null,
+            'compra_id' => null,
             'transacao_id' => $transacao->id,
             'quantidade' => 2
         ]);
@@ -137,11 +137,11 @@ class EstoqueTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBelongToRequisito()
+    public function testBelongToCompra()
     {
         $estoque = factory(Estoque::class)->create();
-        $expected = Requisito::find($estoque->requisito_id);
-        $result = $estoque->requisito;
+        $expected = Compra::find($estoque->compra_id);
+        $result = $estoque->compra;
         $this->assertEquals($expected, $result);
     }
 
@@ -150,7 +150,7 @@ class EstoqueTest extends TestCase
         $transacao = factory(Item::class)->make()->calculate();
         $transacao->save();
         $estoque = factory(Estoque::class)->make([
-            'requisito_id' => null,
+            'compra_id' => null,
             'transacao_id' => $transacao->id,
             'quantidade' => -2,
         ]);

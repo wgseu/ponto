@@ -49,6 +49,10 @@ class SessaoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Código da sessão',
             ],
+            'cozinha_id' => [
+                'type' => Type::id(),
+                'description' => 'Remo de cozinha que será trabalhado nessa sessão',
+            ],
             'data_inicio' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de início da sessão',

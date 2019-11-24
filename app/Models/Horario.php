@@ -47,6 +47,11 @@ class Horario extends Model implements ValidateInterface
     public const MODO_ENTREGA = 'entrega';
 
     /**
+     * Total number of minutes in one day
+     */
+    public const MINUTES_PER_DAY = 1440;
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -114,7 +119,70 @@ class Horario extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
     }
 
+    /**
+     * Regras:
+     * Função e prestador não podem ser selecionados juntos,
+     * A data de inicio não pode ser maior que o fim,
+     * O inicio, o fim, a entrega minima, e a entrega maxima não podem ser negativo,
+     * A entrega minima não pode ser maior que a entrega maxima,
+     * Horário de inicio e fim não podem ser sobrescritos com o mesmo modo, função, ou prestador,
+     * Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas.
+     */
     public function validate()
     {
+        $errors = [];
+        $horario = self::where('modo', $this->modo)
+            ->when($this->funcao_id, function ($query) {
+                return $query->where('funcao_id', $this->funcao_id);
+            })
+            ->when($this->prestador_id, function ($query) {
+                return $query->where('prestador_id', $this->prestador_id);
+            })
+            ->when($this->exists, function ($query) {
+                return $query->where('id', '<>', $this->id);
+            })
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->where('inicio', '>=', $this->inicio)
+                    ->where('inicio', '<=', $this->fim);
+                })
+                ->orWhere(function ($query) {
+                    $query->where('inicio', '<=', $this->inicio)
+                    ->where('fim', '>=', $this->inicio);
+                });
+            })
+            ->where('fechado', $this->fechado)
+            ->count('id');
+        if (!is_null($this->funcao_id) && !is_null($this->prestador_id)) {
+            $errors['funcao_id'] = __('messages.invalid_selections_funcao_prestador');
+        }
+        if ($this->inicio >= $this->fim) {
+            $errors['inicio'] = __('messages.invalid_interval_funcionamento');
+        } elseif (!$this->fechado && $this->inicio < self::MINUTES_PER_DAY) {
+            $errors['inicio'] = __('messages.inicio_invalid');
+        } elseif (!$this->fechado && $this->fim >= self::MINUTES_PER_DAY * 8) {
+            $errors['fim'] = __('messages.fim_invalid');
+        }
+        if (
+            !is_null($this->entrega_minima)
+            && $this->entrega_minima > $this->entrega_maxima
+            && $this->entrega_maxima != 0
+        ) {
+            $errors['entrega_minima'] = __('messages.interval_entrega_invalid');
+        } elseif (!is_null($this->entrega_minima) && $this->entrega_minima < 0) {
+            $errors['entrega_minima'] = __('messages.entrega_minima_cannot_negative');
+        }
+        if (
+            $this->fechado
+            && (!is_null($this->funcao_id)
+            || !is_null($this->prestador_id)
+            || $this->modo != self::MODO_FUNCIONAMENTO)
+        ) {
+            $errors['entrega_maxima'] = __('messages.close_invalid');
+        }
+        if ($horario > 0) {
+            $errors['inicio'] = __('messages.horario_existing');
+        }
+        return $errors;
     }
 }

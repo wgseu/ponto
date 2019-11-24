@@ -26,25 +26,27 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\ValidationException;
+use App\Models\Funcao;
 use Tests\TestCase;
 use App\Models\Horario;
+use App\Models\Prestador;
 
 class HorarioTest extends TestCase
 {
     public function testCreateHorario()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_horario =  factory(Horario::class)->create();
         $response = $this->graphfl('create_horario', [
             'input' => [
-                'inicio' => 1,
-                'fim' => 1,
+                'inicio' => Horario::MINUTES_PER_DAY,
+                'fim' => Horario::MINUTES_PER_DAY + 500,
             ]
         ], $headers);
 
         $found_horario = Horario::findOrFail($response->json('data.CreateHorario.id'));
-        $this->assertEquals(1, $found_horario->inicio);
-        $this->assertEquals(1, $found_horario->fim);
+        $this->assertEquals(Horario::MINUTES_PER_DAY, $found_horario->inicio);
+        $this->assertEquals(Horario::MINUTES_PER_DAY + 500, $found_horario->fim);
     }
 
     public function testUpdateHorario()
@@ -54,13 +56,13 @@ class HorarioTest extends TestCase
         $this->graphfl('update_horario', [
             'id' => $horario->id,
             'input' => [
-                'inicio' => 1,
-                'fim' => 1,
+                'inicio' => Horario::MINUTES_PER_DAY + 20,
+                'fim' => Horario::MINUTES_PER_DAY + 200,
             ]
         ], $headers);
         $horario->refresh();
-        $this->assertEquals(1, $horario->inicio);
-        $this->assertEquals(1, $horario->fim);
+        $this->assertEquals(Horario::MINUTES_PER_DAY + 20, $horario->inicio);
+        $this->assertEquals(Horario::MINUTES_PER_DAY + 200, $horario->fim);
     }
 
     public function testDeleteHorario()
@@ -78,5 +80,103 @@ class HorarioTest extends TestCase
         $horario = factory(Horario::class)->create();
         $response = $this->graphfl('query_horario', [ 'id' => $horario->id ], $headers);
         $this->assertEquals($horario->id, $response->json('data.horarios.data.0.id'));
+    }
+
+    public function testDuplicadoHorarios()
+    {
+        $horario = factory(Horario::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create(['inicio' => $horario->inicio + 1, 'fim' => $horario->fim - 1]);
+    }
+
+
+    public function testIntervaloSobrescrito()
+    {
+        $horario = factory(Horario::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create(['inicio' => $horario->inicio - 1, 'fim' => $horario->fim + 1]);
+    }
+
+    public function testMultiplaSelecao()
+    {
+        $funcao = factory(Funcao::class)->create();
+        $prestador = factory(Prestador::class)->create();
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create(['funcao_id' => $funcao->id, 'prestador_id' => $prestador->id]);
+    }
+
+    public function testHorarioFuncionamentoInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'inicio' => Horario::MINUTES_PER_DAY * 3,
+            'fim' => Horario::MINUTES_PER_DAY * 2,
+        ]);
+    }
+
+    public function testHorarioInicioInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'inicio' => Horario::MINUTES_PER_DAY - 100,
+        ]);
+    }
+
+    public function testHorarioTerminimoInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'fim' => (Horario::MINUTES_PER_DAY * 8) + 100,
+        ]);
+    }
+
+    public function testInvalidIntervalEntrega()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'modo' => Horario::MODO_ENTREGA,
+            'entrega_minima' => Horario::MINUTES_PER_DAY * 3,
+            'entrega_maxima' => Horario::MINUTES_PER_DAY * 2,
+        ]);
+    }
+
+    public function testTempoEntregaMinimaInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'modo' => Horario::MODO_ENTREGA,
+            'entrega_minima' => -10,
+        ]);
+    }
+
+    public function testFechamentoInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Horario::class)->create([
+            'modo' => Horario::MODO_OPERACAO,
+            'fechado' => true,
+        ]);
+    }
+
+    public function testAlterarDuplicandoHorarios()
+    {
+        $funcao = factory(Funcao::class)->create();
+        factory(Horario::class)->create(['inicio' => 4000, 'fim' => 4500, 'funcao_id' => $funcao->id]);
+        $horario = factory(Horario::class)->create(['inicio' => 3000, 'fim' => 3500, 'funcao_id' => $funcao->id]);
+        $horario->fim = 4200;
+        $this->assertEquals($funcao->id, $horario->funcao->id);
+        $this->expectException(ValidationException::class);
+        $horario->save();
+    }
+
+    public function testAlterarIntervaloSobrescrito()
+    {
+        $prestador = factory(Prestador::class)->create();
+        factory(Horario::class)->create(['inicio' => 3000, 'fim' => 3500, 'prestador_id' => $prestador->id]);
+        $horario = factory(Horario::class)->create(['inicio' => 4000, 'fim' => 4500, 'prestador_id' => $prestador->id]);
+        $horario->inicio = 3200;
+        $this->assertEquals($prestador->id, $horario->prestador->id);
+        $this->expectException(ValidationException::class);
+        $horario->save();
     }
 }

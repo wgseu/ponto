@@ -816,4 +816,13 @@ return [
     'movement' => 'Movimentações do caixa',
     'payment' => 'Pagamento de contas',
     'cash_number' => 'Caixa :number',
+    'invalid_selections_funcao_prestador' => 'Função e prestador não podem ser selecionados juntos',
+    'invalid_interval_funcionamento' => 'O intervalo de Funcionamento é inválido',
+    'inicio_invalid' => 'O horario de inicio é invalido',
+    'fim_invalid' => 'O horario de fim é invalido',
+    'interval_existing' => 'Esse intervalo de tempo já está selecionado',
+    'horario_existing' => 'Esse horario já existe',
+    'interval_entrega_invalid' => 'O intervalo de entrega é invalido',
+    'entrega_minima_cannot_negative' => 'A entrega minima não pode ser negativa',
+    'close_invalid' => 'Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas',
 ];

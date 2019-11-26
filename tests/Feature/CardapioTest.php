@@ -40,9 +40,10 @@ class CardapioTest extends TestCase
     public function testCreateCardapio()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_cardapio =  factory(Cardapio::class)->create();
+        $seed_cardapio =  factory(Cardapio::class)->make();
         $response = $this->graphfl('create_cardapio', [
             'input' => [
+                'cozinha_id' => $seed_cardapio->cozinha_id,
                 'produto_id' => $seed_cardapio->produto_id,
             ]
         ], $headers);

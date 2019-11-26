@@ -71,6 +71,12 @@ class EstoqueFilter extends InputType
             'preco_compra' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],
+            'custo_medio' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
+            'estoque' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
             'lote' => [
                 'type' => GraphQL::type('StringFilter'),
             ],

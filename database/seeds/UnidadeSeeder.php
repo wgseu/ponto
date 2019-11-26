@@ -27,15 +27,5 @@ class UnidadeSeeder extends Seeder
             'descricao' => __('messages.unity_grass'),
             'sigla' => 'g'
         ]))->save();
-        (new Unidade([
-            'nome' => __('messages.Calorie'),
-            'descricao' => __('messages.unity_calorie'),
-            'sigla' => 'cal'
-        ]))->save();
-        (new Unidade([
-            'nome' => __('messages.joule'),
-            'descricao' => __('messages.unity_joule'),
-            'sigla' => 'J'
-        ]))->save();
     }
 }

@@ -71,6 +71,12 @@ class EstoqueOrder extends InputType
             'preco_compra' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'custo_medio' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'estoque' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'lote' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

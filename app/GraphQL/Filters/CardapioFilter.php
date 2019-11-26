@@ -44,6 +44,9 @@ class CardapioFilter extends InputType
             'id' => [
                 'type' => Type::id(),
             ],
+            'cozinha_id' => [
+                'type' => GraphQL::type('IdFilter'),
+            ],
             'produto_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],

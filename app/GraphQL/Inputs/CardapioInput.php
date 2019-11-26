@@ -42,6 +42,10 @@ class CardapioInput extends InputType
     public function fields(): array
     {
         return [
+            'cozinha_id' => [
+                'type' => Type::nonNull(Type::id()),
+                'description' => 'Permite mostrar o cardápio somente dessa cozinha',
+            ],
             'produto_id' => [
                 'type' => Type::id(),
                 'description' => 'Produto que faz parte desse cardápio',

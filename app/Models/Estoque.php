@@ -178,6 +178,7 @@ class Estoque extends Model implements
         // baixa o estoque dos ingredientes
         $custo_aproximado = $this->baixar();
         $this->preco_compra = $custo_aproximado;
+        $this->calculate();
         $this->save();
     }
 
@@ -246,17 +247,48 @@ class Estoque extends Model implements
     }
 
     /**
+     * Calcula o custo médio e estoque
+     *
+     * @return self
+     */
+    public function calculate()
+    {
+        if ($this->quantidade < 0) {
+            return $this;
+        }
+        if ($this->exists) {
+            $old = $this->fresh();
+            // quantidade anterior à compra
+            $estoque = $old->estoque - $old->quantidade;
+            // custo total anterior à compra
+            $old_custo_total = $old->estoque * $old->custo_medio - $old->quantidade * $old->preco_compra;
+            // custo médio anterior à compra
+            $custo_medio = $old_custo_total / $estoque;
+        } else {
+            $estoque = $this->produto->estoque;
+            $custo_medio = $this->produto->custo_medio;
+        }
+        $estoque_total = $estoque + $this->quantidade;
+        $this->estoque = $estoque_total;
+        $custo_total = $estoque * $custo_medio + $this->quantidade * $this->preco_compra;
+        $this->custo_medio = $custo_total / $estoque_total;
+        return $this;
+    }
+
+    /**
      * Atualiza a contagem do produto
      *
      * @return void
      */
     protected function updateCounting()
     {
+        $run_contagem = true;
         $decrement = 0;
+        $old = null;
         if ($this->exists) {
             $old = $this->fresh();
             if ($old->quantidade == $this->quantidade && !$this->cancelado) {
-                return;
+                $run_contagem = false;
             }
             $decrement = $old->quantidade;
         }
@@ -265,16 +297,34 @@ class Estoque extends Model implements
         } else {
             $quantidade = $this->quantidade - $decrement;
         }
-        $contagem = Contagem::firstOrCreate(
-            [
-                'setor_id' => $this->setor_id,
-                'produto_id' => $this->produto_id,
-            ],
-            [ 'quantidade' => 0 ]
-        );
-        $contagem->increment('quantidade', $quantidade);
+        if ($run_contagem) {
+            $contagem = Contagem::firstOrCreate(
+                [
+                    'setor_id' => $this->setor_id,
+                    'produto_id' => $this->produto_id,
+                ],
+                [ 'quantidade' => 0 ]
+            );
+            $contagem->increment('quantidade', $quantidade);
+            $produto = $this->produto;
+            $produto->increment('estoque', $quantidade);
+        }
+        // checa por alteração na quantidade, preço de compra ou cancelamento
+        if (
+            $this->quantidade < 0 ||
+            (
+                !is_null($old) &&
+                $old->cancelado == $this->cancelado &&
+                $old->quantidade == $this->quantidade &&
+                $old->preco_compra == $this->preco_compra
+            )
+        ) {
+            return;
+        }
         $produto = $this->produto;
-        $produto->increment('estoque', $quantidade);
+        $custo_medio = $this->custo_medio;
+        // TODO: implementar correção de custo médio
+        // $produto->update(['custo_medio' => $custo_medio]);
     }
 
     /**

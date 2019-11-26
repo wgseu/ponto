@@ -67,6 +67,7 @@ class Cardapio extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
+        'cozinha_id',
         'produto_id',
         'composicao_id',
         'pacote_id',
@@ -86,6 +87,14 @@ class Cardapio extends Model implements ValidateInterface
         'acrescimo' => 0,
         'disponivel' => true,
     ];
+
+    /**
+     * Permite mostrar o cardápio somente dessa cozinha
+     */
+    public function cozinha()
+    {
+        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+    }
 
     /**
      * Produto que faz parte desse cardápio

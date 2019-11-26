@@ -1231,6 +1231,8 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('prestador_id')->nullable();
             $table->double('quantidade');
             $table->decimal('preco_compra', 19, 4)->default(0);
+            $table->decimal('custo_medio', 19, 4)->nullable();
+            $table->double('estoque')->nullable();
             $table->string('lote', 45)->nullable();
             $table->dateTime('fabricacao')->nullable();
             $table->dateTime('vencimento')->nullable();
@@ -2025,6 +2027,7 @@ class CreateInitialTables extends Migration
 
         Schema::create('cardapios', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('cozinha_id');
             $table->unsignedInteger('produto_id')->nullable();
             $table->unsignedInteger('composicao_id')->nullable();
             $table->unsignedInteger('pacote_id')->nullable();
@@ -2046,6 +2049,7 @@ class CreateInitialTables extends Migration
 
             $table->unique(
                 [
+                    'cozinha_id',
                     'produto_id',
                     'composicao_id',
                     'pacote_id',
@@ -2059,6 +2063,11 @@ class CreateInitialTables extends Migration
             $table->index(['composicao_id']);
             $table->index(['pacote_id']);
             $table->index(['cliente_id']);
+            $table->index(['produto_id']);
+            $table->foreign('cozinha_id')
+                ->references('id')->on('cozinhas')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->foreign('produto_id')
                 ->references('id')->on('produtos')
                 ->onUpdate('cascade')

@@ -65,7 +65,7 @@ class UpdateMovimentacaoMutation extends Mutation
     {
         $movimentacao = Movimentacao::findOrFail($args['id']);
         $movimentacao->fill($args['input']);
-        $movimentacao->save();
+        $movimentacao->cancelOrSave();
         return $movimentacao;
     }
 }

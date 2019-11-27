@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Carbon;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -79,6 +80,25 @@ class Sessao extends Model implements ValidateInterface
     public function cozinha()
     {
         return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+    }
+    
+    /*
+     * Informa se a sessão está aberta
+     * @return boolean Check if a of Aberta is selected or checked
+     */
+    public function aberta()
+    {
+        return $this->aberta == true;
+    }
+
+    /**
+     * Cancela sessão
+     */
+    public function cancel()
+    {
+        $this->data_termino = Carbon::now();
+        $this->aberta = false;
+        $this->save();
     }
 
     public function validate()

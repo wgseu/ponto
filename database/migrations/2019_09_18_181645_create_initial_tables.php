@@ -835,8 +835,8 @@ class CreateInitialTables extends Migration
 
         Schema::create('movimentacoes', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('sessao_id');
-            $table->unsignedInteger('caixa_id');
+            $table->unsignedInteger('sessao_id')->nullable();
+            $table->unsignedInteger('caixa_id')->nullable();
             $table->boolean('aberta')->default(true);
             $table->unsignedInteger('iniciador_id');
             $table->unsignedInteger('fechador_id')->nullable();

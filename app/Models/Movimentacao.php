@@ -27,8 +27,11 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\ValidationException;
 
 /**
  * Movimentação do caixa, permite abrir diversos caixas na conta de
@@ -37,6 +40,8 @@ use Illuminate\Database\Eloquent\Model;
 class Movimentacao extends Model implements ValidateInterface
 {
     use ModelEvents;
+
+    public const CREATED_AT = 'data_abertura';
 
     /**
      * The table associated with the model.
@@ -109,7 +114,116 @@ class Movimentacao extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Prestador', 'fechador_id');
     }
 
+    /**
+     * Informa se a movimentação está aberto
+     * @return boolean Check if a of Aberta is selected or checked
+     */
+    public function aberta()
+    {
+        return $this->aberta == true;
+    }
+
+    /**
+     * Cria sessão caso não tenha e salva movimentação
+     */
+    public function createSessaoOrSave()
+    {
+        DB::transaction(function () {
+            $horario = Horario::loadByAvailable(time());
+            if (is_null($horario) || is_null($horario->cozinha_id)) {
+                throw new ValidationException(['cozinha' => __('messages.session_not_kitchen_or_not_exists')]);
+            }
+            if (is_null($this->sessao_id)) {
+                $sessao = new Sessao();
+                $sessao->fill([
+                    'cozinha_id' => $horario->cozinha_id,
+                    'data_inicio' => Carbon::now(),
+                ]);
+                $sessao->save();
+                $this->sessao_id = $sessao->id;
+            }
+            $this->save();
+        });
+    }
+
+    /**
+     * Salva e cancela sessão atrelada
+     */
+    public function cancelOrSave()
+    {
+        DB::transaction(function () {
+            $this->save();
+            if (!is_null($this->data_fechamento) && $this->aberta == false) {
+                $sessao = $this->sessao;
+                $sessao->cancel();
+            }
+        });
+    }
+
     public function validate()
     {
+        $errors = [];
+        $old = self::find($this->id);
+        if (!is_null($old) && !$old->aberta()) {
+            $errors['id'] = __('messages.cannot_changed');
+        }
+        $sessao = $this->sessao;
+        if (!$sessao->aberta()) {
+            $errors['sessao_id'] = __('messages.sessao_closed');
+        } elseif (!is_null($old) && $old->sessao_id != $this->sessao_id) {
+            $errors['sessao_id'] = __('messages.sessao_changed');
+        }
+        $caixa = $this->caixa;
+        if (!is_null($caixa) && !$caixa->ativo()) {
+            $errors['caixa_id'] = __('messages.caixa_inactive', ['descricao' => $caixa->descricao]);
+        }
+        $count = self::where(['aberta' => true])->count();
+        $pedidos = Pedido::where([
+            ['sessao_id', $this->sessao_id],
+            ['estado', '<>', Pedido::ESTADO_CANCELADO],
+            ['estado', '<>', Pedido::ESTADO_CONCLUIDO],
+        ])->count();
+        $pagamentos = Pagamento::where([
+            ['movimentacao_id', $this->id],
+            ['estado', '<>', Pagamento::ESTADO_CANCELADO],
+            ['estado', '<>', Pagamento::ESTADO_PAGO],
+        ])->count();
+        if (!$this->exists() && !$this->aberta()) {
+            $errors['aberta'] = __('messages.aberta_create_closed');
+        } elseif (!is_null($old) && !$old->aberta() && $this->aberta()) {
+            $errors['aberta'] = __('messages.aberta_reopen');
+        } elseif (!$this->aberta() && $count < 2 && $pedidos > 0) {
+            $errors['aberta'] = __('messages.aberta_orders', ['pedidos' => $pedidos]);
+        } elseif (!$this->aberta() && $count < 2 && $pagamentos > 0) {
+            $errors['aberta'] = __('messages.aberta_payments', ['pagamentos' => $pagamentos]);
+        }
+        $movimentacao = self::where([
+            ['sessao_id', $this->sessao_id],
+            ['caixa_id', $this->caixa_id],
+            ['iniciador_id', $this->iniciador_id],
+            ['aberta', true]
+        ])->first();
+        $iniciador = $this->iniciador()->onlyTrashed()->first();
+        if (!is_null($iniciador) && !is_null($iniciador->data_termino) && $this->aberta()) {
+            $errors['iniciador_id'] = __('messages.iniciador_inactive');
+        } elseif (!is_null($movimentacao) && !$this->exists) {
+            $errors['iniciador_id'] = __('messages.iniciador_initiated');
+        } elseif (!is_null($old) && $old->iniciador_id != $this->iniciador_id) {
+            $errors['iniciador_id'] = __('messages.iniciador_changed');
+        }
+        if (!is_null($this->fechador_id) && $this->aberta) {
+            $errors['fechador_id'] = __('messages.fechador_mustbe_empty');
+        } elseif (is_null($this->fechador_id) && !$this->aberta()) {
+            $errors['fechador_id'] = __('messages.fechador_cannot_empty');
+        }
+        if (!is_null($old) && $old->data_abertura != $this->data_abertura) {
+            $errors['data_abertura'] = __('messages.data_abertura_changed');
+        }
+        if (!is_null($this->data_fechamento) && $this->aberta()) {
+            $errors['data_fechamento'] = __('messages.data_fechamento_mustbe_empty');
+        } elseif (is_null($this->data_fechamento) && !$this->aberta()) {
+            $errors['data_fechamento'] = __('messages.data_fechamento_cannot_empty');
+        }
+        return $errors;
     }
 }

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Util\Date;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -117,6 +118,23 @@ class Horario extends Model implements ValidateInterface
     public function cozinha()
     {
         return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+    }
+
+    /**
+     * Retorna o horário compeendido ou próximo horário disponível com base no tempo unix
+     * @param int $time tempo atual
+     * @return self Self instance filled or empty
+     */
+    public static function loadByAvailable($time = null)
+    {
+        $week_offset = Date::weekOffset($time);
+        // carrega até o final da semana (Sábado)
+        $horario = self::where('fim', '>=', $week_offset)->orderBy('inicio', 'asc')->first();
+        if (is_null($horario)) {
+            // carrega na outra semana (domingo)
+            $horario = Horario::where('fechado', false)->orderBy('inicio', 'asc')->first();
+        }
+        return $horario;
     }
 
     /**

@@ -61,7 +61,7 @@ class CreateMovimentacaoMutation extends Mutation
     {
         $movimentacao = new Movimentacao();
         $movimentacao->fill($args['input']);
-        $movimentacao->save();
+        $movimentacao->createSessaoOrSave();
         return $movimentacao;
     }
 }

@@ -44,12 +44,12 @@ class MovimentacaoInput extends InputType
     {
         return [
             'sessao_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo' .
                     ' código da sessão',
             ],
             'caixa_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Caixa a qual pertence essa movimentação',
             ],
             'aberta' => [
@@ -69,7 +69,7 @@ class MovimentacaoInput extends InputType
                 'description' => 'Data de fechamento do caixa',
             ],
             'data_abertura' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data de abertura do caixa',
             ],
         ];

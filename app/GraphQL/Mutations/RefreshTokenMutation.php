@@ -46,7 +46,7 @@ class RefreshTokenMutation extends Mutation
 
     public function type(): Type
     {
-        return GraphQL::type('ClienteAuth');
+        return GraphQL::type('AuthBase');
     }
 
     public function args(): array
@@ -72,6 +72,7 @@ class RefreshTokenMutation extends Mutation
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,
+            'cliente'      => $cliente->toArray(),
         ];
     }
 }

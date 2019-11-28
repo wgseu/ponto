@@ -69,6 +69,7 @@ class LoginClienteMutation extends Mutation
             throw new AuthorizationException(__('messages.verify_account'));
         }
         return [
+            'refresh_token' => auth()->user()->createRefreshToken(),
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,

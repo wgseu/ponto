@@ -28,22 +28,36 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Types;
 
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Type as GraphQLType;
 
-class ClienteAuthType extends AuthBaseType
+class AuthBaseType extends GraphQLType
 {
     protected $attributes = [
-        'name' => 'ClienteAuth',
-        'description' => 'Resposta do login',
+        'name' => 'AuthBase',
+        'description' => 'Resposta da atualização do token',
     ];
 
     public function fields(): array
     {
-        return array_merge(parent::fields(), [
-            'refresh_token' => [
+        return [
+            'access_token' => [
                 'type' => Type::string(),
-                'description' => 'Token para renovar o token de acesso',
+                'description' => 'Token que permite acessar os recursos',
             ],
-        ]);
+            'token_type' => [
+                'type' => Type::string(),
+                'description' => 'Tipo de token, sempre bearer',
+            ],
+            'expires_in' => [
+                'type' => Type::int(),
+                'description' => 'Timestamp que o token irá expirar em segundos',
+            ],
+            'cliente' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Os dados do cliente do token',
+            ],
+        ];
     }
 }

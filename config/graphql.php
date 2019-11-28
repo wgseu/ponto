@@ -176,6 +176,7 @@ return [
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
+                'RefreshToken' => 'App\GraphQL\Mutations\RefreshTokenMutation',
 
                 'CreateSetor' => 'App\GraphQL\Mutations\CreateSetorMutation',
                 'UpdateSetor' => 'App\GraphQL\Mutations\UpdateSetorMutation',
@@ -793,6 +794,7 @@ return [
         'DateTime' => 'App\GraphQL\Types\DateTimeType',
 
         'ClienteAuth' => 'App\GraphQL\Types\ClienteAuthType',
+        'AuthBase' => 'App\GraphQL\Types\AuthBaseType',
 
         'Setor' => 'App\GraphQL\Types\SetorType',
         'Mesa' => 'App\GraphQL\Types\MesaType',

@@ -22,17 +22,17 @@ class PropriedadeSeeder extends Seeder
         (new Propriedade([
             'grupo_id' => $group->id,
             'nome' => __('messages.small'),
-            'abreviacao' => 'P',
+            'abreviacao' => __('messages.abbreviation_small'),
         ]))->save();
         (new Propriedade([
             'grupo_id' => $group->id,
             'nome' => __('messages.medium'),
-            'abreviacao' => 'M',
+            'abreviacao' => __('messages.abbreviation_medium'),
         ]))->save();
         (new Propriedade([
             'grupo_id' => $group->id,
             'nome' => __('messages.large'),
-            'abreviacao' => 'G',
+            'abreviacao' => __('messages.abbreviation_large'),
         ]))->save();
     }
 }

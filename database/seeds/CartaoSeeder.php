@@ -20,67 +20,67 @@ class CartaoSeeder extends Seeder
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "Visa",
-            'imagem_url' => "visa.png",
+            'imagem_url' => "images/card/visa.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "MasterCard",
-            'imagem_url' => "mastercard.png",
+            'imagem_url' => "images/card/mastercard.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "Hipercard",
-            'imagem_url' => "hipercard.png",
+            'imagem_url' => "images/card/hipercard.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "Elo",
-            'imagem_url' => "elo.png",
+            'imagem_url' => "images/card/elo.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "American Express",
-            'imagem_url' => "american_express.png",
+            'imagem_url' => "images/card/american_express.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $credito->id,
             'bandeira' => "Diners Club",
-            'imagem_url' => "diners_club.png",
+            'imagem_url' => "images/card/diners_club.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $debito->id,
             'bandeira' => "Maestro",
-            'imagem_url' => "maestro.png",
+            'imagem_url' => "images/card/maestro.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $debito->id,
             'bandeira' => "Visa Electron",
-            'imagem_url' => "visa_electron.png",
+            'imagem_url' => "images/card/visa_electron.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $debito->id,
             'bandeira' => "Elo",
-            'imagem_url' => "elo.png",
+            'imagem_url' => "images/card/elo.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $vale->id,
             'bandeira' => "Sodexo",
-            'imagem_url' => "sodexo.png",
+            'imagem_url' => "images/card/sodexo.png",
         ]))->save();
 
         (new Cartao([
             'forma_id' => $vale->id,
             'bandeira' => "Ticket",
-            'imagem_url' => "ticket.png",
+            'imagem_url' => "images/card/ticket.png",
         ]))->save();
     }
 }

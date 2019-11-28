@@ -36,6 +36,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.coca_cola_350ml'),
             'preco_venda' => 3.5,
             'tipo' => Produto::TIPO_PRODUTO,
+            'imagem_url' => 'images/produtcs/coca-cola_lata_350ml.png',
         ]))->save();
         (new Produto([
             'codigo' => '2',
@@ -45,6 +46,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.x_burguer'),
             'preco_venda' => 15.0,
             'tipo' => Produto::TIPO_COMPOSICAO,
+            'imagem_url' => 'images/produtcs/x-burguer.png',
         ]))->save();
         (new Produto([
             'codigo' => '3',
@@ -55,6 +57,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/alface.png',
         ]))->save();
         (new Produto([
             'codigo' => '4',
@@ -65,6 +68,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/tomate.png',
         ]))->save();
         (new Produto([
             'codigo' => '5',
@@ -73,6 +77,7 @@ class ProdutoSeeder extends Seeder
             'setor_preparo_id' => $pizza_sector->id,
             'descricao' => __('messages.pizza'),
             'tipo' => Produto::TIPO_PACOTE,
+            'imagem_url' => 'images/produtcs/pizza.png',
         ]))->save();
         (new Produto([
             'codigo' => '6',
@@ -82,6 +87,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.x_bacon'),
             'preco_venda' => 18.0,
             'tipo' => Produto::TIPO_COMPOSICAO,
+            'imagem_url' => 'images/produtcs/x_bacon.png',
         ]))->save();
         (new Produto([
             'codigo' => '7',
@@ -93,6 +99,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_COMPOSICAO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/pizza_mussarela.png',
         ]))->save();
         (new Produto([
             'codigo' => '8',
@@ -104,6 +111,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_COMPOSICAO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/pizza_calabresa.png',
         ]))->save();
         (new Produto([
             'codigo' => '9',
@@ -113,6 +121,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/catupiry.png',
         ]))->save();
         (new Produto([
             'codigo' => '10',
@@ -122,6 +131,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/cheddar.png',
         ]))->save();
         (new Produto([
             'codigo' => '11',
@@ -130,6 +140,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.bread'),
             'tipo' => Produto::TIPO_PRODUTO,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/pao.png',
         ]))->save();
         (new Produto([
             'codigo' => '12',
@@ -138,6 +149,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.egg'),
             'tipo' => Produto::TIPO_PRODUTO,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/ovo.png',
         ]))->save();
         (new Produto([
             'codigo' => '13',
@@ -147,6 +159,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/cebola.png',
         ]))->save();
         (new Produto([
             'codigo' => '14',
@@ -157,6 +170,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/bacon.png',
         ]))->save();
         (new Produto([
             'codigo' => '15',
@@ -166,6 +180,7 @@ class ProdutoSeeder extends Seeder
             'abreviacao' => _('messages.burger'),
             'tipo' => Produto::TIPO_COMPOSICAO,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/hamburguer_artesanal.png',
         ]))->save();
         (new Produto([
             'codigo' => '16',
@@ -174,6 +189,7 @@ class ProdutoSeeder extends Seeder
             'descricao' => __('messages.acai'),
             'preco_venda' => 8.00,
             'tipo' => Produto::TIPO_COMPOSICAO,
+            'imagem_url' => 'images/produtcs/acai.png',
         ]))->save();
         (new Produto([
             'codigo' => '17',
@@ -184,6 +200,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/morango.png',
         ]))->save();
         (new Produto([
             'codigo' => '18',
@@ -194,6 +211,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/chocolate.png',
         ]))->save();
         (new Produto([
             'codigo' => '19',
@@ -204,6 +222,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/leite_condensado.png',
         ]))->save();
         (new Produto([
             'codigo' => '20',
@@ -214,6 +233,8 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/polpa_de_acai.png',
+
         ]))->save();
         (new Produto([
             'codigo' => '21',
@@ -223,6 +244,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_COMPOSICAO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/massa_de_pizza.png',
         ]))->save();
         (new Produto([
             'codigo' => '22',
@@ -232,6 +254,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/oleo_de_soja.png',
         ]))->save();
         (new Produto([
             'codigo' => '23',
@@ -242,6 +265,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/oregano.png',
         ]))->save();
         (new Produto([
             'codigo' => '24',
@@ -252,6 +276,7 @@ class ProdutoSeeder extends Seeder
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/farinha_de_trigo.png',
         ]))->save();
         (new Produto([
             'codigo' => '25',
@@ -261,6 +286,7 @@ class ProdutoSeeder extends Seeder
             'abreviacao' => __('messages.catupiry'),
             'tipo' => Produto::TIPO_COMPOSICAO,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/borda_de_catupiry.png',
         ]))->save();
         (new Produto([
             'codigo' => '26',
@@ -270,6 +296,7 @@ class ProdutoSeeder extends Seeder
             'abreviacao' => __('messages.cheddar'),
             'tipo' => Produto::TIPO_COMPOSICAO,
             'disponivel' => false,
+            'imagem_url' => 'images/produtcs/borda_de_cheddar.png',
         ]))->save();
     }
 }

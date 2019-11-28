@@ -582,6 +582,10 @@ return [
     'small' => 'Pequena',
     'medium' => 'Média',
     'large' => 'Grande',
+    'abbreviation_small' => 'P',
+    'abbreviation_medium' => 'M',
+    'abbreviation_large' => 'G',
+
 
     'real' => 'Real',
     'symbol_real' => 'R$',
@@ -824,5 +828,14 @@ return [
     'horario_existing' => 'Esse horario já existe',
     'interval_entrega_invalid' => 'O intervalo de entrega é invalido',
     'entrega_minima_cannot_negative' => 'A entrega minima não pode ser negativa',
-    'close_invalid' => 'Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas',
+    'close_invalid' => 'Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador' .
+        'selecionadas',
+    'pizzeria' => 'Pizzaria',
+    'restaurant' => 'Restaurante',
+    'steak_house' => 'Churrascaria',
+    'ice_cream_shop' => 'Sorveteria',
+    'pub' => 'Bar',
+    'snack_bar' => 'Lanchonete',
+    'acaiteria' => 'Açaiteria',
+    'pastelaria' => 'Pastelaria',
 ];

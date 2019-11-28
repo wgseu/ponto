@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             OrigemSeeder::class,
             RegimeSeeder::class,
             ImpostoSeeder::class,
+            CozinhaSeeder::class,
             // OperacaoSeeder::class,
             // IntegracaoSeeder::class,
 
@@ -48,6 +49,7 @@ class DatabaseSeeder extends Seeder
             GrupoSeeder::class,
             PropriedadeSeeder::class,
             PacoteSeeder::class,
+            EstoqueSeeder::class,
         ]);
     }
 }

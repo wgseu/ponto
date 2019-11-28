@@ -48,6 +48,10 @@ class CardapioType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador do cardápio',
             ],
+            'cozinha_id' => [
+                'type' => Type::id(),
+                'description' => 'Permite mostrar o cardápio somente dessa cozinha',
+            ],
             'produto_id' => [
                 'type' => Type::id(),
                 'description' => 'Produto que faz parte desse cardápio',

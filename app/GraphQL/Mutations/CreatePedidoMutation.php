@@ -330,7 +330,7 @@ class CreatePedidoMutation extends Mutation
             $pedido->prestador_id = $funcionario_id;
             $pedido->save();
             $itens = $input['itens'] ?? [];
-            $this->saveItems($itens, $pedido, $funcionario_id, $prestador);
+            $this->saveItems($itens, $pedido, $prestador, $funcionario_id);
             $pagamentos = $input['pagamentos'] ?? [];
             $this->savePayments($pagamentos, $pedido, $funcionario_id);
             $pedido->totalize();

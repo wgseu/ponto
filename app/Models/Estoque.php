@@ -157,6 +157,7 @@ class Estoque extends Model implements
         $item = $this->transacao;
         $item->custo_aproximado += $custo_aproximado;
         $item->save();
+        $this->preco_compra = $custo_aproximado;
     }
 
     /**

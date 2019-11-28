@@ -272,7 +272,7 @@ class Item extends Model implements
         $estoque = new Estoque([
             'setor_id' => $produto->setor_estoque_id,
             'produto_id' => $this->produto_id,
-            'quantidade' => -$this->quantidade,
+            'quantidade' => $this->quantidade,
             'transacao_id' => $this->id,
             'prestador_id' => $this->prestador_id,
         ]);

@@ -35,7 +35,7 @@ class ClienteSeeder extends Seeder
         $cliente->save();
 
         $empresa = Empresa::find('1');
-        $empresa->empresa_id = $cliente->id;
+        $empresa->empresa_id = $empresa_cliente->id;
         $empresa->save();
     }
 }

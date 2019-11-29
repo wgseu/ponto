@@ -236,11 +236,12 @@ class Estoque extends Model implements
                 'producao_id' => $this->id,
                 'setor_id' => $produto->setor_estoque_id,
                 'produto_id' => $produto->id,
-                'quantidade' => -$composicao->quantidade,
+                'quantidade' => $composicao->quantidade * -1,
                 'transacao_id' => $this->transacao_id,
                 'prestador_id' => $this->prestador_id,
                 'preco_compra' => $produto->custo_medio,
             ]);
+            $estoque->calculate();
             $estoque->save();
             $custo_aproximado += ($composicao->quantidade * $produto->custo_medio) / $this->quantidade;
         }
@@ -254,9 +255,6 @@ class Estoque extends Model implements
      */
     public function calculate()
     {
-        if ($this->quantidade < 0) {
-            return $this;
-        }
         if ($this->exists) {
             $old = $this->fresh();
             // quantidade anterior à compra
@@ -325,7 +323,8 @@ class Estoque extends Model implements
         $produto = $this->produto;
         $custo_medio = $this->custo_medio;
         // TODO: implementar correção de custo médio
-        // $produto->update(['custo_medio' => $custo_medio]);
+        $produto->custo_medio = $custo_medio;
+        $produto->save();
     }
 
     /**

@@ -309,10 +309,10 @@ class Item extends Model implements
     {
         $errors = [];
         $old = $this->fresh();
-        if ($old->produto_id !== $this->produto_id) {
+        if ($old->produto_id != $this->produto_id) {
             $errors['produto_id'] = __('messages.item_cannot_change_type');
         }
-        if ($old->servico_id !== $this->servico_id) {
+        if ($old->servico_id != $this->servico_id) {
             $errors['servico_id'] = __('messages.item_cannot_change_type');
         }
         if (!is_null($this->produto_id) && $old->quantidade != $this->quantidade) {

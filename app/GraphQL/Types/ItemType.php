@@ -61,8 +61,16 @@ class ItemType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Produto vendido',
             ],
+            'produto' => [
+                'type' => GraphQL::type('Produto'),
+                'description' => 'Produto vendido',
+            ],
             'servico_id' => [
                 'type' => Type::id(),
+                'description' => 'Serviço cobrado ou taxa',
+            ],
+            'servico' => [
+                'type' => GraphQL::type('Servico'),
                 'description' => 'Serviço cobrado ou taxa',
             ],
             'item_id' => [

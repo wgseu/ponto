@@ -173,6 +173,8 @@ return [
                 'empresa' => 'App\GraphQL\Queries\EmpresaQuery',
                 'sistema' => 'App\GraphQL\Queries\SistemaQuery',
                 'emitente' => 'App\GraphQL\Queries\EmitenteQuery',
+
+                'pedido' => 'App\GraphQL\Queries\PedidoSummaryQuery',
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
@@ -878,6 +880,7 @@ return [
         'Conferencia' => 'App\GraphQL\Types\ConferenciaType',
 
         'ClienteVerify' => 'App\GraphQL\Types\ClienteVerifyType',
+        'PedidoSummary' => 'App\GraphQL\Types\PedidoSummaryType',
 
         'CarteiraTipo' => 'App\GraphQL\Enums\CarteiraTipoEnum',
         'CarteiraAmbiente' => 'App\GraphQL\Enums\CarteiraAmbienteEnum',

@@ -80,6 +80,10 @@ class PagamentoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Forma da pagamento do pedido',
             ],
+            'forma' => [
+                'type' => GraphQL::type('Forma'),
+                'description' => 'Forma da pagamento do pedido',
+            ],
             'pedido_id' => [
                 'type' => Type::id(),
                 'description' => 'Pedido que foi pago',
@@ -90,6 +94,10 @@ class PagamentoType extends GraphQLType
             ],
             'cartao_id' => [
                 'type' => Type::id(),
+                'description' => 'Cartão em que foi pago, para forma de pagamento em cartão',
+            ],
+            'cartao' => [
+                'type' => GraphQL::type('Cartao'),
                 'description' => 'Cartão em que foi pago, para forma de pagamento em cartão',
             ],
             'cheque_id' => [

@@ -31,7 +31,7 @@ class EstoqueSeeder extends Seeder
         $oregano = Produto::where('codigo', '23')->first();
         $farinha = Produto::where('codigo', '24')->first();
 
-        $setor = Setor::where('nome', __('messages.covered_hall'))->first();
+        $setor = Setor::where('nome', __('messages.stock'))->first();
 
         (new Estoque([
             'produto_id' => $coca_cola->id,

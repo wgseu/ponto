@@ -13,6 +13,14 @@ class ClienteSeeder extends Seeder
      */
     public function run()
     {
+        $empresa_cliente = new Cliente([
+            'tipo' => Cliente::TIPO_JURIDICA,
+            'nome' => 'Empresa',
+            'sobrenome' => 'Teste',
+            'email' => 'empresa@grandchef.com.br',
+        ]);
+        $empresa_cliente->save();
+ 
         $cliente = new Cliente([
             'tipo' => Cliente::TIPO_FISICA,
             'login' => 'admin',
@@ -21,9 +29,13 @@ class ClienteSeeder extends Seeder
             'sobrenome' => 'Teste',
             'genero' => Cliente::GENERO_MASCULINO,
             'email' => 'beta@grandchef.com.br',
-            'empresa_id' => Empresa::find(1)->empresa_id,
+            'empresa_id' => $empresa_cliente->id,
         ]);
         $cliente->forceFill(['status' => Cliente::STATUS_ATIVO]);
         $cliente->save();
+
+        $empresa = Empresa::find('1');
+        $empresa->empresa_id = $cliente->id;
+        $empresa->save();
     }
 }

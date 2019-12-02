@@ -42,6 +42,7 @@ class Movimentacao extends Model implements ValidateInterface
     use ModelEvents;
 
     public const CREATED_AT = 'data_abertura';
+    public const UPDATED_AT = null;
 
     /**
      * The table associated with the model.
@@ -50,12 +51,6 @@ class Movimentacao extends Model implements ValidateInterface
      */
     protected $table = 'movimentacoes';
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -69,7 +64,6 @@ class Movimentacao extends Model implements ValidateInterface
         'iniciador_id',
         'fechador_id',
         'data_fechamento',
-        'data_abertura',
     ];
 
     /**
@@ -103,7 +97,7 @@ class Movimentacao extends Model implements ValidateInterface
      */
     public function iniciador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'iniciador_id');
+        return $this->belongsTo('App\Models\Prestador', 'iniciador_id')->withTrashed();
     }
 
     /**
@@ -115,21 +109,12 @@ class Movimentacao extends Model implements ValidateInterface
     }
 
     /**
-     * Informa se a movimentação está aberto
-     * @return boolean Check if a of Aberta is selected or checked
-     */
-    public function aberta()
-    {
-        return $this->aberta == true;
-    }
-
-    /**
      * Cria sessão caso não tenha e salva movimentação
      */
     public function createSessaoOrSave()
     {
         DB::transaction(function () {
-            $horario = Horario::loadByAvailable(time());
+            $horario = Horario::loadByAvailable();
             if (is_null($horario) || is_null($horario->cozinha_id)) {
                 throw new ValidationException(['cozinha' => __('messages.session_not_kitchen_or_not_exists')]);
             }
@@ -147,15 +132,20 @@ class Movimentacao extends Model implements ValidateInterface
     }
 
     /**
-     * Salva e cancela sessão atrelada
+     * Salva movimentação e fecha sessões atreladas
      */
-    public function cancelOrSave()
+    public function closeOrSave()
     {
         DB::transaction(function () {
-            $this->save();
-            if (!is_null($this->data_fechamento) && $this->aberta == false) {
-                $sessao = $this->sessao;
-                $sessao->cancel();
+            $prestador = auth()->user()->prestador;
+            if ($this->aberta == false) {
+                $this->data_fechamento = Carbon::now();
+                $this->fechador_id = $prestador->id;
+                $this->save();
+                $sessoes = $this->sessao()->get();
+                foreach ($sessoes as $sessao) {
+                    $sessao->close();
+                }
             }
         });
     }
@@ -164,17 +154,17 @@ class Movimentacao extends Model implements ValidateInterface
     {
         $errors = [];
         $old = self::find($this->id);
-        if (!is_null($old) && !$old->aberta()) {
+        if (!is_null($old) && $old->aberta != true) {
             $errors['id'] = __('messages.cannot_changed');
         }
         $sessao = $this->sessao;
-        if (!$sessao->aberta()) {
+        if (!is_null($sessao) && $sessao->aberta != true) {
             $errors['sessao_id'] = __('messages.sessao_closed');
         } elseif (!is_null($old) && $old->sessao_id != $this->sessao_id) {
             $errors['sessao_id'] = __('messages.sessao_changed');
         }
         $caixa = $this->caixa;
-        if (!is_null($caixa) && !$caixa->ativo()) {
+        if (!is_null($caixa) && $caixa->ativa != true) {
             $errors['caixa_id'] = __('messages.caixa_inactive', ['descricao' => $caixa->descricao]);
         }
         $count = self::where(['aberta' => true])->count();
@@ -188,13 +178,13 @@ class Movimentacao extends Model implements ValidateInterface
             ['estado', '<>', Pagamento::ESTADO_CANCELADO],
             ['estado', '<>', Pagamento::ESTADO_PAGO],
         ])->count();
-        if (!$this->exists() && !$this->aberta()) {
+        if (!$this->exists && $this->aberta != true) {
             $errors['aberta'] = __('messages.aberta_create_closed');
-        } elseif (!is_null($old) && !$old->aberta() && $this->aberta()) {
+        } elseif (!is_null($old) && $old->aberta != true && $this->aberta == true) {
             $errors['aberta'] = __('messages.aberta_reopen');
-        } elseif (!$this->aberta() && $count < 2 && $pedidos > 0) {
+        } elseif ($this->aberta != true && $count < 2 && $pedidos > 0) {
             $errors['aberta'] = __('messages.aberta_orders', ['pedidos' => $pedidos]);
-        } elseif (!$this->aberta() && $count < 2 && $pagamentos > 0) {
+        } elseif ($this->aberta != true && $count < 2 && $pagamentos > 0) {
             $errors['aberta'] = __('messages.aberta_payments', ['pagamentos' => $pagamentos]);
         }
         $movimentacao = self::where([
@@ -203,8 +193,8 @@ class Movimentacao extends Model implements ValidateInterface
             ['iniciador_id', $this->iniciador_id],
             ['aberta', true]
         ])->first();
-        $iniciador = $this->iniciador()->onlyTrashed()->first();
-        if (!is_null($iniciador) && !is_null($iniciador->data_termino) && $this->aberta()) {
+        $iniciador = $this->iniciador;
+        if (!is_null($iniciador) && !is_null($iniciador->data_termino) && $this->aberta == true) {
             $errors['iniciador_id'] = __('messages.iniciador_inactive');
         } elseif (!is_null($movimentacao) && !$this->exists) {
             $errors['iniciador_id'] = __('messages.iniciador_initiated');
@@ -213,15 +203,15 @@ class Movimentacao extends Model implements ValidateInterface
         }
         if (!is_null($this->fechador_id) && $this->aberta) {
             $errors['fechador_id'] = __('messages.fechador_mustbe_empty');
-        } elseif (is_null($this->fechador_id) && !$this->aberta()) {
+        } elseif (is_null($this->fechador_id) && $this->aberta != true) {
             $errors['fechador_id'] = __('messages.fechador_cannot_empty');
         }
         if (!is_null($old) && $old->data_abertura != $this->data_abertura) {
             $errors['data_abertura'] = __('messages.data_abertura_changed');
         }
-        if (!is_null($this->data_fechamento) && $this->aberta()) {
+        if (!is_null($this->data_fechamento) && $this->aberta == true) {
             $errors['data_fechamento'] = __('messages.data_fechamento_mustbe_empty');
-        } elseif (is_null($this->data_fechamento) && !$this->aberta()) {
+        } elseif (is_null($this->data_fechamento) && $this->aberta != true) {
             $errors['data_fechamento'] = __('messages.data_fechamento_cannot_empty');
         }
         return $errors;

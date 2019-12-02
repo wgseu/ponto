@@ -68,6 +68,7 @@ return [
     'caixa_create_permition' => 'Cadastra os caixas',
     'caixa_update_permition' => 'Atualiza os caixas',
     'caixa_delete_permition' => 'Exclui ou arquiva os caixas',
+    'caixa_reopen_permition' => 'Reabre o caixa',
     'forma_view_permition' => 'Lista e visualiza as formas de pagamento',
     'forma_create_permition' => 'Cadastra as formas de pagamento',
     'forma_update_permition' => 'Atualiza as formas de pagamento',
@@ -842,4 +843,6 @@ return [
     'data_fechamento_mustbe_empty' => 'Data de fechamento deve ser vazia',
     'data_fechamento_cannot_empty' => 'Data de fechamento não deve ser vazia',
     'session_not_kitchen_or_not_exists' => 'Cozinha não configurada no horário ou não existe',
+    'restaurant' => 'Restaurante',
+    'not_permition_reopen' => 'Sem permissão para reabrir o caixa',
 ];

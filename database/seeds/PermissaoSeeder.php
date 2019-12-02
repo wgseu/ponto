@@ -138,6 +138,11 @@ class PermissaoSeeder extends Seeder
             'nome' => 'caixa:delete',
             'descricao' => __('messages.caixa_delete_permition'),
         ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 7,
+            'nome' => 'caixa:reopen',
+            'descricao' => __('messages.caixa_reopen_permition'),
+        ]))->save();
 
         (new Permissao([
             'funcionalidade_id' => 33,

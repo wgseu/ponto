@@ -48,11 +48,6 @@ class Horario extends Model implements ValidateInterface
     public const MODO_ENTREGA = 'entrega';
 
     /**
-     * Total number of minutes in one day
-     */
-    public const MINUTES_PER_DAY = 1440;
-
-    /**
      * The table associated with the model.
      *
      * @var string
@@ -129,10 +124,15 @@ class Horario extends Model implements ValidateInterface
     {
         $week_offset = Date::weekOffset($time);
         // carrega até o final da semana (Sábado)
-        $horario = self::where('fim', '>=', $week_offset)->orderBy('inicio', 'asc')->first();
+        $horario = self::where('fim', '>=', $week_offset)
+            ->where('modo', Horario::MODO_FUNCIONAMENTO)
+            ->where('fechado', false)
+            ->orderBy('inicio', 'asc')->first();
         if (is_null($horario)) {
             // carrega na outra semana (domingo)
-            $horario = Horario::where('fechado', false)->orderBy('inicio', 'asc')->first();
+            $horario = self::where('fechado', false)
+                ->where('modo', Horario::MODO_FUNCIONAMENTO)
+                ->orderBy('inicio', 'asc')->first();
         }
         return $horario;
     }
@@ -176,9 +176,9 @@ class Horario extends Model implements ValidateInterface
         }
         if ($this->inicio >= $this->fim) {
             $errors['inicio'] = __('messages.invalid_interval_funcionamento');
-        } elseif (!$this->fechado && $this->inicio < self::MINUTES_PER_DAY) {
+        } elseif (!$this->fechado && $this->inicio < Date::MINUTES_PER_DAY) {
             $errors['inicio'] = __('messages.inicio_invalid');
-        } elseif (!$this->fechado && $this->fim >= self::MINUTES_PER_DAY * 8) {
+        } elseif (!$this->fechado && $this->fim >= Date::MINUTES_PER_DAY * 8) {
             $errors['fim'] = __('messages.fim_invalid');
         }
         if (

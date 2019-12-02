@@ -43,34 +43,13 @@ class MovimentacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'sessao_id' => [
-                'type' => Type::id(),
-                'description' => 'Sessão do dia, permite abrir vários caixas no mesmo dia com o mesmo' .
-                    ' código da sessão',
-            ],
             'caixa_id' => [
-                'type' => Type::id(),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Caixa a qual pertence essa movimentação',
             ],
             'aberta' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se o caixa está aberto',
-            ],
-            'iniciador_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Funcionário que abriu o caixa',
-            ],
-            'fechador_id' => [
-                'type' => Type::id(),
-                'description' => 'Funcionário que fechou o caixa',
-            ],
-            'data_fechamento' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de fechamento do caixa',
-            ],
-            'data_abertura' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de abertura do caixa',
             ],
         ];
     }

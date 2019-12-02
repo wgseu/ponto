@@ -86,15 +86,6 @@ class Caixa extends Model implements ValidateInterface
     }
 
     /**
-     * Informa se o caixa está ativo
-     * @return boolean Check if o of Ativo is selected or checked
-     */
-    public function ativo()
-    {
-        return $this->ativa == true;
-    }
-
-    /**
      * Regras:
      * Se o caixa estiver em uso não pode ser desativado;
      * O caixa só pode ter a cateira do tipo local;

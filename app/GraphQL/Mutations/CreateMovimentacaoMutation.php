@@ -61,6 +61,8 @@ class CreateMovimentacaoMutation extends Mutation
     {
         $movimentacao = new Movimentacao();
         $movimentacao->fill($args['input']);
+        $prestador = auth()->user()->prestador;
+        $movimentacao->iniciador_id = $prestador->id;
         $movimentacao->createSessaoOrSave();
         return $movimentacao;
     }

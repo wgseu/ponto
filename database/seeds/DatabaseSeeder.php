@@ -38,6 +38,10 @@ class DatabaseSeeder extends Seeder
             OrigemSeeder::class,
             RegimeSeeder::class,
             ImpostoSeeder::class,
+            // CozinhaSeeder::class,
+            HorarioSeeder::class,
+            SessaoSeeder::class,
+            MovimentacaoSeeder::class,
             // OperacaoSeeder::class,
             // IntegracaoSeeder::class,
 

@@ -81,20 +81,11 @@ class Sessao extends Model implements ValidateInterface
     {
         return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
     }
-    
-    /*
-     * Informa se a sessão está aberta
-     * @return boolean Check if a of Aberta is selected or checked
-     */
-    public function aberta()
-    {
-        return $this->aberta == true;
-    }
 
     /**
      * Cancela sessão
      */
-    public function cancel()
+    public function close()
     {
         $this->data_termino = Carbon::now();
         $this->aberta = false;

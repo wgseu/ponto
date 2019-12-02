@@ -42,23 +42,20 @@ class MovimentacaoTest extends TestCase
     public function testCreateMovimentacao()
     {
         $headers = PrestadorTest::authOwner();
-        $prestador = factory(Prestador::class)->create();
         $cozinha = factory(Cozinha::class)->create();
         factory(Horario::class)->create([
             'cozinha_id' => $cozinha->id
         ]);
+        $caixa = factory(Caixa::class)->create();
         $response = $this->graphfl('create_movimentacao', [
             'input' => [
-                'iniciador_id' => $prestador->id,
-                'aberta' => true,
-                'data_abertura' => '2019-12-28 12:30:00',
+                'caixa_id' => $caixa->id,
             ]
         ], $headers);
 
         $found_movimentacao = Movimentacao::findOrFail($response->json('data.CreateMovimentacao.id'));
-        $this->assertEquals($prestador->id, $found_movimentacao->iniciador_id);
         $this->assertEquals(true, $found_movimentacao->aberta);
-        $this->assertEquals('2019-12-28 12:30:00', $found_movimentacao->data_abertura);
+        $this->assertEquals($caixa->id, $found_movimentacao->caixa_id);
     }
 
     public function testUpdateMovimentacao()
@@ -68,13 +65,11 @@ class MovimentacaoTest extends TestCase
         $this->graphfl('update_movimentacao', [
             'id' => $movimentacao->id,
             'input' => [
-                'data_fechamento' => '2019-12-28 12:30:00',
-                'fechador_id' => $movimentacao->iniciador_id,
                 'aberta' => false,
             ]
         ], $headers);
         $movimentacao->refresh();
-        $this->assertEquals('2019-12-28 12:30:00', $movimentacao->data_fechamento);
+        $this->assertEquals($movimentacao->aberta, 0);
     }
 
     public function testFindMovimentacao()
@@ -236,10 +231,9 @@ class MovimentacaoTest extends TestCase
     public function testMovimentacaoAberturaAlterar()
     {
         $movimentacao = factory(Movimentacao::class)->create();
+        $movimentacao->data_abertura = '2020-01-25 12:15:00';
         $this->expectException(ValidationException::class);
-        $movimentacao->update([
-            'data_abertura' => '2020-01-25 12:15:00',
-        ]);
+        $movimentacao->save();
     }
 
     public function testCriarMovimentacaoSessaoNull()
@@ -254,8 +248,6 @@ class MovimentacaoTest extends TestCase
         $response = $this->graphfl('create_movimentacao', [
             'input' => [
                 'caixa_id' => $caixa->id,
-                'iniciador_id' => $prestador->id,
-                'data_abertura' => '2016-12-25 12:15:00',
             ]
         ], $headers);
         $movimentacao = Movimentacao::findOrFail($response->json('data.CreateMovimentacao.id'));
@@ -263,8 +255,6 @@ class MovimentacaoTest extends TestCase
 
         $this->assertEquals($sessao->id, $movimentacao->sessao_id);
         $this->assertEquals($caixa->id, $movimentacao->caixa_id);
-        $this->assertEquals($prestador->id, $movimentacao->iniciador_id);
-        $this->assertEquals('2016-12-25 12:15:00', $movimentacao->data_abertura);
     }
 
     public function testCriarMovimentacaoHorarioNull()

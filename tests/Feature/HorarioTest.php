@@ -26,11 +26,12 @@
 
 namespace Tests\Feature;
 
-use App\Exceptions\ValidationException;
-use App\Models\Funcao;
+use App\Util\Date;
 use Tests\TestCase;
+use App\Models\Funcao;
 use App\Models\Horario;
 use App\Models\Prestador;
+use App\Exceptions\ValidationException;
 
 class HorarioTest extends TestCase
 {
@@ -39,14 +40,14 @@ class HorarioTest extends TestCase
         $headers = PrestadorTest::authOwner();
         $response = $this->graphfl('create_horario', [
             'input' => [
-                'inicio' => Horario::MINUTES_PER_DAY,
-                'fim' => Horario::MINUTES_PER_DAY + 500,
+                'inicio' => Date::MINUTES_PER_DAY,
+                'fim' => Date::MINUTES_PER_DAY + 500,
             ]
         ], $headers);
 
         $found_horario = Horario::findOrFail($response->json('data.CreateHorario.id'));
-        $this->assertEquals(Horario::MINUTES_PER_DAY, $found_horario->inicio);
-        $this->assertEquals(Horario::MINUTES_PER_DAY + 500, $found_horario->fim);
+        $this->assertEquals(Date::MINUTES_PER_DAY, $found_horario->inicio);
+        $this->assertEquals(Date::MINUTES_PER_DAY + 500, $found_horario->fim);
     }
 
     public function testUpdateHorario()
@@ -56,13 +57,13 @@ class HorarioTest extends TestCase
         $this->graphfl('update_horario', [
             'id' => $horario->id,
             'input' => [
-                'inicio' => Horario::MINUTES_PER_DAY + 20,
-                'fim' => Horario::MINUTES_PER_DAY + 200,
+                'inicio' => Date::MINUTES_PER_DAY + 20,
+                'fim' => Date::MINUTES_PER_DAY + 200,
             ]
         ], $headers);
         $horario->refresh();
-        $this->assertEquals(Horario::MINUTES_PER_DAY + 20, $horario->inicio);
-        $this->assertEquals(Horario::MINUTES_PER_DAY + 200, $horario->fim);
+        $this->assertEquals(Date::MINUTES_PER_DAY + 20, $horario->inicio);
+        $this->assertEquals(Date::MINUTES_PER_DAY + 200, $horario->fim);
     }
 
     public function testDeleteHorario()
@@ -109,8 +110,8 @@ class HorarioTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         factory(Horario::class)->create([
-            'inicio' => Horario::MINUTES_PER_DAY * 3,
-            'fim' => Horario::MINUTES_PER_DAY * 2,
+            'inicio' => Date::MINUTES_PER_DAY * 3,
+            'fim' => Date::MINUTES_PER_DAY * 2,
         ]);
     }
 
@@ -118,7 +119,7 @@ class HorarioTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         factory(Horario::class)->create([
-            'inicio' => Horario::MINUTES_PER_DAY - 100,
+            'inicio' => Date::MINUTES_PER_DAY - 100,
         ]);
     }
 
@@ -126,7 +127,7 @@ class HorarioTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         factory(Horario::class)->create([
-            'fim' => (Horario::MINUTES_PER_DAY * 8) + 100,
+            'fim' => (Date::MINUTES_PER_DAY * 8) + 100,
         ]);
     }
 
@@ -135,8 +136,8 @@ class HorarioTest extends TestCase
         $this->expectException(ValidationException::class);
         factory(Horario::class)->create([
             'modo' => Horario::MODO_ENTREGA,
-            'entrega_minima' => Horario::MINUTES_PER_DAY * 3,
-            'entrega_maxima' => Horario::MINUTES_PER_DAY * 2,
+            'entrega_minima' => Date::MINUTES_PER_DAY * 3,
+            'entrega_maxima' => Date::MINUTES_PER_DAY * 2,
         ]);
     }
 

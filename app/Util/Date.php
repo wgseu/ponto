@@ -37,6 +37,17 @@ class Date
     public const MINUTES_PER_DAY = 1440;
 
     /**
+     * Day of week
+     */
+    public const SUNDAY = 1;
+    public const MONDAY = 2;
+    public const TUESDAY = 3;
+    public const FOURTH = 4;
+    public const FIFTH = 5;
+    public const FRIDAY = 6;
+    public const SATURDAY = 7;
+
+    /**
      * Get week offset in minutes started from sunday
      * @param  int $time get week offset for this time
      * @return int number of minutes from week begin
@@ -49,5 +60,16 @@ class Date
         $today_sec = $time - strtotime('00:00', $time);
         $today_min = (int) ($today_sec / 60);
         return $week_day * self::MINUTES_PER_DAY + $today_min;
+    }
+
+    /**
+     * Retorna dia da semana conforme parâmetro
+     * @param int constante date
+     * @return int
+     */
+    public static function make($day_week, $time)
+    {
+        return $day_week * self::MINUTES_PER_DAY + date('G', strtotime("$time")) * 60
+        + date('i', strtotime("$time"));
     }
 }

@@ -21,6 +21,7 @@ class ProdutoSeeder extends Seeder
         $acai_category = Categoria::where('descricao', __('messages.acai'))->first();
         $oil_category = Categoria::where('descricao', __('messages.oils'))->first();
         $spices_category = Categoria::where('descricao', __('messages.spices'))->first();
+        $vegetables_category = Categoria::where('descricao', __('messages.vegetables'))->first();
 
         $un_unity = Unidade::where('sigla', 'UN')->first();
         $g_unity = Unidade::where('sigla', 'g')->first();
@@ -52,7 +53,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '3',
-            'categoria_id' => $soda_category->id,
+            'categoria_id' => $vegetables_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'setor_preparo_id' => $pub_sector->id,
@@ -64,7 +65,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '4',
-            'categoria_id' => $soda_category->id,
+            'categoria_id' => $vegetables_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'setor_preparo_id' => $pub_sector->id,
@@ -141,7 +142,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '11',
-            'categoria_id' => $pizza_category->id,
+            'categoria_id' => $snacks_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'descricao' => __('messages.bread'),
@@ -151,7 +152,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '12',
-            'categoria_id' => $pizza_category->id,
+            'categoria_id' => $snacks_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'descricao' => __('messages.egg'),
@@ -161,7 +162,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '13',
-            'categoria_id' => $pizza_category->id,
+            'categoria_id' => $spices_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'descricao' => __('messages.onion'),
@@ -184,7 +185,7 @@ class ProdutoSeeder extends Seeder
         ]))->save();
         (new Produto([
             'codigo' => '15',
-            'categoria_id' => $pizza_category->id,
+            'categoria_id' => $snacks_category->id,
             'unidade_id' => $un_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'descricao' => __('messages.handmade_burger'),

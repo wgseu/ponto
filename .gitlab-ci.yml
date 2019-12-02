@@ -77,12 +77,10 @@ coding style:
     - composer global require hirak/prestissimo
 
     - mkdir -p storage/logs
-    - mkdir -p storage/app/cache
-    - mkdir -p storage/app/compiled
+    - mkdir -p storage/app/public
     - mkdir -p storage/framework/cache
     - mkdir -p storage/framework/views
     - mkdir -p storage/framework/sessions
-    - mkdir -p storage/framework/testing
 
   script:
     - composer install --ignore-platform-reqs --no-interaction
@@ -123,6 +121,7 @@ build:
     - if [ "$CI_COMMIT_REF_NAME" = "master" ]; then APP_REF="master"; else APP_REF="$LAST_APP_TAG"; fi
     - 'curl -f -s -L -o app.zip -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://gitlab.com/api/v4/projects/13475444/jobs/artifacts/$APP_REF/download?job=build"'
     - unzip -q app.zip -d build
+    - rm -f app.zip
     - cp -r build/dist/spa/* public/
     - echo "App artifacts successful downloaded from $APP_REF"
 

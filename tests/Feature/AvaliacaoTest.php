@@ -37,6 +37,7 @@ class AvaliacaoTest extends TestCase
         $seed_avaliacao =  factory(Avaliacao::class)->create();
         $response = $this->graphfl('create_avaliacao', [
             'input' => [
+                'pedido_id' => $seed_avaliacao->pedido_id,
                 'metrica_id' => $seed_avaliacao->metrica_id,
                 'estrelas' => 1,
                 'data_avaliacao' => '2016-12-25 12:15:00',
@@ -44,6 +45,7 @@ class AvaliacaoTest extends TestCase
         ], $headers);
 
         $found_avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
+        $this->assertEquals($seed_avaliacao->pedido_id, $found_avaliacao->pedido_id);
         $this->assertEquals($seed_avaliacao->metrica_id, $found_avaliacao->metrica_id);
         $this->assertEquals(1, $found_avaliacao->estrelas);
         $this->assertEquals('2016-12-25 12:15:00', $found_avaliacao->data_avaliacao);

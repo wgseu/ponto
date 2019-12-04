@@ -52,7 +52,7 @@ class AvaliacaoInput extends InputType
                     ' for avaliação de produto',
             ],
             'pedido_id' => [
-                'type' => Type::id(),
+                'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido que foi avaliado, quando nulo o produto deve ser informado',
             ],
             'produto_id' => [
@@ -62,6 +62,7 @@ class AvaliacaoInput extends InputType
             'estrelas' => [
                 'type' => Type::nonNull(Type::int()),
                 'description' => 'Quantidade de estrelas de 1 a 5',
+                'rules' => ['min:1', 'max:5'],
             ],
             'comentario' => [
                 'type' => Type::string(),

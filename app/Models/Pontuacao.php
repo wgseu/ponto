@@ -95,5 +95,10 @@ class Pontuacao extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        if (!is_null($this->item_id) && is_null($this->pedido_id)) {
+            $errors['item_id'] = __('messages.pedido_not_null');
+        }
+        return $errors;
     }
 }

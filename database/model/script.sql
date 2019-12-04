@@ -2414,7 +2414,7 @@ CREATE TABLE IF NOT EXISTS `avaliacoes` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT 'Identificador da avaliação[G:o]',
   `metrica_id` INT NOT NULL COMMENT 'Métrica de avaliação[G:a][N:Métrica]',
   `cliente_id` INT NULL DEFAULT NULL COMMENT 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando for avaliação de produto[G:o][N:Cliente]',
-  `pedido_id` INT NULL DEFAULT NULL COMMENT 'Pedido que foi avaliado, quando nulo o produto deve ser informado[G:o][N:Pedido]',
+  `pedido_id` INT NOT NULL COMMENT 'Pedido que foi avaliado, quando nulo o produto deve ser informado[G:o][N:Pedido]',
   `produto_id` INT NULL DEFAULT NULL COMMENT 'Produto que foi avaliado[G:o][N:Produto]',
   `estrelas` INT NOT NULL COMMENT 'Quantidade de estrelas de 1 a 5[G:a][N:Estrelas]',
   `comentario` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Comentário da avaliação[G:o][N:Comentário]',

@@ -837,4 +837,49 @@ return [
     'acaiteria' => 'Açaiteria',
     'pastelaria' => 'Pastelaria',
     'invalid_picture' => 'A imagem enviada é inválida, permitido somente png ou jpeg',
+    'not_permition_reopen' => 'Sem permissão para reabrir o caixa',
+    'pedido_not_null' => 'Para pontuação de item informe um pedido',
+    'reopen_cashier' => 'Reabertura do caixa :caixa',
+    'operation_description_5101' => 'Venda de produção do estabelecimento',
+    'operation_detail_5101' => 'Classificam-se neste código as vendas de mercadorias adquiridas ou recebidas ' .
+    'de terceiros para industrialização ou comercialização, que não tenham sido objeto de qualquer processo ' .
+    'industrial no estabelecimento. Também serão classificadas neste código as vendas de mercadorias por ' .
+    'estabelecimento comercial de cooperativa destinadas a seus cooperados ou estabelecimento de outra cooperativa',
+    'operation_description_5102' => 'Venda de mercadoria adquirida ou recebida de terceiros',
+    'operation_detail_5102' => 'Classificam-se neste código as vendas de mercadorias adquiridas ou recebidas ' .
+    'de terceiros para industrialização ou comercialização, que não tenham sido objeto de qualquer processo ' .
+    'industrial no estabelecimento. Também serão classificadas neste código as vendas de mercadorias por ' .
+    'estabelecimento comercial de cooperativa destinadas a seus cooperados ou estabelecimento de outra cooperativa',
+    'operation_description_5103' => 'Venda de produção do estabelecimento, efetuada fora do estabelecimento',
+    'operation_detail_5103' => 'Classificam-se neste código as vendas efetuadas fora do estabelecimento, ' .
+    'inclusive por meio de veículo, de produtos industrializados no estabelecimento',
+    'operation_description_5104' => 'Venda de mercadoria adquirida ou recebida de terceiros, ' .
+    'efetuada fora do estabelecimento',
+    'operation_detail_5104' => 'Classificam-se neste código as vendas efetuadas fora do ' .
+    'estabelecimento, inclusive por meio de veículo, ' .
+    'de mercadorias adquiridas ou recebidas de terceiros para industrialização ou comercialização, que não tenham ' .
+    'sido objeto de qualquer processo industrial no estabelecimento',
+    'operation_description_5115' => 'Venda de mercadoria adquirida ou recebida de terceiros, ' .
+    'recebida anteriormente em consignação mercantil',
+    'operation_detail_5115' => 'Classificam-se neste código as vendas de mercadorias adquiridas ou ' .
+    'recebidas de terceiros, recebidas anteriormente a título de consignação mercantil',
+    'operation_description_5401' => 'Venda de produção do estabelecimento em operação com produto sujeito ' .
+    'ao regime de substituição tributária, na condição de contribuinte substituto',
+    'operation_detail_5401' => 'Classificam-se neste código as vendas de produtos industrializados no ' .
+    'estabelecimento em operações com produtos sujeitos ao regime de substituição tributária, na condição ' .
+    'de contribuinte substituto. Também serão classificadas neste código as vendas de produtos industrializados ' .
+    'por estabelecimento industrial de cooperativa sujeitos ao regime de substituição tributária, na condição ' .
+    'de contribuinte substituto.',
+    'operation_description_5405' => 'Venda de mercadoria adquirida ou recebida de terceiros em operação com ' .
+    'mercadoria sujeita ao regime de substituição tributária, na condição de contribuinte substituído',
+    'operation_detail_5405' => 'Classificam-se neste código as vendas de mercadorias adquiridas ou recebidas ' .
+    'de terceiros em operação com mercadorias sujeitas ao regime de substituição tributária, na condição de ' .
+    'contribuinte substituído',
+    'metrica_description_delivery' => 'Avalie sua experiência com a entrega',
+    'presentation' => 'Apresentação',
+    'metrica_description_presentation' => 'Avalie sua experiência com a apresentação',
+    'metrica_description_attendance' => 'Avalie sua experiência com o atendimento prestado',
+    'attendance' => 'Atendimento',
+    'production' => 'Produção',
+    'metrica_description_production' => 'Avalie sua experiência com a produção',
 ];

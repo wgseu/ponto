@@ -1997,7 +1997,7 @@ class CreateInitialTables extends Migration
             $table->increments('id');
             $table->unsignedInteger('metrica_id');
             $table->unsignedInteger('cliente_id')->nullable();
-            $table->unsignedInteger('pedido_id')->nullable();
+            $table->unsignedInteger('pedido_id');
             $table->unsignedInteger('produto_id')->nullable();
             $table->integer('estrelas');
             $table->string('comentario', 255)->nullable();

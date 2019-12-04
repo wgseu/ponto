@@ -60,7 +60,7 @@ class RefreshTokenMutation extends Mutation
     {
         /** @var Payload $payload */
         $payload = JWTAuth::decode(new Token($args['refresh_token'] ?? null));
-        if (($payload['typ'] ?? null) == 'refresh') {
+        if (($payload['typ'] ?? null) != 'refresh') {
             throw new ValidationException(['refresh_token' => __('messages.invalid_refresh_token')]);
         }
         $cliente = Cliente::findOrFail($payload['uid'] ?? null);

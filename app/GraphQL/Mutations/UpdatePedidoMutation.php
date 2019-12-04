@@ -123,7 +123,7 @@ class UpdatePedidoMutation extends CreatePedidoMutation
             }
             if ($pedido->estado != Pedido::ESTADO_CANCELADO) {
                 $itens = $input['itens'] ?? [];
-                $this->saveItems($itens, $pedido, $funcionario_id, $prestador);
+                $this->saveItems($itens, $pedido, $prestador, $funcionario_id);
                 $pagamentos = $input['pagamentos'] ?? [];
                 $this->savePayments($pagamentos, $pedido, $funcionario_id);
                 if ($pedido->estado == Pedido::ESTADO_ENTREGA) {

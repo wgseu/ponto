@@ -60,8 +60,13 @@ class CreateProdutoMutation extends Mutation
     public function resolve($root, $args)
     {
         $produto = new Produto();
-        $produto->fill($args['input']);
-        $produto->save();
+        $produto->fillNextCode();
+        try {
+            UpdateProdutoMutation::saveProduct($produto, $args['input']);
+        } catch (\Throwable $th) {
+            $produto->clean(new Produto());
+            throw $th;
+        }
         return $produto;
     }
 }

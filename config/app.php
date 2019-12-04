@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost:8003'),
+    'url' => env('APP_URL', 'http://localhost:' . env('WEB_PORT', '8003')),
 
     'asset_url' => env('ASSET_URL', null),
 

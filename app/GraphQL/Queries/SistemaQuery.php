@@ -59,23 +59,28 @@ class SistemaQuery extends Query
 
     public function resolve($root, $args)
     {
-        $sistema = Sistema::find('1');
-        $sistema->loadOptions();
+        /** @var Sistema $sistema */
+        $sistema = app('system');
         $sistema_data = $sistema->toArray();
         $sistema_data['opcoes'] = json_encode(Filter::emptyObject(
             $sistema->options->getValues($args['all'] ?? false)
         ));
-        $empresa = Empresa::find('1');
+        /** @var Empresa $empresa */
+        $empresa = app('business');
         if (is_null($empresa)) {
             return $sistema_data;
         }
         $empresa_data = $empresa->toArray();
-        $pais = $empresa->pais;
+        /** @var Pais $pais */
+        $pais = app('country');
         if (!is_null($pais)) {
             $empresa_data['pais'] = $pais->toArray();
-            $empresa_data['pais']['moeda'] = $pais->moeda->toArray();
+            /** @var Moeda $moeda */
+            $moeda = app('currency');
+            $empresa_data['pais']['moeda'] = $moeda->toArray();
         }
-        $cliente_empresa = $empresa->empresa;
+        /** @var Cliente $cliente_empresa */
+        $cliente_empresa = app('company');
         if (!is_null($cliente_empresa)) {
             $empresa_data['empresa'] = $cliente_empresa->toArray();
         }

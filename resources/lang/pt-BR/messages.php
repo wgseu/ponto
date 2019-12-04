@@ -788,7 +788,7 @@ return [
     'cliente_cannot_associated_integracao' => 'Um cliente não pode se associar a uma integração',
     'item_composition_not_found' => 'A composição informada no item ":item" não existe',
     'item_composition_exceded' => 'Adicional acima do permitido, escolha no máximo :max adicional de :name',
-    'item_incorrect_price' => 'O preço do item ":item" deveria ser :expected em vez de :given',
+    'item_incorrect_price' => 'O preço do item ":name" deveria ser :expected em vez de :given',
     'item_elevated_quantity' => 'Quantidade muito elevada, faça multiplos lançamentos menores',
     'production_without_sector' => 'A composição ":name" não pode ser produzida' .
         ' porque o setor de estoque não foi informado no cadastro',
@@ -810,7 +810,6 @@ return [
     'package_no_product_formation' => 'A formação do produto ":name" não foi informado no pacote ":package"',
     'package_no_property_formation' => 'A formação da propriedade ":name" não foi informado no pacote ":package"',
     'item_incorrect_quantity' => 'A quantidade do item ":name" deveria ser :expected em vez de :given',
-    'item_incorrect_price' => 'O preço do item ":name" deveria ser :expected em vez de :given',
     'formation_incorrect_quantity' => 'A quantidade da formação está incorreta',
     'package_incorrect_description' => 'A descrição do pacote ":given" está diferente do esperado ":expected"',
     'group_need_itens' => 'Necessário no mínimo :min itens, ' .
@@ -834,8 +833,8 @@ return [
     'restaurant' => 'Restaurante',
     'steak_house' => 'Churrascaria',
     'ice_cream_shop' => 'Sorveteria',
-    'pub' => 'Bar',
     'snack_bar' => 'Lanchonete',
     'acaiteria' => 'Açaiteria',
     'pastelaria' => 'Pastelaria',
+    'invalid_picture' => 'A imagem enviada é inválida, permitido somente png ou jpeg',
 ];

@@ -225,7 +225,7 @@ class Item extends Model implements
         if (!Number::isEqual($this->preco, $preco)) {
             throw new Exception(
                 __('messages.item_incorrect_price', [
-                    'item' => $produto->descricao,
+                    'name' => $produto->descricao,
                     'expected' => Mask::money($preco, true),
                     'given' => Mask::money($this->preco, true),
                 ])

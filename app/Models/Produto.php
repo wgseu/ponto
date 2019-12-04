@@ -28,10 +28,12 @@ namespace App\Models;
 
 use App\Models\Item;
 use App\Concerns\ModelEvents;
-use App\Exceptions\Exception;
 use App\Interfaces\ValidateInterface;
+use App\Util\Upload;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Informações sobre o produto, composição ou pacote
@@ -90,6 +92,7 @@ class Produto extends Model implements ValidateInterface
         'insumo',
         'avaliacao',
         'imagem_url',
+        'imagem',
     ];
 
     /**
@@ -110,6 +113,72 @@ class Produto extends Model implements ValidateInterface
         'insumo' => false,
         'estoque' => 0,
     ];
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Upload::send($value, 'images/products');
+        }
+    }
+
+    /**
+     * Limpa os recursos do produto atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
+    }
+
+    /**
+     * Atribui um próximo código para o produto
+     *
+     * @return void
+     */
+    public function fillNextCode()
+    {
+        $query = DB::table('produtos as p')
+            ->select('p.*')
+            ->leftJoin('produtos as o', DB::raw('CAST(o.codigo as DECIMAL)'), '=', DB::raw('CAST(p.codigo as DECIMAL) + 1'))
+            ->whereNull('o.id');
+        if (isset($this->codigo)) {
+            $query->where(DB::raw('CAST(p.codigo as DECIMAL)'), '>=', $this->codigo - 1);
+        }
+        $query->orderBy('p.codigo', 'ASC');
+        $last = $query->first();
+        if (!is_null($last)) {
+            $this->codigo = strval($last->codigo + 1);
+        } elseif (!\is_numeric($this->codigo) || $this->codigo < 1) {
+            $this->codigo = '1';
+        }
+    }
 
     /**
      * Retorna o nome abreviado do produto
@@ -223,7 +292,7 @@ class Produto extends Model implements ValidateInterface
     {
         $errors = [];
         $old = $this->fresh();
-        $item = Item::where('produto_id', $this->produto_id);
+        $item = Item::where('produto_id', $this->id);
         if (
             !is_null($old)
             && $this->tipo != $old->tipo

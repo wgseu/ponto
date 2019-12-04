@@ -43,7 +43,7 @@ class ProdutoInput extends InputType
     {
         return [
             'codigo' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => Type::string(),
                 'description' => 'Código do produto podendo ser de barras ou aleatório, deve ser único' .
                     ' entre todos os produtos',
                 'rules' => ['max:100'],
@@ -68,6 +68,14 @@ class ProdutoInput extends InputType
             'tributacao_id' => [
                 'type' => Type::id(),
                 'description' => 'Informações de tributação do produto',
+            ],
+            'tributacao' => [
+                'type' => GraphQL::type('TributacaoUpdateInput'),
+                'description' => 'Informações de tributação do produto',
+            ],
+            'cardapios' => [
+                'type' => Type::listOf(GraphQL::type('CardapioUpdateInput')),
+                'description' => 'Cardápios para cada integração ou local de venda',
             ],
             'descricao' => [
                 'type' => Type::nonNull(Type::string()),
@@ -140,7 +148,10 @@ class ProdutoInput extends InputType
             'imagem_url' => [
                 'type' => Type::string(),
                 'description' => 'Imagem do produto',
-                'rules' => ['max:100'],
+            ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem do produto a ser alterada/cadastrada',
             ],
         ];
     }

@@ -99,6 +99,11 @@ class Settings
         return $this->values[$section][$key];
     }
 
+    public function get()
+    {
+        return call_user_func_array($this->getEntry, func_get_args());
+    }
+
     /**
      * Set new value for entry key
      * @param string $key   section value

@@ -31,12 +31,8 @@ cp .env.example .env
 yarn
 make start
 make update
+make link
 make migrate
-```
-
-Armazenar imagens e documentos locais
-```sh
-php artisan storage:link
 ```
 
 Antes de fazer commit, rodar os comandos abaixo com sucesso

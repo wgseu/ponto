@@ -21,9 +21,10 @@ help:
 	@echo ""
 	@echo "Commands:"
 	@echo "  start        Create and start containers"
+	@echo "  link         Create symbolic link for storage files"
 	@echo "  migrate      Run new migrations"
 	@echo "  downgrade    Downgrade migrations"
-	@echo "  seeds         Run seeds"
+	@echo "  seeds        Run seeds"
 	@echo "  update       Update PHP dependencies with composer"
 	@echo "  autoload     Update PHP autoload files"
 	@echo "  test         Test application"
@@ -88,6 +89,9 @@ start: init
 
 stop:
 	@docker-compose down -v
+
+link:
+	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan storage:link
 
 migrate:
 	@docker exec -i $(shell CURRENT_UID=$(CURRENT_UID) docker-compose ps -q php) ./artisan migrate

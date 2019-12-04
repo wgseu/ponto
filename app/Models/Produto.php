@@ -166,7 +166,12 @@ class Produto extends Model implements ValidateInterface
     {
         $query = DB::table('produtos as p')
             ->select('p.*')
-            ->leftJoin('produtos as o', DB::raw('CAST(o.codigo as DECIMAL)'), '=', DB::raw('CAST(p.codigo as DECIMAL) + 1'))
+            ->leftJoin(
+                'produtos as o',
+                DB::raw('CAST(o.codigo as DECIMAL)'),
+                '=',
+                DB::raw('CAST(p.codigo as DECIMAL) + 1')
+            )
             ->whereNull('o.id');
         if (isset($this->codigo)) {
             $query->where(DB::raw('CAST(p.codigo as DECIMAL)'), '>=', $this->codigo - 1);

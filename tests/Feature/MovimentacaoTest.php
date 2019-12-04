@@ -35,6 +35,7 @@ use App\Models\Cozinha;
 use App\Models\Prestador;
 use App\Models\Pagamento;
 use App\Models\Movimentacao;
+use Illuminate\Support\Carbon;
 use App\Exceptions\ValidationException;
 
 class MovimentacaoTest extends TestCase
@@ -62,14 +63,18 @@ class MovimentacaoTest extends TestCase
     {
         $headers = PrestadorTest::authOwner();
         $movimentacao = factory(Movimentacao::class)->create();
+        $movimentacao->aberta = false;
+        $movimentacao->fechador_id = $movimentacao->iniciador_id;
+        $movimentacao->data_fechamento = Carbon::now();
+        $movimentacao->save();
         $this->graphfl('update_movimentacao', [
             'id' => $movimentacao->id,
             'input' => [
-                'aberta' => false,
+                'aberta' => true,
             ]
         ], $headers);
         $movimentacao->refresh();
-        $this->assertEquals($movimentacao->aberta, 0);
+        $this->assertEquals($movimentacao->aberta, true);
     }
 
     public function testFindMovimentacao()
@@ -78,21 +83,6 @@ class MovimentacaoTest extends TestCase
         $movimentacao = factory(Movimentacao::class)->create();
         $response = $this->graphfl('query_movimentacao', [ 'id' => $movimentacao->id ], $headers);
         $this->assertEquals($movimentacao->id, $response->json('data.movimentacoes.data.0.id'));
-    }
-
-    public function testMovimentacaoFechada()
-    {
-        $prestador = factory(Prestador::class)->create();
-        $movimentacao = factory(Movimentacao::class)->create();
-        $movimentacao->update([
-            'aberta' => false,
-            'fechador_id' => $prestador->id,
-            'data_fechamento' => '2019-12-28 12:30:00',
-        ]);
-        $movimentacao->refresh();
-        $movimentacao->fechador_id = 2;
-        $this->expectException(ValidationException::class);
-        $movimentacao->save();
     }
 
     public function testSessaoFechada()

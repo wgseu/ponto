@@ -83,7 +83,7 @@ class Sessao extends Model implements ValidateInterface
     }
 
     /**
-     * Cancela sessão
+     * Fecha sessão
      */
     public function close()
     {

@@ -134,19 +134,18 @@ class Movimentacao extends Model implements ValidateInterface
     /**
      * Salva movimentação e fecha sessões atreladas
      */
-    public function closeOrSave()
+    public function closeOrSave($prestador)
     {
-        DB::transaction(function () {
-            $prestador = auth()->user()->prestador;
+        DB::transaction(function () use ($prestador) {
             if ($this->aberta == false) {
                 $this->data_fechamento = Carbon::now();
                 $this->fechador_id = $prestador->id;
-                $this->save();
                 $sessoes = $this->sessao()->get();
                 foreach ($sessoes as $sessao) {
                     $sessao->close();
                 }
             }
+            $this->save();
         });
     }
 
@@ -154,11 +153,9 @@ class Movimentacao extends Model implements ValidateInterface
     {
         $errors = [];
         $old = self::find($this->id);
-        if (!is_null($old) && $old->aberta != true) {
-            $errors['id'] = __('messages.cannot_changed');
-        }
+
         $sessao = $this->sessao;
-        if (!is_null($sessao) && $sessao->aberta != true) {
+        if ($sessao->exists && $sessao->aberta != true) {
             $errors['sessao_id'] = __('messages.sessao_closed');
         } elseif (!is_null($old) && $old->sessao_id != $this->sessao_id) {
             $errors['sessao_id'] = __('messages.sessao_changed');
@@ -180,8 +177,6 @@ class Movimentacao extends Model implements ValidateInterface
         ])->count();
         if (!$this->exists && $this->aberta != true) {
             $errors['aberta'] = __('messages.aberta_create_closed');
-        } elseif (!is_null($old) && $old->aberta != true && $this->aberta == true) {
-            $errors['aberta'] = __('messages.aberta_reopen');
         } elseif ($this->aberta != true && $count < 2 && $pedidos > 0) {
             $errors['aberta'] = __('messages.aberta_orders', ['pedidos' => $pedidos]);
         } elseif ($this->aberta != true && $count < 2 && $pagamentos > 0) {

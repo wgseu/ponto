@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Movimentacao;
+use App\Models\Sessao;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
@@ -62,7 +63,9 @@ class CreateMovimentacaoMutation extends Mutation
         $movimentacao = new Movimentacao();
         $movimentacao->fill($args['input']);
         $prestador = auth()->user()->prestador;
+        $sessao = Sessao::where('aberta', true)->first();
         $movimentacao->iniciador_id = $prestador->id;
+        $movimentacao->sessao_id = $sessao->id ?? null;
         $movimentacao->createSessaoOrSave();
         return $movimentacao;
     }

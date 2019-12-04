@@ -30,6 +30,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Caixa;
 use App\Models\Auditoria;
+use App\Models\Movimentacao;
 use Illuminate\Support\Carbon;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
@@ -68,23 +69,6 @@ class UpdateCaixaMutation extends Mutation
     {
         $caixa = Caixa::findOrFail($args['id']);
         $caixa->fill($args['input']);
-        $condition = $caixa->ativa == false && $caixa->ativa != ($args['input']['ativa'] ?? false);
-        $prestador = auth()->user()->prestador;
-        if ($condition && !Auth::user()->can('caixa:reopen')) {
-            throw new ValidationException(['reopen', __('messages.not_permition_reopen')]);
-        }
-        if ($condition && Auth::user()->can('caixa:reopen')) {
-            (new Auditoria([
-                'prestador_id' => $prestador->id,
-                'autorizador_id' => $prestador->id,
-                'tipo' => Auditoria::TIPO_FINANCEIRO,
-                'prioridade' => Auditoria::PRIORIDADE_ALTA,
-                'descricao' => 'Reabertura do caixa ' . $caixa->descricao,
-                'data_registro' => Carbon::now(),
-            ]))->save();
-            $caixa->data_desativada = null;
-            $caixa->ativa = 1;
-        }
         $caixa->save();
         return $caixa;
     }

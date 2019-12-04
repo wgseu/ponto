@@ -69,7 +69,7 @@ class Date
      */
     public static function make($day_week, $time)
     {
-        return $day_week * self::MINUTES_PER_DAY + date('G', strtotime("$time")) * 60
-        + date('i', strtotime("$time"));
+        return $day_week * self::MINUTES_PER_DAY + date('G', strtotime($time)) * 60
+        + date('i', strtotime($time));
     }
 }

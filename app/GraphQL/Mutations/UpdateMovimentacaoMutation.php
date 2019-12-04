@@ -28,7 +28,9 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Models\Auditoria;
 use App\Models\Movimentacao;
+use Illuminate\Support\Carbon;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +44,7 @@ class UpdateMovimentacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('movimentacao:update');
+        return Auth::check() && (Auth::user()->can('movimentacao:update') || Auth::user()->can('caixa:reopen'));
     }
 
     public function type(): Type
@@ -64,8 +66,24 @@ class UpdateMovimentacaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $movimentacao = Movimentacao::findOrFail($args['id']);
+        $reabrindo = $movimentacao->aberta == false && $movimentacao->aberta != $args['input']['aberta'];
         $movimentacao->fill($args['input']);
-        $movimentacao->closeOrSave();
+
+        $prestador = auth()->user()->prestador;
+        $caixa = $movimentacao->caixa;
+        if ($caixa->exists && $reabrindo) {
+            (new Auditoria([
+                'prestador_id' => $prestador->id,
+                'autorizador_id' => $prestador->id,
+                'tipo' => Auditoria::TIPO_FINANCEIRO,
+                'prioridade' => Auditoria::PRIORIDADE_ALTA,
+                'descricao' => __('reopen_cashier', ['caixa' => $caixa->descricao]),
+                'data_registro' => Carbon::now(),
+            ]))->save();
+            $movimentacao->fechador_id = null;
+            $movimentacao->data_fechamento = null;
+        }
+        $movimentacao->closeOrSave($prestador);
         return $movimentacao;
     }
 }

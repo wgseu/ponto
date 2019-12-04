@@ -39,9 +39,10 @@ class Upload
      *
      * @param string $value
      * @param string $base_path
+     * @param mixed $options
      * @return string
      */
-    public static function send($value, $base_path)
+    public static function send($value, $base_path, $options = [])
     {
         if (preg_match('/^data:\w+\/[\w-]+;base64,/', $value, $matches)) {
             $value = substr($value, strlen($matches[0]));
@@ -57,7 +58,7 @@ class Upload
             $name = uniqid() . '.' . $extension;
             $path = "$base_path/${name}";
         } while (Storage::exists($path));
-        Storage::put($path, $content);
+        Storage::put($path, $content, $options);
         return $path;
     }
 

@@ -140,9 +140,13 @@ class Movimentacao extends Model implements ValidateInterface
             if ($this->aberta == false) {
                 $this->data_fechamento = Carbon::now();
                 $this->fechador_id = $prestador->id;
-                $sessoes = $this->sessao()->get();
-                foreach ($sessoes as $sessao) {
-                    $sessao->close();
+                $movimentacao = self::where([
+                    ['aberta' => true],
+                    ['caixa_id' => $this->caixa_id]
+                ])->count();
+                if ($movimentacao < 2) {
+                    $sessoes = $this->sessao()->get();
+                    $sessoes->close();
                 }
             }
             $this->save();
@@ -152,10 +156,11 @@ class Movimentacao extends Model implements ValidateInterface
     public function validate()
     {
         $errors = [];
-        $old = self::find($this->id);
+        $old = $this->fresh();
 
         $sessao = $this->sessao;
-        if ($sessao->exists && $sessao->aberta != true) {
+        $global_sessao = Sessao::where('aberta', true)->first();
+        if ($sessao->exists && !$sessao->aberta && $global_sessao->aberta) {
             $errors['sessao_id'] = __('messages.sessao_closed');
         } elseif (!is_null($old) && $old->sessao_id != $this->sessao_id) {
             $errors['sessao_id'] = __('messages.sessao_changed');
@@ -179,7 +184,7 @@ class Movimentacao extends Model implements ValidateInterface
             $errors['aberta'] = __('messages.aberta_create_closed');
         } elseif ($this->aberta != true && $count < 2 && $pedidos > 0) {
             $errors['aberta'] = __('messages.aberta_orders', ['pedidos' => $pedidos]);
-        } elseif ($this->aberta != true && $count < 2 && $pagamentos > 0) {
+        } elseif ($this->aberta != true && $pagamentos > 0) {
             $errors['aberta'] = __('messages.aberta_payments', ['pagamentos' => $pagamentos]);
         }
         $movimentacao = self::where([
@@ -189,9 +194,7 @@ class Movimentacao extends Model implements ValidateInterface
             ['aberta', true]
         ])->first();
         $iniciador = $this->iniciador;
-        if (!is_null($iniciador) && !is_null($iniciador->data_termino) && $this->aberta == true) {
-            $errors['iniciador_id'] = __('messages.iniciador_inactive');
-        } elseif (!is_null($movimentacao) && !$this->exists) {
+        if (!is_null($movimentacao) && !$this->exists) {
             $errors['iniciador_id'] = __('messages.iniciador_initiated');
         } elseif (!is_null($old) && $old->iniciador_id != $this->iniciador_id) {
             $errors['iniciador_id'] = __('messages.iniciador_changed');

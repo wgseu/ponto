@@ -66,12 +66,13 @@ class UpdateMovimentacaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $movimentacao = Movimentacao::findOrFail($args['id']);
-        $reabrindo = $movimentacao->aberta == false && $movimentacao->aberta != $args['input']['aberta'];
+        $reabrindo = $movimentacao->aberta == false
+        && $movimentacao->aberta != ($args['input']['aberta'] ?? $movimentacao->aberta);
         $movimentacao->fill($args['input']);
 
         $prestador = auth()->user()->prestador;
         $caixa = $movimentacao->caixa;
-        if ($caixa->exists && $reabrindo) {
+        if ($reabrindo && Auth::user()->can('caixa:reopen')) {
             (new Auditoria([
                 'prestador_id' => $prestador->id,
                 'autorizador_id' => $prestador->id,

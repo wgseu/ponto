@@ -65,7 +65,7 @@ class CreateMovimentacaoMutation extends Mutation
         $prestador = auth()->user()->prestador;
         $sessao = Sessao::where('aberta', true)->first();
         $movimentacao->iniciador_id = $prestador->id;
-        $movimentacao->sessao_id = $sessao->id ?? null;
+        $movimentacao->sessao_id = !is_null($sessao) ? $sessao->id : null;
         $movimentacao->createSessaoOrSave();
         return $movimentacao;
     }

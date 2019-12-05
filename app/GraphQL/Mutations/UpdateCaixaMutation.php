@@ -29,13 +29,9 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Caixa;
-use App\Models\Auditoria;
-use App\Models\Movimentacao;
-use Illuminate\Support\Carbon;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
-use App\Exceptions\ValidationException;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateCaixaMutation extends Mutation

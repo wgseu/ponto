@@ -64,7 +64,8 @@ class Date
 
     /**
      * Retorna dia da semana conforme parâmetro
-     * @param int constante date
+     * @param int day_week
+     * @param int time
      * @return int
      */
     public static function make($day_week, $time)

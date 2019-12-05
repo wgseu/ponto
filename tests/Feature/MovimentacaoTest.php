@@ -176,18 +176,6 @@ class MovimentacaoTest extends TestCase
         ]);
     }
 
-    public function testAbertoComPrestadorInativo()
-    {
-        $prestador = factory(Prestador::class)->create([
-            'data_termino' => '2019-11-10 12:30:00',
-        ]);
-        $this->expectException(ValidationException::class);
-        factory(Movimentacao::class)->create([
-            'iniciador_id' => $prestador->id,
-            'aberta' => true,
-        ]);
-    }
-
     public function testMovimentacaoExists()
     {
         $seed_movimentacao = factory(Movimentacao::class)->create();

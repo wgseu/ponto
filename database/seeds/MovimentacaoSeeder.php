@@ -18,7 +18,9 @@ class MovimentacaoSeeder extends Seeder
     {
         $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
         $caixa = Caixa::where('ativa', true)->first();
+        $sessao = Sessao::where('aberta', true)->first();
         (new Movimentacao([
+            'sessao_id' => $sessao->id,
             'iniciador_id' => $cliente->id,
             'data_abertura' => Carbon::now(),
             'caixa_id' => $caixa->id,

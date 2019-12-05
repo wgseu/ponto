@@ -845,4 +845,5 @@ return [
     'session_not_kitchen_or_not_exists' => 'Cozinha não configurada no horário ou não existe',
     'restaurant' => 'Restaurante',
     'not_permition_reopen' => 'Sem permissão para reabrir o caixa',
+    'movement_open' => 'Sessão não pode ser fechada por ha movimentação aberta',
 ];

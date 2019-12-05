@@ -882,4 +882,7 @@ return [
     'attendance' => 'Atendimento',
     'production' => 'Produção',
     'metrica_description_production' => 'Avalie sua experiência com a produção',
+    'close_invalid' => 'Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas',
+    'user_acess_invalid_facebook' => "É necessário autorizar o acesso Facebook",
+    'acess_invalid' => 'Acesso negado',
 ];

@@ -98,7 +98,7 @@ class Sessao extends Model implements ValidateInterface
         $movimentacao = Movimentacao::where('sessao_id', $this->id)
             ->where('aberta', true)->first();
         if (!is_null($movimentacao) && !is_null($this->data_termino) && !$this->aberta) {
-            $errors['aberta'] = _('messages.movement_open');
+            $errors['aberta'] = __('messages.movement_open');
         }
         return $errors;
     }

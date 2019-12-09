@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Core\Settings;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -46,6 +47,20 @@ class Integracao extends Model implements ValidateInterface
      * @var string
      */
     protected $table = 'integracoes';
+
+    /**
+     * Setting model
+     *
+     * @var Settings
+     */
+    public $options;
+
+    /**
+     * Setting model
+     *
+     * @var Settings
+     */
+    public $associations;
 
     /**
      * The attributes that are mass assignable.
@@ -72,7 +87,49 @@ class Integracao extends Model implements ValidateInterface
         'ativo' => false,
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->options = new Settings();
+        $this->associations = new Settings();
+    }
+
+    public function loadOptions()
+    {
+        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+    }
+
+    public function applyOptions()
+    {
+        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+    }
+
+    public function loadAssociations()
+    {
+        $this->associations->addValues(json_decode(base64_decode($this->associacoes), true));
+    }
+
+    public function applyAssociations()
+    {
+        $this->associacoes = base64_encode(json_encode($this->associations->getValues()));
+    }
+
+    /**
+     * Regras:
+     * Se a Intregração estiver ativa Login e senha não podem ser nulos
+     */
     public function validate()
     {
+        $errors = [];
+        if (
+            $this->ativo &&
+            (
+                is_null($this->login) ||
+                is_null($this->secret)
+            )
+        ) {
+            $errors['ativo'] = __('messagens.integration_aticve_login_cannot_null');
+        }
+        return $errors;
     }
 }

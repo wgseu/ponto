@@ -26,50 +26,59 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Mutations;
+namespace App\GraphQL\Queries;
 
-use App\Exceptions\ValidationException;
-use App\Models\Dispositivo;
+use App\Models\Cliente;
+use App\Models\Funcao;
+use App\Models\Prestador;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
+use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class CreateDispositivoMutation extends Mutation
+class UsuarioQuery extends Query
 {
     protected $attributes = [
-        'name' => 'CreateDispositivo',
+        'name' => 'usuario',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('dispositivo:create');
+        return Auth::check();
     }
 
     public function type(): Type
     {
-        return GraphQL::type('DispositivoCreation');
+        return GraphQL::type('Usuario');
     }
 
-    public function args(): array
+    /**
+     * Cria a query com base no usuário
+     *
+     * @param Cliente $user
+     * @return array
+     */
+    public static function process($user)
     {
-        return [
-            'input' => ['type' => Type::nonNull(GraphQL::type('DispositivoInput'))],
-        ];
-    }
-
-    public function resolve($root, $args)
-    {
-        $dispositivo = new Dispositivo();
-        $dispositivo->fill($args['input']);
-        $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
-        $dispositivo->applyOptions();
-        if ($dispositivo->serial == $dispositivo->validacao && !Auth::user()->can('dispositivo:validate')) {
-            throw new ValidationException(['validacao' => __('messages.no_permission_to_validate')]);
+        /** @var Prestador $prestador */
+        $prestador = $user->prestador;
+        $cliente_data = $user->toArray();
+        if (!is_null($prestador)) {
+            /** @var Funcao $funcao */
+            $funcao = $prestador->funcao;
+            $permissoes = $funcao->permissoes()->pluck('nome');
+            $cliente_data['prestador'] = $prestador->toArray();
+            $cliente_data['prestador']['funcao'] = $funcao->toArray();
+            $cliente_data['prestador']['funcao']['permissoes'] = $permissoes;
         }
-        $dispositivo->save();
-        $dispositivo_data = $dispositivo->toArray();
-        $dispositivo_data['access_token'] = auth('device')->fromSubject($dispositivo);
-        return $dispositivo_data;
+        $cliente_data['proprietario'] = $user->isOwner();
+        return $cliente_data;
+    }
+
+    public function resolve()
+    {
+        /** @var Cliente $user */
+        $user = Auth::user();
+        return self::process($user);
     }
 }

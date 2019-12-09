@@ -51,6 +51,10 @@ class FuncaoType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Descreve o nome da função',
             ],
+            'permissoes' => [
+                'type' => Type::listOf(Type::string()),
+                'description' => 'Lista de permissões dessa função',
+            ],
             'remuneracao' => [
                 'type' => Type::float(),
                 'description' => 'Remuneracao pelas atividades exercidas, não está incluso comissões',

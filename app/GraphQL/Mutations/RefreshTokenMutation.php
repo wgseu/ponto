@@ -30,6 +30,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Exceptions\AuthorizationException;
 use App\Exceptions\ValidationException;
+use App\GraphQL\Queries\UsuarioQuery;
 use App\Models\Cliente;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
@@ -72,7 +73,7 @@ class RefreshTokenMutation extends Mutation
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,
-            'cliente'      => $cliente->toArray(),
+            'user'         => UsuarioQuery::process($cliente),
         ];
     }
 }

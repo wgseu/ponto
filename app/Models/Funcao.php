@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 /**
  * Função ou atribuição de tarefas à um prestador
@@ -65,6 +66,17 @@ class Funcao extends Model implements ValidateInterface
     public function acessos()
     {
         return $this->hasMany('App\Models\Acesso', 'funcao_id');
+    }
+
+    /**
+     * Lista de permissões dessa função
+     *
+     * @return Builder
+     */
+    public function permissoes()
+    {
+        return Permissao::leftJoin('acessos', 'acessos.permissao_id', '=', 'permissoes.id')
+            ->where('acessos.funcao_id', $this->id);
     }
 
     /**

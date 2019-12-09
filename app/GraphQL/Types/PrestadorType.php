@@ -58,7 +58,11 @@ class PrestadorType extends GraphQLType
             ],
             'funcao_id' => [
                 'type' => Type::id(),
-                'description' => 'Função do prestada na empresa',
+                'description' => 'Função do prestador na empresa',
+            ],
+            'funcao' => [
+                'type' => GraphQL::type('Funcao'),
+                'description' => 'Função do prestador na empresa',
             ],
             'cliente_id' => [
                 'type' => Type::id(),

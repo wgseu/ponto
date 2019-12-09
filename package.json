@@ -10,6 +10,10 @@
     "eslint": "^5.16.0"
   },
   "dependencies": {
+    "apollo-boost": "^0.4.4",
+    "graphql": "^14.5.8",
+    "graphql-tag": "^2.10.1",
+    "node-fetch": "^2.6.0",
     "socket.io": "^2.2.0"
   }
 }

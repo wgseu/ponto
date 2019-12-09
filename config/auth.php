@@ -45,6 +45,16 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
+
+        'device' => [
+            'driver' => 'jwt',
+            'provider' => 'devices',
+        ],
+
+        'authorizer' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
     ],
 
     /*
@@ -68,6 +78,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\Cliente::class,
+        ],
+
+        'devices' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Dispositivo::class,
         ],
 
         // 'users' => [

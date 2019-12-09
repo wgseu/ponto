@@ -26,38 +26,31 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Types;
+namespace App\GraphQL\Queries;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use App\Models\Dispositivo;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Type as GraphQLType;
+use Rebing\GraphQL\Support\Query;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class AuthBaseType extends GraphQLType
+class DispositivoInfoQuery extends Query
 {
     protected $attributes = [
-        'name' => 'AuthBase',
-        'description' => 'Resposta da atualização do token',
+        'name' => 'dispositivo',
     ];
 
-    public function fields(): array
+    public function authorize(array $args): bool
     {
-        return [
-            'access_token' => [
-                'type' => Type::string(),
-                'description' => 'Token que permite acessar os recursos',
-            ],
-            'token_type' => [
-                'type' => Type::string(),
-                'description' => 'Tipo de token, sempre bearer',
-            ],
-            'expires_in' => [
-                'type' => Type::int(),
-                'description' => 'Timestamp que o token irá expirar em segundos',
-            ],
-            'user' => [
-                'type' => GraphQL::type('Usuario'),
-                'description' => 'Os dados do usuário do token',
-            ],
-        ];
+        return auth('device')->check();
+    }
+
+    public function type(): Type
+    {
+        return GraphQL::type('Dispositivo');
+    }
+
+    public function resolve($root, $args)
+    {
+        return auth('device')->user();
     }
 }

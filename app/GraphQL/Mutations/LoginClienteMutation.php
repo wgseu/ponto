@@ -28,11 +28,12 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
-use App\Exceptions\AuthenticationException;
-use App\Exceptions\AuthorizationException;
 use App\Models\Cliente;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
+use App\GraphQL\Queries\UsuarioQuery;
+use App\Exceptions\AuthorizationException;
+use App\Exceptions\AuthenticationException;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class LoginClienteMutation extends Mutation
@@ -70,10 +71,10 @@ class LoginClienteMutation extends Mutation
         }
         return [
             'refresh_token' => auth()->user()->createRefreshToken(),
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth()->factory()->getTTL() * 60,
-            'cliente'      => auth()->user()->toArray(),
+            'access_token'  => $token,
+            'token_type'    => 'bearer',
+            'expires_in'    => auth()->factory()->getTTL() * 60,
+            'user'          => UsuarioQuery::process(auth()->user()),
         ];
     }
 }

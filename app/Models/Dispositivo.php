@@ -29,12 +29,14 @@ namespace App\Models;
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Carbon;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Computadores e tablets com opções de acesso
  */
-class Dispositivo extends Model implements ValidateInterface
+class Dispositivo extends User implements ValidateInterface, JWTSubject
 {
     use ModelEvents;
 
@@ -105,6 +107,42 @@ class Dispositivo extends Model implements ValidateInterface
     public function applyOptions()
     {
         $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+    }
+
+    /**
+     * Informa se o dispositivo está validado e autorizado
+     * para realizar consultas na api
+     *
+     * @return boolean
+     */
+    public function isValid()
+    {
+        return !is_null($this->serial) && $this->serial == $this->validacao;
+    }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+            'iss' => null,
+            'uid' => null,
+            'exp' => Carbon::now('UTC')->addMinutes(365 * 24 * 60)->getTimestamp(),
+            'typ' => 'device',
+        ];
     }
 
     /**

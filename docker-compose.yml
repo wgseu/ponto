@@ -27,6 +27,8 @@ services:
         command: node resources/js/index.js
         restart: always
         working_dir: /usr/src/app
+        environment:
+            - APP_URL=http://${DEBUG_HOST}:${WEB_PORT}
         volumes:
             - "./:/usr/src/app"
     myadmin:

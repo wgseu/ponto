@@ -36,7 +36,7 @@ return [
     //     'mutation' => '\Rebing\GraphQL\GraphQLController@mutation'
     // ]
     //
-    'controllers' => \Rebing\GraphQL\GraphQLController::class.'@query',
+    'controllers' => \Rebing\GraphQL\GraphQLController::class . '@query',
 
     // Any middleware for the graphql route group
     'middleware' => ['cors'],
@@ -175,6 +175,8 @@ return [
                 'emitente' => 'App\GraphQL\Queries\EmitenteQuery',
 
                 'pedido' => 'App\GraphQL\Queries\PedidoSummaryQuery',
+                'usuario' => 'App\GraphQL\Queries\UsuarioQuery',
+                'dispositivo' => 'App\GraphQL\Queries\DispositivoInfoQuery',
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
@@ -881,6 +883,8 @@ return [
 
         'ClienteVerify' => 'App\GraphQL\Types\ClienteVerifyType',
         'PedidoSummary' => 'App\GraphQL\Types\PedidoSummaryType',
+        'Usuario' => 'App\GraphQL\Types\UsuarioType',
+        'DispositivoCreation' => 'App\GraphQL\Types\DispositivoCreationType',
 
         'CarteiraTipo' => 'App\GraphQL\Enums\CarteiraTipoEnum',
         'CarteiraAmbiente' => 'App\GraphQL\Enums\CarteiraAmbienteEnum',

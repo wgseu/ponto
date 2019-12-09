@@ -99,9 +99,14 @@ class Settings
         return $this->values[$section][$key];
     }
 
+    /**
+     * Get entry value
+     *
+     * @return mixed
+     */
     public function get()
     {
-        return call_user_func_array($this->getEntry, func_get_args());
+        return call_user_func_array([$this, 'getEntry'], func_get_args());
     }
 
     /**

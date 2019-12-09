@@ -266,10 +266,7 @@ class Cliente extends User implements
      */
     public function isOwner()
     {
-        $empresa = Empresa::find('1');
-        return is_null($empresa)
-            || is_null($empresa->empresa_id)
-            || $empresa->empresa_id == $this->empresa_id;
+        return app('business')->empresa_id == $this->empresa_id;
     }
 
     /**

@@ -28,10 +28,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\Impressora;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +47,8 @@ class ImpressoraQuery extends Query
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('impressora:view');
+        return (Auth::check() && Auth::user()->can('impressora:view')) ||
+            (auth('device')->check() && auth('device')->user()->isValid());
     }
 
     public function type(): Type
@@ -60,7 +61,7 @@ class ImpressoraQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ImpressoraFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ImpressoraOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
+            'limit' => ['name' => 'limit', 'type' => Type::int()],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }
@@ -73,7 +74,11 @@ class ImpressoraQuery extends Query
             $args['filter'] ?? [],
             Impressora::with($fields->getRelations())->select($fields->getSelect())
         );
+        $limit = $args['limit'] ?? 10;
+        if (!isset($args['limit'])) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

@@ -27,13 +27,17 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Carbon;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\ValidateInsertInterface;
 
 /**
  * Avaliação de atendimento e outros serviços do estabelecimento
  */
-class Avaliacao extends Model implements ValidateInterface
+class Avaliacao extends Model implements
+    ValidateInterface,
+    ValidateInsertInterface
 {
     use ModelEvents;
 
@@ -99,7 +103,37 @@ class Avaliacao extends Model implements ValidateInterface
         return $this->belongsTo('App\Models\Produto', 'produto_id');
     }
 
+    public function metrics()
+    {
+        if (!is_null($this->pedido_id) && !is_null($this->produto_id)) {
+            $total = self::where('produto_id', $this->produto_id)->avg('estrelas');
+            $produto = $this->produto;
+            $produto->avaliacao = $total;
+            $produto->save();
+            return;
+        }
+        $estrelas = self::where('metrica_id', $this->metrica_id)->sum('estrelas');
+        $metrica = $this->metrica;
+        $metrica->avaliacao = $estrelas / $metrica->quantidade;
+        $metrica->save();
+    }
+
     public function validate()
     {
+    }
+
+    public function onInsert()
+    {
+        $errors = [];
+        $avaliacao = self::where('pedido_id', $this->pedido_id)->first();
+        if (!is_null($avaliacao)) {
+            $errors['pedido_id'] = __('messages.order_have_evaluation');
+        }
+        $pedido = $this->pedido;
+        $days = Carbon::now()->diff($pedido->data_criacao)->days;
+        if (!is_null($pedido) && $days > 7) {
+            $errors['pedido_id'] = __('messages.order_more_week');
+        }
+        return $errors;
     }
 }

@@ -66,6 +66,7 @@ class UpdateAvaliacaoMutation extends Mutation
         $avaliacao = Avaliacao::findOrFail($args['id']);
         $avaliacao->fill($args['input']);
         $avaliacao->save();
+        $avaliacao->metrics();
         return $avaliacao;
     }
 }

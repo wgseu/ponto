@@ -786,7 +786,7 @@ return [
     'account_null' => 'A conta não pode ser vazia',
     'error_selection_multiple_product' => 'Produto, composição, pacote não podem ser selecionados juntos, ' .
         'sendo obrigatória a escolha de um',
-    'total_cannot_negativo' => 'O Deconto não pode ser superior ao preço de venda do produto',
+    'total_cannot_negativo' => 'O Desconto não pode ser superior ao preço de venda do produto',
     'cliente_cannot_associated_integracao' => 'Um cliente não pode se associar a uma integração',
     'item_composition_not_found' => 'A composição informada no item ":item" não existe',
     'item_composition_exceded' => 'Adicional acima do permitido, escolha no máximo :max adicional de :name',
@@ -904,4 +904,6 @@ return [
     'restaurant' => 'Restaurante',
     'not_permition_reopen' => 'Sem permissão para reabrir o caixa',
     'movement_open' => 'Sessão não pode ser fechada por ha movimentação aberta',
+    'order_have_evaluation' => 'Pedido já tem uma avaliação',
+    'order_more_week' => 'Pedido não pode ser avaliado após uma semana',
 ];

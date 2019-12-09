@@ -27,13 +27,16 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Junções de mesas, informa quais mesas estão juntas ao pedido
  */
-class Juncao extends Model implements ValidateInterface
+class Juncao extends Model implements
+    ValidateInterface,
+    ValidateInsertInterface
 {
     use ModelEvents;
 
@@ -93,5 +96,45 @@ class Juncao extends Model implements ValidateInterface
 
     public function validate()
     {
+        $errors = [];
+        $pedido = $this->pedido;
+        $juncao = self::where('mesa_id', $this->mesa_id)
+            ->where('estado', self::ESTADO_ASSOCIADO)
+            ->when($this->exists, function ($query) {
+                return $query->where('id', '<>', $this->id);
+            });
+        $mesa_pedido = Pedido::where('mesa_id', $this->mesa_id)
+            ->where('estado', Pedido::ESTADO_ABERTO);
+        // Não pode juntar mesa com pedido aberto
+        if ($mesa_pedido->exists()) {
+            $errors['mesa_id'] = __('messages.mesa_associated_ordem');
+        }
+        // Não pode juntar uma mesa já associada
+        if ($juncao->exists()) {
+            $errors['mesa_id'] = __('messages.mesa_id_exists');
+        }
+        // Não pode juntar uma mesa com ela mesma
+        if ($this->mesa_id == $pedido->mesa->id) {
+            $errors['mesa_id'] = __('messages.mesa_id_same');
+        }
+        // Não pode juntar uma mesa com o estado do pedido diferente de aberto
+        if ($pedido->estado != Pedido::ESTADO_ABERTO) {
+            $errors['pedido_id'] = __('messages.pedido_id_closed');
+        }
+        // O tipo do pedido deve ser mesa
+        if ($pedido->tipo != Pedido::TIPO_MESA) {
+            $errors['pedidoid'] = __('messages.pedido_id_incompatible');
+        }
+        return $errors;
+    }
+
+    public function onInsert()
+    {
+        $errors = [];
+        // Não pode criar um junçao o estado diferente de associado
+        if ($this->estado != self::ESTADO_ASSOCIADO) {
+            $errors['estado'] = __('messages.join_must_be_associated');
+        }
+        return $errors;
     }
 }

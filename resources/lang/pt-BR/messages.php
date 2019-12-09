@@ -927,4 +927,10 @@ return [
     'uniform_equipments' => 'Uniforme e Equipamentos',
     'accounting' => 'Contabilidade',
     'commission' => 'Comissão',
+    'mesa_id_exists' => 'A mesa informada já está associada com outra mesa',
+    'mesa_id_same' => 'A mesa não pode juntar com ela mesma',
+    'pedido_id_closed' => 'O estado do Pedido precisa ser aberto',
+    'pedido_id_incompatible' => 'O pedido de destino deve ser de uma mesa',
+    'join_must_be_associated' => 'A junção deve ser cadastrada como associada',
+    'mesa_associated_ordem' => 'Já existe um pedido associado a está mesa',
 ];

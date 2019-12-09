@@ -26,25 +26,28 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Juncao;
 use App\Models\Mesa;
+use App\Models\Pedido;
 
 class JuncaoTest extends TestCase
 {
     public function testCreateJuncao()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_juncao =  factory(Juncao::class)->create();
+        $seed_juncao = factory(Juncao::class)->create();
+        $mesa =  factory(Mesa::class)->create();
         $response = $this->graphfl('create_juncao', [
             'input' => [
-                'mesa_id' => $seed_juncao->mesa_id,
+                'mesa_id' => $mesa->id,
                 'pedido_id' => $seed_juncao->pedido_id,
             ]
         ], $headers);
 
         $found_juncao = Juncao::findOrFail($response->json('data.CreateJuncao.id'));
-        $this->assertEquals($seed_juncao->mesa_id, $found_juncao->mesa_id);
+        $this->assertEquals($mesa->id, $found_juncao->mesa_id);
         $this->assertEquals($seed_juncao->pedido_id, $found_juncao->pedido_id);
     }
 
@@ -60,6 +63,50 @@ class JuncaoTest extends TestCase
             ]
         ], $headers);
         $juncao->refresh();
-        $this->assertEquals($mesa->id, $juncao->mesa_id);
+        $this->assertEquals($mesa->id, $juncao->mesa->id);
+    }
+
+    public function testJuntarMesaComPedido()
+    {
+        $mesa = factory(Mesa::class)->create();
+        $pedido = factory(Pedido::class)->create(['mesa_id' => $mesa->id]);
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['mesa_id' => $mesa->id]);
+    }
+
+    public function testJuntarMesaJaAssociada()
+    {
+        $mesa = factory(Mesa::class)->create();
+        $juncao = factory(Juncao::class)->create(['mesa_id' => $mesa->id]);
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['mesa_id' => $mesa->id]);
+    }
+
+    public function testJuntarMesaComElaMesma()
+    {
+        $mesa = factory(Mesa::class)->create();
+        $pedido = factory(Pedido::class)->create(['mesa_id' => $mesa->id]);
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['mesa_id' => $mesa->id, 'pedido_id' => $pedido->id]);
+    }
+
+    public function testJuntarMesaComPedidoNaoAberto()
+    {
+        $pedido = factory(Pedido::class)->create(['estado' => Pedido::ESTADO_AGENDADO]);
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['pedido_id' => $pedido->id]);
+    }
+
+    public function testJuntarMesaComPedidoInvalido()
+    {
+        $pedido = factory(Pedido::class)->create(['tipo' => Pedido::TIPO_COMANDA]);
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['pedido_id' => $pedido->id]);
+    }
+
+    public function testJuntarMesaEstadoInvalido()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Juncao::class)->create(['estado' => Juncao::ESTADO_LIBERADO]);
     }
 }

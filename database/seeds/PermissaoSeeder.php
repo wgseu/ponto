@@ -1129,6 +1129,11 @@ class PermissaoSeeder extends Seeder
             'nome' => 'dispositivo:delete',
             'descricao' => __('messages.dispositivo_delete_permition'),
         ]))->save();
+        (new Permissao([
+            'funcionalidade_id' => 25,
+            'nome' => 'dispositivo:validate',
+            'descricao' => __('messages.dispositivo_validate_permition'),
+        ]))->save();
 
         (new Permissao([
             'funcionalidade_id' => 40,

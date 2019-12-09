@@ -257,6 +257,7 @@ return [
     'dispositivo_create_permition' => 'Cadastra os dispositivos',
     'dispositivo_update_permition' => 'Atualiza os dispositivos',
     'dispositivo_delete_permition' => 'Exclui ou arquiva os dispositivos',
+    'dispositivo_validate_permition' => 'Autoriza dispositivos',
     'impressora_view_permition' => 'Lista e visualiza as impressoras',
     'impressora_create_permition' => 'Cadastra as impressoras',
     'impressora_update_permition' => 'Atualiza as impressoras',

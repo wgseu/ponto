@@ -648,7 +648,6 @@ return [
 
         'SetorInput' => 'App\GraphQL\Inputs\SetorInput',
         'MesaInput' => 'App\GraphQL\Inputs\MesaInput',
-        'SessaoInput' => 'App\GraphQL\Inputs\SessaoInput',
         'BancoInput' => 'App\GraphQL\Inputs\BancoInput',
         'CarteiraInput' => 'App\GraphQL\Inputs\CarteiraInput',
         'CaixaInput' => 'App\GraphQL\Inputs\CaixaInput',
@@ -722,7 +721,6 @@ return [
 
         'SetorUpdateInput' => 'App\GraphQL\Inputs\SetorUpdateInput',
         'MesaUpdateInput' => 'App\GraphQL\Inputs\MesaUpdateInput',
-        'SessaoUpdateInput' => 'App\GraphQL\Inputs\SessaoUpdateInput',
         'BancoUpdateInput' => 'App\GraphQL\Inputs\BancoUpdateInput',
         'CarteiraUpdateInput' => 'App\GraphQL\Inputs\CarteiraUpdateInput',
         'CaixaUpdateInput' => 'App\GraphQL\Inputs\CaixaUpdateInput',

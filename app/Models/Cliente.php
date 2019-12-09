@@ -266,7 +266,7 @@ class Cliente extends User implements
      */
     public function isOwner()
     {
-        return app('business')->empresa_id == $this->empresa_id;
+        return !is_null(app('business')->empresa_id) && app('business')->empresa_id == $this->empresa_id;
     }
 
     /**

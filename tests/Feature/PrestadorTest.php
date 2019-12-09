@@ -26,9 +26,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Acesso;
 use Tests\TestCase;
 use App\Models\Funcao;
 use App\Models\Cliente;
+use App\Models\Permissao;
 use App\Models\Prestador;
 
 class PrestadorTest extends TestCase
@@ -37,11 +39,20 @@ class PrestadorTest extends TestCase
      * Obtém os headers de autenticação do prestador de serviço
      *
      * @param Prestador $prestador opcional
+     * @param string[] $permissoes lista de permissões
      * @return array
      */
-    public static function auth($prestador = null)
+    public static function auth($prestador = null, $permissoes = [])
     {
         $prestador = $prestador ?: factory(Prestador::class)->create();
+        $funcao = $prestador->funcao;
+        foreach ($permissoes as $nome) {
+            $permissao = Permissao::where('nome', $nome)->firstOrFail();
+            (new Acesso([
+                'permissao_id' => $permissao->id,
+                'funcao_id' => $funcao->id
+            ]))->save();
+        }
         $user = $prestador->cliente()->first();
         return ClienteTest::auth($user);
     }

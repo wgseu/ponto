@@ -34,7 +34,6 @@ class DispositivoTest extends TestCase
     public function testCreateDispositivo()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_dispositivo =  factory(Dispositivo::class)->create();
         $response = $this->graphfl('create_dispositivo', [
             'input' => [
                 'nome' => 'Teste',
@@ -45,6 +44,19 @@ class DispositivoTest extends TestCase
         $found_dispositivo = Dispositivo::findOrFail($response->json('data.CreateDispositivo.id'));
         $this->assertEquals('Teste', $found_dispositivo->nome);
         $this->assertEquals('Teste', $found_dispositivo->serial);
+    }
+
+    public function testCreateWithoutValidationAccess()
+    {
+        $headers = PrestadorTest::auth(null, ['dispositivo:create']);
+        $this->expectException(\Exception::class);
+        $this->graphfl('create_dispositivo', [
+            'input' => [
+                'nome' => 'Teste',
+                'serial' => 'Teste',
+                'validacao' => 'Teste',
+            ]
+        ], $headers);
     }
 
     public function testUpdateDispositivo()

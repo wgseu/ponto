@@ -1,5 +1,5 @@
 mutation updateMovimentacao($id: ID!, $input: MovimentacaoUpdateInput!) {
   UpdateMovimentacao(id: $id, input: $input) {
-    data_abertura
+    fechador_id
   }
 }

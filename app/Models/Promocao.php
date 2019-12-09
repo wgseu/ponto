@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Util\Date;
 use App\Concerns\ModelEvents;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
@@ -42,11 +43,6 @@ class Promocao extends Model implements ValidateInterface
 {
     use ModelEvents;
     use SoftDeletes;
-
-    /**
-     * Total number of minutes in one day
-     */
-    public const MINUTES_PER_DAY = 1440;
 
     /**
      * Local onde o preço será aplicado
@@ -262,10 +258,10 @@ class Promocao extends Model implements ValidateInterface
             $errors['inicio'] = __('messages.invalid_interval');
         } elseif (($this->evento == true || $this->agendamento == true) && $this->inicio < time()) {
             $errors['inicio'] = __('messages.promotion_begin_invalid');
-        } elseif ($this->evento == false && $this->agendamento == false && $this->inicio < self::MINUTES_PER_DAY) {
+        } elseif ($this->evento == false && $this->agendamento == false && $this->inicio < Date::MINUTES_PER_DAY) {
             $errors['inicio'] = __('messages.inicio_invalid');
         }
-        if ($this->evento == false && $this->agendamento == false && $this->fim  >= self::MINUTES_PER_DAY * 8) {
+        if ($this->evento == false && $this->agendamento == false && $this->fim  >= Date::MINUTES_PER_DAY * 8) {
             $errors['fim'] = __('messages.promotion_end_invalid');
         }
         if (is_null($this->promocao_id) && $this->pontos < 0) {

@@ -54,7 +54,7 @@ class SistemaTest extends TestCase
     {
         $headers = PrestadorTest::authOwner();
         $empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
-        Empresa::find('1')->update(['empresa_id' => $empresa->id]);
+        app('business')->update(['empresa_id' => $empresa->id]);
         $response = $this->graphfl('query_sistema', [], $headers);
         $this->assertArrayHasKey('empresa', $response->json('data.sistema'));
         $this->assertArrayHasKey('fuso_horario', $response->json('data.sistema'));

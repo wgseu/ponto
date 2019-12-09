@@ -41,7 +41,8 @@ class EmpresaTest extends TestCase
     public static function createOwner($cliente = null)
     {
         $cliente_empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
-        $empresa = Empresa::find('1');
+        /** @var Empresa $empresa */
+        $empresa = app('business');
         $empresa->empresa_id = $cliente_empresa->id;
         $empresa->save();
         $cliente = $cliente ?? factory(Cliente::class)->create();
@@ -53,7 +54,8 @@ class EmpresaTest extends TestCase
     public function testUpdateEmpresa()
     {
         $headers = PrestadorTest::authOwner();
-        $empresa = Empresa::find('1');
+        /** @var Empresa $empresa */
+        $empresa = app('business');
         $parceiro = factory(Cliente::class)->create();
         $this->graphfl('update_empresa', [
             'input' => [
@@ -67,7 +69,8 @@ class EmpresaTest extends TestCase
     public function testFindEmpresa()
     {
         $headers = PrestadorTest::authOwner();
-        $empresa = Empresa::find('1');
+        /** @var Empresa $empresa */
+        $empresa = app('business');
         $response = $this->graphfl('query_empresa', [], $headers);
         $this->assertEquals($empresa->pais_id, $response->json('data.empresa.pais_id'));
     }

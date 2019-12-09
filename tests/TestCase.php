@@ -64,6 +64,10 @@ abstract class TestCase extends BaseTestCase
         }
         auth()->check() && auth()->logout();
         auth()->guard()->unsetToken();
+        auth('authorizer')->check() && auth('authorizer')->logout();
+        auth('authorizer')->unsetToken();
+        auth('device')->check() && auth('device')->logout();
+        auth('device')->unsetToken();
         // limpa os unique do faker
         app('Faker\Generator')->unique(true);
         $this->app = null;

@@ -45,6 +45,7 @@ class AcessoSeeder extends Seeder
         $caixa_create_permition = Permissao::where('nome', 'caixa:create')->first();
         $caixa_update_permition = Permissao::where('nome', 'caixa:update')->first();
         $caixa_delete_permition = Permissao::where('nome', 'caixa:delete')->first();
+        $caixa_reopen_permition = Permissao::where('nome', 'caixa:reopen')->first();
         $forma_view_permition = Permissao::where('nome', 'forma:view')->first();
         $forma_create_permition = Permissao::where('nome', 'forma:create')->first();
         $forma_update_permition = Permissao::where('nome', 'forma:update')->first();

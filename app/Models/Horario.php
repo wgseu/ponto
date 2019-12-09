@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Util\Date;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -45,11 +46,6 @@ class Horario extends Model implements ValidateInterface
     public const MODO_FUNCIONAMENTO = 'funcionamento';
     public const MODO_OPERACAO = 'operacao';
     public const MODO_ENTREGA = 'entrega';
-
-    /**
-     * Total number of minutes in one day
-     */
-    public const MINUTES_PER_DAY = 1440;
 
     /**
      * The table associated with the model.
@@ -120,6 +116,28 @@ class Horario extends Model implements ValidateInterface
     }
 
     /**
+     * Retorna o horário compeendido ou próximo horário disponível com base no tempo unix
+     * @param int $time tempo atual
+     * @return self Self instance filled or empty
+     */
+    public static function loadByAvailable($time = null)
+    {
+        $week_offset = Date::weekOffset($time);
+        // carrega até o final da semana (Sábado)
+        $horario = self::where('fim', '>=', $week_offset)
+            ->where('modo', Horario::MODO_FUNCIONAMENTO)
+            ->where('fechado', false)
+            ->orderBy('inicio', 'asc')->first();
+        if (is_null($horario)) {
+            // carrega na outra semana (domingo)
+            $horario = self::where('fechado', false)
+                ->where('modo', Horario::MODO_FUNCIONAMENTO)
+                ->orderBy('inicio', 'asc')->first();
+        }
+        return $horario;
+    }
+
+    /**
      * Regras:
      * Função e prestador não podem ser selecionados juntos,
      * A data de inicio não pode ser maior que o fim,
@@ -158,9 +176,9 @@ class Horario extends Model implements ValidateInterface
         }
         if ($this->inicio >= $this->fim) {
             $errors['inicio'] = __('messages.invalid_interval_funcionamento');
-        } elseif (!$this->fechado && $this->inicio < self::MINUTES_PER_DAY) {
+        } elseif (!$this->fechado && $this->inicio < Date::MINUTES_PER_DAY) {
             $errors['inicio'] = __('messages.inicio_invalid');
-        } elseif (!$this->fechado && $this->fim >= self::MINUTES_PER_DAY * 8) {
+        } elseif (!$this->fechado && $this->fim >= Date::MINUTES_PER_DAY * 8) {
             $errors['fim'] = __('messages.fim_invalid');
         }
         if (

@@ -39,11 +39,12 @@ class DatabaseSeeder extends Seeder
             RegimeSeeder::class,
             ImpostoSeeder::class,
             CozinhaSeeder::class,
-            // OperacaoSeeder::class,
-            // CozinhaSeeder::class,
             HorarioSeeder::class,
+
+            // Caixa aberto de teste
             SessaoSeeder::class,
             MovimentacaoSeeder::class,
+
             OperacaoSeeder::class,
             // IntegracaoSeeder::class,
             MetricaSeeder::class,

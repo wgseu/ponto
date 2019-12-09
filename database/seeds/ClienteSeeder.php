@@ -21,7 +21,8 @@ class ClienteSeeder extends Seeder
         ]);
         $empresa_cliente->save();
 
-        $empresa = Empresa::find('1');
+        /** @var Empresa $empresa */
+        $empresa = app('business');
         $empresa->empresa_id = $empresa_cliente->id;
         $empresa->save();
  

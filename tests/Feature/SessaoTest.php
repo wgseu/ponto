@@ -28,6 +28,9 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Sessao;
+use App\Models\Movimentacao;
+use Illuminate\Support\Carbon;
+use App\Exceptions\ValidationException;
 
 class SessaoTest extends TestCase
 {
@@ -37,5 +40,15 @@ class SessaoTest extends TestCase
         $sessao = factory(Sessao::class)->create();
         $response = $this->graphfl('query_sessao', [ 'id' => $sessao->id ], $headers);
         $this->assertEquals($sessao->id, $response->json('data.sessoes.data.0.id'));
+    }
+
+    public function testMovimentacaoOpen()
+    {
+        $movimentacao = factory(Movimentacao::class)->create();
+        $sessao = $movimentacao->sessao;
+        $sessao->data_termino = Carbon::now();
+        $sessao->aberta = false;
+        $this->expectException(ValidationException::class);
+        $sessao->save();
     }
 }

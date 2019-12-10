@@ -933,4 +933,8 @@ return [
     'pedido_id_incompatible' => 'O pedido de destino deve ser de uma mesa',
     'join_must_be_associated' => 'A junção deve ser cadastrada como associada',
     'mesa_associated_ordem' => 'Já existe um pedido associado a está mesa',
+    'order_have_evaluation' => 'Pedido já tem uma avaliação',
+    'order_more_week' => 'Pedido não pode ser avaliado após uma semana',
+    'movement_open_date_end' => 'Data de termino deve ser nula quando sessão estiver aberta',
+    'movement_close_null_data_end' => 'Data de termino deve ser preenchido quando a sessão estiver fechada'
 ];

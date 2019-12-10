@@ -89,6 +89,7 @@ class MovimentacaoTest extends TestCase
     {
         $sessao = factory(Sessao::class)->create([
             'aberta' => false,
+            'data_termino' => Carbon::now(),
         ]);
         $this->expectException(ValidationException::class);
         factory(Movimentacao::class)->create([

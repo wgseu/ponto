@@ -55,7 +55,9 @@ class ListaTest extends TestCase
     public function testUpdateLista()
     {
         $headers = PrestadorTest::authOwner();
-        $lista = factory(Lista::class)->create();
+        $lista = factory(Lista::class)->create([
+            'estado' => Lista::ESTADO_ANALISE,
+        ]);
         $this->graphfl('update_lista', [
             'id' => $lista->id,
             'input' => [

@@ -63,6 +63,7 @@ class CreateAvaliacaoMutation extends Mutation
     {
         $avaliacao = new Avaliacao();
         $avaliacao->fill($args['input']);
+        $avaliacao->cliente_id = auth()->user()->id;
         $avaliacao->save();
         $avaliacao->metrics();
         return $avaliacao;

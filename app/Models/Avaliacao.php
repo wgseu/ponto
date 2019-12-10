@@ -106,14 +106,20 @@ class Avaliacao extends Model implements
     public function metrics()
     {
         if (!is_null($this->pedido_id) && !is_null($this->produto_id)) {
-            $total = self::where('produto_id', $this->produto_id)->avg('estrelas');
+            $metrica = $this->metrica;
+            $total = self::where('produto_id', $this->produto_id)
+                ->limit($metrica->quantidade)
+                ->avg('estrelas');
             $produto = $this->produto;
             $produto->avaliacao = $total;
             $produto->save();
             return;
         }
-        $estrelas = self::where('metrica_id', $this->metrica_id)->sum('estrelas');
         $metrica = $this->metrica;
+        $estrelas = self::where('metrica_id', $this->metrica_id)
+            ->limit($metrica->quantidade)
+            ->orderBy('id', 'DESC')
+            ->sum('estrelas');
         $metrica->avaliacao = $estrelas / $metrica->quantidade;
         $metrica->save();
     }

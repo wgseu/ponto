@@ -50,7 +50,6 @@ class AvaliacaoTest extends TestCase
             'input' => [
                 'pedido_id' => $pedido->id,
                 'metrica_id' => $metrica->id,
-                'cliente_id' => $cliente->id,
                 'estrelas' => 1,
                 'data_avaliacao' => '2016-12-25 12:15:00',
             ]
@@ -72,12 +71,15 @@ class AvaliacaoTest extends TestCase
             'cliente_id' => $cliente->id,
             'data_criacao' => Carbon::now(),
         ]);
-        $avaliacao = factory(Avaliacao::class)->create([
-            'cliente_id' => $cliente->id,
-            'pedido_id' => $pedido->id,
-            'metrica_id' => $metrica->id,
-            'data_avaliacao' => '2016-12-25 12:15:00',
-        ]);
+        $response = $this->graphfl('create_avaliacao', [
+            'input' => [
+                'pedido_id' => $pedido->id,
+                'metrica_id' => $metrica->id,
+                'estrelas' => 1,
+                'data_avaliacao' => '2016-12-25 12:15:00',
+            ]
+        ], $headers);
+        $avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
         $this->graphfl('update_avaliacao', [
             'id' => $avaliacao->id,
             'input' => [
@@ -133,6 +135,7 @@ class AvaliacaoTest extends TestCase
     {
         $headers = PrestadorTest::authOwner();
         $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
         $pedido = factory(Pedido::class)->create([
             'cliente_id' => $cliente->id,
             'data_criacao' => Carbon::now(),
@@ -140,9 +143,9 @@ class AvaliacaoTest extends TestCase
         $produto = factory(Produto::class)->create();
         $response = $this->graphfl('create_avaliacao', [
             'input' => [
+                'metrica_id' => $metrica->id,
                 'produto_id' => $produto->id,
                 'pedido_id' => $pedido->id,
-                'cliente_id' => $cliente->id,
                 'estrelas' => 1,
                 'data_avaliacao' => '2016-12-25 12:15:00',
             ]
@@ -167,7 +170,6 @@ class AvaliacaoTest extends TestCase
             'input' => [
                 'pedido_id' => $pedido->id,
                 'metrica_id' => $metrica->id,
-                'cliente_id' => $cliente->id,
                 'estrelas' => 1,
                 'data_avaliacao' => '2016-12-25 12:15:00',
             ]
@@ -176,7 +178,6 @@ class AvaliacaoTest extends TestCase
         factory(Avaliacao::class)->create([
             'pedido_id' => $pedido->id,
             'metrica_id' => $metrica->id,
-            'cliente_id' => $cliente->id,
             'estrelas' => 1,
             'data_avaliacao' => '2016-12-25 12:15:00',
         ]);

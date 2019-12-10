@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Models\Pedido;
 use App\Models\Avaliacao;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
@@ -42,7 +43,9 @@ class UpdateAvaliacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('avaliacao:update');
+        $avaliacao = Avaliacao::findOrFail($args['id']);
+        $pedido = Pedido::findOrFail($avaliacao->pedido_id);
+        return Auth::check() && $pedido->cliente_id == auth()->user()->id;
     }
 
     public function type(): Type

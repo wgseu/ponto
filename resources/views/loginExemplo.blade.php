@@ -11,12 +11,13 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <!-- Login Google 
-    Enviar um response contendo googleUser.getBasicProfile
+    Enviar um token contendo googleUser.getAuthResponse().id_token
     Return Refresh Token
 -->
 <script>
 function onSignIn(googleUser) {
-  var response = googleUser.getBasicProfile();
+  //var response = googleUser.getBasicProfile();
+  var token =  googleUser.getAuthResponse().id_token;
   if (googleUser.isSignedIn()) {
     $.ajax({
       type: "POST",
@@ -25,7 +26,7 @@ function onSignIn(googleUser) {
       },
       url: "login/google",
       data: {
-        response
+        token
       },
       dataType: "text",
       success: function (data) {
@@ -51,13 +52,13 @@ function onSignIn(googleUser) {
 </head>
 <body>
 <!-- Login  Facebook 
-    Enviar um response, email e senha
+    Enviar um token com response.authResponse.accessToken
     Return Refresh Token
 -->
 <script>
   function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
     if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-      login();  
+      login(response);  
     } else {                                 // Not logged into your webpage or we are unable to tell.
       document.getElementById('status').innerHTML = 'Please log ' +
         'into this webpage.';
@@ -96,17 +97,16 @@ function onSignIn(googleUser) {
   }(document, 'script', 'facebook-jssdk'));
 
  
-  function login() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
-    var url = '/me?fields=name,email';
-    FB.api(url, function(response) {
-      $.ajax({
+  function login(response) {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
+    var token = response.authResponse.accessToken;
+    $.ajax({
       type: "POST",
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       url: "login/facebook",
       data: {
-        response
+        token
       },
       dataType: "text",
       success: function (data) {
@@ -115,7 +115,6 @@ function onSignIn(googleUser) {
       error: function (data, textStatus, errorThrown) {
         console.log(data);
       },
-    });
     });
   }
 

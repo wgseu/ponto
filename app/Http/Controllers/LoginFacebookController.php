@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use App\Exceptions\AuthorizationException;
+use Facebook\Facebook;
 use Illuminate\Http\Request;
 
 class LoginFacebookController extends Controller
@@ -13,26 +14,36 @@ class LoginFacebookController extends Controller
      *
      * @param Request $request
      */
-    public function loginFacebook(Request $request)
+    public function login(Request $request)
     {
-        $email = $request->response['email'];
-        $nome = $request->response['name'];
-        $cliente = Cliente::where('email', $email)->first();
-        if (!$cliente) {
-            $cliente = new Cliente();
-            $cliente->nome = $nome;
-            $cliente->email = $email;
-            $cliente->status = Cliente::STATUS_ATIVO;
-            $cliente->save();
+        $facebook = new Facebook([
+            'app_id' => env('FACEBOOK_APP_ID'),
+            'app_secret' => env('FACEBOOK_SECRET'),
+            'default_graph_version' => env('FACEBOOK_VERSION'),
+        ]);
+        $fb_response = $facebook->get('/me?fields=id,name,email', $request->token);
+        $payload = $fb_response->getGraphUser();
+        if ($payload) {
+            $cliente = Cliente::where('email', $payload['email'])->first();
+            if (!$cliente) {
+                $cliente = new Cliente();
+                $cliente->nome = $payload['name'];
+                $cliente->email = $payload['email'];
+                $cliente->status = Cliente::STATUS_ATIVO;
+                $cliente->save();
+            }
+            $cliente = Cliente::where('email', $payload['email'])
+                ->where('status', Cliente::STATUS_ATIVO)
+                ->first();
+            if ($cliente) {
+                return [
+                    'refresh_token' => $cliente->createRefreshToken(),
+                    'token_type'   => 'bearer',
+                    'cliente'      => $cliente->toArray(),
+                ];
+            }
         }
-        $cliente = Cliente::where('email', $email)->where('status', Cliente::STATUS_ATIVO)->first();
-        if ($cliente) {
-            return [
-                'refresh_token' => $cliente->createRefreshToken(),
-                'token_type'   => 'bearer',
-                'cliente'      => $cliente->toArray(),
-            ];
-        }
+        
         throw new AuthorizationException(__('messages.acess_invalid'));
     }
 }

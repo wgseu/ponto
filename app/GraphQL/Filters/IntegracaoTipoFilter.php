@@ -32,47 +32,26 @@ use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class IntegracaoFilter extends InputType
+class IntegracaoTipoFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'IntegracaoFilter',
+        'name' => 'IntegracaoTipoFilter',
     ];
 
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
+            'eq' => [
+                'type' => GraphQL::type('IntegracaoTipo'),
             ],
-            'nome' => [
-                'type' => GraphQL::type('StringFilter'),
+            'ne' => [
+                'type' => GraphQL::type('IntegracaoTipo'),
             ],
-            'codigo' => [
-                'type' => GraphQL::type('StringFilter'),
+            'in' => [
+                'type' => Type::listOf(GraphQL::type('IntegracaoTipo')),
             ],
-            'descricao' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'tipo' => [
-                'type' => GraphQL::type('IntegracaoTipoFilter'),
-            ],
-            'login' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'secret' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'opcoes' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'associacoes' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'ativo' => [
-                'type' => Type::boolean(),
-            ],
-            'data_atualizacao' => [
-                'type' => GraphQL::type('DateFilter'),
+            'ni' => [
+                'type' => Type::listOf(GraphQL::type('IntegracaoTipo')),
             ],
         ];
     }

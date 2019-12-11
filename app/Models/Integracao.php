@@ -38,6 +38,15 @@ class Integracao extends Model implements ValidateInterface
 {
     use ModelEvents;
 
+    /**
+     * Tipo de integração se pedido, login, dispositivo, pagamento, outros
+     */
+    public const TIPO_PEDIDO = 'pedido';
+    public const TIPO_LOGIN = 'login';
+    public const TIPO_DISPOSITIVO = 'dispositivo';
+    public const TIPO_PAGAMENTO = 'pagamento';
+    public const TIPO_OUTROS = 'outros';
+
     public const UPDATED_AT = 'data_atualizacao';
     public const CREATED_AT = null;
 
@@ -69,7 +78,9 @@ class Integracao extends Model implements ValidateInterface
      */
     protected $fillable = [
         'nome',
+        'codigo',
         'descricao',
+        'tipo',
         'login',
         'secret',
         'opcoes',

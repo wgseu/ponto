@@ -423,7 +423,18 @@ class CreateInitialTables extends Migration
         Schema::create('integracoes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nome', 45);
+            $table->string('codigo', 45);
             $table->string('descricao', 200)->nullable();
+            $table->enum(
+                'tipo',
+                [
+                    'pedido',
+                    'login',
+                    'dispositivo',
+                    'pagamento',
+                    'outros',
+                    ]
+                );
             $table->string('login', 200)->nullable();
             $table->string('secret', 200)->nullable();
             $table->text('opcoes')->nullable();

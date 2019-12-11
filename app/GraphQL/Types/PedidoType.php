@@ -196,7 +196,7 @@ class PedidoType extends GraphQLType
                 'description' => 'Data de finalização do pedido',
             ],
             'data_pronto' => [
-                'type' => Type::int(),
+                'type' => GraphQL::type('DateTime'),
                 'description' => 'Data e hora em que todos os itens do pedido foram marcados como pronto',
             ],
             'data_entrega' => [

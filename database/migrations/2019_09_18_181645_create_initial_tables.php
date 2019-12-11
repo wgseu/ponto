@@ -518,7 +518,7 @@ class CreateInitialTables extends Migration
             $table->dateTime('data_impressao')->nullable();
             $table->string('motivo', 200)->nullable();
             $table->dateTime('data_conclusao')->nullable();
-            $table->integer('data_pronto')->nullable();
+            $table->dateTime('data_pronto')->nullable();
             $table->dateTime('data_entrega')->nullable();
             $table->dateTime('data_agendamento')->nullable();
             $table->dateTime('data_criacao');

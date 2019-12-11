@@ -43,8 +43,7 @@ class AutomaticPayment extends Command
         foreach ($contas as $conta) {
             try {
                 DB::transaction(function () use ($conta) {
-                    $empresa = Empresa::find(1);
-                    $pais = $empresa->pais;
+                    $pais = app('country');
                     $pagamento = new Pagamento([
                         'carteira_id' => $conta->carteira_id,
                         'moeda_id' => $pais->moeda_id,

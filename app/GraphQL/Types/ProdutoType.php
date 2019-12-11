@@ -62,6 +62,10 @@ class ProdutoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Informa a unidade do produtos, Ex.: Grama, Litro.',
             ],
+            'unidade' => [
+                'type' => GraphQL::type('Unidade'),
+                'description' => 'Informa a unidade do produtos, Ex.: Grama, Litro.',
+            ],
             'setor_estoque_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa de qual setor o produto será retirado após a venda',

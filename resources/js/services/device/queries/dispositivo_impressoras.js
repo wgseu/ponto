@@ -6,6 +6,7 @@ const query = gql`
     dispositivo {
       id
       setor_id
+      nome
     }
 
     impressoras {

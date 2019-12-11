@@ -26,7 +26,6 @@
 
 namespace App\Util;
 
-use App\Models\Empresa;
 use App\Models\Moeda;
 use App\Models\Pais;
 
@@ -45,16 +44,13 @@ class Mask
     public static function money($value, $format = false, $currency = null)
     {
         $value = round($value, 2);
-        $empresa = Empresa::find(1);
         /** @var Pais $pais */
-        $pais = $empresa->pais;
+        $pais = app('country');
         $sep = $pais->entries->getEntry('currency', 'separator', '.');
         $dec = $pais->entries->getEntry('currency', 'decimal', ',');
         $number =  number_format($value, 2, $dec, $sep);
         if ($format) {
-            if (is_null($currency)) {
-                $currency = $pais->moeda;
-            }
+            $currency = $currency ?: app('currency');
             return __($currency->formato, ['value' => $number]);
         }
         return $number;

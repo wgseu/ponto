@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Exceptions\Exception;
+use App\GraphQL\Queries\PedidoSummaryQuery;
 use App\Models\Cheque;
 use App\Models\Conta;
 use App\Models\Credito;
@@ -64,7 +65,7 @@ class CreatePedidoMutation extends Mutation
 
     public function type(): Type
     {
-        return GraphQL::type('Pedido');
+        return GraphQL::type('PedidoSummary');
     }
 
     public function args(): array
@@ -339,6 +340,6 @@ class CreatePedidoMutation extends Mutation
             }
             $pedido->save();
         });
-        return $pedido;
+        return PedidoSummaryQuery::process($pedido);
     }
 }

@@ -72,7 +72,7 @@ class CreateClienteMutation extends Mutation
             $telefones = $args['input']['telefones'] ?? [];
             foreach ($telefones as $fone) {
                 $telefone = new Telefone($fone);
-                $telefone->pais_id = $fone['pais_id'] ?? app('business')->pais->id;
+                $telefone->pais_id = $fone['pais_id'] ?? app('country')->id;
                 $telefone->cliente_id = $cliente->id;
                 $telefone->save();
             }

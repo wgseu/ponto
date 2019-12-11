@@ -5,6 +5,7 @@ const query = gql`
 
     usuario {
       id
+      nome
       proprietario
       prestador {
         id
@@ -16,6 +17,8 @@ const query = gql`
 
     dispositivo {
       id
+      setor_id
+      nome
     }
 
   }

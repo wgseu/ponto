@@ -56,6 +56,10 @@ class LocalizacaoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Bairro do endereço',
             ],
+            'bairro' => [
+                'type' => GraphQL::type('Bairro'),
+                'description' => 'Bairro do endereço',
+            ],
             'zona_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa a zona do bairro',

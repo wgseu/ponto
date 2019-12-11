@@ -68,6 +68,10 @@ class PrestadorType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Cliente que representa esse prestador, único no cadastro de prestadores',
             ],
+            'cliente' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Cliente que representa esse prestador, único no cadastro de prestadores',
+            ],
             'empresa_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa a empresa que gerencia os colaboradores, nulo para a empresa do' .

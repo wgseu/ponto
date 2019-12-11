@@ -73,7 +73,11 @@ class UnidadeQuery extends Query
             $args['filter'] ?? [],
             Unidade::with($fields->getRelations())->select($fields->getSelect())
         );
+        $limit = $args['limit'] ?? 10;
+        if (!isset($args['limit'])) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

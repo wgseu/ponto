@@ -33,6 +33,7 @@ use App\Models\Viagem;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\GraphQL\Queries\PedidoSummaryQuery;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdatePedidoMutation extends CreatePedidoMutation
@@ -56,7 +57,7 @@ class UpdatePedidoMutation extends CreatePedidoMutation
 
     public function type(): Type
     {
-        return GraphQL::type('Pedido');
+        return GraphQL::type('PedidoSummary');
     }
 
     public function args(): array
@@ -135,6 +136,6 @@ class UpdatePedidoMutation extends CreatePedidoMutation
             }
             $pedido->save();
         });
-        return $pedido;
+        return PedidoSummaryQuery::process($pedido);
     }
 }

@@ -57,9 +57,17 @@ class PedidoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador da mesa, único quando o pedido não está fechado',
             ],
+            'mesa' => [
+                'type' => GraphQL::type('Mesa'),
+                'description' => 'Mesa do pedido, único quando o pedido não está fechado',
+            ],
             'comanda_id' => [
                 'type' => Type::id(),
                 'description' => 'Identificador da comanda, único quando o pedido não está fechado',
+            ],
+            'comanda' => [
+                'type' => GraphQL::type('Comanda'),
+                'description' => 'Comanda do pedido, único quando o pedido não está fechado',
             ],
             'sessao_id' => [
                 'type' => Type::id(),
@@ -68,6 +76,14 @@ class PedidoType extends GraphQLType
             'prestador_id' => [
                 'type' => Type::id(),
                 'description' => 'Prestador que criou esse pedido',
+            ],
+            'prestador' => [
+                'type' => GraphQL::type('Prestador'),
+                'description' => 'Prestador que criou esse pedido',
+                'privacy'     => function (array $args): bool {
+                    return $args['cliente_id'] == auth()->id() ||
+                        (auth('device')->check() && auth('device')->user()->isValid());
+                },
             ],
             'cliente_id' => [
                 'type' => Type::id(),

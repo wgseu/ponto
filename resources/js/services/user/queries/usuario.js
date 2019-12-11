@@ -4,6 +4,7 @@ const query = gql`
   query {
     usuario {
       id
+      nome
       proprietario
       prestador {
         id

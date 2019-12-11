@@ -30,6 +30,7 @@ namespace App\GraphQL\Types;
 
 use App\Models\Bairro;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class BairroType extends GraphQLType
@@ -49,6 +50,10 @@ class BairroType extends GraphQLType
             ],
             'cidade_id' => [
                 'type' => Type::id(),
+                'description' => 'Cidade a qual o bairro pertence',
+            ],
+            'cidade' => [
+                'type' => GraphQL::type('Cidade'),
                 'description' => 'Cidade a qual o bairro pertence',
             ],
             'nome' => [

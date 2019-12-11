@@ -47,7 +47,8 @@ class SetorQuery extends Query
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('setor:view');
+        return (Auth::check() && Auth::user()->can('setor:view')) ||
+            (auth('device')->check() && auth('device')->user()->isValid());
     }
 
     public function type(): Type
@@ -73,7 +74,11 @@ class SetorQuery extends Query
             $args['filter'] ?? [],
             Setor::with($fields->getRelations())->select($fields->getSelect())
         );
+        $limit = $args['limit'] ?? 10;
+        if (!isset($args['limit'])) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

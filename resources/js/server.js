@@ -7,11 +7,15 @@ const PrinterRounter = require('./printing/router')
 class Server {
   constructor () {
     this.server = http.createServer()
-    this.io = SocketIO(this.server, { path: '/ws' })
+    this.io = SocketIO(this.server, {
+      path: '/ws',
+      transports: ['websocket']
+    })
     this.clients = new Map()
     this.devices = new Map()
     this.deviceToken = null
     this.printers = []
+    this.allPrinters = []
   }
 
   print (sender, info) {
@@ -29,11 +33,16 @@ class Server {
   }
 
   async auth (client, info) {
+    if (
+      (info.type === 'user'   && !info.access_token) ||
+      (info.type === 'device' && !info.device_token)
+    ) {
+      this.removeClient(client)
+      this.resetClient(client.socket)
+      return
+    }
     try {
       if (info.type === 'user') {
-        if (!info.access_token) {
-          throw new Error('No authentication token given')
-        }
         const response = info.device_token ?
           await Service.User.fetchWithDevice(info.access_token, info.device_token) :
           await Service.User.fetch(info.access_token)
@@ -44,26 +53,28 @@ class Server {
         client.employee_id = usuario.prestador && usuario.prestador.id
         client.permissions = (usuario.prestador && usuario.prestador.permissions) || []
         client.device_id = dispositivo && dispositivo.id
+        const deviceName = (dispositivo && dispositivo.nome) || client.socket.handshake.headers['x-real-ip']
+        const userType = client.owner ? 'Owner' : (client.employee_id ? 'Employee' : 'User')
+        console.log(`${userType} "${usuario.nome}" connected from ${deviceName}`)
       } else if (info.type === 'device') {
-        const response = this.printers.length > 0 ?
+        const response = this.allPrinters.length > 0 ?
           await Service.Device.fetch(info.device_token) :
           await Service.Device.fetchWithPrinter(info.device_token)
-        const { data: { dispositivo, impressoras: { data: impressoras } } } = response
+        const { data: { dispositivo, impressoras } } = response
         client.type = info.type
         client.device = dispositivo
         client.printers = []
         // usa o token do dispositivo para baixar a lista de impressoras
         this.deviceToken = info.device_token
         this.devices.set(dispositivo.id, client)
-        this.allPrinters = impressoras || this.allPrinters
+        this.allPrinters = (impressoras && impressoras.data) || this.allPrinters
         this.assignPrinters()
-        console.log('impressoras:', this.printers.length)
+        console.log(`Device "${client.device.nome}" connected with ${client.printers.length} printers`)
       }
     } catch (error) {
       this.removeClient(client)
       this.resetClient(client.socket)
-      client.socket.emit('authFailed')
-      console.error(error)
+      console.error('Authentication:', error.message)
     }
   }
 
@@ -110,7 +121,6 @@ class Server {
   onDisconnect (socket) {
     const client = this.clients.get(socket.id)
     this.removeClient(client)
-    console.log('removeClient:', this.clients.size)
   }
 
   resetClient (socket) {
@@ -120,7 +130,6 @@ class Server {
       type: 'user'
     }
     this.clients.set(socket.id, client)
-    console.log('resetClient:', this.clients.size)
   }
 
   removeClient (client) {

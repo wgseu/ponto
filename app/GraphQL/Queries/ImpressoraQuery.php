@@ -61,7 +61,7 @@ class ImpressoraQuery extends Query
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ImpressoraFilter')],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ImpressoraOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int()],
+            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
         ];
     }

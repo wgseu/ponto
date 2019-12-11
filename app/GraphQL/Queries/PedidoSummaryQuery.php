@@ -48,10 +48,10 @@ class PedidoSummaryQuery extends Query
     public function authorize(array $args): bool
     {
         $pedido = Pedido::findOrFail($args['id']);
-        return Auth::check() && (
+        return (Auth::check() && (
             $pedido->cliente_id == Auth::user()->id
             || Auth::user()->can('pedido:view')
-        );
+        )) || (auth('device')->check() && auth('device')->user()->isValid());
     }
 
     public function type(): Type
@@ -69,14 +69,22 @@ class PedidoSummaryQuery extends Query
         ];
     }
 
-    public function resolve($root, $args)
+    /**
+     * Retorna o resumo do pedido informado
+     *
+     * @param Pedido $pedido
+     * @return array
+     */
+    public static function process($pedido)
     {
-        $pedido = Pedido::findOrFail($args['id']);
         $itens = $pedido->itens;
         $itens_data = [];
         foreach ($itens as $item) {
             $item_data = $item->toArray();
-            $item_data['produto'] = is_null($item->produto_id) ? null : $item->produto->toArray();
+            if (!is_null($item->produto_id)) {
+                $item_data['produto'] = $item->produto->toArray();
+                $item_data['produto']['unidade'] = $item->produto->unidade->toArray();
+            }
             $item_data['servico'] = is_null($item->servico_id) ? null : $item->servico->toArray();
             $itens_data[] = $item_data;
         }
@@ -91,9 +99,23 @@ class PedidoSummaryQuery extends Query
         $pedido_data = $pedido->toArray();
         $pedido_data['cliente'] = is_null($pedido->cliente_id) ? null : $pedido->cliente->toArray();
         $pedido_data['entrega'] = is_null($pedido->entrega_id) ? null : $pedido->entrega->toArray();
-        $pedido_data['localizacao'] = is_null($pedido->localizacao_id) ? null : $pedido->localizacao->toArray();
+        if (!is_null($pedido->prestador_id)) {
+            $pedido_data['prestador'] = $pedido->prestador->toArray();
+            $pedido_data['prestador']['cliente'] = $pedido->prestador->cliente->toArray();
+        }
+        if (!is_null($pedido->localizacao_id)) {
+            $pedido_data['localizacao'] = $pedido->localizacao->toArray();
+            $pedido_data['localizacao']['bairro'] = $pedido->localizacao->bairro->toArray();
+            $pedido_data['localizacao']['bairro']['cidade'] = $pedido->localizacao->bairro->cidade->toArray();
+        }
         $pedido_data['itens'] = $itens_data;
         $pedido_data['pagamentos'] = $pagamentos_data;
         return $pedido_data;
+    }
+
+    public function resolve($root, $args)
+    {
+        $pedido = Pedido::findOrFail($args['id']);
+        return $this->process($pedido);
     }
 }

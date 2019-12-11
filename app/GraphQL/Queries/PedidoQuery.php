@@ -68,6 +68,38 @@ class PedidoQuery extends Query
         ];
     }
 
+    /**
+     * Verifica se o filtro passado filtra somente pedidos abertos
+     * usado para não limitar a quantidade de registros retornados
+     *
+     * @param array $filter
+     * @return boolean
+     */
+    public static function isOpenState($filter)
+    {
+        $eq = $filter['eq'] ?? null;
+        if (isset($filter['eq']) && $eq != Pedido::ESTADO_CONCLUIDO && $eq != Pedido::ESTADO_CANCELADO) {
+            return true;
+        }
+        $in = $filter['in'] ?? [];
+        if (
+            isset($filter['in']) &&
+            !in_array(Pedido::ESTADO_CONCLUIDO, $in) &&
+            !in_array(Pedido::ESTADO_CANCELADO, $in)
+        ) {
+            return true;
+        }
+        $ni = $filter['ni'] ?? [];
+        if (
+            isset($filter['ni']) &&
+            in_array(Pedido::ESTADO_CONCLUIDO, $ni) &&
+            in_array(Pedido::ESTADO_CANCELADO, $ni)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
     {
         /** @var SelectFields $fields */
@@ -76,7 +108,11 @@ class PedidoQuery extends Query
             $args['filter'] ?? [],
             Pedido::with($fields->getRelations())->select($fields->getSelect())
         );
+        $limit = $args['limit'] ?? 10;
+        if (!isset($args['limit']) && self::isOpenState($args['filter']['estado'] ?? null)) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

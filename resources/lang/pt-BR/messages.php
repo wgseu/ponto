@@ -882,6 +882,6 @@ return [
     'attendance' => 'Atendimento',
     'production' => 'Produção',
     'metrica_description_production' => 'Avalie sua experiência com a produção',
-    'integration_aticve_login_cannot_null' => 'A integração está ativa é necessário login e senha',
-    'integration_module' => 'Módulo de integração com :sistem',
+    'integration_active_login_cannot_null' => 'A integração está ativa é necessário login e senha',
+    'integration_module' => 'Módulo de integração com :name',
 ];

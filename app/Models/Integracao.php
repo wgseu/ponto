@@ -70,7 +70,6 @@ class Integracao extends Model implements ValidateInterface
     protected $fillable = [
         'nome',
         'descricao',
-        'icone_url',
         'login',
         'secret',
         'opcoes',
@@ -128,7 +127,7 @@ class Integracao extends Model implements ValidateInterface
                 is_null($this->secret)
             )
         ) {
-            $errors['ativo'] = __('messagens.integration_aticve_login_cannot_null');
+            $errors['ativo'] = __('messagens.integration_active_login_cannot_null');
         }
         return $errors;
     }

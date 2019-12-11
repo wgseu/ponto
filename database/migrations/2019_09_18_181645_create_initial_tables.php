@@ -424,7 +424,6 @@ class CreateInitialTables extends Migration
             $table->increments('id');
             $table->string('nome', 45);
             $table->string('descricao', 200)->nullable();
-            $table->string('icone_url', 200)->nullable();
             $table->string('login', 200)->nullable();
             $table->string('secret', 200)->nullable();
             $table->text('opcoes')->nullable();

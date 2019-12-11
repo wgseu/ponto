@@ -40,12 +40,11 @@ class DatabaseSeeder extends Seeder
             ImpostoSeeder::class,
             CozinhaSeeder::class,
             // OperacaoSeeder::class,
-            // CozinhaSeeder::class,
-            HorarioSeeder::class,
+/*             HorarioSeeder::class,
             SessaoSeeder::class,
-            MovimentacaoSeeder::class,
+            MovimentacaoSeeder::class, */
             OperacaoSeeder::class,
-            // IntegracaoSeeder::class,
+            IntegracaoSeeder::class,
             MetricaSeeder::class,
 
             // Cardápio de amostra

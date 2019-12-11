@@ -56,10 +56,6 @@ class IntegracaoType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Descrição do módulo integrador',
             ],
-            'icone_url' => [
-                'type' => Type::string(),
-                'description' => 'Nome do ícone do módulo integrador',
-            ],
             'login' => [
                 'type' => Type::string(),
                 'description' => 'Login de acesso à API de sincronização',

@@ -51,11 +51,6 @@ class IntegracaoInput extends InputType
                 'description' => 'Descrição do módulo integrador',
                 'rules' => ['max:200'],
             ],
-            'icone_url' => [
-                'type' => Type::string(),
-                'description' => 'Nome do ícone do módulo integrador',
-                'rules' => ['max:200'],
-            ],
             'login' => [
                 'type' => Type::string(),
                 'description' => 'Login de acesso à API de sincronização',

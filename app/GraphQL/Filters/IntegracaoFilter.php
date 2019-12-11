@@ -50,9 +50,6 @@ class IntegracaoFilter extends InputType
             'descricao' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
-            'icone_url' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
             'login' => [
                 'type' => GraphQL::type('StringFilter'),
             ],

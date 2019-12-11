@@ -26,9 +26,14 @@ class LoginFacebookController extends Controller
         if ($payload) {
             $cliente = Cliente::where('email', $payload['email'])->first();
             if (!$cliente) {
+                $imagem_url = 'https://graph.facebook.com/' . $payload['id'] . '/picture?type=large';
+                $data = file_get_contents($imagem_url);
                 $cliente = new Cliente();
                 $cliente->nome = $payload['name'];
                 $cliente->email = $payload['email'];
+                if ($data !== false) {
+                    $cliente->imagem = base64_encode($data);
+                }
                 $cliente->status = Cliente::STATUS_ATIVO;
                 $cliente->save();
             }
@@ -39,7 +44,7 @@ class LoginFacebookController extends Controller
                 return [
                     'refresh_token' => $cliente->createRefreshToken(),
                     'token_type'   => 'bearer',
-                    'cliente'      => $cliente->toArray(),
+                    'user'      => $cliente->toArray(),
                 ];
             }
         }

@@ -18,13 +18,14 @@ class LoginGoogleController extends Controller
     {
         $client = new Google_Client(['client_id' => env('GOOGLE_APP_ID')]);
         $payload = $client->verifyIdToken($request->token);
-
         if ($payload) {
             $cliente = Cliente::where('email', $payload['email'])->first();
             if (!$cliente) {
+                $data = file_get_contents($payload['picture']);
                 $cliente = new Cliente();
                 $cliente->nome = $payload['name'];
                 $cliente->email = $payload['email'];
+                $cliente->imagem = base64_encode($data);
                 $cliente->status = Cliente::STATUS_ATIVO;
                 $cliente->save();
             }

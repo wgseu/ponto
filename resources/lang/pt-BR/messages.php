@@ -933,4 +933,8 @@ return [
     'pedido_id_incompatible' => 'O pedido de destino deve ser de uma mesa',
     'join_must_be_associated' => 'A junção deve ser cadastrada como associada',
     'mesa_associated_ordem' => 'Já existe um pedido associado a está mesa',
+    'close_invalid' => 'Para o fechamento o modo deve ser funcionamento e não pode haver função e ' .
+        'prestador selecionadas',
+    'user_acess_invalid_facebook' => "É necessário autorizar o acesso Facebook",
+    'acess_invalid' => 'Acesso negado',
 ];

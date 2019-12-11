@@ -34,7 +34,9 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
 use App\Interfaces\ValidateInsertInterface;
+use App\Util\Upload;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
 
@@ -103,6 +105,7 @@ class Cliente extends User implements
         'instagram',
         'facebook_url',
         'imagem_url',
+        'imagem',
         'linguagem',
     ];
 
@@ -147,6 +150,49 @@ class Cliente extends User implements
             'uid' => null,
             'typ' => 'access',
         ];
+    }
+
+        /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Upload::send($value, 'images/users', 'public');
+        }
+    }
+
+    /**
+     * Limpa os recursos do produto atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
     }
 
     /**

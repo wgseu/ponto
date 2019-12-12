@@ -568,6 +568,7 @@ return [
         'CupomFuncaoValorFilter' => 'App\GraphQL\Filters\CupomFuncaoValorFilter',
         'MetricaTipoFilter' => 'App\GraphQL\Filters\MetricaTipoFilter',
         'CardapioLocalFilter' => 'App\GraphQL\Filters\CardapioLocalFilter',
+        'IntegracaoTipoFilter' => 'App\GraphQL\Filters\IntegracaoTipoFilter',
 
         'SetorOrder' => 'App\GraphQL\Ordering\SetorOrder',
         'MesaOrder' => 'App\GraphQL\Ordering\MesaOrder',
@@ -928,6 +929,7 @@ return [
         'CupomFuncaoValor' => 'App\GraphQL\Enums\CupomFuncaoValorEnum',
         'MetricaTipo' => 'App\GraphQL\Enums\MetricaTipoEnum',
         'CardapioLocal' => 'App\GraphQL\Enums\CardapioLocalEnum',
+        'IntegracaoTipo' => 'App\GraphQL\Enums\IntegracaoTipoEnum',
     ],
 
     // The types will be loaded on demand. Default is to load all types on each request

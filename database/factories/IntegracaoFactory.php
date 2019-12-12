@@ -8,5 +8,7 @@ use Faker\Generator as Faker;
 $factory->define(Integracao::class, function (Faker $faker) {
     return [
         'nome' => $faker->unique()->name,
+        'codigo' => $faker->name,
+        'tipo' => Integracao::TIPO_PEDIDO,
     ];
 });

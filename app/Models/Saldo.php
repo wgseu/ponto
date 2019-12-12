@@ -76,7 +76,7 @@ class Saldo extends Model implements ValidateInterface
      */
     public function moeda()
     {
-        return $this->belongsTo('App\Models\Moeda', 'moeda_id');
+        return $this->belongsTo(Moeda::class, 'moeda_id');
     }
 
     /**
@@ -84,7 +84,7 @@ class Saldo extends Model implements ValidateInterface
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     public function validate()

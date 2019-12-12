@@ -62,32 +62,37 @@ class CreateClienteMutation extends Mutation
     public function resolve($root, $args)
     {
         $cliente_data = [];
-        DB::transaction(function () use ($args, &$cliente_data) {
-            $cliente = new Cliente();
-            $cliente->fill($args['input']);
-            if (!Auth::check() || !Auth::user()->can('cliente:create')) {
-                $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
-            }
-            $cliente->save();
-            $telefones = $args['input']['telefones'] ?? [];
-            foreach ($telefones as $fone) {
-                $telefone = new Telefone($fone);
-                $telefone->pais_id = $fone['pais_id'] ?? app('country')->id;
-                $telefone->cliente_id = $cliente->id;
-                $telefone->save();
-            }
-            if ($cliente->email) {
-                $data = [
-                    'nome' => $cliente->nome,
-                    'url' => url('/account/verify/' . $cliente->createValidateToken())
-                ];
-                Mail::to($cliente->email)->send(new MailContact($data));
-                $cliente->data_envio = Carbon::now();
+        $cliente = new Cliente();
+        try {
+            DB::transaction(function () use ($cliente, $args, &$cliente_data) {
+                $cliente->fill($args['input']);
+                if (!Auth::check() || !Auth::user()->can('cliente:create')) {
+                    $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
+                }
                 $cliente->save();
-                $cliente_data['refresh_token'] = $cliente->createRefreshToken();
-            }
-            $cliente_data = array_merge($cliente->toArray(), $cliente_data);
-        });
+                $telefones = $args['input']['telefones'] ?? [];
+                foreach ($telefones as $fone) {
+                    $telefone = new Telefone($fone);
+                    $telefone->pais_id = $fone['pais_id'] ?? app('country')->id;
+                    $telefone->cliente_id = $cliente->id;
+                    $telefone->save();
+                }
+                if ($cliente->email) {
+                    $data = [
+                        'nome' => $cliente->nome,
+                        'url' => url('/account/verify/' . $cliente->createValidateToken())
+                    ];
+                    Mail::to($cliente->email)->send(new MailContact($data));
+                    $cliente->data_envio = Carbon::now();
+                    $cliente->save();
+                    $cliente_data['refresh_token'] = $cliente->createRefreshToken();
+                }
+                $cliente_data = array_merge($cliente->toArray(), $cliente_data);
+            });
+        } catch (\Throwable $th) {
+            $cliente->clean(new Cliente());
+            throw $th;
+        }
         return $cliente_data;
     }
 }

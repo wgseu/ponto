@@ -91,7 +91,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function pacote()
     {
-        return $this->belongsTo('App\Models\Produto', 'pacote_id');
+        return $this->belongsTo(Produto::class, 'pacote_id');
     }
 
     /**
@@ -99,7 +99,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function grupo()
     {
-        return $this->belongsTo('App\Models\Grupo', 'grupo_id');
+        return $this->belongsTo(Grupo::class, 'grupo_id');
     }
 
     /**
@@ -107,7 +107,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -115,7 +115,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function propriedade()
     {
-        return $this->belongsTo('App\Models\Propriedade', 'propriedade_id');
+        return $this->belongsTo(Propriedade::class, 'propriedade_id');
     }
 
     /**
@@ -125,7 +125,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function associacao()
     {
-        return $this->belongsTo('App\Models\Pacote', 'associacao_id');
+        return $this->belongsTo(Pacote::class, 'associacao_id');
     }
 
     /**

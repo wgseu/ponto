@@ -108,7 +108,7 @@ class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**

@@ -67,7 +67,7 @@ class Permissao extends Model implements ValidateInterface
      */
     public function funcionalidade()
     {
-        return $this->belongsTo('App\Models\Funcionalidade', 'funcionalidade_id');
+        return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
     }
 
     public function validate()

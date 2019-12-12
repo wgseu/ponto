@@ -81,7 +81,7 @@ class Movimentacao extends Model implements ValidateInterface
      */
     public function sessao()
     {
-        return $this->belongsTo('App\Models\Sessao', 'sessao_id');
+        return $this->belongsTo(Sessao::class, 'sessao_id');
     }
 
     /**
@@ -89,7 +89,7 @@ class Movimentacao extends Model implements ValidateInterface
      */
     public function caixa()
     {
-        return $this->belongsTo('App\Models\Caixa', 'caixa_id');
+        return $this->belongsTo(Caixa::class, 'caixa_id');
     }
 
     /**
@@ -97,7 +97,7 @@ class Movimentacao extends Model implements ValidateInterface
      */
     public function iniciador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'iniciador_id')->withTrashed();
+        return $this->belongsTo(Prestador::class, 'iniciador_id')->withTrashed();
     }
 
     /**
@@ -105,7 +105,7 @@ class Movimentacao extends Model implements ValidateInterface
      */
     public function fechador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'fechador_id');
+        return $this->belongsTo(Prestador::class, 'fechador_id');
     }
 
     /**

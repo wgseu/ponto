@@ -87,7 +87,7 @@ class Auditoria extends Model implements ValidateInterface
      */
     public function permissao()
     {
-        return $this->belongsTo('App\Models\Permissao', 'permissao_id');
+        return $this->belongsTo(Permissao::class, 'permissao_id');
     }
 
     /**
@@ -95,7 +95,7 @@ class Auditoria extends Model implements ValidateInterface
      */
     public function prestador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+        return $this->belongsTo(Prestador::class, 'prestador_id');
     }
 
     /**
@@ -103,7 +103,7 @@ class Auditoria extends Model implements ValidateInterface
      */
     public function autorizador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'autorizador_id');
+        return $this->belongsTo(Prestador::class, 'autorizador_id');
     }
 
     public function validate()

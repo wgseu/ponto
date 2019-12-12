@@ -93,7 +93,7 @@ class Associacao extends Model implements ValidateInterface
      */
     public function integracao()
     {
-        return $this->belongsTo('App\Models\Integracao', 'integracao_id');
+        return $this->belongsTo(Integracao::class, 'integracao_id');
     }
 
     /**
@@ -101,7 +101,7 @@ class Associacao extends Model implements ValidateInterface
      */
     public function entrega()
     {
-        return $this->belongsTo('App\Models\Viagem', 'entrega_id');
+        return $this->belongsTo(Viagem::class, 'entrega_id');
     }
 
     public function validate()

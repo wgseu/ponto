@@ -203,7 +203,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function categoria()
     {
-        return $this->belongsTo('App\Models\Categoria', 'categoria_id');
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 
     /**
@@ -211,7 +211,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function unidade()
     {
-        return $this->belongsTo('App\Models\Unidade', 'unidade_id');
+        return $this->belongsTo(Unidade::class, 'unidade_id');
     }
 
     /**
@@ -219,7 +219,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function setorEstoque()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_estoque_id');
+        return $this->belongsTo(Setor::class, 'setor_estoque_id');
     }
 
     /**
@@ -228,7 +228,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function setorPreparo()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_preparo_id');
+        return $this->belongsTo(Setor::class, 'setor_preparo_id');
     }
 
     /**
@@ -236,7 +236,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function tributacao()
     {
-        return $this->belongsTo('App\Models\Tributacao', 'tributacao_id');
+        return $this->belongsTo(Tributacao::class, 'tributacao_id');
     }
 
     /**
@@ -246,7 +246,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function composicoes()
     {
-        return $this->hasMany('App\Models\Composicao', 'composicao_id')
+        return $this->hasMany(Composicao::class, 'composicao_id')
             ->where('ativa', true);
     }
 
@@ -257,7 +257,7 @@ class Produto extends Model implements ValidateInterface
      */
     public function grupos()
     {
-        return $this->hasMany('App\Models\Grupo', 'produto_id')
+        return $this->hasMany(Grupo::class, 'produto_id')
             ->orderBy('ordem', 'asc')
             ->orderBy('id', 'asc');
     }

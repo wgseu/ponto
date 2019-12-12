@@ -145,7 +145,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function promocao()
     {
-        return $this->belongsTo('App\Models\Promocao', 'promocao_id');
+        return $this->belongsTo(Promocao::class, 'promocao_id');
     }
 
     /**
@@ -153,7 +153,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function categoria()
     {
-        return $this->belongsTo('App\Models\Categoria', 'categoria_id');
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 
     /**
@@ -162,7 +162,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -170,7 +170,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function servico()
     {
-        return $this->belongsTo('App\Models\Servico', 'servico_id');
+        return $this->belongsTo(Servico::class, 'servico_id');
     }
 
     /**
@@ -178,7 +178,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function bairro()
     {
-        return $this->belongsTo('App\Models\Bairro', 'bairro_id');
+        return $this->belongsTo(Bairro::class, 'bairro_id');
     }
 
     /**
@@ -186,7 +186,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function zona()
     {
-        return $this->belongsTo('App\Models\Zona', 'zona_id');
+        return $this->belongsTo(Zona::class, 'zona_id');
     }
 
     /**
@@ -194,7 +194,7 @@ class Promocao extends Model implements ValidateInterface
      */
     public function integracao()
     {
-        return $this->belongsTo('App\Models\Integracao', 'integracao_id');
+        return $this->belongsTo(Integracao::class, 'integracao_id');
     }
 
     public function validate()

@@ -94,7 +94,7 @@ class Prestador extends Model implements ValidateInterface
      */
     public function funcao()
     {
-        return $this->belongsTo('App\Models\Funcao', 'funcao_id');
+        return $this->belongsTo(Funcao::class, 'funcao_id');
     }
 
     /**
@@ -102,7 +102,7 @@ class Prestador extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -111,7 +111,7 @@ class Prestador extends Model implements ValidateInterface
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Models\Prestador', 'empresa_id');
+        return $this->belongsTo(Prestador::class, 'empresa_id');
     }
 
     public function validate()

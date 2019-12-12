@@ -68,7 +68,7 @@ class Cidade extends Model implements ValidateInterface
      */
     public function estado()
     {
-        return $this->belongsTo('App\Models\Estado', 'estado_id');
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 
     public function validate()

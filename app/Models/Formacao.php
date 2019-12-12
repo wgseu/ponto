@@ -78,7 +78,7 @@ class Formacao extends Model implements ValidateInterface
      */
     public function item()
     {
-        return $this->belongsTo('App\Models\Item', 'item_id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     /**
@@ -86,7 +86,7 @@ class Formacao extends Model implements ValidateInterface
      */
     public function pacote()
     {
-        return $this->belongsTo('App\Models\Pacote', 'pacote_id');
+        return $this->belongsTo(Pacote::class, 'pacote_id');
     }
 
     /**
@@ -94,7 +94,7 @@ class Formacao extends Model implements ValidateInterface
      */
     public function composicao()
     {
-        return $this->belongsTo('App\Models\Composicao', 'composicao_id');
+        return $this->belongsTo(Composicao::class, 'composicao_id');
     }
 
     public function validate()

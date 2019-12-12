@@ -69,7 +69,7 @@ class Funcionalidade extends Model implements ValidateInterface
      */
     public function modulo()
     {
-        return $this->belongsTo('App\Models\Modulo', 'modulo_id');
+        return $this->belongsTo(Modulo::class, 'modulo_id');
     }
 
     /**
@@ -77,7 +77,7 @@ class Funcionalidade extends Model implements ValidateInterface
      */
     public function funcionalidade()
     {
-        return $this->belongsTo('App\Models\Funcionalidade', 'funcionalidade_id');
+        return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
     }
 
     public function validate()

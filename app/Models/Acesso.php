@@ -66,7 +66,7 @@ class Acesso extends Model implements ValidateInterface
      */
     public function funcao()
     {
-        return $this->belongsTo('App\Models\Funcao', 'funcao_id');
+        return $this->belongsTo(Funcao::class, 'funcao_id');
     }
 
     /**
@@ -74,7 +74,7 @@ class Acesso extends Model implements ValidateInterface
      */
     public function permissao()
     {
-        return $this->belongsTo('App\Models\Permissao', 'permissao_id');
+        return $this->belongsTo(Permissao::class, 'permissao_id');
     }
 
     public function validate()

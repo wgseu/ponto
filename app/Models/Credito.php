@@ -73,7 +73,7 @@ class Credito extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**

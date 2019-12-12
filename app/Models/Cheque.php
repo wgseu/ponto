@@ -78,7 +78,7 @@ class Cheque extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -86,7 +86,7 @@ class Cheque extends Model implements ValidateInterface
      */
     public function banco()
     {
-        return $this->belongsTo('App\Models\Banco', 'banco_id');
+        return $this->belongsTo(Banco::class, 'banco_id');
     }
 
     /**

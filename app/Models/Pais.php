@@ -107,7 +107,7 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function moeda()
     {
-        return $this->belongsTo('App\Models\Moeda', 'moeda_id');
+        return $this->belongsTo(Moeda::class, 'moeda_id');
     }
 
     public function validate()

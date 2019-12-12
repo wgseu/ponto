@@ -150,7 +150,7 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
      */
     public function setor()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_id');
+        return $this->belongsTo(Setor::class, 'setor_id');
     }
 
     /**
@@ -159,7 +159,7 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
      */
     public function caixa()
     {
-        return $this->belongsTo('App\Models\Caixa', 'caixa_id');
+        return $this->belongsTo(Caixa::class, 'caixa_id');
     }
 
     public function validate()

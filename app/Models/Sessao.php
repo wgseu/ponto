@@ -79,7 +79,7 @@ class Sessao extends Model implements ValidateInterface
      */
     public function cozinha()
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return $this->belongsTo(Cozinha::class, 'cozinha_id');
     }
 
     /**

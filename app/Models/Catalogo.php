@@ -87,7 +87,7 @@ class Catalogo extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -95,7 +95,7 @@ class Catalogo extends Model implements ValidateInterface
      */
     public function fornecedor()
     {
-        return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
     public function validate()

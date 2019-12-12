@@ -182,7 +182,7 @@ class Cliente extends User implements
     }
 
     /**
-     * Limpa os recursos do produto atual se alterado
+     * Limpa os recursos do cliente atual se alterado
      *
      * @param self $old
      * @return void
@@ -249,7 +249,7 @@ class Cliente extends User implements
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Models\Cliente', 'empresa_id');
+        return $this->belongsTo(Cliente::class, 'empresa_id');
     }
 
     /**
@@ -257,7 +257,18 @@ class Cliente extends User implements
      */
     public function prestador()
     {
-        return $this->hasOne('App\Models\Prestador', 'cliente_id');
+        return $this->hasOne(Prestador::class, 'cliente_id');
+    }
+
+    /**
+     * Retorna o telefone principal do cliente
+     */
+    public function telefone()
+    {
+        return $this->hasOne(Telefone::class, 'cliente_id')
+            ->orderBy('data_validacao', 'DESC')
+            ->orderBy('principal', 'DESC')
+            ->orderBy('id', 'DESC');
     }
 
     public function validate()

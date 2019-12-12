@@ -84,7 +84,7 @@ class Cartao extends Model implements ValidateInterface
      */
     public function forma()
     {
-        return $this->belongsTo('App\Models\Forma', 'forma_id');
+        return $this->belongsTo(Forma::class, 'forma_id');
     }
 
     /**
@@ -92,7 +92,7 @@ class Cartao extends Model implements ValidateInterface
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     /**

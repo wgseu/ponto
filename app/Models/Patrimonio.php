@@ -95,7 +95,7 @@ class Patrimonio extends Model implements ValidateInterface
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Models\Cliente', 'empresa_id');
+        return $this->belongsTo(Cliente::class, 'empresa_id');
     }
 
     /**
@@ -103,7 +103,7 @@ class Patrimonio extends Model implements ValidateInterface
      */
     public function fornecedor()
     {
-        return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
     public function validate()

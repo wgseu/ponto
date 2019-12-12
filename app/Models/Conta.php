@@ -152,7 +152,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function classificacao()
     {
-        return $this->belongsTo('App\Models\Classificacao', 'classificacao_id');
+        return $this->belongsTo(Classificacao::class, 'classificacao_id');
     }
 
     /**
@@ -160,7 +160,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function funcionario()
     {
-        return $this->belongsTo('App\Models\Prestador', 'funcionario_id');
+        return $this->belongsTo(Prestador::class, 'funcionario_id');
     }
 
     /**
@@ -168,7 +168,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function conta()
     {
-        return $this->belongsTo('App\Models\Conta', 'conta_id');
+        return $this->belongsTo(Conta::class, 'conta_id');
     }
 
     /**
@@ -178,7 +178,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function agrupamento()
     {
-        return $this->belongsTo('App\Models\Conta', 'agrupamento_id');
+        return $this->belongsTo(Conta::class, 'agrupamento_id');
     }
 
     /**
@@ -187,7 +187,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     /**
@@ -195,7 +195,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -203,7 +203,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     public function validate()

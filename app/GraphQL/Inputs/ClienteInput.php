@@ -129,8 +129,11 @@ class ClienteInput extends InputType
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'description' => 'Foto do cliente ou logo da empresa',
-                'rules' => ['max:100'],
+                'description' => 'Url da foto do cliente ou logo da empresa',
+            ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Foto do cliente em base64',
             ],
             'linguagem' => [
                 'type' => Type::string(),

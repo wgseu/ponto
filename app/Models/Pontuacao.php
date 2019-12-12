@@ -65,7 +65,7 @@ class Pontuacao extends Model implements ValidateInterface
      */
     public function promocao()
     {
-        return $this->belongsTo('App\Models\Promocao', 'promocao_id');
+        return $this->belongsTo(Promocao::class, 'promocao_id');
     }
 
     /**
@@ -74,7 +74,7 @@ class Pontuacao extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -82,7 +82,7 @@ class Pontuacao extends Model implements ValidateInterface
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -90,7 +90,7 @@ class Pontuacao extends Model implements ValidateInterface
      */
     public function item()
     {
-        return $this->belongsTo('App\Models\Item', 'item_id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     public function validate()

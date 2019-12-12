@@ -82,7 +82,7 @@ class Caixa extends Model implements ValidateInterface
 
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     /**

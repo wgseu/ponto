@@ -144,7 +144,7 @@ $[field.end]
 $[field.end]
     public function $[fIeld.noid]()
     {
-        return $this->belongsTo('$[Reference.package]\$[Reference.norm]', '$[field]');
+        return $this->belongsTo($[Reference.norm]::class, '$[field]');
     }
 $[field.end]
 

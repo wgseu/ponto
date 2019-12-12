@@ -67,7 +67,7 @@ class Setor extends Model implements ValidateInterface
      */
     public function setor()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_id');
+        return $this->belongsTo(Setor::class, 'setor_id');
     }
 
     /**

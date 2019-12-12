@@ -86,7 +86,7 @@ class Requisito extends Model implements ValidateInterface
      */
     public function lista()
     {
-        return $this->belongsTo('App\Models\Lista', 'lista_id');
+        return $this->belongsTo(Lista::class, 'lista_id');
     }
 
     /**
@@ -94,7 +94,7 @@ class Requisito extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -102,7 +102,7 @@ class Requisito extends Model implements ValidateInterface
      */
     public function compra()
     {
-        return $this->belongsTo('App\Models\Compra', 'compra_id');
+        return $this->belongsTo(Compra::class, 'compra_id');
     }
 
     /**
@@ -111,7 +111,7 @@ class Requisito extends Model implements ValidateInterface
      */
     public function fornecedor()
     {
-        return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
     /**

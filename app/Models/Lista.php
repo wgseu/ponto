@@ -83,7 +83,7 @@ class Lista extends Model implements ValidateInterface
      */
     public function encarregado()
     {
-        return $this->belongsTo('App\Models\Prestador', 'encarregado_id');
+        return $this->belongsTo(Prestador::class, 'encarregado_id');
     }
 
     /**
@@ -91,7 +91,7 @@ class Lista extends Model implements ValidateInterface
      */
     public function viagem()
     {
-        return $this->belongsTo('App\Models\Viagem', 'viagem_id');
+        return $this->belongsTo(Viagem::class, 'viagem_id');
     }
 
     /**

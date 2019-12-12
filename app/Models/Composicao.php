@@ -96,7 +96,7 @@ class Composicao extends Model implements ValidateInterface
      */
     public function composicao()
     {
-        return $this->belongsTo('App\Models\Produto', 'composicao_id');
+        return $this->belongsTo(Produto::class, 'composicao_id');
     }
 
     /**
@@ -105,7 +105,7 @@ class Composicao extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     public function validate()

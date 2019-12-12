@@ -81,7 +81,7 @@ class Bairro extends Model implements ValidateInterface
      */
     public function cidade()
     {
-        return $this->belongsTo('App\Models\Cidade', 'cidade_id');
+        return $this->belongsTo(Cidade::class, 'cidade_id');
     }
 
     /**

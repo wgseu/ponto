@@ -29,14 +29,30 @@ declare(strict_types=1);
 namespace App\GraphQL\Inputs;
 
 use App\Concerns\OptionalFields;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\NonNull;
 
 class TelefoneUpdateInput extends TelefoneInput
 {
-    use OptionalFields;
-
     protected $attributes = [
         'name' => 'TelefoneUpdateInput',
         'description' => 'Telefones dos clientes, apenas o telefone principal deve ser único por' .
             ' cliente',
     ];
+
+    public function fields(): array
+    {
+        $fields = array_merge(parent::fields(), [
+            'id' => [
+                'type' => Type::id(),
+                'description' => 'Informa o id do telefone para atualização do número',
+            ],
+        ]);
+        foreach ($fields as $name => &$spec) {
+            if ($spec['type'] instanceof NonNull) {
+                $fields[$name]['type'] = $spec['type']->getWrappedType();
+            }
+        }
+        return $fields;
+    }
 }

@@ -100,7 +100,7 @@ class Localizacao extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -108,7 +108,7 @@ class Localizacao extends Model implements ValidateInterface
      */
     public function bairro()
     {
-        return $this->belongsTo('App\Models\Bairro', 'bairro_id');
+        return $this->belongsTo(Bairro::class, 'bairro_id');
     }
 
     /**
@@ -116,7 +116,7 @@ class Localizacao extends Model implements ValidateInterface
      */
     public function zona()
     {
-        return $this->belongsTo('App\Models\Zona', 'zona_id');
+        return $this->belongsTo(Zona::class, 'zona_id');
     }
 
     /**

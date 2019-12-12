@@ -128,7 +128,7 @@ class Nota extends Model implements ValidateInterface
      */
     public function ultimoEvento()
     {
-        return $this->belongsTo('App\Models\Evento', 'ultimo_evento_id');
+        return $this->belongsTo(Evento::class, 'ultimo_evento_id');
     }
 
     /**
@@ -136,7 +136,7 @@ class Nota extends Model implements ValidateInterface
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     public function validate()

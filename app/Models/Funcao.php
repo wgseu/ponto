@@ -65,7 +65,7 @@ class Funcao extends Model implements ValidateInterface
 
     public function acessos()
     {
-        return $this->hasMany('App\Models\Acesso', 'funcao_id');
+        return $this->hasMany(Acesso::class, 'funcao_id');
     }
 
     /**

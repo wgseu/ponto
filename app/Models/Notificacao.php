@@ -66,7 +66,7 @@ class Notificacao extends Model implements ValidateInterface
      */
     public function destinatario()
     {
-        return $this->belongsTo('App\Models\Cliente', 'destinatario_id');
+        return $this->belongsTo(Cliente::class, 'destinatario_id');
     }
 
     /**
@@ -74,7 +74,7 @@ class Notificacao extends Model implements ValidateInterface
      */
     public function remetente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'remetente_id');
+        return $this->belongsTo(Cliente::class, 'remetente_id');
     }
 
     public function validate()

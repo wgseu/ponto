@@ -96,7 +96,7 @@ class Horario extends Model implements ValidateInterface
      */
     public function funcao()
     {
-        return $this->belongsTo('App\Models\Funcao', 'funcao_id');
+        return $this->belongsTo(Funcao::class, 'funcao_id');
     }
 
     /**
@@ -104,7 +104,7 @@ class Horario extends Model implements ValidateInterface
      */
     public function prestador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+        return $this->belongsTo(Prestador::class, 'prestador_id');
     }
 
     /**
@@ -112,7 +112,7 @@ class Horario extends Model implements ValidateInterface
      */
     public function cozinha()
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return $this->belongsTo(Cozinha::class, 'cozinha_id');
     }
 
     /**

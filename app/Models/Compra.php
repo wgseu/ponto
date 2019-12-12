@@ -70,7 +70,7 @@ class Compra extends Model implements ValidateInterface
      */
     public function comprador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'comprador_id');
+        return $this->belongsTo(Prestador::class, 'comprador_id');
     }
 
     /**
@@ -78,7 +78,7 @@ class Compra extends Model implements ValidateInterface
      */
     public function fornecedor()
     {
-        return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
     /**
@@ -86,7 +86,7 @@ class Compra extends Model implements ValidateInterface
      */
     public function conta()
     {
-        return $this->belongsTo('App\Models\Conta', 'conta_id');
+        return $this->belongsTo(Conta::class, 'conta_id');
     }
 
     public function validate()

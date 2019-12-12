@@ -82,7 +82,7 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -90,7 +90,7 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
      */
     public function pais()
     {
-        return $this->belongsTo('App\Models\Pais', 'pais_id');
+        return $this->belongsTo(Pais::class, 'pais_id');
     }
 
     public function validate()
@@ -120,10 +120,16 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
     {
         $errors = [];
         $old = $this->fresh();
-        if ($old->numero != $this->numero && !is_null($this->data_validacao)) {
+        if (
+            !is_null($this->data_validacao) &&
+            (
+                $old->numero != $this->numero ||
+                $old->pais_id != $this->pais_id
+            )
+        ) {
             $errors['numero'] = __('messages.phone_mustbe_revalidated');
         }
-        if ($old->tentativas > $this->numero && $old->codigo_verificacao == $this->codigo_verificacao) {
+        if ($old->tentativas >= 3 && $old->codigo_verificacao == $this->codigo_verificacao) {
             $errors['numero'] = __('messages.phone_code_mustbe_regenerated');
         }
         return $errors;

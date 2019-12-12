@@ -71,7 +71,7 @@ class Avaliacao extends Model implements ValidateInterface
      */
     public function metrica()
     {
-        return $this->belongsTo('App\Models\Metrica', 'metrica_id');
+        return $this->belongsTo(Metrica::class, 'metrica_id');
     }
 
     /**
@@ -80,7 +80,7 @@ class Avaliacao extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -88,7 +88,7 @@ class Avaliacao extends Model implements ValidateInterface
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -96,7 +96,7 @@ class Avaliacao extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     public function validate()

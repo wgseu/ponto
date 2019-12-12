@@ -90,7 +90,7 @@ class Estoque extends Model implements
      */
     public function producao()
     {
-        return $this->belongsTo('App\Models\Estoque', 'producao_id');
+        return $this->belongsTo(Estoque::class, 'producao_id');
     }
 
     /**
@@ -98,7 +98,7 @@ class Estoque extends Model implements
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -106,7 +106,7 @@ class Estoque extends Model implements
      */
     public function compra()
     {
-        return $this->belongsTo('App\Models\Compra', 'compra_id');
+        return $this->belongsTo(Compra::class, 'compra_id');
     }
 
     /**
@@ -114,7 +114,7 @@ class Estoque extends Model implements
      */
     public function transacao()
     {
-        return $this->belongsTo('App\Models\Item', 'transacao_id');
+        return $this->belongsTo(Item::class, 'transacao_id');
     }
 
     /**
@@ -122,7 +122,7 @@ class Estoque extends Model implements
      */
     public function fornecedor()
     {
-        return $this->belongsTo('App\Models\Fornecedor', 'fornecedor_id');
+        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
     /**
@@ -130,7 +130,7 @@ class Estoque extends Model implements
      */
     public function setor()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_id');
+        return $this->belongsTo(Setor::class, 'setor_id');
     }
 
     /**
@@ -138,7 +138,7 @@ class Estoque extends Model implements
      */
     public function prestador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+        return $this->belongsTo(Prestador::class, 'prestador_id');
     }
 
     /**

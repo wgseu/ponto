@@ -69,7 +69,7 @@ class Endereco extends Model implements ValidateInterface
      */
     public function cidade()
     {
-        return $this->belongsTo('App\Models\Cidade', 'cidade_id');
+        return $this->belongsTo(Cidade::class, 'cidade_id');
     }
 
     /**
@@ -77,7 +77,7 @@ class Endereco extends Model implements ValidateInterface
      */
     public function bairro()
     {
-        return $this->belongsTo('App\Models\Bairro', 'bairro_id');
+        return $this->belongsTo(Bairro::class, 'bairro_id');
     }
 
     public function validate()

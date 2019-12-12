@@ -69,7 +69,7 @@ class Resumo extends Model implements ValidateInterface
      */
     public function movimentacao()
     {
-        return $this->belongsTo('App\Models\Movimentacao', 'movimentacao_id');
+        return $this->belongsTo(Movimentacao::class, 'movimentacao_id');
     }
 
     /**
@@ -77,7 +77,7 @@ class Resumo extends Model implements ValidateInterface
      */
     public function forma()
     {
-        return $this->belongsTo('App\Models\Forma', 'forma_id');
+        return $this->belongsTo(Forma::class, 'forma_id');
     }
 
     /**
@@ -85,7 +85,7 @@ class Resumo extends Model implements ValidateInterface
      */
     public function cartao()
     {
-        return $this->belongsTo('App\Models\Cartao', 'cartao_id');
+        return $this->belongsTo(Cartao::class, 'cartao_id');
     }
 
     public function validate()

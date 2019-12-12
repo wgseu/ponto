@@ -88,7 +88,7 @@ class Emitente extends Model implements ValidateInterface
      */
     public function contador()
     {
-        return $this->belongsTo('App\Models\Cliente', 'contador_id');
+        return $this->belongsTo(Cliente::class, 'contador_id');
     }
 
     /**
@@ -96,7 +96,7 @@ class Emitente extends Model implements ValidateInterface
      */
     public function regime()
     {
-        return $this->belongsTo('App\Models\Regime', 'regime_id');
+        return $this->belongsTo(Regime::class, 'regime_id');
     }
 
     public function validate()

@@ -107,7 +107,7 @@ class Carteira extends Model implements ValidateInterface
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     /**
@@ -115,7 +115,7 @@ class Carteira extends Model implements ValidateInterface
      */
     public function banco()
     {
-        return $this->belongsTo('App\Models\Banco', 'banco_id');
+        return $this->belongsTo(Banco::class, 'banco_id');
     }
 
     public function validate()

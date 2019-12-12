@@ -123,6 +123,10 @@ class ClienteType extends GraphQLType
                 'description' => 'Código da linguagem utilizada pelo cliente para visualizar o aplicativo' .
                     ' e o site, Ex: pt-BR',
             ],
+            'telefone' => [
+                'type' => GraphQL::type('Telefone'),
+                'description' => 'Telefone principal do cliente',
+            ],
             'data_envio' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do envio do e-mail de validação ou recuperação de conta',

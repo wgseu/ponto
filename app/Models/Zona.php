@@ -80,7 +80,7 @@ class Zona extends Model implements ValidateInterface
      */
     public function bairro()
     {
-        return $this->belongsTo('App\Models\Bairro', 'bairro_id');
+        return $this->belongsTo(Bairro::class, 'bairro_id');
     }
 
     /**

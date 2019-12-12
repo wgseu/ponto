@@ -83,7 +83,7 @@ class Juncao extends Model implements
      */
     public function mesa()
     {
-        return $this->belongsTo('App\Models\Mesa', 'mesa_id');
+        return $this->belongsTo(Mesa::class, 'mesa_id');
     }
 
     /**
@@ -91,7 +91,7 @@ class Juncao extends Model implements
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     public function validate()

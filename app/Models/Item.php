@@ -103,7 +103,7 @@ class Item extends Model implements
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -111,7 +111,7 @@ class Item extends Model implements
      */
     public function prestador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+        return $this->belongsTo(Prestador::class, 'prestador_id');
     }
 
     /**
@@ -119,7 +119,7 @@ class Item extends Model implements
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -127,7 +127,7 @@ class Item extends Model implements
      */
     public function servico()
     {
-        return $this->belongsTo('App\Models\Servico', 'servico_id');
+        return $this->belongsTo(Servico::class, 'servico_id');
     }
 
     /**
@@ -135,7 +135,7 @@ class Item extends Model implements
      */
     public function item()
     {
-        return $this->belongsTo('App\Models\Item', 'item_id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     /**
@@ -143,7 +143,7 @@ class Item extends Model implements
      */
     public function pagamento()
     {
-        return $this->belongsTo('App\Models\Pagamento', 'pagamento_id');
+        return $this->belongsTo(Pagamento::class, 'pagamento_id');
     }
 
     /**
@@ -153,7 +153,7 @@ class Item extends Model implements
      */
     public function formacoes()
     {
-        return $this->hasMany('App\Models\Formacao', 'item_id');
+        return $this->hasMany(Formacao::class, 'item_id');
     }
 
     /**

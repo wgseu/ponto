@@ -68,7 +68,7 @@ class Classificacao extends Model implements ValidateInterface
      */
     public function classificacao()
     {
-        return $this->belongsTo('App\Models\Classificacao', 'classificacao_id');
+        return $this->belongsTo(Classificacao::class, 'classificacao_id');
     }
 
     /**

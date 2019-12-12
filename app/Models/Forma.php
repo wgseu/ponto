@@ -98,7 +98,7 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     public function validate()

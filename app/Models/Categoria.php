@@ -79,7 +79,7 @@ class Categoria extends Model implements ValidateInterface
      */
     public function categoria()
     {
-        return $this->belongsTo('App\Models\Categoria', 'categoria_id');
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 
     /**

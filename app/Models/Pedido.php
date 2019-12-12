@@ -127,7 +127,7 @@ class Pedido extends Model implements
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -135,7 +135,7 @@ class Pedido extends Model implements
      */
     public function mesa()
     {
-        return $this->belongsTo('App\Models\Mesa', 'mesa_id');
+        return $this->belongsTo(Mesa::class, 'mesa_id');
     }
 
     /**
@@ -143,7 +143,7 @@ class Pedido extends Model implements
      */
     public function comanda()
     {
-        return $this->belongsTo('App\Models\Comanda', 'comanda_id');
+        return $this->belongsTo(Comanda::class, 'comanda_id');
     }
 
     /**
@@ -151,7 +151,7 @@ class Pedido extends Model implements
      */
     public function sessao()
     {
-        return $this->belongsTo('App\Models\Sessao', 'sessao_id');
+        return $this->belongsTo(Sessao::class, 'sessao_id');
     }
 
     /**
@@ -159,7 +159,7 @@ class Pedido extends Model implements
      */
     public function prestador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'prestador_id');
+        return $this->belongsTo(Prestador::class, 'prestador_id');
     }
 
     /**
@@ -167,7 +167,7 @@ class Pedido extends Model implements
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -176,7 +176,7 @@ class Pedido extends Model implements
      */
     public function localizacao()
     {
-        return $this->belongsTo('App\Models\Localizacao', 'localizacao_id');
+        return $this->belongsTo(Localizacao::class, 'localizacao_id');
     }
 
     /**
@@ -184,7 +184,7 @@ class Pedido extends Model implements
      */
     public function entrega()
     {
-        return $this->belongsTo('App\Models\Viagem', 'entrega_id');
+        return $this->belongsTo(Viagem::class, 'entrega_id');
     }
 
     /**
@@ -192,7 +192,7 @@ class Pedido extends Model implements
      */
     public function associacao()
     {
-        return $this->belongsTo('App\Models\Associacao', 'associacao_id');
+        return $this->belongsTo(Associacao::class, 'associacao_id');
     }
 
     /**
@@ -200,7 +200,7 @@ class Pedido extends Model implements
      */
     public function fechador()
     {
-        return $this->belongsTo('App\Models\Prestador', 'fechador_id');
+        return $this->belongsTo(Prestador::class, 'fechador_id');
     }
 
     /**
@@ -208,7 +208,7 @@ class Pedido extends Model implements
      */
     public function itens()
     {
-        return $this->hasMany('App\Models\Item', 'pedido_id')->where('cancelado', false);
+        return $this->hasMany(Item::class, 'pedido_id')->where('cancelado', false);
     }
 
     /**
@@ -216,7 +216,7 @@ class Pedido extends Model implements
      */
     public function pagamentos()
     {
-        return $this->hasMany('App\Models\Pagamento', 'pedido_id')
+        return $this->hasMany(Pagamento::class, 'pedido_id')
             ->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
     }
 

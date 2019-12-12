@@ -85,7 +85,7 @@ class Empresa extends Model implements ValidateInterface
      */
     public function pais()
     {
-        return $this->belongsTo('App\Models\Pais', 'pais_id');
+        return $this->belongsTo(Pais::class, 'pais_id');
     }
 
     /**
@@ -94,7 +94,7 @@ class Empresa extends Model implements ValidateInterface
      */
     public function empresa()
     {
-        return $this->belongsTo('App\Models\Cliente', 'empresa_id');
+        return $this->belongsTo(Cliente::class, 'empresa_id');
     }
 
     /**
@@ -103,7 +103,7 @@ class Empresa extends Model implements ValidateInterface
      */
     public function parceiro()
     {
-        return $this->belongsTo('App\Models\Cliente', 'parceiro_id');
+        return $this->belongsTo(Cliente::class, 'parceiro_id');
     }
 
     /**

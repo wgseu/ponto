@@ -99,7 +99,7 @@ class Pagamento extends Model implements
      */
     public function carteira()
     {
-        return $this->belongsTo('App\Models\Carteira', 'carteira_id');
+        return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
     /**
@@ -107,7 +107,7 @@ class Pagamento extends Model implements
      */
     public function moeda()
     {
-        return $this->belongsTo('App\Models\Moeda', 'moeda_id');
+        return $this->belongsTo(Moeda::class, 'moeda_id');
     }
 
     /**
@@ -117,7 +117,7 @@ class Pagamento extends Model implements
      */
     public function pagamento()
     {
-        return $this->belongsTo('App\Models\Pagamento', 'pagamento_id');
+        return $this->belongsTo(Pagamento::class, 'pagamento_id');
     }
 
     /**
@@ -126,7 +126,7 @@ class Pagamento extends Model implements
      */
     public function agrupamento()
     {
-        return $this->belongsTo('App\Models\Pagamento', 'agrupamento_id');
+        return $this->belongsTo(Pagamento::class, 'agrupamento_id');
     }
 
     /**
@@ -135,7 +135,7 @@ class Pagamento extends Model implements
      */
     public function movimentacao()
     {
-        return $this->belongsTo('App\Models\Movimentacao', 'movimentacao_id');
+        return $this->belongsTo(Movimentacao::class, 'movimentacao_id');
     }
 
     /**
@@ -143,7 +143,7 @@ class Pagamento extends Model implements
      */
     public function funcionario()
     {
-        return $this->belongsTo('App\Models\Prestador', 'funcionario_id');
+        return $this->belongsTo(Prestador::class, 'funcionario_id');
     }
 
     /**
@@ -151,7 +151,7 @@ class Pagamento extends Model implements
      */
     public function forma()
     {
-        return $this->belongsTo('App\Models\Forma', 'forma_id');
+        return $this->belongsTo(Forma::class, 'forma_id');
     }
 
     /**
@@ -159,7 +159,7 @@ class Pagamento extends Model implements
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -167,7 +167,7 @@ class Pagamento extends Model implements
      */
     public function conta()
     {
-        return $this->belongsTo('App\Models\Conta', 'conta_id');
+        return $this->belongsTo(Conta::class, 'conta_id');
     }
 
     /**
@@ -175,7 +175,7 @@ class Pagamento extends Model implements
      */
     public function cartao()
     {
-        return $this->belongsTo('App\Models\Cartao', 'cartao_id');
+        return $this->belongsTo(Cartao::class, 'cartao_id');
     }
 
     /**
@@ -183,7 +183,7 @@ class Pagamento extends Model implements
      */
     public function cheque()
     {
-        return $this->belongsTo('App\Models\Cheque', 'cheque_id');
+        return $this->belongsTo(Cheque::class, 'cheque_id');
     }
 
     /**
@@ -191,7 +191,7 @@ class Pagamento extends Model implements
      */
     public function crediario()
     {
-        return $this->belongsTo('App\Models\Conta', 'crediario_id');
+        return $this->belongsTo(Conta::class, 'crediario_id');
     }
 
     /**
@@ -199,7 +199,7 @@ class Pagamento extends Model implements
      */
     public function credito()
     {
-        return $this->belongsTo('App\Models\Credito', 'credito_id');
+        return $this->belongsTo(Credito::class, 'credito_id');
     }
 
     /**

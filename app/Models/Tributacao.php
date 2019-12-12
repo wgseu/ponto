@@ -70,7 +70,7 @@ class Tributacao extends Model implements ValidateInterface
      */
     public function origem()
     {
-        return $this->belongsTo('App\Models\Origem', 'origem_id');
+        return $this->belongsTo(Origem::class, 'origem_id');
     }
 
     /**
@@ -78,7 +78,7 @@ class Tributacao extends Model implements ValidateInterface
      */
     public function operacao()
     {
-        return $this->belongsTo('App\Models\Operacao', 'operacao_id');
+        return $this->belongsTo(Operacao::class, 'operacao_id');
     }
 
     /**
@@ -86,7 +86,7 @@ class Tributacao extends Model implements ValidateInterface
      */
     public function imposto()
     {
-        return $this->belongsTo('App\Models\Imposto', 'imposto_id');
+        return $this->belongsTo(Imposto::class, 'imposto_id');
     }
 
     public function validate()

@@ -67,7 +67,7 @@ class Estado extends Model implements ValidateInterface
      */
     public function pais()
     {
-        return $this->belongsTo('App\Models\Pais', 'pais_id');
+        return $this->belongsTo(Pais::class, 'pais_id');
     }
 
     public function validate()

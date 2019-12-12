@@ -93,7 +93,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function cozinha()
     {
-        return $this->belongsTo('App\Models\Cozinha', 'cozinha_id');
+        return $this->belongsTo(Cozinha::class, 'cozinha_id');
     }
 
     /**
@@ -101,7 +101,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -109,7 +109,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function composicao()
     {
-        return $this->belongsTo('App\Models\Composicao', 'composicao_id');
+        return $this->belongsTo(Composicao::class, 'composicao_id');
     }
 
     /**
@@ -117,7 +117,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function pacote()
     {
-        return $this->belongsTo('App\Models\Pacote', 'pacote_id');
+        return $this->belongsTo(Pacote::class, 'pacote_id');
     }
 
     /**
@@ -125,7 +125,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
@@ -133,7 +133,7 @@ class Cardapio extends Model implements ValidateInterface
      */
     public function integracao()
     {
-        return $this->belongsTo('App\Models\Integracao', 'integracao_id');
+        return $this->belongsTo(Integracao::class, 'integracao_id');
     }
 
     /**

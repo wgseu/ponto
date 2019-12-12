@@ -115,7 +115,7 @@ class Impressora extends Model implements ValidateInterface
      */
     public function dispositivo()
     {
-        return $this->belongsTo('App\Models\Dispositivo', 'dispositivo_id');
+        return $this->belongsTo(Dispositivo::class, 'dispositivo_id');
     }
 
     /**
@@ -123,7 +123,7 @@ class Impressora extends Model implements ValidateInterface
      */
     public function setor()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_id');
+        return $this->belongsTo(Setor::class, 'setor_id');
     }
 
     public function validate()

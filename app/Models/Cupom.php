@@ -119,7 +119,7 @@ class Cupom extends Model implements ValidateInterface
      */
     public function cupom()
     {
-        return $this->belongsTo('App\Models\Cupom', 'cupom_id');
+        return $this->belongsTo(Cupom::class, 'cupom_id');
     }
 
     /**
@@ -127,7 +127,7 @@ class Cupom extends Model implements ValidateInterface
      */
     public function pedido()
     {
-        return $this->belongsTo('App\Models\Pedido', 'pedido_id');
+        return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
     /**
@@ -135,7 +135,7 @@ class Cupom extends Model implements ValidateInterface
      */
     public function cliente()
     {
-        return $this->belongsTo('App\Models\Cliente', 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     public function validate()

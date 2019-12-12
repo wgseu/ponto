@@ -63,7 +63,7 @@ class Contagem extends Model implements ValidateInterface
      */
     public function produto()
     {
-        return $this->belongsTo('App\Models\Produto', 'produto_id');
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 
     /**
@@ -71,7 +71,7 @@ class Contagem extends Model implements ValidateInterface
      */
     public function setor()
     {
-        return $this->belongsTo('App\Models\Setor', 'setor_id');
+        return $this->belongsTo(Setor::class, 'setor_id');
     }
 
     public function validate()

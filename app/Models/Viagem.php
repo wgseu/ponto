@@ -66,7 +66,7 @@ class Viagem extends Model implements ValidateInterface
      */
     public function responsavel()
     {
-        return $this->belongsTo('App\Models\Prestador', 'responsavel_id');
+        return $this->belongsTo(Prestador::class, 'responsavel_id');
     }
 
     /**

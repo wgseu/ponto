@@ -33,6 +33,7 @@ use App\Models\Avaliacao;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\ValidationException;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateAvaliacaoMutation extends Mutation
@@ -67,6 +68,10 @@ class UpdateAvaliacaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $avaliacao = Avaliacao::findOrFail($args['id']);
+        $pedido = Pedido::findOrFail($avaliacao->pedido_id);
+        if ($pedido->cliente_id != auth()->user()->id) {
+            throw new ValidationException(['update_evaluation' => __('messages.no_permission_update_evaluation')]);
+        }
         $avaliacao->fill($args['input']);
         $avaliacao->save();
         $avaliacao->metrics();

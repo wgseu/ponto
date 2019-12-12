@@ -109,6 +109,7 @@ class Avaliacao extends Model implements
             $metrica = $this->metrica;
             $total = self::where('produto_id', $this->produto_id)
                 ->limit($metrica->quantidade)
+                ->orderBy('id', 'DESC')
                 ->avg('estrelas');
             $produto = $this->produto;
             $produto->avaliacao = $total;
@@ -119,7 +120,7 @@ class Avaliacao extends Model implements
         $estrelas = self::where('metrica_id', $this->metrica_id)
             ->limit($metrica->quantidade)
             ->orderBy('id', 'DESC')
-            ->sum('estrelas');
+            ->avg('estrelas');
         $metrica->avaliacao = $estrelas / $metrica->quantidade;
         $metrica->save();
     }

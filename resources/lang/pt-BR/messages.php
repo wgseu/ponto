@@ -906,4 +906,5 @@ return [
     'movement_open' => 'Sessão não pode ser fechada por ha movimentação aberta',
     'order_have_evaluation' => 'Pedido já tem uma avaliação',
     'order_more_week' => 'Pedido não pode ser avaliado após uma semana',
+    'no_permission_update_evaluation' => 'Você não pode alterar essa avaliação',
 ];

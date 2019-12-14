@@ -27,26 +27,37 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Pedido;
+use App\Models\Metrica;
+use App\Models\Produto;
+use App\Models\Cliente;
 use App\Models\Avaliacao;
+use Illuminate\Support\Carbon;
+use App\Exceptions\ValidationException;
 
 class AvaliacaoTest extends TestCase
 {
     public function testCreateAvaliacao()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_avaliacao =  factory(Avaliacao::class)->create();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
         $response = $this->graphfl('create_avaliacao', [
             'input' => [
-                'pedido_id' => $seed_avaliacao->pedido_id,
-                'metrica_id' => $seed_avaliacao->metrica_id,
+                'pedido_id' => $pedido->id,
+                'metrica_id' => $metrica->id,
                 'estrelas' => 1,
                 'data_avaliacao' => '2016-12-25 12:15:00',
             ]
         ], $headers);
 
         $found_avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
-        $this->assertEquals($seed_avaliacao->pedido_id, $found_avaliacao->pedido_id);
-        $this->assertEquals($seed_avaliacao->metrica_id, $found_avaliacao->metrica_id);
+        $this->assertEquals($pedido->id, $found_avaliacao->pedido_id);
+        $this->assertEquals($metrica->id, $found_avaliacao->metrica_id);
         $this->assertEquals(1, $found_avaliacao->estrelas);
         $this->assertEquals('2016-12-25 12:15:00', $found_avaliacao->data_avaliacao);
     }
@@ -54,33 +65,140 @@ class AvaliacaoTest extends TestCase
     public function testUpdateAvaliacao()
     {
         $headers = PrestadorTest::authOwner();
-        $avaliacao = factory(Avaliacao::class)->create();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
+        $response = $this->graphfl('create_avaliacao', [
+            'input' => [
+                'pedido_id' => $pedido->id,
+                'metrica_id' => $metrica->id,
+                'estrelas' => 1,
+                'data_avaliacao' => '2016-12-25 12:15:00',
+            ]
+        ], $headers);
+        $avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
         $this->graphfl('update_avaliacao', [
             'id' => $avaliacao->id,
             'input' => [
-                'estrelas' => 1,
+                'estrelas' => 2,
                 'data_avaliacao' => '2016-12-28 12:30:00',
             ]
         ], $headers);
         $avaliacao->refresh();
-        $this->assertEquals(1, $avaliacao->estrelas);
+        $this->assertEquals(2, $avaliacao->estrelas);
         $this->assertEquals('2016-12-28 12:30:00', $avaliacao->data_avaliacao);
     }
 
     public function testDeleteAvaliacao()
     {
         $headers = PrestadorTest::authOwner();
-        $avaliacao_to_delete = factory(Avaliacao::class)->create();
-        $this->graphfl('delete_avaliacao', ['id' => $avaliacao_to_delete->id], $headers);
-        $avaliacao = Avaliacao::find($avaliacao_to_delete->id);
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
+        $avaliacao = factory(Avaliacao::class)->create([
+            'cliente_id' => $cliente->id,
+            'pedido_id' => $pedido->id,
+            'metrica_id' => $metrica->id,
+            'data_avaliacao' => '2016-12-25 12:15:00',
+        ]);
+        $this->graphfl('delete_avaliacao', ['id' => $avaliacao->id], $headers);
+        $avaliacao = Avaliacao::find($avaliacao->id);
         $this->assertNull($avaliacao);
     }
 
     public function testFindAvaliacao()
     {
         $headers = PrestadorTest::authOwner();
-        $avaliacao = factory(Avaliacao::class)->create();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
+        $avaliacao = factory(Avaliacao::class)->create([
+            'cliente_id' => $cliente->id,
+            'pedido_id' => $pedido->id,
+            'metrica_id' => $metrica->id,
+            'data_avaliacao' => '2016-12-25 12:15:00',
+        ]);
         $response = $this->graphfl('query_avaliacao', [ 'id' => $avaliacao->id ], $headers);
         $this->assertEquals($avaliacao->id, $response->json('data.avaliacoes.data.0.id'));
+    }
+
+    public function testAvaliacaoProduto()
+    {
+        $headers = PrestadorTest::authOwner();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
+        $produto = factory(Produto::class)->create();
+        $response = $this->graphfl('create_avaliacao', [
+            'input' => [
+                'metrica_id' => $metrica->id,
+                'produto_id' => $produto->id,
+                'pedido_id' => $pedido->id,
+                'estrelas' => 1,
+                'data_avaliacao' => '2016-12-25 12:15:00',
+            ]
+        ], $headers);
+
+        $avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
+        $this->assertEquals($produto->id, $avaliacao->produto_id);
+        $this->assertEquals($avaliacao->cliente_id, $cliente->id);
+        $this->assertEquals($avaliacao->pedido_id, $pedido->id);
+    }
+
+    public function testAvaliacaoDuplicada()
+    {
+        $headers = PrestadorTest::authOwner();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => Carbon::now(),
+        ]);
+        $this->graphfl('create_avaliacao', [
+            'input' => [
+                'pedido_id' => $pedido->id,
+                'metrica_id' => $metrica->id,
+                'estrelas' => 1,
+                'data_avaliacao' => '2016-12-25 12:15:00',
+            ]
+        ], $headers);
+        $this->expectException(ValidationException::class);
+        factory(Avaliacao::class)->create([
+            'pedido_id' => $pedido->id,
+            'metrica_id' => $metrica->id,
+            'estrelas' => 1,
+            'data_avaliacao' => '2016-12-25 12:15:00',
+        ]);
+    }
+
+    public function testAvaliacaoAposSeteDias()
+    {
+        PrestadorTest::authOwner();
+        $cliente = Cliente::where('status', Cliente::STATUS_ATIVO)->first();
+        $metrica = factory(Metrica::class)->create();
+        $pedido = factory(Pedido::class)->create([
+            'cliente_id' => $cliente->id,
+            'data_criacao' => '2019-11-20 12:15:00',
+        ]);
+        $this->expectException(ValidationException::class);
+        factory(Avaliacao::class)->create([
+            'pedido_id' => $pedido->id,
+            'metrica_id' => $metrica->id,
+            'cliente_id' => $cliente->id,
+            'estrelas' => 1,
+            'data_avaliacao' => Carbon::now(),
+        ]);
     }
 }

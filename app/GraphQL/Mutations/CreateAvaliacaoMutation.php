@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Models\Pedido;
 use App\Models\Avaliacao;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
@@ -42,7 +43,8 @@ class CreateAvaliacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('avaliacao:create');
+        $pedido = Pedido::findOrFail($args['input']['pedido_id']);
+        return Auth::check() && $pedido->cliente_id == auth()->user()->id;
     }
 
     public function type(): Type
@@ -61,7 +63,9 @@ class CreateAvaliacaoMutation extends Mutation
     {
         $avaliacao = new Avaliacao();
         $avaliacao->fill($args['input']);
+        $avaliacao->cliente_id = auth()->user()->id;
         $avaliacao->save();
+        $avaliacao->metrics();
         return $avaliacao;
     }
 }

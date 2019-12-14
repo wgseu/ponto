@@ -46,11 +46,6 @@ class AvaliacaoInput extends InputType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Métrica de avaliação',
             ],
-            'cliente_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando' .
-                    ' for avaliação de produto',
-            ],
             'pedido_id' => [
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido que foi avaliado, quando nulo o produto deve ser informado',

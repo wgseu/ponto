@@ -2006,7 +2006,7 @@ class CreateInitialTables extends Migration
         Schema::create('avaliacoes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('metrica_id');
-            $table->unsignedInteger('cliente_id')->nullable();
+            $table->unsignedInteger('cliente_id');
             $table->unsignedInteger('pedido_id');
             $table->unsignedInteger('produto_id')->nullable();
             $table->integer('estrelas');

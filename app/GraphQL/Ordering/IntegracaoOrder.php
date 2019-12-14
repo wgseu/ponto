@@ -47,10 +47,13 @@ class IntegracaoOrder extends InputType
             'nome' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'codigo' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'descricao' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
-            'icone_url' => [
+            'tipo' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'login' => [

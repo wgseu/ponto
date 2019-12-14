@@ -52,13 +52,17 @@ class IntegracaoType extends GraphQLType
                 'type' => Type::string(),
                 'description' => 'Nome do módulo de integração',
             ],
+            'codigo' => [
+                'type' => Type::string(),
+                'description' => 'Identicador da integração nome unix_case',
+            ],
             'descricao' => [
                 'type' => Type::string(),
                 'description' => 'Descrição do módulo integrador',
             ],
-            'icone_url' => [
-                'type' => Type::string(),
-                'description' => 'Nome do ícone do módulo integrador',
+            'tipo' => [
+                'type' => GraphQL::type('IntegracaoTipo'),
+                'description' => 'Tipo de integração se pedido, login, dispositivo, pagamento, outros',
             ],
             'login' => [
                 'type' => Type::string(),

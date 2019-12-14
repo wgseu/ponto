@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
 
@@ -46,15 +47,19 @@ class IntegracaoInput extends InputType
                 'description' => 'Nome do módulo de integração',
                 'rules' => ['max:45'],
             ],
+            'codigo' => [
+                'type' => Type::nonNull(Type::string()),
+                'description' => 'Identicador da integração nome unix_case',
+                'rules' => ['max:45'],
+            ],
             'descricao' => [
                 'type' => Type::string(),
                 'description' => 'Descrição do módulo integrador',
                 'rules' => ['max:200'],
             ],
-            'icone_url' => [
-                'type' => Type::string(),
-                'description' => 'Nome do ícone do módulo integrador',
-                'rules' => ['max:200'],
+            'tipo' => [
+                'type' => GraphQL::type('IntegracaoTipo'),
+                'description' => 'Tipo de integração se pedido, login, dispositivo, pagamento, outros',
             ],
             'login' => [
                 'type' => Type::string(),

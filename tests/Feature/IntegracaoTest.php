@@ -26,6 +26,7 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Integracao;
 
@@ -39,6 +40,12 @@ class IntegracaoTest extends TestCase
             'id' => $integracao->id,
             'input' => [
                 'nome' => 'Atualizou',
+                'opcoes' => '{
+                    "token" : "abc123"
+                }',
+                'associacoes' => '{
+                    "teste": "123"
+                }'
             ]
         ], $headers);
         $integracao->refresh();
@@ -51,5 +58,14 @@ class IntegracaoTest extends TestCase
         $integracao = factory(Integracao::class)->create();
         $response = $this->graphfl('query_integracao', [ 'id' => $integracao->id ], $headers);
         $this->assertEquals($integracao->id, $response->json('data.integracoes.data.0.id'));
+    }
+
+    public function testIntegracaoAtivaLoginNulo()
+    {
+        $this->expectException(ValidationException::class);
+        factory(Integracao::class)->create([
+            'ativo' => true,
+            'login' => null,
+        ]);
     }
 }

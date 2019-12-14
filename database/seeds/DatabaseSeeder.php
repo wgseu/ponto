@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
             MovimentacaoSeeder::class,
 
             OperacaoSeeder::class,
-            // IntegracaoSeeder::class,
+            IntegracaoSeeder::class,
             MetricaSeeder::class,
 
             // Cardápio de amostra

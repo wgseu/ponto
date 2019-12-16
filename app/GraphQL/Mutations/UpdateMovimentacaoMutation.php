@@ -44,7 +44,13 @@ class UpdateMovimentacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && (Auth::user()->can('movimentacao:update') || Auth::user()->can('caixa:reopen'));
+        $movimentacao = Movimentacao::findOrFail($args['id']);
+        $reabrindo = $movimentacao->aberta == false
+            && $movimentacao->aberta != ($args['input']['aberta'] ?? $movimentacao->aberta);
+        return Auth::check() && (
+                (!$reabrindo && Auth::user()->can('movimentacao:update'))
+                || ($reabrindo && Auth::user()->can('caixa:reopen')
+            ));
     }
 
     public function type(): Type
@@ -67,12 +73,12 @@ class UpdateMovimentacaoMutation extends Mutation
     {
         $movimentacao = Movimentacao::findOrFail($args['id']);
         $reabrindo = $movimentacao->aberta == false
-        && $movimentacao->aberta != ($args['input']['aberta'] ?? $movimentacao->aberta);
+            && $movimentacao->aberta != ($args['input']['aberta'] ?? $movimentacao->aberta);
         $movimentacao->fill($args['input']);
 
         $prestador = auth()->user()->prestador;
         $caixa = $movimentacao->caixa;
-        if ($reabrindo && Auth::user()->can('caixa:reopen')) {
+        if ($reabrindo) {
             (new Auditoria([
                 'prestador_id' => $prestador->id,
                 'autorizador_id' => $prestador->id,

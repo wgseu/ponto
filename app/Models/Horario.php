@@ -178,8 +178,6 @@ class Horario extends Model implements ValidateInterface
             $errors['inicio'] = __('messages.invalid_interval_funcionamento');
         } elseif (!$this->fechado && $this->inicio < Date::MINUTES_PER_DAY) {
             $errors['inicio'] = __('messages.inicio_invalid');
-        } elseif ($this->fechado && $this->inicio < Date::MINUTES_PER_DAY) {
-            $errors['inicio'] = __('messages.inicio_invalid');
         } elseif (!$this->fechado && $this->fim >= Date::MINUTES_PER_DAY * 8) {
             $errors['fim'] = __('messages.fim_invalid');
         }

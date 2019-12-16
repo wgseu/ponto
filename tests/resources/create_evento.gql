@@ -1,9 +1,0 @@
-mutation createEvento($input: EventoInput!) {
-  CreateEvento(input: $input) {
-    id
-    nota_id
-    estado
-    mensagem
-    codigo
-  }
-}

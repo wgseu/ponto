@@ -28,8 +28,6 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Contagem;
-use App\Models\Produto;
-use App\Models\Setor;
 
 class ContagemTest extends TestCase
 {

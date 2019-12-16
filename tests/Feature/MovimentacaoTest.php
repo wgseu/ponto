@@ -61,20 +61,16 @@ class MovimentacaoTest extends TestCase
 
     public function testUpdateMovimentacao()
     {
-        $headers = PrestadorTest::authOwner();
         $movimentacao = factory(Movimentacao::class)->create();
-        $movimentacao->aberta = false;
-        $movimentacao->fechador_id = $movimentacao->iniciador_id;
-        $movimentacao->data_fechamento = Carbon::now();
-        $movimentacao->save();
+        $headers = PrestadorTest::authOwner();
         $this->graphfl('update_movimentacao', [
             'id' => $movimentacao->id,
             'input' => [
-                'aberta' => true,
+                'aberta' => false,
             ]
         ], $headers);
         $movimentacao->refresh();
-        $this->assertEquals($movimentacao->aberta, true);
+        $this->assertNotTrue($movimentacao->aberta);
     }
 
     public function testFindMovimentacao()

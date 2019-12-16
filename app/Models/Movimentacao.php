@@ -140,16 +140,16 @@ class Movimentacao extends Model implements ValidateInterface
             if ($this->aberta == false) {
                 $this->data_fechamento = Carbon::now();
                 $this->fechador_id = $prestador->id;
-                $movimentacao = self::where([
-                    ['aberta' => true],
-                    ['caixa_id' => $this->caixa_id]
-                ])->count();
-                if ($movimentacao < 2) {
-                    $sessoes = $this->sessao()->get();
-                    $sessoes->close();
-                }
             }
+            $movimentacao = self::where('sessao_id', $this->sessao_id)
+                ->where('aberta', true)
+                ->where('caixa_id', $this->caixa_id)
+                ->count();
             $this->save();
+            if ($movimentacao == 1) {
+                $sessao = $this->sessao;
+                $sessao->close();
+            }
         });
     }
 
@@ -159,8 +159,7 @@ class Movimentacao extends Model implements ValidateInterface
         $old = $this->fresh();
 
         $sessao = $this->sessao;
-        $global_sessao = Sessao::where('aberta', true)->first();
-        if (!is_null($sessao) && !$sessao->aberta && $global_sessao->aberta) {
+        if (!$this->exists && !$sessao->aberta) {
             $errors['sessao_id'] = __('messages.sessao_closed');
         } elseif (!is_null($old) && $old->sessao_id != $this->sessao_id) {
             $errors['sessao_id'] = __('messages.sessao_changed');

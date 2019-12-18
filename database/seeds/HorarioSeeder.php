@@ -14,22 +14,23 @@ class HorarioSeeder extends Seeder
      */
     public function run()
     {
-        $cozinha = Cozinha::where('nome', __('messages.restaurant'))->first();
-        for ($i = 1; $i < 8; $i++) {
+        $restaurante = Cozinha::where('nome', __('messages.restaurant'))->first();
+        for ($i = 1; $i <= 7; $i++) {
             $inicio = Date::make($i, '10:30');
             $fim = Date::make($i, '13:00');
             (new Horario([
-                'cozinha_id' => $cozinha->id,
+                'cozinha_id' => $restaurante->id,
                 'inicio' => $inicio,
                 'fim' => $fim,
             ]))->save();
         }
 
-        for ($i = 1; $i < 8; $i++) {
+        $pizzaria = Cozinha::where('nome', __('messages.pizzeria'))->first();
+        for ($i = 1; $i <= 7; $i++) {
             $inicio = Date::make($i, '18:00');
             $fim = Date::make($i, '23:00');
             (new Horario([
-                'cozinha_id' => $cozinha->id,
+                'cozinha_id' => $pizzaria->id,
                 'inicio' => $inicio,
                 'fim' => $fim,
             ]))->save();

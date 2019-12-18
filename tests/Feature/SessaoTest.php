@@ -51,4 +51,24 @@ class SessaoTest extends TestCase
         $this->expectException(ValidationException::class);
         $sessao->save();
     }
+
+    public function testAbertoDataTermino()
+    {
+        $movimentacao = factory(Movimentacao::class)->create();
+        $sessao = $movimentacao->sessao;
+        $sessao->aberta = true;
+        $sessao->data_termino = Carbon::now();
+        $this->expectException(ValidationException::class);
+        $sessao->save();
+    }
+
+    public function testFechadoDataTerminoNulo()
+    {
+        $movimentacao = factory(Movimentacao::class)->create();
+        $sessao = $movimentacao->sessao;
+        $sessao->aberta = false;
+        $sessao->data_termino = null;
+        $this->expectException(ValidationException::class);
+        $sessao->save();
+    }
 }

@@ -958,4 +958,6 @@ return [
     'order_have_evaluation' => 'Pedido já tem uma avaliação',
     'order_more_week' => 'Pedido não pode ser avaliado após uma semana',
     'no_permission_update_evaluation' => 'Você não pode alterar essa avaliação',
+    'movement_open_date_end' => 'Data de termino deve ser nula quando sessão estiver aberta',
+    'movement_close_null_data_end' => 'Data de termino deve ser preenchido quando a sessão estiver fechada'
 ];

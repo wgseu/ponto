@@ -169,8 +169,8 @@ class Movimentacao extends Model implements ValidateInterface
             $errors['caixa_id'] = __('messages.caixa_inactive', ['descricao' => $caixa->descricao]);
         }
         $count = self::where([
-            ['aberta' => true],
-            ['sessao_id' => $this->sessao_id]
+            ['aberta', true],
+            ['sessao_id', $this->sessao_id]
         ])->count();
         $pedidos = Pedido::where([
             ['sessao_id', $this->sessao_id],
@@ -195,7 +195,6 @@ class Movimentacao extends Model implements ValidateInterface
             ['iniciador_id', $this->iniciador_id],
             ['aberta', true]
         ])->first();
-        $iniciador = $this->iniciador;
         if (!is_null($movimentacao) && !$this->exists) {
             $errors['iniciador_id'] = __('messages.iniciador_initiated');
         } elseif (!is_null($old) && $old->iniciador_id != $this->iniciador_id) {

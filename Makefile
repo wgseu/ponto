@@ -73,7 +73,7 @@ update:
 		-v $(shell pwd):/app \
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
-		roquie/composer-parallel update -n --ignore-platform-reqs --no-scripts -vvv
+		roquie/composer-parallel update -n --ignore-platform-reqs --no-scripts
 
 autoload:
 	@docker run --rm \

@@ -280,6 +280,7 @@ class CreatePedidoMutation extends Mutation
             if (!$cancelamento) {
                 $pagamento->pedido_id = $pedido->id;
                 $pagamento->funcionario_id = $funcionario_id;
+                $pagamento->moeda_id = $pagamento->moeda_id ?? app('currency')->id;
                 // cria objetos do pagamento como conta, desconto do crédito e folha de cheque
                 if (isset($pagamento_data['credito'])) {
                     $this->payWithBalance($pagamento, $pagamento_data['credito'], $pedido, $funcionario_id);

@@ -136,10 +136,10 @@ class Produto extends Model implements ValidateInterface
         $this->attributes['imagem_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setImagemAttribute($value, $width, $height, $folder)
     {
         if (isset($value)) {
-            $this->attributes['imagem_url'] = Upload::send($value, 'images/products', 'public');
+            $this->attributes['imagem_url'] = Image::upload($value, 'products', $width, $height, $folder);
         }
     }
 

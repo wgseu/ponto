@@ -26,9 +26,11 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
@@ -57,6 +59,7 @@ class Propriedade extends Model implements ValidateInterface
         'nome',
         'abreviacao',
         'imagem_url',
+        'imagem',
     ];
 
     /**
@@ -78,6 +81,49 @@ class Propriedade extends Model implements ValidateInterface
     public function grupo()
     {
         return $this->belongsTo(Grupo::class, 'grupo_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value, $width, $height, $folder)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Image::upload($value, 'properties', $width, $height, $folder);
+        }
+    }
+
+    /**
+     * Limpa os recursos do serviço atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
     }
 
     public function validate()

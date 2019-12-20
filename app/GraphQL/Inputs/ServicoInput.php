@@ -91,6 +91,10 @@ class ServicoInput extends InputType
                 'description' => 'Banner do evento',
                 'rules' => ['max:100'],
             ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem do serviço a ser alterada/cadastrada',
+            ],
             'ativo' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se o serviço está ativo',

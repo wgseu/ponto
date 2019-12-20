@@ -155,6 +155,14 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Retorna o conteudo do arquivo informado
+     */
+    public static function getResourceContent($name)
+    {
+        return file_get_contents(self::resourcePath("/$name"));
+    }
+
+    /**
      * GraphQL POST request using filename as query
      *
      * @param  string $filename
@@ -164,7 +172,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function graphfl(string $filename, array $variables = [], array $headers = []): TestResponse
     {
-        $query = file_get_contents(self::resourcePath("/$filename.gql"));
+        $query = self::getResourceContent("$filename.gql");
         return $this->graphql($query, $variables, $headers);
     }
 }

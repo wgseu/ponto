@@ -59,9 +59,14 @@ class CreatePropriedadeMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $propriedade = new Propriedade();
-        $propriedade->fill($args['input']);
-        $propriedade->save();
+        try {
+            $propriedade = new Propriedade();
+            $propriedade->fill($args['input']);
+            $propriedade->save();
+        } catch (\Throwable $th) {
+            $propriedade->clean(new Propriedade());
+            throw $th;
+        }
         return $propriedade;
     }
 }

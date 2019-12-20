@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ac2a6211228874e75673d2933e96243",
+    "content-hash": "91038a5d1868fee060c6cf9369681370",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -5524,23 +5524,18 @@
             "authors": [
                 {
                     "name": "Geert Bergman",
-                    "role": "Project Author",
-                    "homepage": "http://www.scrivo.org/"
+                    "homepage": "http://www.scrivo.org/",
+                    "role": "Project Author"
                 },
                 {
                     "name": "Vladimir Jimenez",
-<<<<<<< Updated upstream
                     "homepage": "https://allejo.io",
                     "role": "Maintainer"
-=======
-                    "role": "Contributor",
-                    "homepage": "https://allejo.io"
->>>>>>> Stashed changes
                 },
                 {
                     "name": "Martin Folkers",
-                    "role": "Contributor",
-                    "homepage": "https://twobrain.io"
+                    "homepage": "https://twobrain.io",
+                    "role": "Contributor"
                 }
             ],
             "description": "Server side syntax highlighter that supports 185 languages. It's a PHP port of highlight.js",

@@ -116,10 +116,11 @@ class Servico extends Model implements ValidateInterface
         $this->attributes['imagem_url'] = $value;
     }
 
-    public function setImagemAttribute($value, $width, $height, $folder)
+    public function setImagemAttribute($value)
     {
         if (isset($value)) {
-            $this->attributes['imagem_url'] = Image::upload($value, 'services', $width, $height, $folder);
+            $image = new Image();
+            $this->attributes['imagem_url'] = $image->upload($value, 'services');
         }
     }
 

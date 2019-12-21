@@ -52,7 +52,41 @@ class ItemQuery extends Query
 
     public function type(): Type
     {
-        return GraphQL::paginate('Item');
+        return GraphQL::paginate('ItemKitchen');
+    }
+
+    /**
+     * Verifica se o filtro passado filtra somente pedidos abertos
+     * usado para não limitar a quantidade de registros retornados
+     *
+     * @param array $filter
+     * @return boolean
+     */
+    public static function isOpenState($filter)
+    {
+        $eq = $filter['eq'] ?? null;
+        if (isset($filter['eq']) && $eq != Item::ESTADO_ENTREGUE) {
+            return true;
+        }
+        $ne = $filter['ne'] ?? null;
+        if (isset($filter['ne']) && $ne == Item::ESTADO_ENTREGUE) {
+            return true;
+        }
+        $in = $filter['in'] ?? [];
+        if (
+            isset($filter['in']) &&
+            !in_array(Item::ESTADO_ENTREGUE, $in)
+        ) {
+            return true;
+        }
+        $ni = $filter['ni'] ?? [];
+        if (
+            isset($filter['ni']) &&
+            in_array(Item::ESTADO_ENTREGUE, $ni)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     public function args(): array
@@ -73,7 +107,21 @@ class ItemQuery extends Query
             $args['filter'] ?? [],
             Item::with($fields->getRelations())->select($fields->getSelect())
         );
+        $limit = $args['limit'] ?? 10;
+        if (
+            !isset($args['limit']) &&
+            isset($args['filter']['cancelado']) &&
+            !$args['filter']['cancelado'] &&
+            (
+                is_null($args['filter']['produto_id']['ne'] ?? 0) ||
+                !is_null($args['filter']['produto_id']['eq'] ?? null)
+            ) &&
+            !$args['filter']['produto_id']['ne'] &&
+            self::isOpenState($args['filter']['estado'] ?? null)
+        ) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

@@ -883,6 +883,7 @@ return [
         'ClienteVerify' => 'App\GraphQL\Types\ClienteVerifyType',
         'PedidoSummary' => 'App\GraphQL\Types\PedidoSummaryType',
         'Usuario' => 'App\GraphQL\Types\UsuarioType',
+        'ItemKitchen' => 'App\GraphQL\Types\ItemKitchenType',
         'DispositivoCreation' => 'App\GraphQL\Types\DispositivoCreationType',
 
         'CarteiraTipo' => 'App\GraphQL\Enums\CarteiraTipoEnum',

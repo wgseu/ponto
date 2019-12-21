@@ -97,6 +97,8 @@ class PedidoSummaryQuery extends Query
             $pagamentos_data[] = $item_data;
         }
         $pedido_data = $pedido->toArray();
+        $pedido_data['mesa'] = is_null($pedido->mesa_id) ? null : $pedido->mesa->toArray();
+        $pedido_data['comanda'] = is_null($pedido->comanda_id) ? null : $pedido->comanda->toArray();
         $pedido_data['cliente'] = is_null($pedido->cliente_id) ? null : $pedido->cliente->toArray();
         $pedido_data['entrega'] = is_null($pedido->entrega_id) ? null : $pedido->entrega->toArray();
         if (!is_null($pedido->prestador_id)) {

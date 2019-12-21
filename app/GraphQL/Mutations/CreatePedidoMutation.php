@@ -156,6 +156,7 @@ class CreatePedidoMutation extends Mutation
         }
         $item->fill($item_data);
         if ($cancelamento) {
+            $item->save();
             return $item;
         }
         $item->pedido_id = $pedido->id;

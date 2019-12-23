@@ -65,7 +65,7 @@ class DateType extends ScalarType
         }
 
         // Intentionally without message, as all information already in wrapped Exception
-        throw new Exception();
+        throw new \Exception();
     }
 
     public function toType(): Type

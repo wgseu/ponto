@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\GraphQL\Types;
 
 use DateTime;
+use DateTimeZone;
 use GraphQL\Language\AST\Node;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
@@ -35,7 +36,7 @@ class DateTimeType extends ScalarType
             throw new InvariantViolation('DateTime is not an instance of DateTime');
         }
 
-        return $value->format('Y-m-d H:i:s');
+        return $value->format('c');
     }
 
     /**
@@ -43,7 +44,11 @@ class DateTimeType extends ScalarType
      */
     public function parseValue($value): ?DateTime
     {
-        return DateTime::createFromFormat('Y-m-d H:i:s', $value) ?: null;
+        $date = DateTime::createFromFormat(DateTime::ATOM, $value) ?: null;
+        if (!is_null($date)) {
+            $date->setTimeZone(new DateTimeZone(config('app.timezone')));
+        }
+        return $date;
     }
 
     /**
@@ -65,7 +70,7 @@ class DateTimeType extends ScalarType
         }
 
         // Intentionally without message, as all information already in wrapped Exception
-        throw new Exception();
+        throw new \Exception();
     }
 
     public function toType(): Type

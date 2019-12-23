@@ -59,9 +59,14 @@ class CreateCategoriaMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $categoria = new Categoria();
-        $categoria->fill($args['input']);
-        $categoria->save();
+        try {
+            $categoria = new Categoria();
+            $categoria->fill($args['input']);
+            $categoria->save();
+        } catch (\Throwable $th) {
+            $categoria->clean(new Categoria());
+            throw $th;
+        }
         return $categoria;
     }
 }

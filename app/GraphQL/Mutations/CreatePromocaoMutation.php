@@ -59,9 +59,14 @@ class CreatePromocaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $promocao = new Promocao();
-        $promocao->fill($args['input']);
-        $promocao->save();
+        try {
+            $promocao = new Promocao();
+            $promocao->fill($args['input']);
+            $promocao->save();
+        } catch (\Throwable $th) {
+            $promocao->clean(new Promocao());
+            throw $th;
+        }
         return $promocao;
     }
 }

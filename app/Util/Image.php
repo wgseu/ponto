@@ -34,7 +34,7 @@ use Intervention\Image\Facades\Image as InterventionImage;
 class Image
 {
 
-    public function upload($value, $path, $width = 256, $height = 256, $folder = 'public')
+    public static function upload($value, $path, $width = 256, $height = 256, $folder = 'public')
     {
         $content = InterventionImage::make($value);
         $content->fit($width, $height);

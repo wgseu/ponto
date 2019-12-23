@@ -64,6 +64,10 @@ class CompraInput extends InputType
                 'description' => 'Informa o nome do documento no servidor do sistema',
                 'rules' => ['max:200'],
             ],
+            'documento' => [
+                'type' => Type::string(),
+                'description' => 'Base64 do documento a ser alterada/cadastrada',
+            ],
             'data_compra' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Informa da data de finalização da compra',

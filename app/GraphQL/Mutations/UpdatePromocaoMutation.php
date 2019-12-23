@@ -64,8 +64,15 @@ class UpdatePromocaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $promocao = Promocao::findOrFail($args['id']);
-        $promocao->fill($args['input']);
-        $promocao->save();
+        $old = $promocao->replicate();
+        try {
+            $promocao->fill($args['input']);
+            $promocao->save();
+            $old->clean($promocao);
+        } catch (\Throwable $th) {
+            $promocao->clean($old);
+            throw $th;
+        }
         return $promocao;
     }
 }

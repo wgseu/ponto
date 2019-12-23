@@ -68,12 +68,19 @@ class UpdateContaMutation extends Mutation
     public function resolve($root, $args)
     {
         $conta = Conta::findOrFail($args['id']);
-        $conta->fill($args['input']);
-        if ($conta->estado == Conta::ESTADO_CANCELADA) {
-            $conta->refresh();
-            $conta->cancel($args['desagrupar'] ?? false);
-        } else {
-            $conta->save();
+        $old = $conta->replicate();
+        try {
+            $conta->fill($args['input']);
+            if ($conta->estado == Conta::ESTADO_CANCELADA) {
+                $conta->refresh();
+                $conta->cancel($args['desagrupar'] ?? false);
+            } else {
+                $conta->save();
+                $old->clean($conta);
+            }
+        } catch (\Throwable $th) {
+            $conta->clean($old);
+            throw $th;
         }
         return $conta;
     }

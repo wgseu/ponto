@@ -64,8 +64,15 @@ class UpdatePatrimonioMutation extends Mutation
     public function resolve($root, $args)
     {
         $patrimonio = Patrimonio::findOrFail($args['id']);
-        $patrimonio->fill($args['input']);
-        $patrimonio->save();
+        $old = $patrimonio->replicate();
+        try {
+            $patrimonio->fill($args['input']);
+            $patrimonio->save();
+            $old->clean($patrimonio);
+        } catch (\Throwable $th) {
+            $patrimonio->clean($old);
+            throw $th;
+        }
         return $patrimonio;
     }
 }

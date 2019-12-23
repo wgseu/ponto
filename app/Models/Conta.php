@@ -32,7 +32,6 @@ use App\Concerns\ModelEvents;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
 use App\Interfaces\ValidateUpdateInterface;
 
 /**
@@ -121,6 +120,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         'vencimento',
         'numero',
         'anexo_url',
+        'anexo',
         'estado',
         'data_calculo',
         'data_emissao',
@@ -204,6 +204,49 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
     public function pedido()
     {
         return $this->belongsTo(Pedido::class, 'pedido_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->anexo_url) ? null : $this->attributes['anexo_url'];
+        }
+        $this->attributes['anexo_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['anexo_url'] = Upload::send($value, 'docs/accounts', 'private');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->anexo_url) && $this->anexo_url != $old->anexo_url) {
+            Storage::delete($this->attributes['anexo_url']);
+        }
+        $this->attributes['anexo_url'] = is_null($old->anexo_url) ? null : $old->attributes['anexo_url'];
     }
 
     public function validate()

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -88,6 +89,7 @@ class Carteira extends Model implements ValidateInterface
         'token',
         'ambiente',
         'logo_url',
+        'logo',
         'cor',
         'ativa',
     ];
@@ -116,6 +118,49 @@ class Carteira extends Model implements ValidateInterface
     public function banco()
     {
         return $this->belongsTo(Banco::class, 'banco_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->logo_url) ? null : $this->attributes['logo_url'];
+        }
+        $this->attributes['logo_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['logo_url'] = Image::upload($value, 'wallets', 128, 128);
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->logo_url) && $this->logo_url != $old->logo_url) {
+            Storage::delete($this->attributes['logo_url']);
+        }
+        $this->attributes['logo_url'] = is_null($old->logo_url) ? null : $old->attributes['logo_url'];
     }
 
     public function validate()

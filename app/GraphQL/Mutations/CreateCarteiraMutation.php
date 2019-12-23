@@ -59,9 +59,14 @@ class CreateCarteiraMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $carteira = new Carteira();
-        $carteira->fill($args['input']);
-        $carteira->save();
+        try {
+            $carteira = new Carteira();
+            $carteira->fill($args['input']);
+            $carteira->save();
+        } catch (\Throwable $th) {
+            $carteira->clean(new Carteira());
+            throw $th;
+        }
         return $carteira;
     }
 }

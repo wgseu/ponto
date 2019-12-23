@@ -59,9 +59,14 @@ class CreatePatrimonioMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $patrimonio = new Patrimonio();
-        $patrimonio->fill($args['input']);
-        $patrimonio->save();
+        try {
+            $patrimonio = new Patrimonio();
+            $patrimonio->fill($args['input']);
+            $patrimonio->save();
+        } catch (\Throwable $th) {
+            $patrimonio->clean(new Patrimonio());
+            throw $th;
+        }
         return $patrimonio;
     }
 }

@@ -93,6 +93,11 @@ class CarteiraInput extends InputType
                 'description' => 'Logo do gateway de pagamento',
                 'rules' => ['max:100'],
             ],
+            'logo' => [
+                'type' => Type::string(),
+                'description' => 'Logo do gateway de pagamento',
+                'rules' => ['max:100'],
+            ],
             'cor' => [
                 'type' => Type::string(),
                 'description' => 'Cor predominante da marca da instituição',

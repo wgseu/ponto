@@ -30,7 +30,6 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Propriedade;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -67,10 +66,8 @@ class UpdatePropriedadeMutation extends Mutation
         $propriedade = Propriedade::findOrFail($args['id']);
         $old = $propriedade->replicate();
         try {
-            DB::transaction(function () use ($args, $propriedade) {
-                $propriedade->fill($args['input']);
-                $propriedade->save();
-            });
+            $propriedade->fill($args['input']);
+            $propriedade->save();
             $old->clean($propriedade);
         } catch (\Throwable $th) {
             $propriedade->clean($old);

@@ -177,8 +177,7 @@ class Cliente extends User implements
     public function setImagemAttribute($value)
     {
         if (isset($value)) {
-            $image = new Image();
-            $this->attributes['imagem_url'] = $image->upload($value, 'users');
+            $this->attributes['imagem_url'] = Image::upload($value, 'users');
         }
     }
 

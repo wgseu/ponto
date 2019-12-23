@@ -64,7 +64,6 @@ class PropriedadeInput extends InputType
             'imagem' => [
                 'type' => Type::string(),
                 'description' => 'Imagem que representa a propriedade',
-                'rules' => ['max:100'],
             ],
         ];
     }

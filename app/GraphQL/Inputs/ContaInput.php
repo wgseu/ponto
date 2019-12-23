@@ -136,6 +136,10 @@ class ContaInput extends InputType
                 'description' => 'Caminho do anexo da conta',
                 'rules' => ['max:200'],
             ],
+            'anexo' => [
+                'type' => Type::string(),
+                'description' => 'Base64 do anexo da conta a ser alterada/cadastrada',
+            ],
             'estado' => [
                 'type' => GraphQL::type('ContaEstado'),
                 'description' => 'Informa o estado da conta',

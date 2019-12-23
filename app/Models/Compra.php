@@ -62,6 +62,7 @@ class Compra extends Model implements ValidateInterface
         'fornecedor_id',
         'conta_id',
         'documento_url',
+        'documento',
         'data_compra',
     ];
 
@@ -87,6 +88,49 @@ class Compra extends Model implements ValidateInterface
     public function conta()
     {
         return $this->belongsTo(Conta::class, 'conta_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->documento_url) ? null : $this->attributes['documento_url'];
+        }
+        $this->attributes['documento_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['documento_url'] = Upload::send($value, 'docs/purchases', 'private');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->documento_url) && $this->documento_url != $old->documento_url) {
+            Storage::delete($this->attributes['documento_url']);
+        }
+        $this->attributes['documento_url'] = is_null($old->documento_url) ? null : $old->attributes['documento_url'];
     }
 
     public function validate()

@@ -59,9 +59,14 @@ class CreateCartaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $cartao = new Cartao();
-        $cartao->fill($args['input']);
-        $cartao->save();
+        try {
+            $cartao = new Cartao();
+            $cartao->fill($args['input']);
+            $cartao->save();
+        } catch (\Throwable $th) {
+            $cartao->clean(new Cartao());
+            throw $th;
+        }
         return $cartao;
     }
 }

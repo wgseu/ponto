@@ -30,7 +30,6 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Servico;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -67,10 +66,8 @@ class UpdateServicoMutation extends Mutation
         $servico = Servico::findOrFail($args['id']);
         $old = $servico->replicate();
         try {
-            DB::transaction(function () use ($servico, $args) {
-                $servico->fill($args['input']);
-                $servico->save();
-            });
+            $servico->fill($args['input']);
+            $servico->save();
             $old->clean($servico);
         } catch (\Throwable $th) {
             $servico->clean($old);

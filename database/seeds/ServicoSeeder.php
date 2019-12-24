@@ -14,7 +14,7 @@ class ServicoSeeder extends Seeder
     {
         (new Servico([
             'nome' => __('messages.delivery'),
-            'descricao' => __('messages.delivery_description'),
+            'descricao' => __('messages.delivery_service_permission'),
             'tipo' => Servico::TIPO_TAXA,
             'obrigatorio' => false,
             'valor' => 1,

@@ -28,7 +28,7 @@ class MetricaSeeder extends Seeder
             'tipo' => Metrica::TIPO_ATENDIMENTO,
         ]))->save();
         (new Metrica([
-            'nome' => _('messages.production'),
+            'nome' => __('messages.production'),
             'descricao' => __('messages.metrica_description_production'),
             'tipo' => Metrica::TIPO_PRODUCAO,
         ]))->save();

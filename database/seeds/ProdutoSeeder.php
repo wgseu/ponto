@@ -178,7 +178,7 @@ class ProdutoSeeder extends Seeder
             'unidade_id' => $g_unity->id,
             'setor_estoque_id' => $stock_sector->id,
             'descricao' => __('messages.bacon_1kg'),
-            'abreviacao' => __('bacon'),
+            'abreviacao' => __('messages.bacon'),
             'tipo' => Produto::TIPO_PRODUTO,
             'divisivel' => true,
             'disponivel' => false,

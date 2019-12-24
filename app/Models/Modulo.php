@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Módulos do sistema que podem ser desativados/ativados
  */
-class Modulo extends Model implements ValidateInterface
+class Modulo extends Model
 {
     use ModelEvents;
 
@@ -71,8 +70,4 @@ class Modulo extends Model implements ValidateInterface
     protected $attributes = [
         'habilitado' => true,
     ];
-
-    public function validate($old)
-    {
-    }
 }

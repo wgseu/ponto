@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Conferência diária de produto em cada setor
  */
-class Conferencia extends Model implements ValidateInterface
+class Conferencia extends Model
 {
     use ModelEvents;
 
@@ -81,9 +80,5 @@ class Conferencia extends Model implements ValidateInterface
     public function setor()
     {
         return $this->belongsTo(Setor::class, 'setor_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

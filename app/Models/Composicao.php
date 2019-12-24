@@ -27,14 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Informa as propriedades da composição de um produto composto
  */
-class Composicao extends Model implements ValidateInterface
+class Composicao extends Model
 {
     use ModelEvents;
     use SoftDeletes;
@@ -106,9 +105,5 @@ class Composicao extends Model implements ValidateInterface
     public function produto()
     {
         return $this->belongsTo(Produto::class, 'produto_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,7 +27,6 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -35,7 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Métricas de avaliação do atendimento e outros serviços do
  * estabelecimento
  */
-class Metrica extends Model implements ValidateInterface
+class Metrica extends Model
 {
     use ModelEvents;
     use SoftDeletes;
@@ -78,8 +77,4 @@ class Metrica extends Model implements ValidateInterface
         'avaliacao',
         'data_processamento',
     ];
-
-    public function validate($old)
-    {
-    }
 }

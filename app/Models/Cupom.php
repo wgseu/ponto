@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa os cupons de descontos e seus usos
  */
-class Cupom extends Model implements ValidateInterface
+class Cupom extends Model
 {
     use ModelEvents;
 
@@ -136,9 +135,5 @@ class Cupom extends Model implements ValidateInterface
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

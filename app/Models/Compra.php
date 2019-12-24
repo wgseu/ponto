@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Compras realizadas em uma lista num determinado fornecedor
  */
-class Compra extends Model implements ValidateInterface
+class Compra extends Model
 {
     use ModelEvents;
 
@@ -87,9 +86,5 @@ class Compra extends Model implements ValidateInterface
     public function conta()
     {
         return $this->belongsTo(Conta::class, 'conta_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

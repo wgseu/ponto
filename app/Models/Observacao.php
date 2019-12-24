@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Observações e instruções de preparo de produto
  */
-class Observacao extends Model implements ValidateInterface
+class Observacao extends Model
 {
     use ModelEvents;
 
@@ -77,9 +76,5 @@ class Observacao extends Model implements ValidateInterface
     public function produto()
     {
         return $this->belongsTo(Produto::class, 'produto_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

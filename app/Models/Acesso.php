@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Permite acesso à uma determinada funcionalidade da lista de permissões
  */
-class Acesso extends Model implements ValidateInterface
+class Acesso extends Model
 {
     use ModelEvents;
 
@@ -75,9 +74,5 @@ class Acesso extends Model implements ValidateInterface
     public function permissao()
     {
         return $this->belongsTo(Permissao::class, 'permissao_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

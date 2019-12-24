@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Grupo de funcionalidades do sistema
  */
-class Funcionalidade extends Model implements ValidateInterface
+class Funcionalidade extends Model
 {
     use ModelEvents;
 
@@ -78,9 +77,5 @@ class Funcionalidade extends Model implements ValidateInterface
     public function funcionalidade()
     {
         return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,14 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Resumo de fechamento de caixa, informa o valor contado no fechamento do
  * caixa para cada forma de pagamento
  */
-class Resumo extends Model implements ValidateInterface
+class Resumo extends Model
 {
     use ModelEvents;
 
@@ -86,9 +85,5 @@ class Resumo extends Model implements ValidateInterface
     public function cartao()
     {
         return $this->belongsTo(Cartao::class, 'cartao_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

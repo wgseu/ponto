@@ -28,7 +28,6 @@ namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use Illuminate\Support\Carbon;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\ValidateInsertInterface;
 
@@ -36,7 +35,6 @@ use App\Interfaces\ValidateInsertInterface;
  * Avaliação de atendimento e outros serviços do estabelecimento
  */
 class Avaliacao extends Model implements
-    ValidateInterface,
     ValidateInsertInterface
 {
     use ModelEvents;
@@ -123,10 +121,6 @@ class Avaliacao extends Model implements
             ->avg('estrelas');
         $metrica->avaliacao = $estrelas / $metrica->quantidade;
         $metrica->save();
-    }
-
-    public function validate($old)
-    {
     }
 
     public function onInsert()

@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Unidades de medidas aplicadas aos produtos
  */
-class Unidade extends Model implements ValidateInterface
+class Unidade extends Model
 {
     use ModelEvents;
 
@@ -61,8 +60,4 @@ class Unidade extends Model implements ValidateInterface
         'descricao',
         'sigla',
     ];
-
-    public function validate($old)
-    {
-    }
 }

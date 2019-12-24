@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Regimes tributários
  */
-class Regime extends Model implements ValidateInterface
+class Regime extends Model
 {
     use ModelEvents;
 
@@ -60,8 +59,4 @@ class Regime extends Model implements ValidateInterface
         'codigo',
         'descricao',
     ];
-
-    public function validate($old)
-    {
-    }
 }

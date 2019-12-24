@@ -28,7 +28,6 @@ namespace App\Models;
 
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use App\Util\Filter;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
@@ -37,7 +36,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 /**
  * Computadores e tablets com opções de acesso
  */
-class Dispositivo extends User implements ValidateInterface, JWTSubject
+class Dispositivo extends User implements JWTSubject
 {
     use ModelEvents;
 
@@ -181,9 +180,5 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
     public function caixa()
     {
         return $this->belongsTo(Caixa::class, 'caixa_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

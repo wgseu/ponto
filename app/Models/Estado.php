@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Estado federativo de um país
  */
-class Estado extends Model implements ValidateInterface
+class Estado extends Model
 {
     use ModelEvents;
 
@@ -68,9 +67,5 @@ class Estado extends Model implements ValidateInterface
     public function pais()
     {
         return $this->belongsTo(Pais::class, 'pais_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,14 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa qual foi a formação que gerou esse produto, assim como quais
  * item foram retirados/adicionados da composição
  */
-class Formacao extends Model implements ValidateInterface
+class Formacao extends Model
 {
     use ModelEvents;
 
@@ -95,9 +94,5 @@ class Formacao extends Model implements ValidateInterface
     public function composicao()
     {
         return $this->belongsTo(Composicao::class, 'composicao_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

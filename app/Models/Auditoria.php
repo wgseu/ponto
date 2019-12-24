@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Registra todas as atividades importantes do sistema
  */
-class Auditoria extends Model implements ValidateInterface
+class Auditoria extends Model
 {
     use ModelEvents;
 
@@ -104,9 +103,5 @@ class Auditoria extends Model implements ValidateInterface
     public function autorizador()
     {
         return $this->belongsTo(Prestador::class, 'autorizador_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

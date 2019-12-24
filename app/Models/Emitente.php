@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Dados do emitente das notas fiscais
  */
-class Emitente extends Model implements ValidateInterface
+class Emitente extends Model
 {
     use ModelEvents;
 
@@ -97,9 +96,5 @@ class Emitente extends Model implements ValidateInterface
     public function regime()
     {
         return $this->belongsTo(Regime::class, 'regime_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

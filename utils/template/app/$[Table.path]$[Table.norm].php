@@ -29,7 +29,6 @@ namespace $[Table.package];
 $[table.end]
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 $[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -42,7 +41,7 @@ $[table.each(comment)]
 $[table.end]
  */
 $[table.end]
-class $[Table.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end] implements ValidateInterface
+class $[Table.norm]$[table.if(inherited)] extends $[table.inherited]$[table.end]
 {
     use ModelEvents;
 $[table.exists(data_arquivado|data_arquivamento|data_desativacao|data_desativada)]
@@ -147,8 +146,4 @@ $[field.end]
         return $this->belongsTo($[Reference.norm]::class, '$[field]');
     }
 $[field.end]
-
-    public function validate($old)
-    {
-    }
 }

@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Mesas para lançamento de pedidos
  */
-class Mesa extends Model implements ValidateInterface
+class Mesa extends Model
 {
     use ModelEvents;
 
@@ -78,9 +77,5 @@ class Mesa extends Model implements ValidateInterface
     public function setor()
     {
         return $this->belongsTo(Setor::class, 'setor_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

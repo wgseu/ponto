@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Origem da mercadoria
  */
-class Origem extends Model implements ValidateInterface
+class Origem extends Model
 {
     use ModelEvents;
 
@@ -60,8 +59,4 @@ class Origem extends Model implements ValidateInterface
         'codigo',
         'descricao',
     ];
-
-    public function validate($old)
-    {
-    }
 }

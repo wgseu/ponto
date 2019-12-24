@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Código Fiscal de Operações e Prestações (CFOP)
  */
-class Operacao extends Model implements ValidateInterface
+class Operacao extends Model
 {
     use ModelEvents;
 
@@ -61,8 +60,4 @@ class Operacao extends Model implements ValidateInterface
         'descricao',
         'detalhes',
     ];
-
-    public function validate($old)
-    {
-    }
 }

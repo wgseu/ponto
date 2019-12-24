@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa a listagem de todas as funções do sistema
  */
-class Permissao extends Model implements ValidateInterface
+class Permissao extends Model
 {
     use ModelEvents;
 
@@ -68,9 +67,5 @@ class Permissao extends Model implements ValidateInterface
     public function funcionalidade()
     {
         return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

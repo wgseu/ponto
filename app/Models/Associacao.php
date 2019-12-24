@@ -27,14 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Lista de pedidos que não foram integrados ainda e devem ser associados
  * ao sistema
  */
-class Associacao extends Model implements ValidateInterface
+class Associacao extends Model
 {
     use ModelEvents;
 
@@ -102,9 +101,5 @@ class Associacao extends Model implements ValidateInterface
     public function entrega()
     {
         return $this->belongsTo(Viagem::class, 'entrega_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

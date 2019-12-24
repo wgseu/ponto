@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Categoria de comida servida pelo estabelecimento
  */
-class Cozinha extends Model implements ValidateInterface
+class Cozinha extends Model
 {
     use ModelEvents;
 
@@ -60,8 +59,4 @@ class Cozinha extends Model implements ValidateInterface
         'nome',
         'descricao',
     ];
-
-    public function validate($old)
-    {
-    }
 }

@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Saldos dos pagamentos para cada carteira e moeda
  */
-class Saldo extends Model implements ValidateInterface
+class Saldo extends Model
 {
     use ModelEvents;
 
@@ -85,9 +84,5 @@ class Saldo extends Model implements ValidateInterface
     public function carteira()
     {
         return $this->belongsTo(Carteira::class, 'carteira_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
  */
-class Propriedade extends Model implements ValidateInterface
+class Propriedade extends Model
 {
     use ModelEvents;
 
@@ -78,9 +77,5 @@ class Propriedade extends Model implements ValidateInterface
     public function grupo()
     {
         return $this->belongsTo(Grupo::class, 'grupo_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,14 +27,13 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Notas fiscais e inutilizações
  */
-class Nota extends Model implements ValidateInterface
+class Nota extends Model
 {
     use ModelEvents;
     use SoftDeletes;
@@ -137,9 +136,5 @@ class Nota extends Model implements ValidateInterface
     public function pedido()
     {
         return $this->belongsTo(Pedido::class, 'pedido_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

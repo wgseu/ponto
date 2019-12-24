@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Notificações e avisos para os clientes, funcionários e administradores
  */
-class Notificacao extends Model implements ValidateInterface
+class Notificacao extends Model
 {
     use ModelEvents;
 
@@ -75,9 +74,5 @@ class Notificacao extends Model implements ValidateInterface
     public function remetente()
     {
         return $this->belongsTo(Cliente::class, 'remetente_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

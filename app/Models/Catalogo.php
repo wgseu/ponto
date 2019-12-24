@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informa a lista de produtos disponíveis nos fornecedores
  */
-class Catalogo extends Model implements ValidateInterface
+class Catalogo extends Model
 {
     use ModelEvents;
 
@@ -96,9 +95,5 @@ class Catalogo extends Model implements ValidateInterface
     public function fornecedor()
     {
         return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Eventos de envio das notas
  */
-class Evento extends Model implements ValidateInterface
+class Evento extends Model
 {
     use ModelEvents;
 
@@ -80,9 +79,5 @@ class Evento extends Model implements ValidateInterface
     public function nota()
     {
         return $this->belongsTo(Nota::class, 'nota_id');
-    }
-
-    public function validate($old)
-    {
     }
 }

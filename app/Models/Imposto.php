@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Impostos disponíveis para informar no produto
  */
-class Imposto extends Model implements ValidateInterface
+class Imposto extends Model
 {
     use ModelEvents;
 
@@ -72,8 +71,4 @@ class Imposto extends Model implements ValidateInterface
         'codigo',
         'descricao',
     ];
-
-    public function validate($old)
-    {
-    }
 }

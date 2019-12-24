@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Bancos disponíveis no país
  */
-class Banco extends Model implements ValidateInterface
+class Banco extends Model
 {
     use ModelEvents;
 
@@ -63,8 +62,4 @@ class Banco extends Model implements ValidateInterface
         'agencia_mascara',
         'conta_mascara',
     ];
-
-    public function validate($old)
-    {
-    }
 }

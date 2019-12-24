@@ -51,7 +51,7 @@ class AvaliacaoTest extends TestCase
                 'pedido_id' => $pedido->id,
                 'metrica_id' => $metrica->id,
                 'estrelas' => 1,
-                'data_avaliacao' => '2016-12-25 12:15:00',
+                'data_avaliacao' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 
@@ -76,7 +76,7 @@ class AvaliacaoTest extends TestCase
                 'pedido_id' => $pedido->id,
                 'metrica_id' => $metrica->id,
                 'estrelas' => 1,
-                'data_avaliacao' => '2016-12-25 12:15:00',
+                'data_avaliacao' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
         $avaliacao = Avaliacao::findOrFail($response->json('data.CreateAvaliacao.id'));
@@ -84,7 +84,7 @@ class AvaliacaoTest extends TestCase
             'id' => $avaliacao->id,
             'input' => [
                 'estrelas' => 2,
-                'data_avaliacao' => '2016-12-28 12:30:00',
+                'data_avaliacao' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $avaliacao->refresh();
@@ -105,7 +105,7 @@ class AvaliacaoTest extends TestCase
             'cliente_id' => $cliente->id,
             'pedido_id' => $pedido->id,
             'metrica_id' => $metrica->id,
-            'data_avaliacao' => '2016-12-25 12:15:00',
+            'data_avaliacao' => '2016-12-25T12:15:00Z',
         ]);
         $this->graphfl('delete_avaliacao', ['id' => $avaliacao->id], $headers);
         $avaliacao = Avaliacao::find($avaliacao->id);
@@ -125,7 +125,7 @@ class AvaliacaoTest extends TestCase
             'cliente_id' => $cliente->id,
             'pedido_id' => $pedido->id,
             'metrica_id' => $metrica->id,
-            'data_avaliacao' => '2016-12-25 12:15:00',
+            'data_avaliacao' => '2016-12-25T12:15:00Z',
         ]);
         $response = $this->graphfl('query_avaliacao', [ 'id' => $avaliacao->id ], $headers);
         $this->assertEquals($avaliacao->id, $response->json('data.avaliacoes.data.0.id'));
@@ -147,7 +147,7 @@ class AvaliacaoTest extends TestCase
                 'produto_id' => $produto->id,
                 'pedido_id' => $pedido->id,
                 'estrelas' => 1,
-                'data_avaliacao' => '2016-12-25 12:15:00',
+                'data_avaliacao' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 
@@ -171,7 +171,7 @@ class AvaliacaoTest extends TestCase
                 'pedido_id' => $pedido->id,
                 'metrica_id' => $metrica->id,
                 'estrelas' => 1,
-                'data_avaliacao' => '2016-12-25 12:15:00',
+                'data_avaliacao' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
         $this->expectException(ValidationException::class);
@@ -179,7 +179,7 @@ class AvaliacaoTest extends TestCase
             'pedido_id' => $pedido->id,
             'metrica_id' => $metrica->id,
             'estrelas' => 1,
-            'data_avaliacao' => '2016-12-25 12:15:00',
+            'data_avaliacao' => '2016-12-25T12:15:00Z',
         ]);
     }
 

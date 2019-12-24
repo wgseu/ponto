@@ -50,7 +50,7 @@ class AssociacaoTest extends TestCase
                 'status' => Associacao::STATUS_AGENDADO,
                 'sincronizado' => true,
                 'integrado' => true,
-                'data_pedido' => '2016-12-28 12:30:00',
+                'data_pedido' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $associacao->refresh();

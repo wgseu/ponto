@@ -46,7 +46,7 @@ class NotaTest extends TestCase
                 'numero_final' => 1,
                 'sequencia' => 1,
                 'contingencia' => true,
-                'data_emissao' => '2016-12-25 12:15:00',
+                'data_emissao' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 
@@ -79,7 +79,7 @@ class NotaTest extends TestCase
                 'numero_final' => 1,
                 'sequencia' => 1,
                 'contingencia' => true,
-                'data_emissao' => '2016-12-28 12:30:00',
+                'data_emissao' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $nota->refresh();

@@ -42,7 +42,7 @@ class ListaTest extends TestCase
             'input' => [
                 'descricao' => 'Teste',
                 'encarregado_id' => $seed_lista->encarregado_id,
-                'data_viagem' => '2016-12-25 12:15:00',
+                'data_viagem' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 

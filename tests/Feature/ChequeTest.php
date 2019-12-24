@@ -57,7 +57,7 @@ class ChequeTest extends TestCase
                 'conta' => 'Atualizou',
                 'numero' => 'Atualizou',
                 'valor' => 1.50,
-                'vencimento' => '2016-12-28 12:30:00',
+                'vencimento' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $cheque->refresh();
@@ -98,7 +98,7 @@ class ChequeTest extends TestCase
 
     public function testValidateChequeUpdateRecolhido()
     {
-        $cheque = factory(Cheque::class)->create(['recolhimento' => '2016-12-28 12:30:00']);
+        $cheque = factory(Cheque::class)->create(['recolhimento' => '2016-12-28T12:30:00Z']);
         $cheque->valor =  1000;
         $this->expectException(ValidationException::class);
         $cheque->save();

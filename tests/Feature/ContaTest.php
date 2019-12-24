@@ -49,8 +49,8 @@ class ContaTest extends TestCase
                 'classificacao_id' => $classificacao->id,
                 'descricao' => 'Teste',
                 'valor' => 40,
-                'vencimento' => '2020-12-25 12:15:00',
-                'data_emissao' => '2019-10-25 12:15:00',
+                'vencimento' => '2020-12-25T12:15:00Z',
+                'data_emissao' => '2019-10-25T12:15:00Z',
                 'frequencia' => 1,
             ]
         ], $headers);
@@ -73,8 +73,8 @@ class ContaTest extends TestCase
             'input' => [
                 'descricao' => 'Atualizou',
                 'valor' => 50,
-                'vencimento' => '2020-12-28 12:30:00',
-                'data_emissao' => '2019-12-28 12:30:00',
+                'vencimento' => '2020-12-28T12:30:00Z',
+                'data_emissao' => '2019-12-28T12:30:00Z',
             ]
         ], $headers);
         $conta->refresh();

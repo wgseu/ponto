@@ -41,8 +41,8 @@ class CupomTest extends TestCase
                 'quantidade' => 1,
                 'tipo_desconto' => Cupom::TIPO_DESCONTO_VALOR,
                 'incluir_servicos' => true,
-                'validade' => '2016-12-25 12:15:00',
-                'data_registro' => '2016-12-25 12:15:00',
+                'validade' => '2016-12-25T12:15:00Z',
+                'data_registro' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 
@@ -66,8 +66,8 @@ class CupomTest extends TestCase
                 'quantidade' => 1,
                 'tipo_desconto' => Cupom::TIPO_DESCONTO_VALOR,
                 'incluir_servicos' => true,
-                'validade' => '2016-12-28 12:30:00',
-                'data_registro' => '2016-12-28 12:30:00',
+                'validade' => '2016-12-28T12:30:00Z',
+                'data_registro' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $cupom->refresh();

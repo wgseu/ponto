@@ -119,7 +119,7 @@ class MovimentacaoTest extends TestCase
         factory(Movimentacao::class)->create([
             'aberta' => false,
             'fechador_id' => $prestador->id,
-            'data_fechamento' => '2019-12-28 12:30:00',
+            'data_fechamento' => '2019-12-28T12:30:00Z',
         ]);
     }
 
@@ -130,7 +130,7 @@ class MovimentacaoTest extends TestCase
         $movimentacao->update([
             'aberta' => false,
             'fechador_id' => $prestador->id,
-            'data_fechamento' => '2019-12-28 12:30:00',
+            'data_fechamento' => '2019-12-28T12:30:00Z',
         ]);
         $movimentacao->refresh();
         $this->expectException(ValidationException::class);
@@ -154,7 +154,7 @@ class MovimentacaoTest extends TestCase
         $movimentacao->update([
             'aberta' => false,
             'fechador_id' => $prestador->id,
-            'data_fechamento' => '2019-12-28 12:30:00',
+            'data_fechamento' => '2019-12-28T12:30:00Z',
         ]);
     }
 
@@ -169,7 +169,7 @@ class MovimentacaoTest extends TestCase
         $movimentacao->update([
             'aberta' => false,
             'fechador_id' => $prestador->id,
-            'data_fechamento' => '2019-12-28 12:30:00',
+            'data_fechamento' => '2019-12-28T12:30:00Z',
         ]);
     }
 
@@ -242,7 +242,7 @@ class MovimentacaoTest extends TestCase
             'input' => [
                 'caixa_id' => $caixa->id,
                 'iniciador_id' => $prestador->id,
-                'data_abertura' => '2016-12-25 12:15:00',
+                'data_abertura' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
     }

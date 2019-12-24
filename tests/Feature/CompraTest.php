@@ -39,7 +39,7 @@ class CompraTest extends TestCase
             'input' => [
                 'comprador_id' => $seed_compra->comprador_id,
                 'fornecedor_id' => $seed_compra->fornecedor_id,
-                'data_compra' => '2016-12-25 12:15:00',
+                'data_compra' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
 
@@ -56,7 +56,7 @@ class CompraTest extends TestCase
         $this->graphfl('update_compra', [
             'id' => $compra->id,
             'input' => [
-                'data_compra' => '2016-12-28 12:30:00',
+                'data_compra' => '2016-12-28T12:30:00Z',
             ]
         ], $headers);
         $compra->refresh();

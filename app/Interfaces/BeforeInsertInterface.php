@@ -24,53 +24,19 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace App\Models;
-
-use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
+namespace App\Interfaces;
 
 /**
- * Informa a listagem de todas as funções do sistema
+ * Evento chamado antes de inserir um model no banco de dados
  */
-class Permissao extends Model implements ValidateInterface
+interface BeforeInsertInterface
 {
-    use ModelEvents;
-
     /**
-     * The table associated with the model.
+     * Evento chamado após inserir um model no banco de dados
+     * Não pode validar mais, apenas lançar exceções,
+     * Mas só dentro de transações as alterações serão desfeitas
      *
-     * @var string
+     * @return void
      */
-    protected $table = 'permissoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'funcionalidade_id',
-        'nome',
-        'descricao',
-    ];
-
-    /**
-     * Categoriza um grupo de permissões
-     */
-    public function funcionalidade()
-    {
-        return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
-    }
-
-    public function validate($old)
-    {
-    }
+    public function beforeInsert();
 }

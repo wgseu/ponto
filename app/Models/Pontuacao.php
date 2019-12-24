@@ -93,7 +93,7 @@ class Pontuacao extends Model implements ValidateInterface
         return $this->belongsTo(Item::class, 'item_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->item_id) && is_null($this->pedido_id)) {

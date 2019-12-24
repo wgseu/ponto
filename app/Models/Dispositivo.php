@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
+use App\Util\Filter;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -95,18 +96,33 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->options = new Settings();
+        parent::__construct($attributes);
+    }
+
+    /**
+     * Retorna as opções da empresa como string json
+     *
+     * @return string
+     */
+    public function getOpcoesAttribute()
+    {
+        $this->options->includeDefaults = app('settings')->includeDefaults;
+        $this->loadOptions();
+        return json_encode(Filter::emptyObject($this->options->getValues()));
+    }
+
+    public function setOpcoesAttribute($value)
+    {
+        $this->options->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['opcoes'] = base64_encode(json_encode($this->options->getValues(false)));
     }
 
     public function loadOptions()
     {
-        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
-    }
-
-    public function applyOptions()
-    {
-        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+        $this->options->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('opcoes')), true)
+        );
     }
 
     /**
@@ -145,6 +161,11 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
         ];
     }
 
+    public function getAccessTokenAttribute()
+    {
+        return auth('device')->fromSubject($this);
+    }
+
     /**
      * Setor em que o dispositivo está instalado/será usado
      */
@@ -162,7 +183,7 @@ class Dispositivo extends User implements ValidateInterface, JWTSubject
         return $this->belongsTo(Caixa::class, 'caixa_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

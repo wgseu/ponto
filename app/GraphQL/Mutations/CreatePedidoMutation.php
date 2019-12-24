@@ -41,6 +41,7 @@ use App\Models\Prestador;
 use App\Models\Produto;
 use App\Rules\Montagem;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
@@ -152,7 +153,7 @@ class CreatePedidoMutation extends Mutation
             }
         }
         if ($cancelamento) {
-            $item_data = ['cancelado' => true];
+            $item_data = array_intersect_key($item_data, array_flip(['cancelado', 'motivo', 'desperdicado']));
         }
         $item->fill($item_data);
         if ($cancelamento) {
@@ -161,8 +162,10 @@ class CreatePedidoMutation extends Mutation
         }
         $item->pedido_id = $pedido->id;
         $item->prestador_id = $funcionario_id;
-        // calcula os totais e a comissão do funcionário
-        $item->calculate($prestador);
+        // muda a data de processamento em caso de alteração de estado
+        if ($item->exists && $item->estado != $item->fresh()->estado) {
+            $item->data_processamento = Carbon::now();
+        }
         // não salva os subitens antes de checar a formação como um todo
         if ($level > 0) {
             return $item;
@@ -275,7 +278,7 @@ class CreatePedidoMutation extends Mutation
             }
             $cancelamento = ($pagamento_data['estado'] ?? null) == Pagamento::ESTADO_CANCELADO;
             if ($cancelamento) {
-                $pagamento_data = ['estado' => Pagamento::ESTADO_CANCELADO];
+                $pagamento_data = array_intersect_key($pagamento_data, array_flip(['estado']));
             }
             $pagamento->fill($pagamento_data);
             if (!$cancelamento) {
@@ -299,8 +302,6 @@ class CreatePedidoMutation extends Mutation
                     }
                     $pagamento->pagamento_id = $pagamentos_ids[$pagamento_data['pagamento_id']];
                 }
-                // calcula carteira, valor da moeda e outros
-                $pagamento->calculate();
             }
             $pagamento->save();
             $pagamentos_ids[$index] = $pagamento->id;
@@ -336,12 +337,11 @@ class CreatePedidoMutation extends Mutation
             $this->saveItems($itens, $pedido, $prestador, $funcionario_id);
             $pagamentos = $input['pagamentos'] ?? [];
             $this->savePayments($pagamentos, $pedido, $funcionario_id);
-            $pedido->totalize();
             if ($pedido->tipo == Pedido::TIPO_BALCAO) {
                 $pedido->estado = Pedido::ESTADO_CONCLUIDO;
             }
             $pedido->save();
         });
-        return PedidoSummaryQuery::process($pedido);
+        return $pedido;
     }
 }

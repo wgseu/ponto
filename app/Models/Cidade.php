@@ -71,7 +71,7 @@ class Cidade extends Model implements ValidateInterface
         return $this->belongsTo(Estado::class, 'estado_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!Validator::checkCEP($this->cep, true)) {

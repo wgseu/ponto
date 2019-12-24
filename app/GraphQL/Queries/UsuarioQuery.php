@@ -52,33 +52,8 @@ class UsuarioQuery extends Query
         return GraphQL::type('Usuario');
     }
 
-    /**
-     * Cria a query com base no usuário
-     *
-     * @param Cliente $user
-     * @return array
-     */
-    public static function process($user)
-    {
-        /** @var Prestador $prestador */
-        $prestador = $user->prestador;
-        $cliente_data = $user->toArray();
-        if (!is_null($prestador)) {
-            /** @var Funcao $funcao */
-            $funcao = $prestador->funcao;
-            $permissoes = $funcao->permissoes()->pluck('nome');
-            $cliente_data['prestador'] = $prestador->toArray();
-            $cliente_data['prestador']['funcao'] = $funcao->toArray();
-            $cliente_data['prestador']['funcao']['permissoes'] = $permissoes;
-        }
-        $cliente_data['proprietario'] = $user->isOwner();
-        return $cliente_data;
-    }
-
     public function resolve()
     {
-        /** @var Cliente $user */
-        $user = Auth::user();
-        return self::process($user);
+        return Auth::user();
     }
 }

@@ -73,7 +73,7 @@ class Imposto extends Model implements ValidateInterface
         'descricao',
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

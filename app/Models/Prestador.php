@@ -114,7 +114,7 @@ class Prestador extends Model implements ValidateInterface
         return $this->belongsTo(Prestador::class, 'empresa_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $cliente = $this->cliente;

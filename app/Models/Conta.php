@@ -29,16 +29,18 @@ namespace App\Models;
 use App\Util\Mask;
 use App\Util\Number;
 use App\Concerns\ModelEvents;
-use Illuminate\Support\Facades\DB;
+use App\Interfaces\AfterSaveInterface;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
 use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Contas a pagar e ou receber
  */
-class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
+class Conta extends Model implements
+    ValidateInterface,
+    ValidateUpdateInterface,
+    AfterSaveInterface
 {
     use ModelEvents;
 
@@ -206,7 +208,33 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
-    public function validate()
+    /**
+     * Devolve a lista de todas as subcontas não canceladas
+     */
+    public function contas()
+    {
+        return $this->hasMany(self::class, 'conta_id')
+            ->where('estado', '<>', self::ESTADO_CANCELADA);
+    }
+
+    /**
+     * Devolve a lista com as contas agrupadas no primeiro nível
+     */
+    public function agrupamentos()
+    {
+        return $this->hasMany(self::class, 'agrupamento_id');
+    }
+
+    /**
+     * Devolve a lista de todos os pagamentos não cancelados
+     */
+    public function pagamentos()
+    {
+        return $this->hasMany(Pagamento::class, 'conta_id')
+            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
+    }
+
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->pedido_id)) {
@@ -288,10 +316,9 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
-        $old = $this->fresh();
         if ($old->estado == self::ESTADO_PAGA && $this->estado != self::ESTADO_CANCELADA) {
             $errors['id'] = __('messages.account_cannot_changed_consolidated');
         }
@@ -316,30 +343,30 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         return $errors;
     }
 
-    public function cancel($desagrupar = false)
+    public function afterSave($old)
     {
-        DB::transaction(function () use ($desagrupar) {
-            $this->internalCancel($desagrupar);
-        });
+        if ($this->estado == self::ESTADO_CANCELADA) {
+            $this->cancelDependecies();
+        }
     }
 
-    private function internalCancel($desagrupar)
+    private function cancelDependecies()
     {
-        $pagamentos = Pagamento::where('conta_id', $this->id)
-            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
+        // desagrupa as contas dependentes
+        $agrupamentos = $this->agrupamentos;
+        foreach ($agrupamentos as $conta) {
+            $conta->update(['agrupamento_id' => null]);
+        }
+        // cancela os pagamentos dessa conta
+        $pagamentos = $this->pagamentos;
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
         }
-        if ($desagrupar) {
-            $contas = self::where('agrupamento_id', $this->id)
-                ->where('estado', '<>', self::ESTADO_CANCELADA)->get();
-            foreach ($contas as $conta) {
-                $conta->agrupamento_id = null;
-                $conta->save();
-            }
+        // cancela as subcontas
+        $contas = $this->contas;
+        foreach ($contas as $conta) {
+            $conta->update(['estado' => self::ESTADO_CANCELADA]);
         }
-        $this->estado = self::ESTADO_CANCELADA;
-        $this->save();
     }
 
     public function total()

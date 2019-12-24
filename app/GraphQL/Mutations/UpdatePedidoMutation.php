@@ -112,7 +112,7 @@ class UpdatePedidoMutation extends CreatePedidoMutation
                 ]);
             }
             if (($input['estado'] ?? null) == Pedido::ESTADO_CANCELADO) {
-                $input = ['estado' => Pedido::ESTADO_CANCELADO];
+                $input = array_intersect_key($input, array_flip(['estado', 'motivo']));
             }
             $pedido->fill($input);
             // o pedido pode ser feito por cliente final ou funcionário
@@ -130,12 +130,10 @@ class UpdatePedidoMutation extends CreatePedidoMutation
                 if ($pedido->estado == Pedido::ESTADO_ENTREGA) {
                     $entrega = $input['entrega'] ?? [];
                     $this->applyDeliveryman($entrega, $pedido);
-                    $pedido->payChanges();
                 }
-                $pedido->totalize();
             }
             $pedido->save();
         });
-        return PedidoSummaryQuery::process($pedido);
+        return $pedido;
     }
 }

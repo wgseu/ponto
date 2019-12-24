@@ -62,7 +62,7 @@ class Operacao extends Model implements ValidateInterface
         'detalhes',
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

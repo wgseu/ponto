@@ -153,10 +153,9 @@ class Movimentacao extends Model implements ValidateInterface
         });
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
-        $old = $this->fresh();
 
         $sessao = $this->sessao;
         if (!$this->exists && !$sessao->aberta) {

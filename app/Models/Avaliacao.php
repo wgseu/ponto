@@ -125,7 +125,7 @@ class Avaliacao extends Model implements
         $metrica->save();
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 

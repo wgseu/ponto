@@ -27,9 +27,15 @@
 namespace App\Interfaces;
 
 /**
- * Valida regras de negócio após inserir o model no banco
+ * Evento chamado antes de inserir um model no banco de dados
  */
 interface AfterInsertInterface
 {
+    /**
+     * Evento chamado antes de inserir um model no banco de dados
+     * e depois de validar
+     *
+     * @return void
+     */
     public function afterInsert();
 }

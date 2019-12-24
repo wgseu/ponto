@@ -139,7 +139,7 @@ class Nota extends Model implements ValidateInterface
         return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

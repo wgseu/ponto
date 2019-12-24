@@ -39,7 +39,7 @@ class AutomaticPayment extends Command
             ->where('tipo', '<>', Conta::TIPO_RECEITA)
             ->where('estado', Conta::ESTADO_ATIVA)
             ->where('vencimento', '<=', Carbon::now())
-            ->where('agrupamento_id', null)->get();
+            ->whereNull('agrupamento_id')->get();
         foreach ($contas as $conta) {
             try {
                 DB::transaction(function () use ($conta) {
@@ -59,13 +59,11 @@ class AutomaticPayment extends Command
                     $conta->save();
                     $frequencia = $conta->frequencia;
                     if ($conta->modo == Conta::MODO_MENSAL) {
-                        $data = new DateTime($conta->vencimento);
-                        $vencimento = $data->modify("+ $frequencia month");
-                        $vencimento = date_format($vencimento, 'Y-m-d H:i:s');
+                        $vencimento = new DateTime($conta->vencimento);
+                        $vencimento->modify("+ $frequencia month");
                     } else {
-                        $data = new DateTime($conta->vencimento);
-                        $vencimento = $data->modify("+ $frequencia day");
-                        $vencimento = date_format($vencimento, 'Y-m-d H:i:s');
+                        $vencimento = new DateTime($conta->vencimento);
+                        $vencimento->modify("+ $frequencia day");
                     }
                     $new_conta = $conta->replicate();
                     $new_conta->fill([

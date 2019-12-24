@@ -92,7 +92,7 @@ class Servico extends Model implements ValidateInterface
         'ativo' => true,
     ];
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->valor < 0) {

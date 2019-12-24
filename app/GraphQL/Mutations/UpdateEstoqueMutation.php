@@ -65,7 +65,6 @@ class UpdateEstoqueMutation extends Mutation
     {
         $estoque = Estoque::findOrFail($args['id']);
         $estoque->fill($args['input']);
-        $estoque->calculate();
         $estoque->save();
         return $estoque;
     }

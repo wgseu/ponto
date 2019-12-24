@@ -43,7 +43,9 @@ class CreateDispositivoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('dispositivo:create');
+        $dispositivo = new Dispositivo($args['input']);
+        return Auth::check() && Auth::user()->can('dispositivo:create') &&
+            ($dispositivo->serial != $dispositivo->validacao || Auth::user()->can('dispositivo:validate'));
     }
 
     public function type(): Type
@@ -60,16 +62,8 @@ class CreateDispositivoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $dispositivo = new Dispositivo();
-        $dispositivo->fill($args['input']);
-        $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
-        $dispositivo->applyOptions();
-        if ($dispositivo->serial == $dispositivo->validacao && !Auth::user()->can('dispositivo:validate')) {
-            throw new ValidationException(['validacao' => __('messages.no_permission_to_validate')]);
-        }
+        $dispositivo = new Dispositivo($args['input']);
         $dispositivo->save();
-        $dispositivo_data = $dispositivo->toArray();
-        $dispositivo_data['access_token'] = auth('device')->fromSubject($dispositivo);
-        return $dispositivo_data;
+        return $dispositivo;
     }
 }

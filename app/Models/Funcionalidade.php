@@ -80,7 +80,7 @@ class Funcionalidade extends Model implements ValidateInterface
         return $this->belongsTo(Funcionalidade::class, 'funcionalidade_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

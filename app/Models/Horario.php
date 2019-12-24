@@ -146,7 +146,7 @@ class Horario extends Model implements ValidateInterface
      * Horário de inicio e fim não podem ser sobrescritos com o mesmo modo, função, ou prestador,
      * Para o fechamento o modo deve ser funcionamento e não pode haver função e prestador selecionadas.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $horario = self::where('modo', $this->modo)

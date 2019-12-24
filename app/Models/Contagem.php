@@ -74,7 +74,7 @@ class Contagem extends Model implements ValidateInterface
         return $this->belongsTo(Setor::class, 'setor_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

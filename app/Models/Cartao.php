@@ -100,7 +100,7 @@ class Cartao extends Model implements ValidateInterface
      * Taxa, dias_repasse, e taxa_antecipacao não podem ser negativas
      * Um cartão não pode ser criado desativado.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->taxa < 0) {

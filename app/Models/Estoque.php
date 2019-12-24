@@ -28,6 +28,8 @@ namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Exceptions\Exception;
+use App\Interfaces\AfterSaveInterface;
+use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
@@ -39,7 +41,9 @@ use Illuminate\Database\Eloquent\Model;
 class Estoque extends Model implements
     ValidateInterface,
     ValidateInsertInterface,
-    ValidateUpdateInterface
+    ValidateUpdateInterface,
+    AfterSaveInterface,
+    BeforeSaveInterface
 {
     use ModelEvents;
 
@@ -179,7 +183,6 @@ class Estoque extends Model implements
         // baixa o estoque dos ingredientes
         $custo_aproximado = $this->baixar();
         $this->preco_compra = $custo_aproximado;
-        $this->calculate();
         $this->save();
     }
 
@@ -241,7 +244,6 @@ class Estoque extends Model implements
                 'prestador_id' => $this->prestador_id,
                 'preco_compra' => $produto->custo_medio,
             ]);
-            $estoque->calculate();
             $estoque->save();
             $custo_aproximado += ($composicao->quantidade * $produto->custo_medio) / $this->quantidade;
         }
@@ -253,78 +255,25 @@ class Estoque extends Model implements
      *
      * @return self
      */
-    public function calculate()
+    protected function calculate()
     {
-        if ($this->exists) {
-            $old = $this->fresh();
-            // quantidade anterior à compra
-            $estoque = $old->estoque - $old->quantidade;
-            // custo total anterior à compra
-            $old_custo_total = $old->estoque * $old->custo_medio - $old->quantidade * $old->preco_compra;
-            // custo médio anterior à compra
-            $custo_medio = $old_custo_total / $estoque;
-        } else {
-            $estoque = $this->produto->estoque;
-            $custo_medio = $this->produto->custo_medio;
-        }
-        $estoque_total = $estoque + $this->quantidade;
-        $this->estoque = $estoque_total;
-        $custo_total = $estoque * $custo_medio + $this->quantidade * $this->preco_compra;
-        $this->custo_medio = $custo_total / $estoque_total;
-        return $this;
-    }
-
-    /**
-     * Atualiza a contagem do produto
-     *
-     * @return void
-     */
-    protected function updateCounting()
-    {
-        $run_contagem = true;
-        $decrement = 0;
-        $old = null;
-        if ($this->exists) {
-            $old = $this->fresh();
-            if ($old->quantidade == $this->quantidade && !$this->cancelado) {
-                $run_contagem = false;
-            }
-            $decrement = $old->quantidade;
-        }
-        if ($this->cancelado) {
-            $quantidade = -$decrement;
-        } else {
-            $quantidade = $this->quantidade - $decrement;
-        }
-        if ($run_contagem) {
-            $contagem = Contagem::firstOrCreate(
-                [
-                    'setor_id' => $this->setor_id,
-                    'produto_id' => $this->produto_id,
-                ],
-                [ 'quantidade' => 0 ]
-            );
-            $contagem->increment('quantidade', $quantidade);
-            $produto = $this->produto;
-            $produto->increment('estoque', $quantidade);
-        }
-        // checa por alteração na quantidade, preço de compra ou cancelamento
-        if (
-            $this->quantidade < 0 ||
-            (
-                !is_null($old) &&
-                $old->cancelado == $this->cancelado &&
-                $old->quantidade == $this->quantidade &&
-                $old->preco_compra == $this->preco_compra
-            )
-        ) {
+        if ($this->quantidade < 0) {
+            $this->custo_medio = $this->preco_compra;
             return;
         }
-        $produto = $this->produto;
-        $custo_medio = $this->custo_medio;
-        // TODO: implementar correção de custo médio
-        $produto->custo_medio = $custo_medio;
-        $produto->save();
+        if ($this->exists) {
+            $old = $this->fresh();
+            // custo total anterior
+            $custo = $old->estoque * $old->custo_medio - $old->quantidade * $old->preco_compra;
+            $estoque = $old->estoque - $old->quantidade;
+        } else {
+            $custo = $this->produto->estoque * $this->produto->custo_medio;
+            $estoque = $this->produto->estoque;
+        }
+        $custo_total = $custo + $this->quantidade * $this->preco_compra;
+        $this->estoque = $estoque + $this->quantidade;
+        $this->custo_medio = $custo_total / $this->estoque;
+        return $this;
     }
 
     /**
@@ -338,7 +287,7 @@ class Estoque extends Model implements
      * Se cancelado não pode ser alterado;
      * Não pode criar já cancelado.
      */
-    public function validate()
+    public function validate($old)
     {
         $produto = $this->produto;
         if ($produto->tipo == Produto::TIPO_PACOTE) {
@@ -374,15 +323,84 @@ class Estoque extends Model implements
                 'sector' => $setor->nome,
             ])];
         }
-        $this->updateCounting();
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
-        $old = $this->fresh();
         if ($old->cancelado) {
             return ['cancelado' => __('messages.estoque_already_canceled')];
         }
-        $this->updateCounting();
+        if (
+            !$this->cancelado &&
+            !$this->isChangeAllowed([
+                'fornecedor_id',
+                'compra_id',
+                'lote',
+                'fabricacao',
+                'vencimento',
+                'detalhes',
+                'preco_compra',
+                'custo_medio',
+                'estoque'
+            ])
+        ) {
+            return ['cancelado' => __('messages.estoque_change_denied')];
+        }
+        if (
+            $this->cancelado &&
+            !$this->isChangeAllowed(['cancelado', 'detalhes'])
+        ) {
+            return ['cancelado' => __('messages.estoque_cancel_with_changes')];
+        }
+    }
+
+    public function beforeSave($old)
+    {
+        $this->calculate();
+    }
+
+    public function afterSave($old)
+    {
+        $this->updateCounting($old);
+    }
+
+    /**
+     * Atualiza a contagem do produto
+     *
+     * @param self $old estoque antes de ser atualizado
+     * @return void
+     */
+    protected function updateCounting($old)
+    {
+        if ($old && $old->cancelado == $this->cancelado) {
+            return;
+        }
+        // atualiza a contagem de estoque
+        if ($this->cancelado) {
+            $quantidade = -$this->quantidade;
+        } else {
+            $quantidade = $this->quantidade;
+        }
+        $contagem = Contagem::firstOrCreate(
+            [
+                'setor_id' => $this->setor_id,
+                'produto_id' => $this->produto_id,
+            ],
+            [ 'quantidade' => 0 ]
+        );
+        $contagem->increment('quantidade', $quantidade);
+        $produto = $this->produto;
+        $produto->increment('estoque', $quantidade);
+        // não atualiza custo médio em saídas
+        if ($this->quantidade < 0) {
+            return;
+        }
+        // atualiza o custo médio
+        if ($this->cancelado) {
+            // TODO: implementar cancelamento de entrada em estoque
+        } else {
+            $produto->custo_medio = $this->custo_medio;
+            $produto->save();
+        }
     }
 }

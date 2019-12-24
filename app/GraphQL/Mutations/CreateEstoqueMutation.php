@@ -61,7 +61,6 @@ class CreateEstoqueMutation extends Mutation
     {
         $estoque = new Estoque();
         $estoque->fill($args['input']);
-        $estoque->calculate();
         $estoque->save();
         return $estoque;
     }

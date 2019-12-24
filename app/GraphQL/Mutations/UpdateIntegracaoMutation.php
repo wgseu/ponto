@@ -64,15 +64,7 @@ class UpdateIntegracaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $integracao = Integracao::findOrFail($args['id']);
-        $integracao->loadOptions();
-        $integracao->loadAssociations();
-        $integracao->opcoes = null;
-        $integracao->associacoes = null;
         $integracao->fill($args['input']);
-        $integracao->options->addValues(json_decode($integracao->opcoes ?? '{}', true));
-        $integracao->associations->addValues(json_decode($integracao->associacoes ?? '{}', true));
-        $integracao->applyOptions();
-        $integracao->applyAssociations();
         $integracao->save();
         return $integracao;
     }

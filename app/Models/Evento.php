@@ -82,7 +82,7 @@ class Evento extends Model implements ValidateInterface
         return $this->belongsTo(Nota::class, 'nota_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

@@ -121,7 +121,7 @@ class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
      * A quantidade maxima do grupo não pode ser inferior a quantidade maxima do pacote.
      * Se o grupo está associado a um pacote a alteração da ordem não pode ser superior a ordem do grupo associado;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $produto = $this->produto;
@@ -140,10 +140,9 @@ class Grupo extends Model implements ValidateInterface, ValidateUpdateInterface
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
-        $old = $this->fresh();
         $ordem = self::select('1')
             ->from('pacotes as p')
             ->leftJoin('pacotes as a', 'a.id', '=', 'p.associacao_id')

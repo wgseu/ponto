@@ -84,7 +84,7 @@ class UpdateMovimentacaoMutation extends Mutation
                 'autorizador_id' => $prestador->id,
                 'tipo' => Auditoria::TIPO_FINANCEIRO,
                 'prioridade' => Auditoria::PRIORIDADE_ALTA,
-                'descricao' => __('reopen_cashier', ['caixa' => $caixa->descricao]),
+                'descricao' => __('messages.reopen_cashier', ['caixa' => $caixa->descricao]),
                 'data_registro' => Carbon::now(),
             ]))->save();
             $movimentacao->fechador_id = null;

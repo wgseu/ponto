@@ -62,7 +62,7 @@ class Unidade extends Model implements ValidateInterface
         'sigla',
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

@@ -112,14 +112,19 @@ class ItemQuery extends Query
             !isset($args['limit']) &&
             isset($args['filter']['cancelado']) &&
             !$args['filter']['cancelado'] &&
+            isset($args['filter']['produto_id']) &&
             (
-                is_null($args['filter']['produto_id']['ne'] ?? 0) ||
-                !is_null($args['filter']['produto_id']['eq'] ?? null)
+                (
+                    array_key_exists('ne', $args['filter']['produto_id']) &&
+                    is_null($args['filter']['produto_id']['ne'])
+                ) || (
+                    isset($args['filter']['produto_id']['eq'])
+                )
             ) &&
             !$args['filter']['produto_id']['ne'] &&
             self::isOpenState($args['filter']['estado'] ?? null)
         ) {
-            $limit = (clone $query)->count();
+            $limit = min((clone $query)->count(), 500);
         }
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);

@@ -96,7 +96,7 @@ class Cheque extends Model implements ValidateInterface
      * Depois de recolhido e cancelado um cheque não pode ser alterado;
      * O valor do cheque não pode ser negativo.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!$this->exists) {

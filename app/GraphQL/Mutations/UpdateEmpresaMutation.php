@@ -60,13 +60,11 @@ class UpdateEmpresaMutation extends Mutation
     public function resolve($root, $args)
     {
         /** @var Empresa $empresa */
-        $empresa = app('business');
-        $empresa->loadOptions();
-        $empresa->opcoes = null;
+        $empresa = Empresa::findOrFail('1');
         $empresa->fill($args['input']);
-        $empresa->options->addValues(json_decode($empresa->opcoes ?? '{}', true));
-        $empresa->applyOptions();
         $empresa->save();
+        app('business')->refresh();
+        app('business')->loadOptions();
         return $empresa;
     }
 }

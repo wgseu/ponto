@@ -104,7 +104,7 @@ class Associacao extends Model implements ValidateInterface
         return $this->belongsTo(Viagem::class, 'entrega_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

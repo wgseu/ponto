@@ -60,12 +60,10 @@ class UpdateSistemaMutation extends Mutation
     public function resolve($root, $args)
     {
         $sistema = Sistema::find('1');
-        $sistema->loadOptions();
-        $sistema->opcoes = null;
         $sistema->fill($args['input']);
-        $sistema->options->addValues(json_decode($sistema->opcoes ?? '{}', true));
-        $sistema->applyOptions();
         $sistema->save();
+        app('system')->refresh();
+        app('system')->loadOptions();
         return $sistema;
     }
 }

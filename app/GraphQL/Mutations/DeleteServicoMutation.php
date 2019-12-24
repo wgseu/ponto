@@ -62,7 +62,7 @@ class DeleteServicoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $servico = Servico::findOrFail($args['id']);
+        $servico = Servico::where('id', '<>', Servico::ENTREGA_ID)->findOrFail($args['id']);
         $servico->delete();
         return $servico;
     }

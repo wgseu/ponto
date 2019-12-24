@@ -74,7 +74,7 @@ class LoginClienteMutation extends Mutation
             'access_token'  => $token,
             'token_type'    => 'bearer',
             'expires_in'    => auth()->factory()->getTTL() * 60,
-            'user'          => UsuarioQuery::process(auth()->user()),
+            'user'          => auth()->user(),
         ];
     }
 }

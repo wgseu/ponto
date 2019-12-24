@@ -79,7 +79,7 @@ class Metrica extends Model implements ValidateInterface
         'data_processamento',
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

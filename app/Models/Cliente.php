@@ -152,7 +152,27 @@ class Cliente extends User implements
         ];
     }
 
-        /**
+    /**
+     * Create refresh token for customer
+     *
+     * @return string
+     */
+    public function getRefreshTokenAttribute()
+    {
+        return $this->createRefreshToken();
+    }
+
+    /**
+     * Return if customer is owner
+     *
+     * @return bool
+     */
+    public function getProprietarioAttribute()
+    {
+        return $this->isOwner();
+    }
+
+    /**
      * Get the user's first name.
      *
      * @param  string  $value
@@ -238,7 +258,7 @@ class Cliente extends User implements
             'uid' => $this->id,
             'sub' => null,
             'typ' => 'refresh',
-            'exp' => Carbon::now('UTC')->addMinutes(24 * 60)->getTimestamp(),
+            'exp' => Carbon::now('UTC')->addMinutes(30 * 24 * 60)->getTimestamp(),
         ];
         $payload = JWTFactory::claims($customClaims)->make(true);
         return JWTAuth::encode($payload)->get();
@@ -271,7 +291,7 @@ class Cliente extends User implements
             ->orderBy('id', 'DESC');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->tipo == self::TIPO_FISICA) {

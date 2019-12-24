@@ -33,6 +33,9 @@ use App\Exceptions\Exception;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\ValidationException;
+use App\Interfaces\AfterSaveInterface;
+use App\Interfaces\BeforeSaveInterface;
+use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
 
 /**
@@ -41,7 +44,10 @@ use App\Interfaces\ValidateUpdateInterface;
  */
 class Item extends Model implements
     ValidateInterface,
-    ValidateUpdateInterface
+    ValidateUpdateInterface,
+    ValidateInsertInterface,
+    BeforeSaveInterface,
+    AfterSaveInterface
 {
     use ModelEvents;
 
@@ -157,16 +163,21 @@ class Item extends Model implements
     }
 
     /**
+     * Subitens
+     */
+    public function itens()
+    {
+        return $this->hasMany(Item::class, 'item_id')->where('cancelado', false);
+    }
+
+    /**
      * Calcula a comissão do item
      *
      * @param Prestador $prestador
      * @return self
      */
-    public function calculate($prestador = null)
+    protected function calculate()
     {
-        if ((is_null($prestador) || $prestador->id != $this->prestador_id) && !is_null($this->prestador_id)) {
-            $prestador = $this->$prestador;
-        }
         $produto = $this->produto;
         if (!is_null($produto)) {
             $this->preco_venda = $produto->preco_venda;
@@ -177,10 +188,6 @@ class Item extends Model implements
             $this->preco_venda = $servico->valor;
         }
         $this->subtotal = $this->preco * $this->quantidade;
-        if (!is_null($prestador) && !is_null($produto)) {
-            $comissao = $this->subtotal * ($prestador->porcentagem / 100);
-            $this->comissao = $produto->cobrar_servico ? $comissao : 0;
-        }
         $this->total = $this->subtotal + $this->comissao;
         return $this;
     }
@@ -282,7 +289,16 @@ class Item extends Model implements
         $this->save();
     }
 
-    public function validate()
+    protected function cancelDependencies()
+    {
+        // cancela os sub itens
+        $itens = $this->itens;
+        foreach ($itens as $item) {
+            $item->update(['cancelado' => true]);
+        }
+    }
+
+    public function validate($old)
     {
         $errors = [];
         if (is_null($this->produto_id) && is_null($this->servico_id) && $this->preco >= 0) {
@@ -295,32 +311,64 @@ class Item extends Model implements
         }
         if ($this->quantidade <= 0) {
             $errors['quantidade'] = __('messages.item_invalid_quantity');
-        }
-        if (($this->quantidade > 100 && is_null($this->prestador_id)) || $this->quantidade > 1000) {
+        } elseif (($this->quantidade > 100 && is_null($this->prestador_id)) || $this->quantidade > 1000) {
             $errors['quantidade'] = __('messages.item_elevated_quantity');
-        }
-        if ($this->pedido->finished()) {
-            $errors['quantidade'] = __('messages.item_order_finished');
         }
         return $errors;
     }
 
-    public function onUpdate()
+    public function onInsert()
     {
-        $errors = [];
-        $old = $this->fresh();
-        if ($old->produto_id != $this->produto_id) {
-            $errors['produto_id'] = __('messages.item_cannot_change_type');
+        if ($this->pedido->finished()) {
+            // adicionando item em pedido concluído ou cancelado
+            return ['quantidade' => __('messages.item_order_finished')];
         }
-        if ($old->servico_id != $this->servico_id) {
-            $errors['servico_id'] = __('messages.item_cannot_change_type');
+    }
+
+    public function onUpdate($old)
+    {
+        $pedido = $this->pedido;
+        $old_pedido = $old->pedido;
+        if ($old->cancelado) {
+            return ['quantidade' => __('messages.item_already_cancelled')];
+        } elseif ($this->cancelado && !is_null($this->item_id) && !$this->item->cancelado) {
+            return ['quantidade' => __('messages.parent_item_no_cancelled')];
+        } elseif ($old->produto_id != $this->produto_id) {
+            return ['produto_id' => __('messages.item_cannot_change_type')];
+        } elseif ($old->servico_id != $this->servico_id) {
+            return ['servico_id' => __('messages.item_cannot_change_type')];
+        } elseif (!is_null($this->produto_id) && $old->quantidade != $this->quantidade) {
+            return ['quantidade' => __('messages.item_cannot_change_quantity')];
+        } elseif (
+            (
+                $pedido->estado == Pedido::ESTADO_CANCELADO ||
+                $old_pedido->estado == Pedido::ESTADO_CANCELADO
+            ) &&
+            !$this->cancelado
+        ) {
+            // alterando um item de ou para pedido cancelado (não está cancelando o item)
+            return ['quantidade' => __('messages.item_move_finished')];
+        } elseif (
+            $pedido->estado == Pedido::ESTADO_CONCLUIDO &&
+            (
+                $pedido->tipo != Pedido::TIPO_BALCAO ||
+                !$this->isChangeAllowed(['estado', 'data_processamento', 'data_atualizacao'])
+            )
+        ) {
+            // alterando outro campo do item sem ser o estado quando o pedido está concluído
+            return ['pedido_id' => __('messages.item_order_finished')];
         }
-        if (!is_null($this->produto_id) && $old->quantidade != $this->quantidade) {
-            $errors['quantidade'] = __('messages.item_cannot_change_quantity');
+    }
+
+    public function beforeSave($old)
+    {
+        $this->calculate();
+    }
+
+    public function afterSave($old)
+    {
+        if ($this->cancelado) {
+            $this->cancelDependencies();
         }
-        if ($this->pedido_id != $old->pedido_id && $old->pedido->finished()) {
-            $errors['quantidade'] = __('messages.item_move_finished');
-        }
-        return $errors;
     }
 }

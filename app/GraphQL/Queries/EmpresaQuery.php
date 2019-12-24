@@ -64,13 +64,9 @@ class EmpresaQuery extends Query
 
     public function resolve($root, $args)
     {
+        app('settings')->includeDefaults = $args['all'] ?? false;
         /** @var Empresa $empresa */
         $empresa = app('business');
-        $empresa->loadOptions();
-        $empresa_data = $empresa->toArray();
-        $empresa_data['opcoes'] = json_encode(Filter::emptyObject(
-            $empresa->options->getValues($args['all'] ?? false)
-        ));
-        return $empresa_data;
+        return $empresa;
     }
 }

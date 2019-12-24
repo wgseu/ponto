@@ -92,7 +92,7 @@ class Sessao extends Model implements ValidateInterface
         $this->save();
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $movimentacao_aberta = Movimentacao::where('sessao_id', $this->id)

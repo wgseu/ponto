@@ -73,7 +73,7 @@ class RefreshTokenMutation extends Mutation
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth()->factory()->getTTL() * 60,
-            'user'         => UsuarioQuery::process($cliente),
+            'user'         => $cliente,
         ];
     }
 }

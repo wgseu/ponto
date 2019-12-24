@@ -89,7 +89,7 @@ class Compra extends Model implements ValidateInterface
         return $this->belongsTo(Conta::class, 'conta_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

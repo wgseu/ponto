@@ -94,7 +94,7 @@ class Juncao extends Model implements
         return $this->belongsTo(Pedido::class, 'pedido_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $pedido = $this->pedido;

@@ -93,7 +93,7 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
         return $this->belongsTo(Pais::class, 'pais_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $query = self::where('cliente_id', $this->cliente_id)->where(function ($query) {
@@ -116,10 +116,9 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
-        $old = $this->fresh();
         if (
             !is_null($this->data_validacao) &&
             (

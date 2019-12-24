@@ -28,13 +28,13 @@ namespace App\Models;
 
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
+use App\Util\Filter;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Informações da empresa
  */
-class Empresa extends Model implements ValidateInterface
+class Empresa extends Model
 {
     use ModelEvents;
 
@@ -76,8 +76,8 @@ class Empresa extends Model implements ValidateInterface
      */
     public function __construct(array $attributes = [])
     {
+        $this->options = new Settings();
         parent::__construct($attributes);
-        $this->options = new Settings([]);
     }
 
     /**
@@ -107,26 +107,32 @@ class Empresa extends Model implements ValidateInterface
     }
 
     /**
-     * Carrega as opções do sistema
+     * Retorna as opções da empresa como string json
+     *
+     * @return string
+     */
+    public function getOpcoesAttribute()
+    {
+        $this->options->includeDefaults = app('settings')->includeDefaults;
+        $this->loadOptions();
+        return json_encode(Filter::emptyObject($this->options->getValues()));
+    }
+
+    public function setOpcoesAttribute($value)
+    {
+        $this->options->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['opcoes'] = base64_encode(json_encode($this->options->getValues(false)));
+    }
+
+    /**
+     * Carrega as opções da empresa
      *
      * @return void
      */
     public function loadOptions()
     {
-        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
-    }
-
-    /**
-     * Aplica as opções do sistema para salvar no banco
-     *
-     * @return void
-     */
-    public function applyOptions()
-    {
-        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
-    }
-
-    public function validate()
-    {
+        $this->options->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('opcoes')), true)
+        );
     }
 }

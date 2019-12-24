@@ -34,7 +34,7 @@ class PagamentoTest extends TestCase
     public function testUpdatePagamento()
     {
         $headers = PrestadorTest::authOwner();
-        $pagamento = factory(Pagamento::class)->make()->calculate();
+        $pagamento = factory(Pagamento::class)->make();
         $pagamento->save();
         $this->graphfl('update_pagamento', [
             'id' => $pagamento->id,
@@ -49,7 +49,7 @@ class PagamentoTest extends TestCase
     public function testFindPagamento()
     {
         $headers = PrestadorTest::authOwner();
-        $pagamento = factory(Pagamento::class)->make()->calculate();
+        $pagamento = factory(Pagamento::class)->make();
         $pagamento->save();
         $response = $this->graphfl('query_pagamento', [ 'id' => $pagamento->id ], $headers);
         $this->assertEquals($pagamento->id, $response->json('data.pagamentos.data.0.id'));

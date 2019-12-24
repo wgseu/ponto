@@ -64,7 +64,7 @@ class Banco extends Model implements ValidateInterface
         'conta_mascara',
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

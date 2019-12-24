@@ -43,7 +43,14 @@ class UpdateDispositivoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('dispositivo:update');
+        $dispositivo = Dispositivo::findOrFail($args['id']);
+        $old = $dispositivo->replicate();
+        $dispositivo->fill($args['input']);
+        return Auth::check() && Auth::user()->can('dispositivo:update') && (
+            $old->serial == $old->validacao ||
+            $dispositivo->serial != $dispositivo->validacao ||
+            Auth::user()->can('dispositivo:validate')
+        );
     }
 
     public function type(): Type
@@ -65,19 +72,7 @@ class UpdateDispositivoMutation extends Mutation
     public function resolve($root, $args)
     {
         $dispositivo = Dispositivo::findOrFail($args['id']);
-        $old = $dispositivo->replicate();
-        $dispositivo->loadOptions();
-        $dispositivo->opcoes = null;
         $dispositivo->fill($args['input']);
-        $dispositivo->options->addValues(json_decode($dispositivo->opcoes ?? '{}', true));
-        $dispositivo->applyOptions();
-        if (
-            $old->serial != $old->validacao &&
-            $dispositivo->serial == $dispositivo->validacao &&
-            !Auth::user()->can('dispositivo:validate')
-        ) {
-            throw new ValidationException(['validacao' => __('messages.no_permission_to_validate')]);
-        }
         $dispositivo->save();
         return $dispositivo;
     }

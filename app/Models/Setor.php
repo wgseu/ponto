@@ -75,22 +75,22 @@ class Setor extends Model implements ValidateInterface
      * Subsetor não pode ser referência para uma uma nova subsetor.
      * Depois de ser usuado como referência um setor não pode alterar o setor_id para uma subsetor.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->setor_id)) {
             $setorpai = $this->setor;
             if (!is_null($setorpai) && !is_null($setorpai->setor_id)) {
-                $errors['setor_id'] = __('messagens.setorpai_already');
+                $errors['setor_id'] = __('messages.setorpai_already');
             } elseif ($this->id == $this->setor_id) {
-                $errors['setor_id'] = __('messagens.setorpai_some');
+                $errors['setor_id'] = __('messages.setorpai_some');
             }
         }
         if ($this->exists) {
             $setor = self::where('setor_id', $this->id);
             $oldSetor = $this->fresh();
             if ($setor->exists() && $oldSetor->setor_id != $this->setor_id) {
-                $errors['setor_id'] = __('messagens.setorpai_invalid_update');
+                $errors['setor_id'] = __('messages.setorpai_invalid_update');
             }
         }
         return $errors;

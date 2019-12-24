@@ -102,7 +102,7 @@ class UpdateClienteMutation extends Mutation
                     ) {
                         // invalida a validação
                         $telefone->data_validacao = null;
-                        // TODO: enviar o SMS
+                        // TODO: enviar SMS
                     }
                     $telefone->save();
                 }

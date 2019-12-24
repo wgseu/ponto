@@ -72,7 +72,7 @@ class Modulo extends Model implements ValidateInterface
         'habilitado' => true,
     ];
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

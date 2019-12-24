@@ -27,6 +27,8 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\AfterSaveInterface;
+use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
@@ -39,7 +41,9 @@ use Illuminate\Support\Carbon;
 class Pagamento extends Model implements
     ValidateInterface,
     ValidateInsertInterface,
-    ValidateUpdateInterface
+    ValidateUpdateInterface,
+    AfterSaveInterface,
+    BeforeSaveInterface
 {
     use ModelEvents;
 
@@ -213,11 +217,28 @@ class Pagamento extends Model implements
     }
 
     /**
+     * Devolve a lista de todos os subpagamentos não cancelados
+     */
+    public function pagamentos()
+    {
+        return $this->hasMany(self::class, 'pagamento_id')
+            ->where('estado', '<>', self::ESTADO_CANCELADO);
+    }
+
+    /**
+     * Devolve a lista com os pagamentos agrupamentos em primeiro nível desse pagamento
+     */
+    public function agrupamentos()
+    {
+        return $this->hasMany(self::class, 'agrupamento_id');
+    }
+
+    /**
      * Calcula o valor na moeda escolhida e preenche outras informações
      *
      * @return self
      */
-    public function calculate()
+    protected function calculate()
     {
         $cartao = $this->cartao;
         $this->carteira_id = null;
@@ -245,51 +266,7 @@ class Pagamento extends Model implements
         return $this;
     }
 
-    /**
-     * Atualiza a contagem do produto
-     *
-     * @return void
-     */
-    protected function updateWallet()
-    {
-        $old_valor = 0;
-        if ($this->exists) {
-            $old = $this->fresh();
-            if (
-                $old->pago() == $this->pago() &&
-                ($old->valor == $this->valor || !$this->pago())
-            ) {
-                return;
-            }
-            if ($old->pago()) {
-                $old_valor = $old->valor;
-            }
-        } elseif (!$this->pago()) {
-            return;
-        }
-        if (!$this->pago()) {
-            $valor = -$old_valor;
-        } else {
-            $valor = $this->valor - $old_valor;
-        }
-        $saldo = Saldo::firstOrCreate(
-            [
-                'moeda_id' => $this->moeda_id,
-                'carteira_id' => $this->carteira_id,
-            ],
-            [ 'valor' => 0 ]
-        );
-        $saldo->increment('valor', $valor);
-    }
-
-    protected function cancel()
-    {
-        // TODO: cancelar crediário
-        // TODO: cancelar uso de crédito
-        // TODO: cancelar emissão de cheque
-    }
-
-    public function validate()
+    public function validate($old)
     {
         if (is_null($this->data_pagamento) && $this->pago()) {
             return ['data_pagamento' => __('messages.no_payment_date')];
@@ -301,17 +278,96 @@ class Pagamento extends Model implements
         if ($this->estado == self::ESTADO_CANCELADO) {
             return ['estado' => __('messages.payment_inserting_cancelled')];
         }
-        $this->updateWallet();
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
-        $old = $this->fresh();
         if ($old->estado == self::ESTADO_CANCELADO) {
             return ['estado' => __('messages.payment_already_cancelled')];
-        } elseif ($this->estado == self::ESTADO_CANCELADO) {
-            $this->cancel();
         }
-        $this->updateWallet();
+        if (
+            $this->estado == self::ESTADO_CANCELADO &&
+            !is_null($this->pedido_id) &&
+            $this->pedido->estado == Pedido::ESTADO_CONCLUIDO
+        ) {
+            return ['estado' => __('messages.payment_order_finished')];
+        }
+        if (
+            $this->estado == self::ESTADO_CANCELADO &&
+            !is_null($this->conta_id) &&
+            (
+                $this->conta->estado == Conta::ESTADO_PAGA ||
+                !is_null($this->conta->agrupamento_id)
+            )
+        ) {
+            return ['estado' => __('messages.payment_bill_paid_grouped')];
+        }
+    }
+
+    public function beforeSave($old)
+    {
+        $this->calculate();
+    }
+
+    public function afterSave($old)
+    {
+        $this->updateWallet($old);
+        if ($this->estado == self::ESTADO_CANCELADO) {
+            $this->cancelDependencies();
+        }
+    }
+
+    /**
+     * Atualiza o saldo da carteira na moeda desse pagamento
+     *
+     * @param self $old conta antes de ser alterada
+     * @return void
+     */
+    protected function updateWallet($old)
+    {
+        if (
+            // não mudou o status na atualização
+            ($old && $old->pago() == $this->pago()) ||
+            // está criando um lançamento sem estar pago ainda
+            (!$old && !$this->pago())
+        ) {
+            return;
+        }
+        if ($this->pago()) {
+            $valor = $this->valor;
+        } else {
+            $valor = -$this->valor;
+        }
+        $saldo = Saldo::firstOrCreate(
+            [
+                'moeda_id' => $this->moeda_id,
+                'carteira_id' => $this->carteira_id,
+            ],
+            [ 'valor' => 0 ]
+        );
+        $saldo->increment('valor', $valor);
+    }
+
+    protected function cancelDependencies()
+    {
+        if (!is_null($this->crediario_id)) {
+            $this->crediario->update(['estado' => Conta::ESTADO_CANCELADA]);
+        }
+        if (!is_null($this->credito_id)) {
+            $this->credito->update(['cancelado' => true]);
+        }
+        if (!is_null($this->cheque_id)) {
+            $this->cheque->update(['cancelado' => true]);
+        }
+        // desagrupa os pagamentos dependentes
+        $agrupamentos = $this->agrupamentos;
+        foreach ($agrupamentos as $pagamento) {
+            $pagamento->update(['agrupamento_id' => null]);
+        }
+        // cancela os trocos, parcelas e taxas
+        $pagamentos = $this->pagamentos;
+        foreach ($pagamentos as $pagamento) {
+            $pagamento->update(['estado' => self::ESTADO_CANCELADO]);
+        }
     }
 }

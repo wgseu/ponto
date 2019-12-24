@@ -63,11 +63,11 @@ class EstoqueTest extends TestCase
         $this->graphfl('update_estoque', [
             'id' => $estoque->id,
             'input' => [
-                'quantidade' => 5,
+                'lote' => 'ACB123',
             ]
         ], $headers);
         $estoque->refresh();
-        $this->assertEquals(5, $estoque->quantidade);
+        $this->assertEquals('ACB123', $estoque->lote);
     }
 
     public function testFindEstoque()
@@ -80,7 +80,7 @@ class EstoqueTest extends TestCase
 
     public function testValidateDoisAtributosEstoque()
     {
-        $transacao = factory(Item::class)->make()->calculate();
+        $transacao = factory(Item::class)->make();
         $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['transacao_id' => $transacao->id]);
@@ -107,7 +107,7 @@ class EstoqueTest extends TestCase
 
     public function testValidateSaidaProdutoPositiva()
     {
-        $transacao = factory(Item::class)->make()->calculate();
+        $transacao = factory(Item::class)->make();
         $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create([
@@ -147,7 +147,7 @@ class EstoqueTest extends TestCase
 
     public function testBelongToTransacao()
     {
-        $transacao = factory(Item::class)->make()->calculate();
+        $transacao = factory(Item::class)->make();
         $transacao->save();
         $estoque = factory(Estoque::class)->make([
             'compra_id' => null,

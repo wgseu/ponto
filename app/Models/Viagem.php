@@ -73,7 +73,7 @@ class Viagem extends Model implements ValidateInterface
      * Regras:
      * A data de chegada é anterior a de saída;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (

@@ -106,7 +106,7 @@ class Patrimonio extends Model implements ValidateInterface
         return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->quantidade < 0) {

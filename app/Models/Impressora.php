@@ -28,13 +28,13 @@ namespace App\Models;
 
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
+use App\Util\Filter;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Impressora para impressão de serviços e contas
  */
-class Impressora extends Model implements ValidateInterface
+class Impressora extends Model
 {
     use ModelEvents;
 
@@ -96,18 +96,38 @@ class Impressora extends Model implements ValidateInterface
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->options = new Settings();
+        parent::__construct($attributes);
     }
 
+    /**
+     * Retorna as opções da impressora como string json
+     *
+     * @return string
+     */
+    public function getOpcoesAttribute()
+    {
+        $this->options->includeDefaults = app('settings')->includeDefaults;
+        $this->loadOptions();
+        return json_encode(Filter::emptyObject($this->options->getValues()));
+    }
+
+    public function setOpcoesAttribute($value)
+    {
+        $this->options->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['opcoes'] = base64_encode(json_encode($this->options->getValues(false)));
+    }
+
+    /**
+     * Carrega as opções da impressora
+     *
+     * @return void
+     */
     public function loadOptions()
     {
-        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
-    }
-
-    public function applyOptions()
-    {
-        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+        $this->options->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('opcoes')), true)
+        );
     }
 
     /**
@@ -124,9 +144,5 @@ class Impressora extends Model implements ValidateInterface
     public function setor()
     {
         return $this->belongsTo(Setor::class, 'setor_id');
-    }
-
-    public function validate()
-    {
     }
 }

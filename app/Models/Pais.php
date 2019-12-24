@@ -28,15 +28,14 @@ namespace App\Models;
 
 use App\Core\Settings;
 use App\Concerns\ModelEvents;
-use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
 use App\Interfaces\ValidateUpdateInterface;
+use App\Util\Filter;
 
 /**
  * Informações de um páis com sua moeda e língua nativa
  */
-class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
+class Pais extends Model implements ValidateUpdateInterface
 {
     use ModelEvents;
 
@@ -88,18 +87,33 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->entries = new Settings();
+        parent::__construct($attributes);
+    }
+
+    /**
+     * Retorna as opções da empresa como string json
+     *
+     * @return string
+     */
+    public function getEntradasAttribute()
+    {
+        $this->entries->includeDefaults = app('settings')->includeDefaults;
+        $this->loadEntries();
+        return json_encode(Filter::emptyObject($this->entries->getValues()));
+    }
+
+    public function setEntradasAttribute($value)
+    {
+        $this->entries->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['entradas'] = base64_encode(json_encode($this->entries->getValues(false)));
     }
 
     public function loadEntries()
     {
-        $this->entries->addValues(json_decode(base64_decode($this->entradas), true));
-    }
-
-    public function applyEntries()
-    {
-        $this->entradas = base64_encode(json_encode($this->entries->getValues()));
+        $this->entries->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('entradas')), true)
+        );
     }
 
     /**
@@ -110,11 +124,7 @@ class Pais extends Model implements ValidateInterface, ValidateUpdateInterface
         return $this->belongsTo(Moeda::class, 'moeda_id');
     }
 
-    public function validate()
-    {
-    }
-
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
         $empresa = Empresa::find(1);

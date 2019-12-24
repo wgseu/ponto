@@ -85,7 +85,7 @@ class Credito extends Model implements ValidateInterface
      * Uma transferencia de credito não pode deixar saldo negativo.
      * Impossível criar um credito já cancelando;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $saldo = self::where('cliente_id', $this->cliente_id)

@@ -148,7 +148,7 @@ $[field.end]
     }
 $[field.end]
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

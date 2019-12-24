@@ -30,7 +30,11 @@ use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Builder;
 use App\Exceptions\ValidationException;
 use App\Interfaces\AfterInsertInterface;
+use App\Interfaces\AfterSaveInterface;
 use App\Interfaces\AfterUpdateInterface;
+use App\Interfaces\BeforeInsertInterface;
+use App\Interfaces\BeforeSaveInterface;
+use App\Interfaces\BeforeUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
 
@@ -48,17 +52,59 @@ trait ModelEvents
     protected function performInsert(Builder $query)
     {
         if ($this instanceof ValidateInterface) {
-            $errors = $this->validate();
+            $errors = $this->validate(null);
             $this->checkErrors($errors);
         }
         if ($this instanceof ValidateInsertInterface) {
             $errors = $this->onInsert();
             $this->checkErrors($errors);
         }
+        if ($this instanceof BeforeSaveInterface) {
+            $this->beforeSave(null);
+        }
+        if ($this instanceof BeforeInsertInterface) {
+            $this->beforeInsert();
+        }
         $result = parent::performInsert($query);
         if ($this instanceof AfterInsertInterface) {
-            $errors = $this->afterInsert();
+            $this->afterInsert();
+        }
+        if ($this instanceof AfterSaveInterface) {
+            $this->afterSave(null);
+        }
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     *
+     * @param Builder  $query
+     * @return bool
+     */
+    protected function performUpdate(Builder $query)
+    {
+        $previous = (clone $this)->setRawAttributes($this->getOriginal());
+        $this->syncChanges();
+        if ($this instanceof ValidateInterface) {
+            $errors = $this->validate($previous);
             $this->checkErrors($errors);
+        }
+        if ($this instanceof ValidateUpdateInterface) {
+            $errors = $this->onUpdate($previous);
+            $this->checkErrors($errors);
+        }
+        if ($this instanceof BeforeSaveInterface) {
+            $this->beforeSave($previous);
+        }
+        if ($this instanceof BeforeUpdateInterface) {
+            $this->beforeUpdate($previous);
+        }
+        $result = parent::performUpdate($query);
+        if ($this instanceof AfterUpdateInterface) {
+            $this->afterUpdate($previous);
+        }
+        if ($this instanceof AfterSaveInterface) {
+            $this->afterSave($previous);
         }
         return $result;
     }
@@ -77,26 +123,13 @@ trait ModelEvents
     }
 
     /**
-     * @inheritDoc
+     * Check if only allowed fields has changed
      *
-     * @param Builder  $query
-     * @return bool
+     * @param array $fields
+     * @return boolean
      */
-    protected function performUpdate(Builder $query)
+    public function isChangeAllowed($fields)
     {
-        if ($this instanceof ValidateInterface) {
-            $errors = $this->validate();
-            $this->checkErrors($errors);
-        }
-        if ($this instanceof ValidateUpdateInterface) {
-            $errors = $this->onUpdate();
-            $this->checkErrors($errors);
-        }
-        $result = parent::performUpdate($query);
-        if ($this instanceof AfterUpdateInterface) {
-            $errors = $this->afterUpdate();
-            $this->checkErrors($errors);
-        }
-        return $result;
+        return empty(array_diff_key($this->getChanges(), array_flip($fields)));
     }
 }

@@ -118,7 +118,7 @@ class Carteira extends Model implements ValidateInterface
         return $this->belongsTo(Banco::class, 'banco_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->carteira_id)) {

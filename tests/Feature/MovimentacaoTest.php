@@ -161,7 +161,7 @@ class MovimentacaoTest extends TestCase
     public function testPagamentoAberto()
     {
         $movimentacao = factory(Movimentacao::class)->create();
-        $pagamento = factory(Pagamento::class)->make()->calculate();
+        $pagamento = factory(Pagamento::class)->make();
         $pagamento->movimentacao_id = $movimentacao->id;
         $pagamento->save();
         $prestador = factory(Prestador::class)->create();

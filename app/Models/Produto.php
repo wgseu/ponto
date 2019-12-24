@@ -293,10 +293,9 @@ class Produto extends Model implements ValidateInterface
         return $estoque;
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
-        $old = $this->fresh();
         $item = Item::where('produto_id', $this->id);
         if (
             !is_null($old)

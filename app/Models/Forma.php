@@ -101,7 +101,7 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
         return $this->belongsTo(Carteira::class, 'carteira_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (
@@ -109,19 +109,19 @@ class Forma extends Model implements ValidateInterface, ValidateUpdateInterface
             !is_null($this->min_parcelas) &&
             $this->parcelas_sem_juros < $this->min_parcelas
         ) {
-            $errors['parcelas_sem_juros'] = __('minimum_installments_not_allowed');
+            $errors['parcelas_sem_juros'] = __('messages.minimum_installments_not_allowed');
         }
         if (
             !is_null($this->min_parcelas) &&
             !is_null($this->max_parcelas) &&
             $this->min_parcelas > $this->max_parcelas
         ) {
-            $errors['max_parcelas'] = __('maximum_portion_allows');
+            $errors['max_parcelas'] = __('messages.maximum_portion_allows');
         }
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
         $old_forma = self::find($this->id);

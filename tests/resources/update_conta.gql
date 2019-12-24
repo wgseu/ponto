@@ -1,9 +1,8 @@
 mutation updateConta(
   $id: ID!
   $input: ContaUpdateInput!
-  $desagrupar: Boolean
 ) {
-  UpdateConta(id: $id, input: $input, desagrupar: $desagrupar) {
+  UpdateConta(id: $id, input: $input) {
     id
     descricao
     valor

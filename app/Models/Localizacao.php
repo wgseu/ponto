@@ -124,7 +124,7 @@ class Localizacao extends Model implements ValidateInterface
      * Se o tipo de Localização for apartamento o atributo apartamento é obrigatório;
      * Se o tipo de Localização for condominio o atributo condominio é obrigatório;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!Validator::checkCEP($this->cep, true)) {

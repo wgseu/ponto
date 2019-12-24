@@ -31,5 +31,11 @@ namespace App\Interfaces;
  */
 interface ValidateUpdateInterface
 {
-    public function onUpdate();
+    /**
+     * Chamado quando ouver alterações
+     *
+     * @param self $previous
+     * @return array list of errors
+     */
+    public function onUpdate($previous);
 }

@@ -70,7 +70,7 @@ class Estado extends Model implements ValidateInterface
         return $this->belongsTo(Pais::class, 'pais_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

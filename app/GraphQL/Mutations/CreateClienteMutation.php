@@ -61,14 +61,11 @@ class CreateClienteMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $cliente_data = [];
         $cliente = new Cliente();
         try {
-            DB::transaction(function () use ($cliente, $args, &$cliente_data) {
+            DB::transaction(function () use ($cliente, $args) {
                 $cliente->fill($args['input']);
-                if (!Auth::check() || !Auth::user()->can('cliente:create')) {
-                    $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
-                }
+                $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
                 $cliente->save();
                 $telefones = $args['input']['telefones'] ?? [];
                 foreach ($telefones as $fone) {
@@ -85,14 +82,12 @@ class CreateClienteMutation extends Mutation
                     Mail::to($cliente->email)->send(new MailContact($data));
                     $cliente->data_envio = Carbon::now();
                     $cliente->save();
-                    $cliente_data['refresh_token'] = $cliente->createRefreshToken();
                 }
-                $cliente_data = array_merge($cliente->toArray(), $cliente_data);
             });
         } catch (\Throwable $th) {
             $cliente->clean(new Cliente());
             throw $th;
         }
-        return $cliente_data;
+        return $cliente;
     }
 }

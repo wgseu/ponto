@@ -20,6 +20,6 @@ class ServicoSeeder extends Seeder
             'valor' => 1,
             'individual' => false,
             'ativo' => true,
-        ]))->forceFill(['id' => 1])->save();
+        ]))->forceFill(['id' => Servico::ENTREGA_ID])->save();
     }
 }

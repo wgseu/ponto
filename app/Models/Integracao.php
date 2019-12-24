@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Concerns\ModelEvents;
 use App\Core\Settings;
 use App\Interfaces\ValidateInterface;
+use App\Util\Filter;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -99,36 +100,76 @@ class Integracao extends Model implements ValidateInterface
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->options = new Settings();
         $this->associations = new Settings();
+        parent::__construct($attributes);
     }
 
+    /**
+     * Retorna as opções da integração como string json
+     *
+     * @return string
+     */
+    public function getOpcoesAttribute()
+    {
+        $this->options->includeDefaults = app('settings')->includeDefaults;
+        $this->loadOptions();
+        return json_encode(Filter::emptyObject($this->options->getValues()));
+    }
+
+    public function setOpcoesAttribute($value)
+    {
+        $this->options->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['opcoes'] = base64_encode(json_encode($this->options->getValues(false)));
+    }
+
+    /**
+     * Carrega as opções da integração
+     *
+     * @return void
+     */
     public function loadOptions()
     {
-        $this->options->addValues(json_decode(base64_decode($this->opcoes), true));
+        $this->options->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('opcoes')), true)
+        );
     }
 
-    public function applyOptions()
+    /**
+     * Retorna as associações da integração como string json
+     *
+     * @return string
+     */
+    public function getAssociacoesAttribute()
     {
-        $this->opcoes = base64_encode(json_encode($this->options->getValues()));
+        $this->associations->includeDefaults = app('settings')->includeDefaults;
+        $this->loadAssociations();
+        return json_encode(Filter::emptyObject($this->associations->getValues()));
     }
 
+    public function setAssociacoesAttribute($value)
+    {
+        $this->associations->addValues(json_decode($value ?? '{}', true));
+        $this->attributes['associacoes'] = base64_encode(json_encode($this->associations->getValues(false)));
+    }
+
+    /**
+     * Carrega as associações da integração
+     *
+     * @return void
+     */
     public function loadAssociations()
     {
-        $this->associations->addValues(json_decode(base64_decode($this->associacoes), true));
-    }
-
-    public function applyAssociations()
-    {
-        $this->associacoes = base64_encode(json_encode($this->associations->getValues()));
+        $this->associations->addValues(
+            json_decode(base64_decode($this->getAttributeFromArray('associacoes')), true)
+        );
     }
 
     /**
      * Regras:
      * Se a Intregração estiver ativa Login e senha não podem ser nulos
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (
@@ -138,7 +179,7 @@ class Integracao extends Model implements ValidateInterface
                 is_null($this->secret)
             )
         ) {
-            $errors['ativo'] = __('messagens.integration_active_login_cannot_null');
+            $errors['ativo'] = __('messages.integration_active_login_cannot_null');
         }
         return $errors;
     }

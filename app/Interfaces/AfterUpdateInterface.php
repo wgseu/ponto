@@ -27,9 +27,17 @@
 namespace App\Interfaces;
 
 /**
- * Valida regras de negócio após atualizar um model já existente no banco
+ * Evento chamado após atualizar um model no banco de dados
  */
 interface AfterUpdateInterface
 {
-    public function afterUpdate();
+    /**
+     * Chamado após atualizar um model já existente e depois de validar
+     * Não pode validar mais, apenas lançar exceções,
+     * Mas só dentro de transações as alterações serão desfeitas
+     *
+     * @param self $previous
+     * @return void
+     */
+    public function afterUpdate($previous);
 }

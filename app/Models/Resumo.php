@@ -88,7 +88,7 @@ class Resumo extends Model implements ValidateInterface
         return $this->belongsTo(Cartao::class, 'cartao_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

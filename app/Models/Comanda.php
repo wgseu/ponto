@@ -76,7 +76,7 @@ class Comanda extends Model implements ValidateInterface
      * Uma comanda não pode ser desativada se houver pedidos relacionado a elas que não estejam concluidos ou cancelados
      * Uma comanda não pode ser criada ja desativada.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $old_comanda = $this->fresh();

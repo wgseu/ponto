@@ -38,111 +38,111 @@ class EstoqueSeeder extends Seeder
             'setor_id' =>  $setor->id,
             'quantidade' => 24,
             'preco_compra' => 2,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $alface->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 4,
             'preco_compra' => 2,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $tomate->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 30,
             'preco_compra' => 0.5,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $catupity->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 3,
             'preco_compra' => 50,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $cheddar->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 3,
             'preco_compra' => 56,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $pao->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 40,
             'preco_compra' => 0.3,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $ovo->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 30,
             'preco_compra' => 0.33,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $cebola->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 30,
             'preco_compra' => 0.3,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $bacon->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 4,
             'preco_compra' => 30,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $morango->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 1.5,
             'preco_compra' => 40,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $chocolate->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 2,
             'preco_compra' => 20,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $leite_condensado->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 1.05,
             'preco_compra' => 11.43,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $acai->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 3,
             'preco_compra' => 12,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $oleo->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 4.5,
             'preco_compra' => 4.22,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $oregano->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 0.6,
             'preco_compra' => 20,
-        ]))->calculate()->save();
+        ]))->save();
 
         (new Estoque([
             'produto_id' => $farinha->id,
             'setor_id' =>  $setor->id,
             'quantidade' => 15,
             'preco_compra' => 6,
-        ]))->calculate()->save();
+        ]))->save();
     }
 }

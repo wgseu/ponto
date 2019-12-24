@@ -142,7 +142,7 @@ class Cardapio extends Model implements ValidateInterface
      * O Deconto não pode ser superior ao preço de venda do produto,
      * Cliente e integração não podem ser selecinados juntos, escolha opcional.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $produto = $this->produto;

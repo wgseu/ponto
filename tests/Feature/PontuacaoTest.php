@@ -61,7 +61,7 @@ class PontuacaoTest extends TestCase
 
     public function testPontuacaoItemPedidoNull()
     {
-        $item = factory(Item::class)->make()->calculate();
+        $item = factory(Item::class)->make();
         $item->save();
         $this->expectException(ValidationException::class);
         factory(Pontuacao::class)->create([

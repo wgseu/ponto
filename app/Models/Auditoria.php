@@ -106,7 +106,7 @@ class Auditoria extends Model implements ValidateInterface
         return $this->belongsTo(Prestador::class, 'autorizador_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

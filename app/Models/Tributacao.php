@@ -89,7 +89,7 @@ class Tributacao extends Model implements ValidateInterface
         return $this->belongsTo(Imposto::class, 'imposto_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!Validator::checkNCM($this->ncm)) {

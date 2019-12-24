@@ -68,7 +68,7 @@ $[field.else.if(float)]
 $[field.else.if(datetime)]
 $[field.match(.*cadastro|.*criacao|.*moviment.*|.*lancamento|.*envio|.*atualizacao|.*arquiva.*|.*desativa.*)]
 $[field.else]
-                '$[field]' => '2016-12-28 12:30:00',
+                '$[field]' => '2016-12-28T12:30:00Z',
 $[field.end]
 $[field.else.if(time)]
                 '$[field]' => '12:30:00',

@@ -99,7 +99,7 @@ class Lista extends Model implements ValidateInterface
      * Depois de comprada a lista não pode ser alterada;
      * A data da viagem não pode ser anterior a data de cadastro.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $oldLista = $this->fresh();

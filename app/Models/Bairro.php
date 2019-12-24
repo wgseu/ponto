@@ -89,16 +89,16 @@ class Bairro extends Model implements ValidateInterface
      * Se não nulas o prazo de  entrega minima não pode ser superior ao prazo de entrega maximo;
      * O valor da entrega não pode ser negativo.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->entrega_minima) && !is_null($this->entrega_maxima)) {
             if ($this->entrega_minima > $this->entrega_maxima) {
-                $errors['entrega_minima'] = __('messagens.error_time_delivery');
+                $errors['entrega_minima'] = __('messages.error_time_delivery');
             }
         }
         if ($this->valor_entrega < 0) {
-            $errors['valor_entrega'] = __('messagens.error_time_delivery');
+            $errors['valor_entrega'] = __('messages.error_time_delivery');
         }
         return $errors;
     }

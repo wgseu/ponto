@@ -77,7 +77,7 @@ class Acesso extends Model implements ValidateInterface
         return $this->belongsTo(Permissao::class, 'permissao_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

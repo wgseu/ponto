@@ -77,7 +77,7 @@ class Notificacao extends Model implements ValidateInterface
         return $this->belongsTo(Cliente::class, 'remetente_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

@@ -2195,6 +2195,7 @@ class CreateInitialTables extends Migration
             (new ModuloSeeder())->run();
             (new FuncionalidadeSeeder())->run();
             (new PermissaoSeeder())->run();
+            (new ServicoSeeder())->run();
         } elseif (env('APP_ENV') != 'testing') {
             (new DatabaseSeeder())->run();
         }

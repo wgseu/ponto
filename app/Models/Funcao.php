@@ -69,6 +69,16 @@ class Funcao extends Model implements ValidateInterface
     }
 
     /**
+     * Retorna a lista de nome das permissões da função
+     *
+     * @return string[]
+     */
+    public function getPermissoesAttribute()
+    {
+        return $this->permissoes()->pluck('nome');
+    }
+
+    /**
      * Lista de permissões dessa função
      *
      * @return Builder
@@ -95,7 +105,7 @@ class Funcao extends Model implements ValidateInterface
      * Regras:
      * A remuração não pode ser negativa;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->remuneracao < 0) {

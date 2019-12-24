@@ -74,7 +74,7 @@ class Fornecedor extends Model implements ValidateInterface
         return $this->belongsTo(Cliente::class, 'empresa_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if ($this->prazo_pagamento < 0) {

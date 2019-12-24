@@ -80,7 +80,7 @@ class Propriedade extends Model implements ValidateInterface
         return $this->belongsTo(Grupo::class, 'grupo_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

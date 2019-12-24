@@ -87,22 +87,22 @@ class Categoria extends Model implements ValidateInterface
      * Subcategoria não pode ser referencia para uma uma nova subcategoria.
      * Depois de usada com referência uma categoria não pode alterar a subcategoria.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->categoria_id)) {
             $categoriapai = $this->categoria;
             if (!is_null($categoriapai) && !is_null($categoriapai->categoria_id)) {
-                $errors['categoria_id'] = __('messagens.categoriapai_already');
+                $errors['categoria_id'] = __('messages.categoriapai_already');
             } elseif ($this->id == $this->categoria_id) {
-                $errors['categoria_id'] = __('messagens.categoriapai_some');
+                $errors['categoria_id'] = __('messages.categoriapai_some');
             }
         }
         if ($this->exists) {
             $categoria = self::where('categoria_id', $this->id);
             $oldCategoria = $this->fresh();
             if ($categoria->exists() && $oldCategoria->categoria_id != $this->categoria_id) {
-                $errors['categoria_id'] = __('messagens.categoriapai_invalid_update');
+                $errors['categoria_id'] = __('messages.categoriapai_invalid_update');
             }
         }
         return $errors;

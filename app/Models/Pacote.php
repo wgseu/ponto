@@ -145,7 +145,7 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
      * Não é permitido associar um pacote com ele mesmo,
      * Não é permitido associar uma associação com outra associação.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $pacote = $this->pacote;
@@ -196,13 +196,13 @@ class Pacote extends Model implements ValidateInterface, ValidateUpdateInterface
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
         $oldPacote = $this->fresh();
         if (!is_null($this->associacao_id)) {
             if ($this->id == $this->associacao_id) {
-                $errors['associacao_id'] = __('messagens.associacao_some');
+                $errors['associacao_id'] = __('messages.associacao_some');
             }
         }
         if ($this->pacote_id != $oldPacote->pacote_id) {

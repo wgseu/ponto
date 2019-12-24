@@ -27,12 +27,15 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\AfterUpdateInterface;
+use App\Interfaces\BeforeUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
 use App\Util\Number;
 use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Informações do pedido de venda
@@ -40,7 +43,9 @@ use Illuminate\Database\Eloquent\Model;
 class Pedido extends Model implements
     ValidateInterface,
     ValidateInsertInterface,
-    ValidateUpdateInterface
+    ValidateUpdateInterface,
+    AfterUpdateInterface,
+    BeforeUpdateInterface
 {
     use ModelEvents;
 
@@ -208,7 +213,11 @@ class Pedido extends Model implements
      */
     public function itens()
     {
-        return $this->hasMany(Item::class, 'pedido_id')->where('cancelado', false);
+        $relation = $this->hasMany(Item::class, 'pedido_id');
+        if ($this->estado != self::ESTADO_CANCELADO) {
+            $relation->where('cancelado', false);
+        }
+        return $relation;
     }
 
     /**
@@ -216,8 +225,11 @@ class Pedido extends Model implements
      */
     public function pagamentos()
     {
-        return $this->hasMany(Pagamento::class, 'pedido_id')
-            ->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
+        $relation = $this->hasMany(Pagamento::class, 'pedido_id');
+        if ($this->estado != self::ESTADO_CANCELADO) {
+            $relation->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
+        }
+        return $relation;
     }
 
     /**
@@ -277,7 +289,7 @@ class Pedido extends Model implements
         }
     }
 
-    public function payChanges()
+    protected function payChanges()
     {
         $trocos = $this->trocos()
             ->where('estado', '<>', Pagamento::ESTADO_PAGO)->get();
@@ -307,13 +319,41 @@ class Pedido extends Model implements
      */
     protected function cancel()
     {
-        $pagamentos = $this->pagamentos;
+        $pagamentos = $this->pagamentos()->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
         }
-        $itens = $this->itens;
+        // só cancela os itens do nível zero, pois os subitens são cancelados automaticamente
+        $itens = $this->itens()->where('cancelado', false)->whereNull('item_id')->get();
         foreach ($itens as $item) {
             $item->update(['cancelado' => true]);
+        }
+    }
+
+    /**
+     * Marca os itens do pedido como entregue
+     *
+     * @return void
+     */
+    protected function markProduced()
+    {
+        $itens = $this->itens()->where('estado', '<>', Item::ESTADO_ENTREGUE)->get();
+        foreach ($itens as $item) {
+            $item->update(['estado' => Item::ESTADO_ENTREGUE]);
+        }
+    }
+
+    protected function checkDone()
+    {
+        $waiting = $this->itens()->whereIn('estado', [
+            Item::ESTADO_ADICIONADO,
+            Item::ESTADO_ENVIADO,
+            Item::ESTADO_PROCESSADO,
+        ])->count() > 0;
+        if ($waiting && !is_null($this->data_pronto)) {
+            $this->data_pronto = null;
+        } elseif (!$waiting && is_null($this->data_pronto)) {
+            $this->data_pronto = Carbon::now();
         }
     }
 
@@ -334,7 +374,7 @@ class Pedido extends Model implements
         }
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (
@@ -363,7 +403,7 @@ class Pedido extends Model implements
         if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->entrega_id)) {
             $errors['entrega_id'] = __('messages.non_delivery_delivering');
         }
-        // nãp pode sair para entrega sem o entregador
+        // não pode sair para entrega sem o entregador
         if (
             in_array($this->estado, [self::ESTADO_ENTREGA, self::ESTADO_CONCLUIDO]) &&
             !is_null($this->localizacao_id) &&
@@ -373,7 +413,7 @@ class Pedido extends Model implements
         }
         // só entrega se tiver endereço
         if (is_null($this->localizacao_id) && !is_null($this->entrega_id)) {
-            $errors['entrega_id'] = __('messages.delivering_without_address');
+            $errors['entrega_id'] = __('messages.cannot_delivery_togo');
         }
         if ($this->tipo == self::TIPO_MESA && is_null($this->mesa_id)) {
             $errors['mesa_id'] = __('messages.table_without_local');
@@ -428,17 +468,12 @@ class Pedido extends Model implements
         return $errors;
     }
 
-    public function onUpdate()
+    public function onUpdate($old)
     {
         $errors = [];
-        $old = $this->fresh();
         // não pode alterar pedido cancelado
         if ($old->estado == self::ESTADO_CANCELADO) {
             $errors['estado'] = __('messages.order_already_cancelled');
-        } elseif ($this->estado == self::ESTADO_CANCELADO) {
-            $this->cancel();
-        } elseif ($old->estado == self::ESTADO_AGENDADO && $this->estado != self::ESTADO_CANCELADO) {
-            $this->reserveProducts();
         }
         if ($this->tipo == self::TIPO_ENTREGA) {
             // não pode entregar sem endereço
@@ -456,8 +491,11 @@ class Pedido extends Model implements
             ) {
                 $errors['estado'] = __('messages.order_not_delivered');
             }
-            // precisa estar pago ou com promessa de pagamento
-            if (!Number::isEqual($this->total, $this->pago + $this->lancado)) {
+            // entrega precisa estar pago ou com promessa de pagamento
+            if (
+                !is_null($this->localizacao_id) &&
+                !Number::isEqual($this->total, $this->pago + $this->lancado)
+            ) {
                 $errors['pago'] = __('messages.order_incomplete_payment');
             }
         }
@@ -483,5 +521,32 @@ class Pedido extends Model implements
             $errors['pago'] = __('messages.order_unpaid');
         }
         return $errors;
+    }
+
+    public function beforeUpdate($old)
+    {
+        if ($this->estado == self::ESTADO_CANCELADO) {
+            return;
+        }
+        if ($this->estado == self::ESTADO_ENTREGA) {
+            $this->payChanges();
+        }
+        if ($this->tipo != self::TIPO_BALCAO && $this->finished()) {
+            $this->markProduced();
+        }
+        $this->checkDone();
+        $this->totalize();
+    }
+
+    public function afterUpdate($old)
+    {
+        if ($this->estado == self::ESTADO_CANCELADO) {
+            $this->cancel();
+        } elseif (
+            $old->estado == self::ESTADO_AGENDADO &&
+            !in_array($this->estado, [self::ESTADO_CANCELADO, self::ESTADO_AGENDADO])
+        ) {
+            $this->reserveProducts();
+        }
     }
 }

@@ -49,8 +49,8 @@ class ContaTest extends TestCase
                 'classificacao_id' => $classificacao->id,
                 'descricao' => 'Teste',
                 'valor' => 40,
-                'vencimento' => '2020-12-25T12:15:00Z',
-                'data_emissao' => '2019-10-25T12:15:00Z',
+                'vencimento' => '2020-12-25T12:15:00-02:00',
+                'data_emissao' => '2019-10-25T12:15:00+03:00',
                 'frequencia' => 1,
             ]
         ], $headers);
@@ -60,8 +60,8 @@ class ContaTest extends TestCase
         $this->assertEquals('Teste', $found_conta->descricao);
         $this->assertEquals(40, $found_conta->valor);
         $this->assertEquals(1, $found_conta->frequencia);
-        $this->assertEquals('2020-12-25 12:15:00', $found_conta->vencimento);
-        $this->assertEquals('2019-10-25 12:15:00', $found_conta->data_emissao);
+        $this->assertEquals('2020-12-25 14:15:00', $found_conta->vencimento);
+        $this->assertEquals('2019-10-25 09:15:00', $found_conta->data_emissao);
     }
 
     public function testUpdateConta()
@@ -366,7 +366,6 @@ class ContaTest extends TestCase
             'input' => [
                 'estado' => Conta::ESTADO_CANCELADA,
             ],
-            'desagrupar' => true,
         ], $headers);
         $conta_pai->refresh();
         $conta1->refresh();

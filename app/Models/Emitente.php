@@ -99,7 +99,7 @@ class Emitente extends Model implements ValidateInterface
         return $this->belongsTo(Regime::class, 'regime_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

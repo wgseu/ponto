@@ -197,7 +197,7 @@ class Promocao extends Model implements ValidateInterface
         return $this->belongsTo(Integracao::class, 'integracao_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $query = self::whereBetween('inicio', [$this->inicio, $this->fim])
@@ -239,7 +239,7 @@ class Promocao extends Model implements ValidateInterface
             $query->where('agendamento', $this->agendamento);
         }
         if ($query->exists()) {
-            $errors['id'] = __('promocao_existing');
+            $errors['id'] = __('messages.promocao_existing');
         }
         $selecao = !is_null($this->categoria_id) +
             !is_null($this->produto_id) +
@@ -267,7 +267,7 @@ class Promocao extends Model implements ValidateInterface
         if (is_null($this->promocao_id) && $this->pontos < 0) {
             $errors['pontos'] = __('messages.points_not_negative');
         } elseif (!is_null($this->promocao_id) && $this->pontos > 0) {
-            $errors['pontos'] = _('messages.points_must_be_negative');
+            $errors['pontos'] = __('messages.points_must_be_negative');
         }
         if ($this->agendamento == true && $this->valor <= 0) {
             $errors['valor'] = __('messages.value_cannot_zero');

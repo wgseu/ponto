@@ -97,7 +97,7 @@ class Formacao extends Model implements ValidateInterface
         return $this->belongsTo(Composicao::class, 'composicao_id');
     }
 
-    public function validate()
+    public function validate($old)
     {
     }
 }

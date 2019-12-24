@@ -48,6 +48,13 @@ class Settings
     public $defaults = [];
 
     /**
+     * Informs if must return default values when get all values
+     *
+     * @var boolean
+     */
+    public $includeDefaults = false;
+
+    /**
      * Constructor for a new instance of Settings
      * @param array $defaults Default values
      */
@@ -231,12 +238,12 @@ class Settings
 
     /**
      * Get all dynamic values for save
-     * @param bool $include_defaults include default values
+     * @param bool $includeDefaults include default values
      * @return array all values set
      */
-    public function getValues($include_defaults = false)
+    public function getValues($includeDefaults = false)
     {
-        if ($include_defaults) {
+        if ($includeDefaults || ($this->includeDefaults && \func_num_args() == 0)) {
             return array_replace_recursive($this->defaults, $this->values);
         }
         return $this->values;
@@ -263,10 +270,10 @@ class Settings
      */
     private static function loadFile($name, $path)
     {
-        $php_file = $path . DIRECTORY_SEPARATOR . $name . '.php';
-        if (!file_exists($php_file)) {
-            throw new \Exception(__('messages.file_not_found'), 404);
+        $phpFile = $path . DIRECTORY_SEPARATOR . $name . '.php';
+        if (!file_exists($phpFile)) {
+            throw new \Exception(__('messages.file_not_found', ['name' => $name]), 404);
         }
-        return require $php_file;
+        return require $phpFile;
     }
 }

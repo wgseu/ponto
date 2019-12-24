@@ -29,14 +29,9 @@ declare(strict_types=1);
 namespace App\GraphQL\Queries;
 
 use App\Models\Pedido;
-use App\GraphQL\Utils\Filter;
-use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class PedidoSummaryQuery extends Query
@@ -69,55 +64,8 @@ class PedidoSummaryQuery extends Query
         ];
     }
 
-    /**
-     * Retorna o resumo do pedido informado
-     *
-     * @param Pedido $pedido
-     * @return array
-     */
-    public static function process($pedido)
-    {
-        $itens = $pedido->itens;
-        $itens_data = [];
-        foreach ($itens as $item) {
-            $item_data = $item->toArray();
-            if (!is_null($item->produto_id)) {
-                $item_data['produto'] = $item->produto->toArray();
-                $item_data['produto']['unidade'] = $item->produto->unidade->toArray();
-            }
-            $item_data['servico'] = is_null($item->servico_id) ? null : $item->servico->toArray();
-            $itens_data[] = $item_data;
-        }
-        $pagamentos = $pedido->pagamentos;
-        $pagamentos_data = [];
-        foreach ($pagamentos as $pagamento) {
-            $pagamento_data = $pagamento->toArray();
-            $pagamento_data['forma'] = $pagamento->forma->toArray();
-            $pagamento_data['cartao'] = is_null($pagamento->cartao_id) ? null : $pagamento->cartao->toArray();
-            $pagamentos_data[] = $item_data;
-        }
-        $pedido_data = $pedido->toArray();
-        $pedido_data['mesa'] = is_null($pedido->mesa_id) ? null : $pedido->mesa->toArray();
-        $pedido_data['comanda'] = is_null($pedido->comanda_id) ? null : $pedido->comanda->toArray();
-        $pedido_data['cliente'] = is_null($pedido->cliente_id) ? null : $pedido->cliente->toArray();
-        $pedido_data['entrega'] = is_null($pedido->entrega_id) ? null : $pedido->entrega->toArray();
-        if (!is_null($pedido->prestador_id)) {
-            $pedido_data['prestador'] = $pedido->prestador->toArray();
-            $pedido_data['prestador']['cliente'] = $pedido->prestador->cliente->toArray();
-        }
-        if (!is_null($pedido->localizacao_id)) {
-            $pedido_data['localizacao'] = $pedido->localizacao->toArray();
-            $pedido_data['localizacao']['bairro'] = $pedido->localizacao->bairro->toArray();
-            $pedido_data['localizacao']['bairro']['cidade'] = $pedido->localizacao->bairro->cidade->toArray();
-        }
-        $pedido_data['itens'] = $itens_data;
-        $pedido_data['pagamentos'] = $pagamentos_data;
-        return $pedido_data;
-    }
-
     public function resolve($root, $args)
     {
-        $pedido = Pedido::findOrFail($args['id']);
-        return $this->process($pedido);
+        return Pedido::findOrFail($args['id']);
     }
 }

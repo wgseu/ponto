@@ -80,7 +80,7 @@ class Moeda extends Model implements ValidateInterface
      * Formato deve conter :value, espaço e simbolo;
      * A divisao deve conter um valor valido
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $formato = ' ' . $this->formato . ' ';
@@ -91,7 +91,7 @@ class Moeda extends Model implements ValidateInterface
         if (!is_null($empresa)) {
             $pais = $empresa->pais;
             if ($pais->moeda_id == $this->id && $this->conversao != 1) {
-                $errors['conversao'] = __('messages.pais_active_conversion_different_1');
+                $errors['conversao'] = __('messages.own_currency_conversion_effect');
             }
         }
         if ($this->ativa && is_null($this->conversao)) {

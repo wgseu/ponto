@@ -120,7 +120,7 @@ class Requisito extends Model implements ValidateInterface
      * A quantidade comprada não pode ser superior a quantidade pedida;
      * A quantidade, comprado, preço máximo e preço não podem ser negativos.
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         if (!is_null($this->compra_id)) {

@@ -90,7 +90,7 @@ class Caixa extends Model implements ValidateInterface
      * Se o caixa estiver em uso não pode ser desativado;
      * O caixa só pode ter a cateira do tipo local;
      */
-    public function validate()
+    public function validate($old)
     {
         $errors = [];
         $carteira = $this->carteira;
@@ -100,7 +100,7 @@ class Caixa extends Model implements ValidateInterface
             $errors['carteira_id'] = __('messages.tipo_carteira_invalido');
         }
         if ($movimento->exists() && !$this->ativa) {
-            $errors['ativa'] = __('caixa_in_use');
+            $errors['ativa'] = __('messages.caixa_in_use');
         }
         return $errors;
     }

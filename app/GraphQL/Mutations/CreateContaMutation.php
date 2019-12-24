@@ -61,7 +61,7 @@ class CreateContaMutation extends Mutation
     {
         $conta = new Conta();
         $conta->fill($args['input']);
-        $conta->funcionario_id = Auth::user()->prestador && Auth::user()->prestador->id;
+        $conta->funcionario_id = Auth::user()->prestador ? Auth::user()->prestador->id : null;
         $conta->save();
         return $conta;
     }

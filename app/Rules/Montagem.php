@@ -27,7 +27,6 @@
 namespace App\Rules;
 
 use App\Exceptions\Exception;
-use App\Exceptions\ValidationException;
 use App\Models\Item;
 use App\Models\Grupo;
 use App\Models\Pacote;
@@ -378,7 +377,7 @@ class Montagem extends Item
      * @param float $preco preço de venda calculado do item
      * @param array $pacotes lista de pacotes formados
      */
-    private function updateItem($index, $quantidade, $preco, $pacotes)
+    private function fix($index, $quantidade, $preco, $pacotes)
     {
         $item = $this->itens[$index]['item'];
         $item->quantidade = $quantidade;
@@ -453,7 +452,7 @@ class Montagem extends Item
      *
      * @return void
      */
-    public function validate()
+    public function verify()
     {
         $this->process($this->check);
     }
@@ -465,7 +464,7 @@ class Montagem extends Item
      */
     public function filter()
     {
-        $this->process($this->updateItem);
+        $this->process($this->fix);
     }
 
     /**

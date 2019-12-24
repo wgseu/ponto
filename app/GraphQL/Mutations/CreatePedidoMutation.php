@@ -195,7 +195,7 @@ class CreatePedidoMutation extends Mutation
             $subformations = self::makeFormations($subitem_data['formacoes'] ?? []);
             $montagem->addItem($subitem, $subformations);
         }
-        $montagem->validate();
+        $montagem->verify();
         self::saveItemFormation($item, $formations, $pedido);
         foreach ($montagem->itens as $info) {
             /** @var Item $subitem */

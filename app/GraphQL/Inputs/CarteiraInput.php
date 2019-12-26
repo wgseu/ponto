@@ -96,7 +96,6 @@ class CarteiraInput extends InputType
             'logo' => [
                 'type' => Type::string(),
                 'description' => 'Logo do gateway de pagamento',
-                'rules' => ['max:100'],
             ],
             'cor' => [
                 'type' => Type::string(),

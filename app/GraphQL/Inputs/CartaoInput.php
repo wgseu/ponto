@@ -75,7 +75,6 @@ class CartaoInput extends InputType
             'imagem' => [
                 'type' => Type::string(),
                 'description' => 'Base64 da imagem do cartão a ser alterada/cadastrada',
-                'rules' => ['max:100'],
             ],
             'ativo' => [
                 'type' => Type::boolean(),

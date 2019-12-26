@@ -31,6 +31,7 @@ use App\Models\Item;
 use App\Models\Grupo;
 use App\Models\Pacote;
 use App\Models\Composicao;
+use App\Models\Produto;
 use App\Util\Mask;
 use App\Util\Number;
 
@@ -137,7 +138,7 @@ class Montagem extends Item
     {
         $item = $this->itens[$item_index]['item'];
         // TODO: verificar se o pacote está ativo
-        $produto = $pacote->produto;
+        $produto = $pacote->produto ?? new Produto();
         // verifica se a propriedade ou o produto está em algum grupo do pacote
         if (!isset($this->grupos[$pacote->grupo_id])) {
             if (is_null($pacote->propriedade_id)) {
@@ -434,16 +435,7 @@ class Montagem extends Item
         });
         if ($index == 0) {
             $produto = $item->produto;
-            $descricao = $produto->descricao . $descricao;
-            if ($descricao != $item->descricao) {
-                throw new Exception(__(
-                    'messages.package_incorrect_description',
-                    [
-                        'given' => $item->descricao,
-                        'expected' => $descricao,
-                    ]
-                ));
-            }
+            $item->descricao = $produto->descricao . $descricao;
         }
     }
 
@@ -454,7 +446,7 @@ class Montagem extends Item
      */
     public function verify()
     {
-        $this->process($this->check);
+        $this->process([$this, 'check']);
     }
 
     /**
@@ -464,7 +456,7 @@ class Montagem extends Item
      */
     public function filter()
     {
-        $this->process($this->fix);
+        $this->process([$this, 'fix']);
     }
 
     /**

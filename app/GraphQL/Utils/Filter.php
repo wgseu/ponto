@@ -63,6 +63,12 @@ class Filter
                     }
                     $query->where($key, '<>', $value);
                     break;
+                case 'in':
+                    $query->whereIn($key, $value);
+                    break;
+                case 'ni':
+                    $query->whereNotIn($key, $value);
+                    break;
                 case 'after':
                 case 'gt':
                     $query->where($key, '>', $value);

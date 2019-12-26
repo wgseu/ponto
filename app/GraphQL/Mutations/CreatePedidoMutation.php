@@ -121,7 +121,11 @@ class CreatePedidoMutation extends Mutation
             $item->formar($formations);
         }
         // garante que o produto não sairá do estoque imediatamente quando for agendamento
-        if ($pedido->estado != Pedido::ESTADO_AGENDADO && !$item->reservado) {
+        if (
+            $pedido->estado != Pedido::ESTADO_AGENDADO &&
+            !$item->reservado &&
+            $item->produto->tipo != Produto::TIPO_PACOTE
+        ) {
             $item->reservar();
         }
     }
@@ -196,10 +200,10 @@ class CreatePedidoMutation extends Mutation
             $montagem->addItem($subitem, $subformations);
         }
         $montagem->verify();
-        self::saveItemFormation($item, $formations, $pedido);
         foreach ($montagem->itens as $info) {
             /** @var Item $subitem */
             $subitem = $info['item'];
+            $subitem->item_id = $item->id;
             /** @var Formacao[] $subformations */
             $subformations = $info['formacoes'];
             self::saveItemFormation($subitem, $subformations, $pedido);

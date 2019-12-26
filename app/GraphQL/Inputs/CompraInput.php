@@ -66,7 +66,7 @@ class CompraInput extends InputType
             ],
             'documento' => [
                 'type' => Type::string(),
-                'description' => 'Base64 do documento a ser alterada/cadastrada',
+                'description' => 'Base64 do documento a ser alterado/cadastrado',
             ],
             'data_compra' => [
                 'type' => Type::nonNull(GraphQL::type('DateTime')),

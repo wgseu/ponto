@@ -27,7 +27,6 @@
 namespace App\Concerns;
 
 use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Builder;
 use App\Exceptions\ValidationException;
 use App\Interfaces\AfterInsertInterface;
 use App\Interfaces\AfterSaveInterface;
@@ -43,68 +42,62 @@ use App\Interfaces\ValidateUpdateInterface;
  */
 trait ModelEvents
 {
-    /**
-     * @inheritDoc
-     *
-     * @param Builder  $query
-     * @return bool
-     */
-    protected function performInsert(Builder $query)
-    {
-        if ($this instanceof ValidateInterface) {
-            $errors = $this->validate(null);
-            $this->checkErrors($errors);
-        }
-        if ($this instanceof ValidateInsertInterface) {
-            $errors = $this->onInsert();
-            $this->checkErrors($errors);
-        }
-        if ($this instanceof BeforeSaveInterface) {
-            $this->beforeSave(null);
-        }
-        if ($this instanceof BeforeInsertInterface) {
-            $this->beforeInsert();
-        }
-        $result = parent::performInsert($query);
-        if ($this instanceof AfterInsertInterface) {
-            $this->afterInsert();
-        }
-        if ($this instanceof AfterSaveInterface) {
-            $this->afterSave(null);
-        }
-        return $result;
-    }
 
     /**
-     * @inheritDoc
+     * Save the model to the database.
      *
-     * @param Builder  $query
+     * @param  array  $options
      * @return bool
      */
-    protected function performUpdate(Builder $query)
+    public function save(array $options = [])
     {
-        $previous = (clone $this)->setRawAttributes($this->getOriginal());
-        $this->syncChanges();
-        if ($this instanceof ValidateInterface) {
-            $errors = $this->validate($previous);
-            $this->checkErrors($errors);
-        }
-        if ($this instanceof ValidateUpdateInterface) {
-            $errors = $this->onUpdate($previous);
-            $this->checkErrors($errors);
-        }
-        if ($this instanceof BeforeSaveInterface) {
-            $this->beforeSave($previous);
-        }
-        if ($this instanceof BeforeUpdateInterface) {
-            $this->beforeUpdate($previous);
-        }
-        $result = parent::performUpdate($query);
-        if ($this instanceof AfterUpdateInterface) {
-            $this->afterUpdate($previous);
-        }
-        if ($this instanceof AfterSaveInterface) {
-            $this->afterSave($previous);
+        if ($this->exists) {
+            $previous = (clone $this)->setRawAttributes($this->getOriginal());
+            $this->syncChanges();
+            $hasChanges = $this->hasChanges($this->getChanges());
+            if ($hasChanges && $this instanceof ValidateInterface) {
+                $errors = $this->validate($previous);
+                $this->checkErrors($errors);
+            }
+            if ($hasChanges && $this instanceof ValidateUpdateInterface) {
+                $errors = $this->onUpdate($previous);
+                $this->checkErrors($errors);
+            }
+            if ($this instanceof BeforeSaveInterface) {
+                $this->beforeSave($previous);
+            }
+            if ($this instanceof BeforeUpdateInterface) {
+                $this->beforeUpdate($previous);
+            }
+            $result = parent::save($options);
+            if ($hasChanges && $this instanceof AfterUpdateInterface) {
+                $this->afterUpdate($previous);
+            }
+            if ($hasChanges && $this instanceof AfterSaveInterface) {
+                $this->afterSave($previous);
+            }
+        } else {
+            if ($this instanceof ValidateInterface) {
+                $errors = $this->validate(null);
+                $this->checkErrors($errors);
+            }
+            if ($this instanceof ValidateInsertInterface) {
+                $errors = $this->onInsert();
+                $this->checkErrors($errors);
+            }
+            if ($this instanceof BeforeSaveInterface) {
+                $this->beforeSave(null);
+            }
+            if ($this instanceof BeforeInsertInterface) {
+                $this->beforeInsert();
+            }
+            $result = parent::save($options);
+            if ($this instanceof AfterInsertInterface) {
+                $this->afterInsert();
+            }
+            if ($this instanceof AfterSaveInterface) {
+                $this->afterSave(null);
+            }
         }
         return $result;
     }

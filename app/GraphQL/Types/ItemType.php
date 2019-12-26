@@ -77,6 +77,10 @@ class ItemType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Pacote em que esse item faz parte',
             ],
+            'grupo' => [
+                'type' => GraphQL::type('Grupo'),
+                'description' => 'Grupo da montagem desse item',
+            ],
             'pagamento_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa se esse item foi pago e qual foi o lançamento',

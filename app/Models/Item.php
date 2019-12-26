@@ -37,6 +37,8 @@ use App\Interfaces\AfterSaveInterface;
 use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
@@ -150,6 +152,19 @@ class Item extends Model implements
     public function pagamento()
     {
         return $this->belongsTo(Pagamento::class, 'pagamento_id');
+    }
+
+    /**
+     * Grupo da montagem do item
+     *
+     * @return Builder
+     */
+    public function getGrupoAttribute()
+    {
+        return Grupo::leftJoin('formacoes', function ($join) {
+            $join->on('formacoes.item_id', '=', DB::raw($this->id));
+        })->leftJoin('pacotes', 'pacotes.id', '=', 'formacoes.pacote_id')
+          ->whereRaw('grupos.id = pacotes.grupo_id')->first();
     }
 
     /**

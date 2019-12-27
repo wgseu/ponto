@@ -34,7 +34,6 @@ use App\GraphQL\Utils\Ordering;
 use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
-use Illuminate\Support\Facades\Auth;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -44,11 +43,6 @@ class ServicoQuery extends Query
     protected $attributes = [
         'name' => 'servicos',
     ];
-
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('servico:view');
-    }
 
     public function type(): Type
     {

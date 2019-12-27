@@ -24,49 +24,21 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-declare(strict_types=1);
+namespace App\Util;
 
-namespace App\GraphQL\Mutations;
+use Intervention\Image\Facades\Image as InterventionImage;
 
-use App\Models\Cartao;
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
-use Illuminate\Support\Facades\Auth;
-use Rebing\GraphQL\Support\Facades\GraphQL;
-
-class CreateCartaoMutation extends Mutation
+/**
+ * Filter values to secure save on database
+ */
+class Image
 {
-    protected $attributes = [
-        'name' => 'CreateCartao',
-    ];
 
-    public function authorize(array $args): bool
+    public static function upload($value, $path, $width = 256, $height = 256, $folder = 'public')
     {
-        return Auth::check() && Auth::user()->can('cartao:create');
-    }
-
-    public function type(): Type
-    {
-        return GraphQL::type('Cartao');
-    }
-
-    public function args(): array
-    {
-        return [
-            'input' => ['type' => Type::nonNull(GraphQL::type('CartaoInput'))],
-        ];
-    }
-
-    public function resolve($root, $args)
-    {
-        try {
-            $cartao = new Cartao();
-            $cartao->fill($args['input']);
-            $cartao->save();
-        } catch (\Throwable $th) {
-            $cartao->clean(new Cartao());
-            throw $th;
-        }
-        return $cartao;
+        $content = InterventionImage::make($value);
+        $content->fit($width, $height);
+        $data = $content->encode('data-url');
+        return Upload::send($data, "images/$path", $folder);
     }
 }

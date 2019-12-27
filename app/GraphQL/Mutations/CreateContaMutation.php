@@ -59,10 +59,15 @@ class CreateContaMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $conta = new Conta();
-        $conta->fill($args['input']);
-        $conta->funcionario_id = Auth::user()->prestador ? Auth::user()->prestador->id : null;
-        $conta->save();
+        try {
+            $conta = new Conta();
+            $conta->fill($args['input']);
+            $conta->funcionario_id = Auth::user()->prestador ? Auth::user()->prestador->id : null;
+            $conta->save();
+        } catch (\Throwable $th) {
+            $conta->clean(new Conta());
+            throw $th;
+        }
         return $conta;
     }
 }

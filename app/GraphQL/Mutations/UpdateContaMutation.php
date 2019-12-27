@@ -31,6 +31,7 @@ namespace App\GraphQL\Mutations;
 use App\Models\Conta;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
@@ -64,8 +65,17 @@ class UpdateContaMutation extends Mutation
     public function resolve($root, $args)
     {
         $conta = Conta::findOrFail($args['id']);
-        $conta->fill($args['input']);
-        $conta->save();
+        $old = $conta->replicate();
+        try {
+            $conta->fill($args['input']);
+            DB::transaction(function () use ($conta) {
+                $conta->save();
+            });
+            $old->clean($conta);
+        } catch (\Throwable $th) {
+            $conta->clean($old);
+            throw $th;
+        }
         return $conta;
     }
 }

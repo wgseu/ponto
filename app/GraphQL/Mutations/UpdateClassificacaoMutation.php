@@ -64,8 +64,15 @@ class UpdateClassificacaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $classificacao = Classificacao::findOrFail($args['id']);
-        $classificacao->fill($args['input']);
-        $classificacao->save();
+        $old = $classificacao->replicate();
+        try {
+            $classificacao->fill($args['input']);
+            $classificacao->save();
+            $old->clean($classificacao);
+        } catch (\Throwable $th) {
+            $classificacao->clean($old);
+            throw $th;
+        }
         return $classificacao;
     }
 }

@@ -58,8 +58,12 @@ class PropriedadeInput extends InputType
             ],
             'imagem_url' => [
                 'type' => Type::string(),
-                'description' => 'Imagem que representa a propriedade',
+                'description' => 'Url da imagem que representa a propriedade',
                 'rules' => ['max:100'],
+            ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Imagem que representa a propriedade',
             ],
         ];
     }

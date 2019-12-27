@@ -30,8 +30,8 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Cartao;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateCartaoMutation extends Mutation
@@ -64,8 +64,15 @@ class UpdateCartaoMutation extends Mutation
     public function resolve($root, $args)
     {
         $cartao = Cartao::findOrFail($args['id']);
-        $cartao->fill($args['input']);
-        $cartao->save();
+        $old = $cartao->replicate();
+        try {
+            $cartao->fill($args['input']);
+            $cartao->save();
+            $old->clean($cartao);
+        } catch (\Throwable $th) {
+            $cartao->clean($old);
+            throw $th;
+        }
         return $cartao;
     }
 }

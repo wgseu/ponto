@@ -59,9 +59,14 @@ class CreateCompraMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $compra = new Compra();
-        $compra->fill($args['input']);
-        $compra->save();
+        try {
+            $compra = new Compra();
+            $compra->fill($args['input']);
+            $compra->save();
+        } catch (\Throwable $th) {
+            $compra->clean(new Compra());
+            throw $th;
+        }
         return $compra;
     }
 }

@@ -59,9 +59,14 @@ class CreateClassificacaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $classificacao = new Classificacao();
-        $classificacao->fill($args['input']);
-        $classificacao->save();
+        try {
+            $classificacao = new Classificacao();
+            $classificacao->fill($args['input']);
+            $classificacao->save();
+        } catch (\Throwable $th) {
+            $classificacao->clean(new Classificacao());
+            throw $th;
+        }
         return $classificacao;
     }
 }

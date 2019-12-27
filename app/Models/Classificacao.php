@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,7 @@ class Classificacao extends Model implements ValidateInterface
         'classificacao_id',
         'descricao',
         'icone_url',
+        'icone',
     ];
 
     /**
@@ -69,6 +71,49 @@ class Classificacao extends Model implements ValidateInterface
     public function classificacao()
     {
         return $this->belongsTo(Classificacao::class, 'classificacao_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getIconeUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setIconeUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->icone_url) ? null : $this->attributes['icone_url'];
+        }
+        $this->attributes['icone_url'] = $value;
+    }
+
+    public function setIconeAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['icone_url'] = Image::upload($value, 'classifications');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->icone_url) && $this->icone_url != $old->icone_url) {
+            Storage::delete($this->attributes['icone_url']);
+        }
+        $this->attributes['icone_url'] = is_null($old->icone_url) ? null : $old->attributes['icone_url'];
     }
 
     /**

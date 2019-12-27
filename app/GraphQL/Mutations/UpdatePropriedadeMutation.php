@@ -64,8 +64,15 @@ class UpdatePropriedadeMutation extends Mutation
     public function resolve($root, $args)
     {
         $propriedade = Propriedade::findOrFail($args['id']);
-        $propriedade->fill($args['input']);
-        $propriedade->save();
+        $old = $propriedade->replicate();
+        try {
+            $propriedade->fill($args['input']);
+            $propriedade->save();
+            $old->clean($propriedade);
+        } catch (\Throwable $th) {
+            $propriedade->clean($old);
+            throw $th;
+        }
         return $propriedade;
     }
 }

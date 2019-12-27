@@ -33,6 +33,8 @@ use App\Interfaces\AfterSaveInterface;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Interfaces\ValidateUpdateInterface;
+use App\Util\Upload;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Contas a pagar e ou receber
@@ -123,6 +125,7 @@ class Conta extends Model implements
         'vencimento',
         'numero',
         'anexo_url',
+        'anexo',
         'estado',
         'data_calculo',
         'data_emissao',
@@ -232,6 +235,49 @@ class Conta extends Model implements
     {
         return $this->hasMany(Pagamento::class, 'conta_id')
             ->where('estado', '<>', Pagamento::ESTADO_CANCELADO);
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string $value
+     * @return string
+     */
+    public function getAnexoUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setAnexoUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->anexo_url) ? null : $this->attributes['anexo_url'];
+        }
+        $this->attributes['anexo_url'] = $value;
+    }
+
+    public function setAnexoAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['anexo_url'] = Upload::send($value, 'docs/accounts', 'private');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->anexo_url) && $this->anexo_url != $old->anexo_url) {
+            Storage::delete($this->attributes['anexo_url']);
+        }
+        $this->attributes['anexo_url'] = is_null($old->anexo_url) ? null : $old->attributes['anexo_url'];
     }
 
     public function validate($old)

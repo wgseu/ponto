@@ -97,6 +97,10 @@ class PatrimonioInput extends InputType
                 'description' => 'Caminho relativo da foto do bem',
                 'rules' => ['max:200'],
             ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem do patromonio a ser alterada/cadastrada',
+            ],
         ];
     }
 }

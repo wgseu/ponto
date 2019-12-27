@@ -156,6 +156,10 @@ class PromocaoInput extends InputType
                 'description' => 'Imagem promocional',
                 'rules' => ['max:100'],
             ],
+            'banner' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem do produto a ser alterada/cadastrada',
+            ],
         ];
     }
 }

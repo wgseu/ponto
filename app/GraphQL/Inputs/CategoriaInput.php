@@ -62,6 +62,10 @@ class CategoriaInput extends InputType
                 'description' => 'Imagem representativa da categoria',
                 'rules' => ['max:100'],
             ],
+            'imagem' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem da categoria a ser alterada/cadastrada',
+            ],
             'ordem' => [
                 'type' => Type::int(),
                 'description' => 'Informa a ordem de exibição das categorias nas vendas',

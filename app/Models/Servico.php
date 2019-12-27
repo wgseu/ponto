@@ -26,11 +26,12 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Util\Number;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Taxas, eventos e serviço cobrado nos pedidos
@@ -77,6 +78,7 @@ class Servico extends Model implements ValidateInterface
         'valor',
         'individual',
         'imagem_url',
+        'imagem',
         'ativo',
     ];
 
@@ -91,6 +93,49 @@ class Servico extends Model implements ValidateInterface
         'individual' => false,
         'ativo' => true,
     ];
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Image::upload($value, 'services');
+        }
+    }
+
+    /**
+     * Limpa os recursos do serviço atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
+    }
 
     public function validate($old)
     {

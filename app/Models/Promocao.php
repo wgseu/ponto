@@ -27,13 +27,12 @@
 namespace App\Models;
 
 use App\Util\Date;
+use App\Util\Image;
 use App\Concerns\ModelEvents;
 use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
-use App\Exceptions\ValidationException;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Validation\Rules\Exists;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o
@@ -116,6 +115,7 @@ class Promocao extends Model implements ValidateInterface
         'ativa',
         'chamada',
         'banner_url',
+        'banner',
     ];
 
     /**
@@ -195,6 +195,49 @@ class Promocao extends Model implements ValidateInterface
     public function integracao()
     {
         return $this->belongsTo(Integracao::class, 'integracao_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getBannerUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setBannerUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->banner_url) ? null : $this->attributes['banner_url'];
+        }
+        $this->attributes['banner_url'] = $value;
+    }
+
+    public function setBannerAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['banner_url'] = Image::upload($value, 'promotions');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->banner_url) && $this->banner_url != $old->banner_url) {
+            Storage::delete($this->attributes['banner_url']);
+        }
+        $this->attributes['banner_url'] = is_null($old->banner_url) ? null : $old->attributes['banner_url'];
     }
 
     public function validate($old)

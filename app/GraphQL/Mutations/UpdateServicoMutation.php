@@ -64,8 +64,15 @@ class UpdateServicoMutation extends Mutation
     public function resolve($root, $args)
     {
         $servico = Servico::findOrFail($args['id']);
-        $servico->fill($args['input']);
-        $servico->save();
+        $old = $servico->replicate();
+        try {
+            $servico->fill($args['input']);
+            $servico->save();
+            $old->clean($servico);
+        } catch (\Throwable $th) {
+            $servico->clean($old);
+            throw $th;
+        }
         return $servico;
     }
 }

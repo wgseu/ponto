@@ -26,19 +26,19 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Foundation\Auth\User;
+use Tymon\JWTAuth\Facades\JWTFactory;
 use App\Interfaces\ValidateInterface;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
 use App\Interfaces\ValidateInsertInterface;
-use App\Util\Upload;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -197,7 +197,7 @@ class Cliente extends User implements
     public function setImagemAttribute($value)
     {
         if (isset($value)) {
-            $this->attributes['imagem_url'] = Upload::send($value, 'images/users', 'public');
+            $this->attributes['imagem_url'] = Image::upload($value, 'users');
         }
     }
 

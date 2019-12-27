@@ -26,10 +26,10 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Models\Item;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
-use App\Util\Upload;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
@@ -139,7 +139,7 @@ class Produto extends Model implements ValidateInterface
     public function setImagemAttribute($value)
     {
         if (isset($value)) {
-            $this->attributes['imagem_url'] = Upload::send($value, 'images/products', 'public');
+            $this->attributes['imagem_url'] = Image::upload($value, 'products');
         }
     }
 

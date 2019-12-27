@@ -56,6 +56,10 @@ class ClassificacaoInput extends InputType
                 'description' => 'Ícone da categoria da conta',
                 'rules' => ['max:100'],
             ],
+            'icone' => [
+                'type' => Type::string(),
+                'description' => 'Base64 da imagem da classificação a ser alterada/cadastrada',
+            ],
         ];
     }
 }

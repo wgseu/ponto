@@ -26,9 +26,11 @@
 
 namespace App\Models;
 
+use App\Util\Image;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Informa detalhadamente um bem da empresa
@@ -73,6 +75,7 @@ class Patrimonio extends Model implements ValidateInterface
         'valor',
         'ativo',
         'imagem_url',
+        'imagem',
     ];
 
     /**
@@ -104,6 +107,49 @@ class Patrimonio extends Model implements ValidateInterface
     public function fornecedor()
     {
         return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Image::upload($value, 'heritages', 800, 600, 'private');
+        }
+    }
+
+    /**
+     * Limpa os recursos do cliente atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
     }
 
     public function validate($old)

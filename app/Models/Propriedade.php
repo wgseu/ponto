@@ -26,16 +26,15 @@
 
 namespace App\Models;
 
-use App\Concerns\ModelEvents;
+use App\Util\Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Informa tamanhos de pizzas e opções de peso do produto
  */
 class Propriedade extends Model
 {
-    use ModelEvents;
-
     public const UPDATED_AT = 'data_atualizacao';
     public const CREATED_AT = null;
 
@@ -56,6 +55,7 @@ class Propriedade extends Model
         'nome',
         'abreviacao',
         'imagem_url',
+        'imagem',
     ];
 
     /**
@@ -77,5 +77,48 @@ class Propriedade extends Model
     public function grupo()
     {
         return $this->belongsTo(Grupo::class, 'grupo_id');
+    }
+
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getImagemUrlAttribute($value)
+    {
+        if ($value) {
+            return Storage::url($value);
+        }
+        return null;
+    }
+
+    public function setImagemUrlAttribute($value)
+    {
+        if (!is_null($value)) {
+            $value = is_null($this->imagem_url) ? null : $this->attributes['imagem_url'];
+        }
+        $this->attributes['imagem_url'] = $value;
+    }
+
+    public function setImagemAttribute($value)
+    {
+        if (isset($value)) {
+            $this->attributes['imagem_url'] = Image::upload($value, 'properties');
+        }
+    }
+
+    /**
+     * Limpa os recursos do serviço atual se alterado
+     *
+     * @param self $old
+     * @return void
+     */
+    public function clean($old)
+    {
+        if (!is_null($this->imagem_url) && $this->imagem_url != $old->imagem_url) {
+            Storage::delete($this->attributes['imagem_url']);
+        }
+        $this->attributes['imagem_url'] = is_null($old->imagem_url) ? null : $old->attributes['imagem_url'];
     }
 }

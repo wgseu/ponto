@@ -50,7 +50,11 @@ class Upload
         $content = base64_decode($value, true);
         $finfo = new \finfo(FILEINFO_EXTENSION);
         $mime = $finfo->buffer($content, FILEINFO_MIME_TYPE);
-        if (!preg_match('/^image\/(jpeg|png)$/', $mime, $ext)) {
+        if (
+            !preg_match('/^image\/(jpeg|png)$/', $mime, $ext) &&
+            !preg_match('/^text\/(xml)$/', $mime, $ext) &&
+            !preg_match('/^application\/(pdf)$/', $mime, $ext)
+        ) {
             throw new ValidationException(['imagem' => __('messages.invalid_picture')]);
         }
         $extension = $ext[1] == 'jpeg' ? 'jpg' : $ext[1];

@@ -59,9 +59,14 @@ class CreateServicoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $servico = new Servico();
-        $servico->fill($args['input']);
-        $servico->save();
+        try {
+            $servico = new Servico();
+            $servico->fill($args['input']);
+            $servico->save();
+        } catch (\Throwable $th) {
+            $servico->clean(new Servico());
+            throw $th;
+        }
         return $servico;
     }
 }

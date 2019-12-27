@@ -64,8 +64,15 @@ class UpdateCompraMutation extends Mutation
     public function resolve($root, $args)
     {
         $compra = Compra::findOrFail($args['id']);
-        $compra->fill($args['input']);
-        $compra->save();
+        $old = $compra->replicate();
+        try {
+            $compra->fill($args['input']);
+            $compra->save();
+            $old->clean($compra);
+        } catch (\Throwable $th) {
+            $compra->clean($old);
+            throw $th;
+        }
         return $compra;
     }
 }

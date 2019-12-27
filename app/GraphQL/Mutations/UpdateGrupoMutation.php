@@ -63,8 +63,11 @@ class UpdateGrupoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $grupo = Grupo::findOrFail($args['id']);
+        $grupo = Grupo::withTrashed()->findOrFail($args['id']);
         $grupo->fill($args['input']);
+        if ($grupo->data_arquivado) {
+            $grupo->restore();
+        }
         $grupo->save();
         return $grupo;
     }

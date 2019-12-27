@@ -28,15 +28,30 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use App\Concerns\OptionalFields;
+use GraphQL\Type\Definition\NonNull;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GrupoUpdateInput extends GrupoInput
 {
-    use OptionalFields;
-
     protected $attributes = [
         'name' => 'GrupoUpdateInput',
         'description' => 'Grupos de pacotes, permite criar grupos como Tamanho, Sabores para' .
             ' formações de produtos',
     ];
+
+    public function fields(): array
+    {
+        $fields = parent::fields();
+        foreach ($fields as $name => &$spec) {
+            if ($spec['type'] instanceof NonNull) {
+                $fields[$name]['type'] = $spec['type']->getWrappedType();
+            }
+        }
+        return array_merge($fields, [
+            'data_arquivado' => [
+                'type' => GraphQL::type('DateTime'),
+                'description' => 'Data de arquivamento da grupo',
+            ],
+        ]);
+    }
 }

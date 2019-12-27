@@ -28,15 +28,31 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use App\Concerns\OptionalFields;
+use GraphQL\Type\Definition\NonNull;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class MetricaUpdateInput extends MetricaInput
 {
-    use OptionalFields;
 
     protected $attributes = [
         'name' => 'MetricaUpdateInput',
         'description' => 'Métricas de avaliação do atendimento e outros serviços do' .
             ' estabelecimento',
     ];
+
+    public function fields(): array
+    {
+        $fields = parent::fields();
+        foreach ($fields as $name => &$spec) {
+            if ($spec['type'] instanceof NonNull) {
+                $fields[$name]['type'] = $spec['type']->getWrappedType();
+            }
+        }
+        return array_merge($fields, [
+            'data_arquivado' => [
+                'type' => GraphQL::type('DateTime'),
+                'description' => 'Data de arquivamento da métrica',
+            ],
+        ]);
+    }
 }

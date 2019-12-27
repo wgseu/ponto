@@ -63,8 +63,11 @@ class UpdateCategoriaMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $categoria = Categoria::findOrFail($args['id']);
+        $categoria = Categoria::withTrashed()->findOrFail($args['id']);
         $categoria->fill($args['input']);
+        if ($categoria->data_arquivado) {
+            $categoria->restore();
+        }
         $categoria->save();
         return $categoria;
     }

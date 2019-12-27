@@ -63,8 +63,11 @@ class UpdateMetricaMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $metrica = Metrica::findOrFail($args['id']);
+        $metrica = Metrica::withTrashed()->findOrFail($args['id']);
         $metrica->fill($args['input']);
+        if ($metrica->data_arquivado) {
+            $metrica->restore();
+        }
         $metrica->save();
         return $metrica;
     }

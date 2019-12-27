@@ -26,14 +26,14 @@
 
 namespace App\Models;
 
+use App\Util\Upload;
 use App\Models\Item;
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
-use App\Util\Upload;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Informações sobre o produto, composição ou pacote

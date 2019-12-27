@@ -28,10 +28,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\Categoria;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -70,6 +70,9 @@ class CategoriaQuery extends Query
         $limit = $args['limit'] ?? 10;
         if (!isset($args['limit'])) {
             $limit = (clone $query)->count();
+        }
+        if ($args['filter']['data_arquivado'] ?? null) {
+            $query->withTrashed();
         }
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);

@@ -79,7 +79,7 @@ class Classificacao extends Model implements ValidateInterface
      * @param  string  $value
      * @return string
      */
-    public function getImagemUrlAttribute($value)
+    public function getIconeUrlAttribute($value)
     {
         if ($value) {
             return Storage::url($value);
@@ -87,7 +87,7 @@ class Classificacao extends Model implements ValidateInterface
         return null;
     }
 
-    public function setImagemUrlAttribute($value)
+    public function setIconeUrlAttribute($value)
     {
         if (!is_null($value)) {
             $value = is_null($this->icone_url) ? null : $this->attributes['icone_url'];
@@ -95,7 +95,7 @@ class Classificacao extends Model implements ValidateInterface
         $this->attributes['icone_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setIconeAttribute($value)
     {
         if (isset($value)) {
             $this->attributes['icone_url'] = Image::upload($value, 'ratings');

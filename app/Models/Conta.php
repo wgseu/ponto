@@ -212,7 +212,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
      * @param  string  $value
      * @return string
      */
-    public function getImagemUrlAttribute($value)
+    public function getAnexoUrlAttribute($value)
     {
         if ($value) {
             return Storage::url($value);
@@ -220,7 +220,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         return null;
     }
 
-    public function setImagemUrlAttribute($value)
+    public function setAnexoUrlAttribute($value)
     {
         if (!is_null($value)) {
             $value = is_null($this->anexo_url) ? null : $this->attributes['anexo_url'];
@@ -228,7 +228,7 @@ class Conta extends Model implements ValidateInterface, ValidateUpdateInterface
         $this->attributes['anexo_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setAnexoAttribute($value)
     {
         if (isset($value)) {
             $this->attributes['anexo_url'] = Upload::send($value, 'docs/accounts', 'private');

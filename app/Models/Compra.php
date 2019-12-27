@@ -96,7 +96,7 @@ class Compra extends Model implements ValidateInterface
      * @param  string  $value
      * @return string
      */
-    public function getImagemUrlAttribute($value)
+    public function getDocumentoUrlAttribute($value)
     {
         if ($value) {
             return Storage::url($value);
@@ -104,7 +104,7 @@ class Compra extends Model implements ValidateInterface
         return null;
     }
 
-    public function setImagemUrlAttribute($value)
+    public function setDocumentoUrlAttribute($value)
     {
         if (!is_null($value)) {
             $value = is_null($this->documento_url) ? null : $this->attributes['documento_url'];
@@ -112,7 +112,7 @@ class Compra extends Model implements ValidateInterface
         $this->attributes['documento_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setDocumentoAttribute($value)
     {
         if (isset($value)) {
             $this->attributes['documento_url'] = Upload::send($value, 'docs/purchases', 'private');

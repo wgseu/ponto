@@ -203,7 +203,7 @@ class Promocao extends Model implements ValidateInterface
      * @param  string  $value
      * @return string
      */
-    public function getImagemUrlAttribute($value)
+    public function getBannerUrlAttribute($value)
     {
         if ($value) {
             return Storage::url($value);
@@ -211,7 +211,7 @@ class Promocao extends Model implements ValidateInterface
         return null;
     }
 
-    public function setImagemUrlAttribute($value)
+    public function setBannerUrlAttribute($value)
     {
         if (!is_null($value)) {
             $value = is_null($this->banner_url) ? null : $this->attributes['banner_url'];
@@ -219,7 +219,7 @@ class Promocao extends Model implements ValidateInterface
         $this->attributes['banner_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setBannerAttribute($value)
     {
         if (isset($value)) {
             $this->attributes['banner_url'] = Image::upload($value, 'promotions');

@@ -126,7 +126,7 @@ class Carteira extends Model implements ValidateInterface
      * @param  string  $value
      * @return string
      */
-    public function getImagemUrlAttribute($value)
+    public function getLogoUrlAttribute($value)
     {
         if ($value) {
             return Storage::url($value);
@@ -134,7 +134,7 @@ class Carteira extends Model implements ValidateInterface
         return null;
     }
 
-    public function setImagemUrlAttribute($value)
+    public function setLogoUrlAttribute($value)
     {
         if (!is_null($value)) {
             $value = is_null($this->logo_url) ? null : $this->attributes['logo_url'];
@@ -142,7 +142,7 @@ class Carteira extends Model implements ValidateInterface
         $this->attributes['logo_url'] = $value;
     }
 
-    public function setImagemAttribute($value)
+    public function setLogoAttribute($value)
     {
         if (isset($value)) {
             $this->attributes['logo_url'] = Image::upload($value, 'wallets', 128, 128);

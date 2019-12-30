@@ -118,7 +118,11 @@ class UpdateProdutoMutation extends Mutation
                 $tributacao = self::saveTributacao($tributacao_data, $produto);
                 $produto->tributacao_id = $tributacao->id;
             }
-            $produto->restore();
+            if ($produto->exists) {
+                $produto->restore();
+            } else {
+                $produto->save();
+            }
             $cardapios_data = $input['cardapios'] ?? [];
             self::saveCardapios($cardapios_data, $produto);
         });

@@ -56,6 +56,10 @@ class ImpressoraType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Setor de impressão',
             ],
+            'setor' => [
+                'type' => GraphQL::type('Setor'),
+                'description' => 'Setor de impressão',
+            ],
             'nome' => [
                 'type' => Type::string(),
                 'description' => 'Nome da impressora instalada no sistema operacional',

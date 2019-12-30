@@ -28,10 +28,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\Metrica;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
 use Illuminate\Support\Facades\Auth;
@@ -73,6 +73,9 @@ class MetricaQuery extends Query
             $args['filter'] ?? [],
             Metrica::with($fields->getRelations())->select($fields->getSelect())
         );
+        if ($args['filter']['data_arquivado'] ?? null) {
+            $query->withTrashed();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

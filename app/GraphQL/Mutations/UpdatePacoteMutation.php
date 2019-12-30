@@ -63,9 +63,9 @@ class UpdatePacoteMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $pacote = Pacote::findOrFail($args['id']);
+        $pacote = Pacote::withTrashed()->findOrFail($args['id']);
         $pacote->fill($args['input']);
-        $pacote->save();
+        $pacote->restore();
         return $pacote;
     }
 }

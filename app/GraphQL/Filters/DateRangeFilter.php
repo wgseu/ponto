@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Filters;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class DateRangeFilter extends InputType
 {
@@ -17,10 +17,10 @@ class DateRangeFilter extends InputType
     {
         return [
             'start' => [
-                'type' => Type::string(),
+                'type' => GraphQL::type('DateTime'),
             ],
             'end' => [
-                'type' => Type::string(),
+                'type' => GraphQL::type('DateTime'),
             ],
         ];
     }

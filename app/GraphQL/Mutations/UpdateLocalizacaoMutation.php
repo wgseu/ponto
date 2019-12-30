@@ -63,9 +63,9 @@ class UpdateLocalizacaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $localizacao = Localizacao::findOrFail($args['id']);
+        $localizacao = Localizacao::withTrashed()->findOrFail($args['id']);
         $localizacao->fill($args['input']);
-        $localizacao->save();
+        $localizacao->restore();
         return $localizacao;
     }
 }

@@ -118,7 +118,7 @@ class UpdateProdutoMutation extends Mutation
                 $tributacao = self::saveTributacao($tributacao_data, $produto);
                 $produto->tributacao_id = $tributacao->id;
             }
-            $produto->save();
+            $produto->restore();
             $cardapios_data = $input['cardapios'] ?? [];
             self::saveCardapios($cardapios_data, $produto);
         });
@@ -126,7 +126,7 @@ class UpdateProdutoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $produto = Produto::findOrFail($args['id']);
+        $produto = Produto::withTrashed()->findOrFail($args['id']);
         $old = $produto->replicate();
         try {
             self::saveProduct($produto, $args['input']);

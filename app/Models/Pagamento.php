@@ -252,8 +252,8 @@ class Pagamento extends Model implements
         $moeda = $this->moeda;
         $this->valor = $moeda->conversao * $this->lancado;
         if ($this->estado == self::ESTADO_PAGO) {
-            $this->data_pagamento = Carbon::now();
-            $this->data_compensacao = $this->data_pagamento;
+            $this->data_pagamento = $this->data_pagamento ?? Carbon::now();
+            $this->data_compensacao = $this->data_compensacao ?? $this->data_pagamento;
             if (!is_null($cartao)) {
                 $this->data_compensacao = $this->data_pagamento->addDays($cartao->dias_repasse);
             } elseif (!is_null($this->cheque_id)) {

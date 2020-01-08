@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\AfterUpdateInterface;
+use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\BeforeUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateInterface;
@@ -45,6 +46,7 @@ class Pedido extends Model implements
     ValidateInsertInterface,
     ValidateUpdateInterface,
     AfterUpdateInterface,
+    BeforeSaveInterface,
     BeforeUpdateInterface
 {
     use ModelEvents;
@@ -372,6 +374,11 @@ class Pedido extends Model implements
                 $item->reservar();
             }
         }
+    }
+
+    public function beforeSave($old)
+    {
+        $this->totalize();
     }
 
     public function validate($old)

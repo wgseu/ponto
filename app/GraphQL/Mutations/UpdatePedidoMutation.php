@@ -33,7 +33,6 @@ use App\Models\Viagem;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\GraphQL\Queries\PedidoSummaryQuery;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdatePedidoMutation extends CreatePedidoMutation

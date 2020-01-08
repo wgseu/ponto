@@ -47,7 +47,7 @@ class PagamentoInput extends InputType
                 'description' => 'Identificador do pagamento no banco',
             ],
             'moeda_id' => [
-                'type' => Type::nonNull(Type::id()),
+                'type' => Type::id(),
                 'description' => 'Informa em qual moeda está o valor informado',
             ],
             'pagamento_id' => [

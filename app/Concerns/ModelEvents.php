@@ -55,6 +55,9 @@ trait ModelEvents
             $previous = (clone $this)->setRawAttributes($this->getOriginal());
             $this->syncChanges();
             $hasChanges = $this->hasChanges($this->getChanges());
+            if ($this instanceof BeforeSaveInterface) {
+                $this->beforeSave($previous);
+            }
             if ($hasChanges && $this instanceof ValidateInterface) {
                 $errors = $this->validate($previous);
                 $this->checkErrors($errors);
@@ -62,9 +65,6 @@ trait ModelEvents
             if ($hasChanges && $this instanceof ValidateUpdateInterface) {
                 $errors = $this->onUpdate($previous);
                 $this->checkErrors($errors);
-            }
-            if ($this instanceof BeforeSaveInterface) {
-                $this->beforeSave($previous);
             }
             if ($this instanceof BeforeUpdateInterface) {
                 $this->beforeUpdate($previous);
@@ -77,6 +77,9 @@ trait ModelEvents
                 $this->afterSave($previous);
             }
         } else {
+            if ($this instanceof BeforeSaveInterface) {
+                $this->beforeSave(null);
+            }
             if ($this instanceof ValidateInterface) {
                 $errors = $this->validate(null);
                 $this->checkErrors($errors);
@@ -84,9 +87,6 @@ trait ModelEvents
             if ($this instanceof ValidateInsertInterface) {
                 $errors = $this->onInsert();
                 $this->checkErrors($errors);
-            }
-            if ($this instanceof BeforeSaveInterface) {
-                $this->beforeSave(null);
             }
             if ($this instanceof BeforeInsertInterface) {
                 $this->beforeInsert();

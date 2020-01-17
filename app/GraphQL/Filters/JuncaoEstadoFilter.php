@@ -26,48 +26,32 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Types;
+namespace App\GraphQL\Filters;
 
-use App\Models\Juncao;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Type as GraphQLType;
+use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class JuncaoType extends GraphQLType
+class JuncaoEstadoFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'Juncao',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
-        'model' => Juncao::class,
+        'name' => 'JuncaoEstadoFilter',
     ];
 
     public function fields(): array
     {
         return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador da junção',
-            ],
-            'mesa_id' => [
-                'type' => Type::id(),
-                'description' => 'Mesa que está junta ao pedido',
-            ],
-            'pedido_id' => [
-                'type' => Type::id(),
-                'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
-            ],
-            'pedido' => [
-                'type' => GraphQL::type('Pedido'),
-                'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
-            ],
-            'estado' => [
+            'eq' => [
                 'type' => GraphQL::type('JuncaoEstado'),
-                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
-                    ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
             ],
-            'data_movimento' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data e hora da junção das mesas',
+            'ne' => [
+                'type' => GraphQL::type('JuncaoEstado'),
+            ],
+            'in' => [
+                'type' => Type::listOf(GraphQL::type('JuncaoEstado')),
+            ],
+            'ni' => [
+                'type' => Type::listOf(GraphQL::type('JuncaoEstado')),
             ],
         ];
     }

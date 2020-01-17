@@ -169,6 +169,7 @@ return [
                 'notificacoes' => 'App\GraphQL\Queries\NotificacaoQuery',
                 'saldos' => 'App\GraphQL\Queries\SaldoQuery',
                 'conferencias' => 'App\GraphQL\Queries\ConferenciaQuery',
+                'juncoes' => 'App\GraphQL\Queries\JuncaoQuery',
 
                 'empresa' => 'App\GraphQL\Queries\EmpresaQuery',
                 'sistema' => 'App\GraphQL\Queries\SistemaQuery',
@@ -571,6 +572,8 @@ return [
         'MetricaTipoFilter' => 'App\GraphQL\Filters\MetricaTipoFilter',
         'CardapioLocalFilter' => 'App\GraphQL\Filters\CardapioLocalFilter',
         'IntegracaoTipoFilter' => 'App\GraphQL\Filters\IntegracaoTipoFilter',
+        'JuncaoFilter' => 'App\GraphQL\Filters\JuncaoFilter',
+        'JuncaoEstadoFilter' => 'App\GraphQL\Filters\JuncaoEstadoFilter',
 
         'SetorOrder' => 'App\GraphQL\Ordering\SetorOrder',
         'MesaOrder' => 'App\GraphQL\Ordering\MesaOrder',
@@ -646,6 +649,7 @@ return [
         'NotificacaoOrder' => 'App\GraphQL\Ordering\NotificacaoOrder',
         'SaldoOrder' => 'App\GraphQL\Ordering\SaldoOrder',
         'ConferenciaOrder' => 'App\GraphQL\Ordering\ConferenciaOrder',
+        'JuncaoOrder' => 'App\GraphQL\Ordering\JuncaoOrder',
 
         'SetorInput' => 'App\GraphQL\Inputs\SetorInput',
         'MesaInput' => 'App\GraphQL\Inputs\MesaInput',

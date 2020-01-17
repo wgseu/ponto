@@ -109,4 +109,12 @@ class JuncaoTest extends TestCase
         $this->expectException(ValidationException::class);
         factory(Juncao::class)->create(['estado' => Juncao::ESTADO_LIBERADO]);
     }
+
+    public function testFind()
+    {
+        $headers = PrestadorTest::authOwner();
+        $juncao = factory(Juncao::class)->create();
+        $response = $this->graphfl('query_juncao', [ 'id' => $juncao->id ], $headers);
+        $this->assertEquals($juncao->id, $response->json('data.juncoes.data.0.id'));
+    }
 }

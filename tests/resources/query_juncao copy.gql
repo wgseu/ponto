@@ -1,0 +1,8 @@
+query ($id: ID!) {
+  juncoes (filter: { id: $id }, order: { id: asc }) {
+    data {
+      id
+    }
+    total
+  }
+}

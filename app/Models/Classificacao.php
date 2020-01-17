@@ -30,6 +30,7 @@ use App\Util\Image;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Classificação se contas, permite atribuir um grupo de contas

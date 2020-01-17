@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Informa se há descontos nos produtos em determinados dias da semana, o

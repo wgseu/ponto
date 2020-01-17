@@ -26,19 +26,16 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Types;
+namespace App\GraphQL\Filters;
 
-use App\Models\Juncao;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Type as GraphQLType;
+use Rebing\GraphQL\Support\InputType;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class JuncaoType extends GraphQLType
+class JuncaoFilter extends InputType
 {
     protected $attributes = [
-        'name' => 'Juncao',
-        'description' => 'Junções de mesas, informa quais mesas estão juntas ao pedido',
-        'model' => Juncao::class,
+        'name' => 'JuncaoFilter',
     ];
 
     public function fields(): array
@@ -46,28 +43,18 @@ class JuncaoType extends GraphQLType
         return [
             'id' => [
                 'type' => Type::id(),
-                'description' => 'Identificador da junção',
             ],
             'mesa_id' => [
-                'type' => Type::id(),
-                'description' => 'Mesa que está junta ao pedido',
+                'type' => GraphQL::type('IdFilter'),
             ],
             'pedido_id' => [
-                'type' => Type::id(),
-                'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
-            ],
-            'pedido' => [
-                'type' => GraphQL::type('Pedido'),
-                'description' => 'Pedido a qual a mesa está junta, o pedido deve ser de uma mesa',
+                'type' => GraphQL::type('IdFilter'),
             ],
             'estado' => [
-                'type' => GraphQL::type('JuncaoEstado'),
-                'description' => 'Estado a junção da mesa. Associado: a mesa está junta ao pedido,' .
-                    ' Liberado: A mesa está livre, Cancelado: A mesa está liberada',
+                'type' => GraphQL::type('JuncaoEstadoFilter'),
             ],
             'data_movimento' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data e hora da junção das mesas',
+                'type' => GraphQL::type('DateFilter'),
             ],
         ];
     }

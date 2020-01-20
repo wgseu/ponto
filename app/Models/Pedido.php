@@ -321,7 +321,9 @@ class Pedido extends Model implements
      */
     protected function cancel()
     {
-        $pagamentos = $this->pagamentos()->where('estado', '<>', Pagamento::ESTADO_CANCELADO)->get();
+        // só cancela os pagamentos do nível zero, pois os subpagamentos são cancelados automaticamente
+        $pagamentos = $this->pagamentos()->where('estado', '<>', Pagamento::ESTADO_CANCELADO)
+            ->whereNull('pagamento_id')->get();
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
         }

@@ -3,12 +3,11 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\Forma;
-use App\Models\Moeda;
 use App\Models\Pagamento;
 use Faker\Generator as Faker;
 
 $factory->define(Pagamento::class, function (Faker $faker) {
-    $moeda = factory(Moeda::class)->create();
+    $moeda = app('currency');
     $forma = factory(Forma::class)->create();
     
     return [

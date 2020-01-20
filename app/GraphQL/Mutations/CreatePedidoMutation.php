@@ -29,7 +29,6 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Exceptions\Exception;
-use App\GraphQL\Queries\PedidoSummaryQuery;
 use App\Models\Cheque;
 use App\Models\Conta;
 use App\Models\Credito;
@@ -85,7 +84,6 @@ class CreatePedidoMutation extends Mutation
     protected function updateOrders($pedidos)
     {
         foreach ($pedidos as $pedido) {
-            $pedido->totalize();
             $pedido->save();
         }
     }
@@ -140,26 +138,26 @@ class CreatePedidoMutation extends Mutation
      * @param int $level
      * @return Item[]
      */
-    protected function saveItem($item_data, $pedido, $prestador, $funcionario_id, $level, &$pedidos_afetados)
+    protected function saveItem($data, $pedido, $prestador, $funcionario_id, $level, &$pedidos_afetados)
     {
         $item = new Item();
-        $cancelamento = $item_data['cancelado'] ?? false;
-        if (isset($item_data['id'])) {
+        $cancelamento = $data['cancelado'] ?? false;
+        if (isset($data['id'])) {
             // permite mover um item de uma mesa para outra
             $query = Item::where('cancelado', false);
             if ($cancelamento) {
                 // só deixa cancelar itens desse pedido
                 $query->where('pedido_id', $pedido->id);
             }
-            $item = $query->findOrFail($item_data['id']);
+            $item = $query->findOrFail($data['id']);
             if ($item->pedido_id != $pedido->id && !isset($pedidos_afetados[$item->pedido_id])) {
                 $pedidos_afetados[$item->pedido_id] = Pedido::findOrFail($item->pedido_id);
             }
         }
         if ($cancelamento) {
-            $item_data = array_intersect_key($item_data, array_flip(['cancelado', 'motivo', 'desperdicado']));
+            $data = array_intersect_key($data, array_flip(['cancelado', 'motivo', 'desperdicado']));
         }
-        $item->fill($item_data);
+        $item->fill($data);
         if ($cancelamento) {
             $item->save();
             return $item;
@@ -178,7 +176,7 @@ class CreatePedidoMutation extends Mutation
             $item->save();
             return $item;
         }
-        $formations = self::makeFormations($item_data['formacoes'] ?? []);
+        $formations = self::makeFormations($data['formacoes'] ?? []);
         if ($item->produto->tipo != Produto::TIPO_PACOTE) {
             self::saveItemFormation($item, $formations, $pedido);
             return $item;
@@ -186,17 +184,17 @@ class CreatePedidoMutation extends Mutation
         $montagem = new Montagem($item->toArray());
         $montagem->initialize();
         $montagem->addItem($item, $formations, true);
-        $subitens = $item_data['subitens'] ?? [];
-        foreach ($subitens as $subitem_data) {
+        $subitens = $data['subitens'] ?? [];
+        foreach ($subitens as $subdata) {
             $subitem = $this->saveItem(
-                $subitem_data,
+                $subdata,
                 $pedido,
                 $prestador,
                 $funcionario_id,
                 1,
                 $pedidos_afetados
             );
-            $subformations = self::makeFormations($subitem_data['formacoes'] ?? []);
+            $subformations = self::makeFormations($subdata['formacoes'] ?? []);
             $montagem->addItem($subitem, $subformations);
         }
         $montagem->verify();
@@ -224,9 +222,9 @@ class CreatePedidoMutation extends Mutation
     {
         $itens = [];
         $pedidos_afetados = [];
-        foreach ($data_itens as $item_data) {
+        foreach ($data_itens as $data) {
             $itens[] = $this->saveItem(
-                $item_data,
+                $data,
                 $pedido,
                 $prestador,
                 $funcionario_id,
@@ -269,50 +267,81 @@ class CreatePedidoMutation extends Mutation
         $pagamento->cheque_id = $cheque->id;
     }
 
-    protected function savePayments($data_pagamentos, $pedido, $funcionario_id)
+    /**
+     * Salva o pagamento do pedido
+     *
+     * @param array $pagamento_data
+     * @param Pedido $pedido
+     * @param int $funcionario_id
+     * @return Pagamento
+     */
+    protected function savePayment($data, $pedido, $funcionario_id)
     {
-        // guarda as associações de pagamentos parcelados
-        $index = 0;
-        $pagamentos_ids = [];
-        $pagamentos = [];
-        foreach ($data_pagamentos as $pagamento_data) {
-            $pagamento = new Pagamento();
-            if (isset($pagamento_data['id'])) {
-                $pagamento = $pedido->pagamentos()->where('id', $pagamento_data['id'])->firstOrFail();
-            }
-            $cancelamento = ($pagamento_data['estado'] ?? null) == Pagamento::ESTADO_CANCELADO;
-            if ($cancelamento) {
-                $pagamento_data = array_intersect_key($pagamento_data, array_flip(['estado']));
-            }
-            $pagamento->fill($pagamento_data);
-            if (!$cancelamento) {
-                $pagamento->pedido_id = $pedido->id;
-                $pagamento->funcionario_id = $funcionario_id;
-                $pagamento->moeda_id = $pagamento->moeda_id ?? app('currency')->id;
-                // cria objetos do pagamento como conta, desconto do crédito e folha de cheque
-                if (isset($pagamento_data['credito'])) {
-                    $this->payWithBalance($pagamento, $pagamento_data['credito'], $pedido, $funcionario_id);
-                } elseif (is_null($funcionario_id)) {
-                    // não cadastra conta e nem cheque
-                } elseif (isset($pagamento_data['crediario'])) {
-                    $this->payCreateAccount($pagamento, $pagamento_data['crediario'], $pedido, $funcionario_id);
-                } elseif (isset($pagamento_data['cheque'])) {
-                    $this->payWithCheck($pagamento, $pagamento_data['cheque'], $pedido);
-                }
-                // remapeia pagamentos parcelados
-                if (isset($pagamento_data['pagamento_id'])) {
-                    if (!isset($pagamentos_ids[$pagamento_data['pagamento_id']])) {
-                        throw new Exception(__('messages.sub_payment_not_found'));
-                    }
-                    $pagamento->pagamento_id = $pagamentos_ids[$pagamento_data['pagamento_id']];
-                }
-            }
-            $pagamento->save();
-            $pagamentos_ids[$index] = $pagamento->id;
-            $pagamentos[] = $pagamento;
-            $index++;
+        $pagamento = new Pagamento();
+        if (isset($data['id'])) {
+            $pagamento = $pedido->pagamentos()->where('id', $data['id'])->firstOrFail();
         }
-        return $pagamentos;
+        $cancelamento = ($data['estado'] ?? null) == Pagamento::ESTADO_CANCELADO;
+        if ($cancelamento) {
+            $data = array_intersect_key($data, array_flip(['estado']));
+        }
+        $pagamento->fill($data);
+        if ($cancelamento) {
+            $pagamento->save();
+            return $pagamento;
+        }
+        $pagamento->pedido_id = $pedido->id;
+        $pagamento->funcionario_id = $funcionario_id;
+        $pagamento->moeda_id = $pagamento->moeda_id ?? app('currency')->id;
+        // cria objetos do pagamento como conta, desconto do crédito e folha de cheque
+        if (isset($data['credito'])) {
+            $this->payWithBalance($pagamento, $data['credito'], $pedido, $funcionario_id);
+        } elseif (is_null($funcionario_id)) {
+            // não cadastra conta e nem cheque
+        } elseif (isset($data['crediario'])) {
+            $this->payCreateAccount($pagamento, $data['crediario'], $pedido, $funcionario_id);
+        } elseif (isset($data['cheque'])) {
+            $this->payWithCheck($pagamento, $data['cheque'], $pedido);
+        }
+        $pagamento->save();
+        if (count($data['itens'] ?? []) > 0) {
+            // marca os itens como pago por esse pagamento
+            Item::whereIn('id', $data['itens'])
+                ->where('cancelado', false)
+                ->where('pedido_id', $pedido->id)
+                ->whereNull('pagamento_id')
+                ->update(['pagamento_id' => $pagamento->id]);
+        }
+        return $pagamento;
+    }
+
+    /**
+     * Salva uma lista de pagamentos
+     *
+     * @param array $data_pagamentos
+     * @param Pedido $pedido
+     * @param int $funcionario_id
+     * @param int $pagamento_id
+     * @return Pagamento[]
+     */
+    protected function savePayments(
+        $data_pagamentos,
+        $pedido,
+        $funcionario_id,
+        $pagamento_id = null
+    ) {
+        foreach ($data_pagamentos as $pagamento_data) {
+            $pagamento_data['pagamento_id'] = $pagamento_id;
+            $pagamento = $this->savePayment($pagamento_data, $pedido, $funcionario_id);
+            if (isset($pagamento_data['subpagamentos'])) {
+                $this->savePayments(
+                    $pagamento_data['subpagamentos'],
+                    $pedido,
+                    $funcionario_id,
+                    $pagamento->id
+                );
+            }
+        }
     }
 
     public function resolve($root, $args)

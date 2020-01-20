@@ -369,5 +369,9 @@ class Pagamento extends Model implements
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => self::ESTADO_CANCELADO]);
         }
+        // desmarca os itens pago por esse pagamento
+        Item::where('cancelado', false)
+            ->where('pagamento_id', $this->id)
+            ->update(['pagamento_id' => null]);
     }
 }

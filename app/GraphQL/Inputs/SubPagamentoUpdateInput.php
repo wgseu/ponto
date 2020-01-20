@@ -28,27 +28,14 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
+use App\Concerns\OptionalFields;
 
-class PagamentoInput extends SubPagamentoInput
+class SubPagamentoUpdateInput extends SubPagamentoInput
 {
+    use OptionalFields;
+
     protected $attributes = [
-        'name' => 'PagamentoInput',
+        'name' => 'SubPagamentoUpdateInput',
         'description' => 'Pagamentos de contas e pedidos',
     ];
-
-    public function fields(): array
-    {
-        return array_merge(parent::fields(), [
-            'subpagamentos' => [
-                'type' => Type::listOf(GraphQL::type('SubPagamentoUpdateInput')),
-                'description' => 'Lista com troco ou parcelas',
-            ],
-            'itens' => [
-                'type' => Type::listOf(Type::id()),
-                'description' => 'Itens para marcar como pago',
-            ],
-        ]);
-    }
 }

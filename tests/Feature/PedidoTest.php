@@ -106,4 +106,51 @@ class PedidoTest extends TestCase
             $prestador_headers
         );
     }
+
+    public function testMarkItemPaidWithChange()
+    {
+        $headers = PrestadorTest::authOwner();
+        $item = factory(Item::class)->create();
+        $pedido = $item->pedido;
+        // atualiza os totais
+        $pedido->save();
+        $pagamento_data = factory(Pagamento::class)->raw([
+            'lancado' => $item->total + 10.00,
+            'estado' => Pagamento::ESTADO_PAGO,
+            'itens' => [$item->id],
+        ]);
+        $pagamento_data['subpagamentos'] = [
+            factory(Pagamento::class)->raw([
+                'lancado' => -10.00,
+                'estado' => Pagamento::ESTADO_PAGO,
+            ])
+        ];
+        $this->graphfl(
+            'update_pedido',
+            [
+                'id' => $pedido->id,
+                'input' => [
+                    'pagamentos' => [ $pagamento_data ],
+                ]
+            ],
+            $headers
+        );
+        $pedido->refresh();
+        $this->assertEquals(-10, $pedido->troco);
+        $item->refresh();
+        $pagamento = $pedido->pagos()->first();
+        $troco = $pedido->trocos()->first();
+        // o item foi marcado como pago
+        $this->assertEquals($pagamento->id, $item->pagamento_id);
+        // o troco ficou dentro do pagamento
+        $this->assertEquals($pagamento->id, $troco->pagamento_id);
+        // testa cancelamento do pagamento do item
+        $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
+        $item->refresh();
+        // o item foi desmarcado como pago
+        $this->assertNull($item->pagamento_id);
+        $troco->refresh();
+        // o troco precisa ser cancelado junto
+        $this->assertEquals(Pagamento::ESTADO_CANCELADO, $troco->estado);
+    }
 }

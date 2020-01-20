@@ -43,14 +43,14 @@ class MovimentacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'caixa_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Caixa a qual pertence essa movimentação',
-            ],
             'aberta' => [
                 'type' => Type::boolean(),
                 'description' => 'Informa se o caixa está aberto',
             ],
+            'valor_inicial' => [
+                'type' => Type::float(),
+                'description' => 'Valor inicial de abertura do caixa',
+            ]
         ];
     }
 }

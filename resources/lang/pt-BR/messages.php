@@ -971,4 +971,9 @@ return [
     'comission' => 'Comissão',
     'comission_service_description' => 'Comissão do(a) atendente',
     'parent_item_no_cancelled' => 'Esse subitem não pode ser cancelado individualmente',
+    'insufficient_funds' => 'O saldo da conta Tesouraria é insuficiente para abertura de caixa',
+    'treasury' => 'Tesouraria',
+    'device_without_till' => 'Esse dispositivo não está associado a nenhum caixa',
+    'open_till_transfer' => 'Abertura de caixa, movimentação :value',
+    'open_till_base' => 'Fundo de caixa',
 ];

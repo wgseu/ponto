@@ -52,8 +52,17 @@ class DispositivoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Setor em que o dispositivo está instalado/será usado',
             ],
+            'setor' => [
+                'type' => GraphQL::type('Setor'),
+                'description' => 'Setor em que o dispositivo está instalado/será usado',
+            ],
             'caixa_id' => [
                 'type' => Type::id(),
+                'description' => 'Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os' .
+                    ' dispositivos',
+            ],
+            'caixa' => [
+                'type' => GraphQL::type('Caixa'),
                 'description' => 'Finalidade do dispositivo, caixa ou terminal, o caixa é único entre os' .
                     ' dispositivos',
             ],

@@ -28,11 +28,17 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Exceptions\Exception;
+use App\Models\Forma;
 use App\Models\Movimentacao;
+use App\Models\Pagamento;
+use App\Models\Saldo;
 use App\Models\Sessao;
+use App\Util\Number;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateMovimentacaoMutation extends Mutation
@@ -43,7 +49,8 @@ class CreateMovimentacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('movimentacao:create');
+        return Auth::check() && Auth::user()->can('movimentacao:create')
+            && auth('device')->check() && auth('device')->user()->isValid();
     }
 
     public function type(): Type
@@ -60,13 +67,58 @@ class CreateMovimentacaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
+        $input = $args['input'];
+        if (is_null(auth('device')->user()->caixa_id)) {
+            throw new Exception(__('messages.device_without_till'));
+        }
         $movimentacao = new Movimentacao();
         $movimentacao->fill($args['input']);
-        $prestador = auth()->user()->prestador;
-        $sessao = Sessao::where('aberta', true)->first();
-        $movimentacao->iniciador_id = $prestador->id;
-        $movimentacao->sessao_id = !is_null($sessao) ? $sessao->id : null;
-        $movimentacao->createSessaoOrSave();
-        return $movimentacao;
+        DB::transaction(function () use ($movimentacao, $input) {
+            $prestador = auth()->user()->prestador;
+            $sessao = Sessao::where('aberta', true)->first();
+            $caixa = auth('device')->user()->caixa;
+            $movimentacao->iniciador_id = $prestador->id;
+            $movimentacao->sessao_id = !is_null($sessao) ? $sessao->id : null;
+            $movimentacao->caixa_id = $caixa->id;
+            $movimentacao->createSessaoOrSave();
+            $valor_inicial = $input['valor_inicial'];
+            if (!Number::isGreater($valor_inicial, 0)) {
+                return;
+            }
+            $forma = Forma::where('tipo', Forma::TIPO_DINHEIRO)
+                ->where('ativa', true)->firstOrFail();
+            $tesouraria = $forma->carteira;
+            $saldo = Saldo::where('moeda_id', app('currency')->id)
+                ->where('carteira_id', $tesouraria->id)->first();
+            if (
+                (!is_null($saldo) && $saldo->valor >= $valor_inicial)
+                || (is_null($saldo) && $valor_inicial == 0)
+            ) {
+                $origem = new Pagamento([
+                    'moeda_id' => app('currency')->id,
+                    'forma_id' => $forma->id,
+                    'valor' => $valor_inicial * -1,
+                    'estado' => Pagamento::ESTADO_PAGO,
+                    'lancado' => $valor_inicial * -1,
+                    'detalhes' => __('messages.open_till_transfer', ['value' => $movimentacao->id]),
+                    'prestador_id' => $movimentacao->iniciador->id,
+                ]);
+                $origem->save();
+                $destino = new Pagamento([
+                    'moeda_id' => app('currency')->id,
+                    'carteira_id' => $movimentacao->caixa->carteira->id,
+                    'forma_id' => $forma->id,
+                    'movimentacao_id' => $movimentacao->id,
+                    'valor' => $valor_inicial,
+                    'estado' => Pagamento::ESTADO_PAGO,
+                    'lancado' => $valor_inicial,
+                    'detalhes' => __('messages.open_till_base'),
+                    'prestador_id' => $movimentacao->iniciador->id,
+                ]);
+                $destino->save();
+                return $movimentacao;
+            }
+            throw new Exception(__('messages.insufficient_funds'));
+        });
     }
 }

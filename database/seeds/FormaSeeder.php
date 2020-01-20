@@ -14,10 +14,11 @@ class FormaSeeder extends Seeder
     public function run()
     {
         $carteira = Carteira::where('descricao', __('messages.cash_drawer_number', ['number' => 1]))->first();
+        $tesouraria = Carteira::where('descricao', __('messages.treasury'))->first();
         (new Forma([
             'descricao' => __('messages.money'),
             'tipo' => Forma::TIPO_DINHEIRO,
-            'carteira_id' => $carteira->id,
+            'carteira_id' => $tesouraria->id,
         ]))->save();
         (new Forma([
             'descricao' => __('messages.credit'),

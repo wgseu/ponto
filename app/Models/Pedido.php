@@ -474,6 +474,14 @@ class Pedido extends Model implements
         if (!in_array($this->estado, [self::ESTADO_ABERTO, self::ESTADO_AGENDADO])) {
             $errors['estado'] = __('messages.order_mustbe_open_scheduled');
         }
+        if (
+            $this->tipo == self::TIPO_MESA &&
+            Juncao::where('mesa_id', $this->mesa_id)
+                ->where('estado', Juncao::ESTADO_ASSOCIADO)
+                ->exists()
+        ) {
+            return ['mesa_id' => __('messages.table_in_use_unified')];
+        }
         return $errors;
     }
 

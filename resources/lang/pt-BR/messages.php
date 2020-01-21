@@ -971,4 +971,6 @@ return [
     'comission' => 'Comissão',
     'comission_service_description' => 'Comissão do(a) atendente',
     'parent_item_no_cancelled' => 'Esse subitem não pode ser cancelado individualmente',
+
+    'table_in_use_unified' => 'Essa mesa já está unificada com outra mesa',
 ];

@@ -12,6 +12,7 @@
 */
 
 Route::get('/account/verify/{token}', 'AccountVerifyController@activateByToken');
+Route::get('/sync/license/{token}', 'SyncLicenseController@callCommand');
 
 Route::get('/loginExemplo', 'LoginController@login');
 Route::post('login/google', 'LoginGoogleController@login');

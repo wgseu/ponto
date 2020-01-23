@@ -29,6 +29,9 @@ declare(strict_types=1);
 namespace App\GraphQL\Utils;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Filter
 {
@@ -37,9 +40,10 @@ class Filter
      *
      * @param array $filter
      * @param Builder $query
+     * @param Model $model
      * @return Builder
      */
-    public static function apply($filter, $query)
+    public static function apply($filter, $query, $model = null)
     {
         foreach ($filter as $key => $stmt) {
             if (!is_array($stmt)) {
@@ -48,6 +52,25 @@ class Filter
             }
             $operator = key($stmt);
             $value = $stmt[$operator];
+            $model = $model ?: $query->getModel();
+            if (method_exists($model, $key)) {
+                $relation = $model->$key();
+                if ($relation instanceof HasOne || $relation instanceof BelongsTo) {
+                    $table = $relation->getRelated()->getTable();
+                    $query->leftJoin(
+                        $table,
+                        $relation->getQualifiedForeignKeyName(),
+                        '=',
+                        $relation->getQualifiedParentKeyName()
+                    );
+                    $subFilter = [];
+                    foreach ($stmt as $key => $value) {
+                        $subFilter["$table.$key"] = $value;
+                    }
+                    self::apply($subFilter, $query);
+                    continue;
+                }
+            }
             switch ($operator) {
                 case 'eq':
                     if (is_null($value)) {
@@ -84,6 +107,9 @@ class Filter
                 case 'to':
                 case 'le':
                     $query->where($key, '<=', $value);
+                    break;
+                case 'like':
+                    $query->where($key, 'like', $value);
                     break;
                 case 'startsWith':
                     $query->where($key, 'like', $value . '%');

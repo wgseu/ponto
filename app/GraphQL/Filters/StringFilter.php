@@ -19,6 +19,10 @@ class StringFilter extends InputType
             'eq' => [
                 'type' => Type::string(),
             ],
+            'like' => [
+                'type' => Type::string(),
+                'description' => 'Text like give input',
+            ],
             'startsWith' => [
                 'type' => Type::string(),
                 'description' => 'Text start with give input',

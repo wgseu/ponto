@@ -57,6 +57,10 @@ class ItemType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Prestador que lançou esse item no pedido',
             ],
+            'prestador' => [
+                'type' => GraphQL::type('Prestador'),
+                'description' => 'Prestador que lançou esse item no pedido',
+            ],
             'produto_id' => [
                 'type' => Type::id(),
                 'description' => 'Produto vendido',

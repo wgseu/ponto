@@ -26,40 +26,16 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Types;
+namespace App\GraphQL\Inputs;
 
-use App\Models\Fornecedor;
-use Rebing\GraphQL\Support\Facades\GraphQL;
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Type as GraphQLType;
+use App\Concerns\OptionalFields;
 
-class FornecedorType extends GraphQLType
+class SubAvaliacaoUpdateInput extends SubAvaliacaoInput
 {
-    protected $attributes = [
-        'name' => 'Fornecedor',
-        'description' => 'Fornecedores de produtos',
-        'model' => Fornecedor::class,
-    ];
+    use OptionalFields;
 
-    public function fields(): array
-    {
-        return [
-            'id' => [
-                'type' => Type::id(),
-                'description' => 'Identificador do fornecedor',
-            ],
-            'empresa_id' => [
-                'type' => Type::id(),
-                'description' => 'Empresa do fornecedor',
-            ],
-            'prazo_pagamento' => [
-                'type' => Type::int(),
-                'description' => 'Prazo em dias para pagamento do fornecedor',
-            ],
-            'data_cadastro' => [
-                'type' => GraphQL::type('DateTime'),
-                'description' => 'Data de cadastro do fornecedor',
-            ],
-        ];
-    }
+    protected $attributes = [
+        'name' => 'SubAvaliacaoUpdateInput',
+        'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
+    ];
 }

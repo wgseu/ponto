@@ -56,18 +56,6 @@ class IntegracaoFilter extends InputType
             'tipo' => [
                 'type' => GraphQL::type('IntegracaoTipoFilter'),
             ],
-            'login' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'secret' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'opcoes' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
-            'associacoes' => [
-                'type' => GraphQL::type('StringFilter'),
-            ],
             'ativo' => [
                 'type' => Type::boolean(),
             ],

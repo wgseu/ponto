@@ -28,7 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Catalogo;
-use App\Models\Fornecedor;
+use App\Models\Cliente;
 use App\Models\Produto;
 
 class CatalogoTest extends TestCase
@@ -37,7 +37,7 @@ class CatalogoTest extends TestCase
     {
         $headers = PrestadorTest::authOwner();
         $produto_id = factory(Produto::class)->create();
-        $fornecedor_id = factory(Fornecedor::class)->create();
+        $fornecedor_id = factory(Cliente::class)->create();
         $response = $this->graphfl('create_catalogo', [
             'input' => [
                 'produto_id' => $produto_id->id,

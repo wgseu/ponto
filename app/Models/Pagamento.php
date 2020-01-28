@@ -95,6 +95,7 @@ class Pagamento extends Model implements
     protected $attributes = [
         'numero_parcela' => 1,
         'parcelas' => 1,
+        'taxas' => 0,
         'estado' => self::ESTADO_ABERTO,
     ];
 
@@ -249,6 +250,7 @@ class Pagamento extends Model implements
         if (!is_null($forma) && is_null($this->carteira_id)) {
             $this->carteira_id = $forma->carteira_id;
         }
+        $carteira = $this->carteira;
         $moeda = $this->moeda;
         $this->valor = $moeda->conversao * $this->lancado;
         if ($this->estado == self::ESTADO_PAGO) {
@@ -263,6 +265,13 @@ class Pagamento extends Model implements
             $this->data_pagamento = null;
             $this->data_compensacao = null;
         }
+        if (!is_null($cartao)) {
+            $this->taxas = ($this->valor * $cartao->taxa / 100) * -1;
+        }
+        if (!is_null($this->pedido_id)) {
+            $this->taxas += $carteira->transacao;
+        }
+        $this->total = $this->valor + $this->taxas;
         return $this;
     }
 
@@ -334,9 +343,9 @@ class Pagamento extends Model implements
             return;
         }
         if ($this->pago()) {
-            $valor = $this->valor;
+            $total = $this->total;
         } else {
-            $valor = -$this->valor;
+            $total = -$this->total;
         }
         $saldo = Saldo::firstOrCreate(
             [
@@ -345,7 +354,7 @@ class Pagamento extends Model implements
             ],
             [ 'valor' => 0 ]
         );
-        $saldo->increment('valor', $valor);
+        $saldo->increment('valor', $total);
     }
 
     protected function cancelDependencies()

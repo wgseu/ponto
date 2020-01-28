@@ -83,6 +83,12 @@ class PagamentoFilter extends InputType
             'credito_id' => [
                 'type' => GraphQL::type('IdFilter'),
             ],
+            'total' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
+            'taxas' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
             'valor' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],

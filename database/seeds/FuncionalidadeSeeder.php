@@ -367,22 +367,10 @@ class FuncionalidadeSeeder extends Seeder
             'descricao' => __('messages.formacao_functionality_description'),
         ]))->save();
         (new Funcionalidade([
-            'id' => 28,
-            'modulo_id' => null,
-            'nome' => __('messages.endereco_functionality_name'),
-            'descricao' => __('messages.endereco_functionality_description'),
-        ]))->save();
-        (new Funcionalidade([
             'id' => 38,
             'modulo_id' => null,
             'nome' => __('messages.horario_functionality_name'),
             'descricao' => __('messages.horario_functionality_description'),
-        ]))->save();
-        (new Funcionalidade([
-            'id' => 58,
-            'modulo_id' => null,
-            'nome' => __('messages.patrimonio_functionality_name'),
-            'descricao' => __('messages.patrimonio_functionality_description'),
         ]))->save();
         (new Funcionalidade([
             'id' => 43,

@@ -112,6 +112,14 @@ class PagamentoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Crédito que foi utilizado para pagar o pedido',
             ],
+            'total' => [
+                'type' => Type::float(),
+                'description' => 'Total recebido ou pago incluso as taxas',
+            ],
+            'taxas' => [
+                'type' => Type::float(),
+                'description' => 'Taxas cobradas pelas operadoras de cartões',
+            ],
             'valor' => [
                 'type' => Type::float(),
                 'description' => 'Valor pago ou recebido na moeda informada no momento do recebimento',

@@ -47,6 +47,9 @@ class ClienteFilter extends InputType
             'tipo' => [
                 'type' => GraphQL::type('ClienteTipoFilter'),
             ],
+            'fornecedor' => [
+                'type' => Type::boolean(),
+            ],
             'telefone' => [
                 'type' => GraphQL::type('TelefoneFilter'),
             ],

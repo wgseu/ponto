@@ -1,9 +1,0 @@
-mutation createPatrimonio($input: PatrimonioInput!) {
-  CreatePatrimonio(input: $input) {
-    id
-    empresa_id
-    numero
-    descricao
-    quantidade
-  }
-}

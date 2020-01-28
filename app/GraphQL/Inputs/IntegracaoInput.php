@@ -42,25 +42,6 @@ class IntegracaoInput extends InputType
     public function fields(): array
     {
         return [
-            'nome' => [
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'Nome do módulo de integração',
-                'rules' => ['max:45'],
-            ],
-            'codigo' => [
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'Identicador da integração nome unix_case',
-                'rules' => ['max:45'],
-            ],
-            'descricao' => [
-                'type' => Type::string(),
-                'description' => 'Descrição do módulo integrador',
-                'rules' => ['max:200'],
-            ],
-            'tipo' => [
-                'type' => GraphQL::type('IntegracaoTipo'),
-                'description' => 'Tipo de integração se pedido, login, dispositivo, pagamento, outros',
-            ],
             'login' => [
                 'type' => Type::string(),
                 'description' => 'Login de acesso à API de sincronização',
@@ -70,11 +51,6 @@ class IntegracaoInput extends InputType
                 'type' => Type::string(),
                 'description' => 'Chave secreta para acesso à API',
                 'rules' => ['max:200'],
-            ],
-            'opcoes' => [
-                'type' => Type::string(),
-                'description' => 'Opções da integração, estados e tokens da loja',
-                'rules' => ['max:65535'],
             ],
             'associacoes' => [
                 'type' => Type::string(),

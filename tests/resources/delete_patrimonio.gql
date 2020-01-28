@@ -1,5 +1,0 @@
-mutation ($id: ID!) {
-  DeletePatrimonio(id: $id) {
-    id
-  }
-}

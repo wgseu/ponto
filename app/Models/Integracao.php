@@ -78,13 +78,12 @@ class Integracao extends Model implements ValidateInterface
      * @var array
      */
     protected $fillable = [
-        'nome',
         'codigo',
+        'nome',
         'descricao',
         'tipo',
         'login',
         'secret',
-        'opcoes',
         'associacoes',
         'ativo',
     ];

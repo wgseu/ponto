@@ -27,17 +27,26 @@
 namespace App\Models;
 
 use App\Concerns\ModelEvents;
+use App\Interfaces\AfterSaveInterface;
+use App\Interfaces\BeforeSaveInterface;
+use App\Interfaces\ValidateInsertInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use App\Interfaces\ValidateInsertInterface;
+use App\Interfaces\ValidateInterface;
 
 /**
  * Avaliação de atendimento e outros serviços do estabelecimento
  */
 class Avaliacao extends Model implements
-    ValidateInsertInterface
+    BeforeSaveInterface,
+    ValidateInsertInterface,
+    ValidateInterface,
+    AfterSaveInterface
 {
     use ModelEvents;
+
+    public const UPDATED_AT = null;
+    public const CREATED_AT = 'data_avaliacao';
 
     /**
      * The table associated with the model.
@@ -45,13 +54,6 @@ class Avaliacao extends Model implements
      * @var string
      */
     protected $table = 'avaliacoes';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -65,7 +67,7 @@ class Avaliacao extends Model implements
         'produto_id',
         'estrelas',
         'comentario',
-        'data_avaliacao',
+        'publico',
     ];
 
     /**
@@ -101,40 +103,101 @@ class Avaliacao extends Model implements
         return $this->belongsTo(Produto::class, 'produto_id');
     }
 
-    public function metrics()
+    /**
+     * Reavalia a métrica e resumo ou o produto
+     *
+     * @return void
+     */
+    public function reassess()
     {
-        if (!is_null($this->pedido_id) && !is_null($this->produto_id)) {
-            $metrica = $this->metrica;
+        if (is_null($this->metrica_id)) {
+            // avaliação resumo
+            return;
+        }
+        $metrica = $this->metrica;
+        if (!is_null($this->produto_id)) {
             $total = self::where('produto_id', $this->produto_id)
                 ->limit($metrica->quantidade)
                 ->orderBy('id', 'DESC')
                 ->avg('estrelas');
             $produto = $this->produto;
-            $produto->avaliacao = $total;
-            $produto->save();
-            return;
+            $produto->update(['avaliacao' => $total]);
         }
-        $metrica = $this->metrica;
         $estrelas = self::where('metrica_id', $this->metrica_id)
             ->limit($metrica->quantidade)
             ->orderBy('id', 'DESC')
             ->avg('estrelas');
-        $metrica->avaliacao = $estrelas / $metrica->quantidade;
-        $metrica->save();
+        $metrica->update(['avaliacao' => $estrelas]);
+
+        // força recálculo da avaliação resumida
+        $avaliacao_resumo = self::where('pedido_id', $this->pedido_id)
+            ->whereNull('metrica_id')->first();
+        if (!is_null($avaliacao_resumo)) {
+            $avaliacao_resumo->save();
+        }
+    }
+
+    public function beforeSave($old)
+    {
+        if (!is_null($this->metrica_id)) {
+            // não é avaliação resumo
+            return;
+        }
+        $this->estrelas = self::where('pedido_id', $this->pedido_id)
+            ->whereNotNull('metrica_id')
+            ->avg('estrelas');
     }
 
     public function onInsert()
     {
-        $errors = [];
-        $avaliacao = self::where('pedido_id', $this->pedido_id)->first();
-        if (!is_null($avaliacao)) {
-            $errors['pedido_id'] = __('messages.order_have_evaluation');
+        if (
+            !is_null($this->produto_id) &&
+            !$this->pedido->itens()->where('produto_id', $this->produto_id)->exists()
+        ) {
+            return ['pedido_id' => __('messages.cannot_evaluate_non_buy_product')];
+        }
+    }
+
+    public function validate($old)
+    {
+        if (is_null($this->metrica_id) && !is_null($this->produto_id)) {
+            return ['pedido_id' => __('messages.product_have_no_metric')];
+        }
+        $query = self::where('pedido_id', $this->pedido_id);
+        if (is_null($this->metrica_id)) {
+            $query->whereNull('metrica_id');
+        } else {
+            $query->where('metrica_id', $this->metrica_id);
+        }
+        if (is_null($this->produto_id)) {
+            $query->whereNull('produto_id');
+        } else {
+            $query->where('produto_id', $this->produto_id);
+        }
+        if (!is_null($old)) {
+            $query->where('id', '<>', $old->id);
+        }
+        if ($query->exists()) {
+            return ['pedido_id' => __('messages.order_have_evaluation')];
+        }
+        if (!is_null($old) && !$this->isChangeAllowed(['publico', 'estrelas'])) {
+            return ['id' => __('messages.evaluation_change_not_allowed')];
         }
         $pedido = $this->pedido;
-        $days = Carbon::now()->diff($pedido->data_criacao)->days;
-        if (!is_null($pedido) && $days > 7) {
-            $errors['pedido_id'] = __('messages.order_more_week');
+        if ($pedido->cancelled()) {
+            return ['pedido_id' => __('messages.cannot_evaluate_cancelled_order')];
         }
-        return $errors;
+        if (!$pedido->closed()) {
+            return ['pedido_id' => __('messages.cannot_evaluate_open_order')];
+        }
+        $days = Carbon::now()->diff($pedido->data_criacao)->days;
+        if ($days > 3) {
+            return ['pedido_id' => __('messages.cannot_evaluate_more_3_days')];
+        }
+    }
+
+    public function afterSave($old)
+    {
+        $this->reassess();
     }
 }

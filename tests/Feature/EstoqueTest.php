@@ -28,7 +28,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Estoque;
-use App\Models\Fornecedor;
+use App\Models\Cliente;
 use App\Models\Item;
 use App\Models\Prestador;
 use App\Models\Produto;
@@ -166,10 +166,10 @@ class EstoqueTest extends TestCase
 
     public function testBelongToFornecedor()
     {
-        $fornecedor = factory(Fornecedor::class)->create();
+        $fornecedor = factory(Cliente::class)->create();
         $estoque = factory(Estoque::class)->create(['fornecedor_id' => $fornecedor->id]);
         $result = $estoque->fornecedor;
-        $expected = Fornecedor::find($estoque->fornecedor_id);
+        $expected = Cliente::find($estoque->fornecedor_id);
         $this->assertEquals($expected, $result);
     }
 

@@ -83,6 +83,12 @@ class PagamentoOrder extends InputType
             'credito_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'total' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'taxas' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'valor' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

@@ -66,7 +66,7 @@ class AvaliacaoType extends GraphQLType
                 'description' => 'Produto que foi avaliado',
             ],
             'estrelas' => [
-                'type' => Type::int(),
+                'type' => Type::float(),
                 'description' => 'Quantidade de estrelas de 1 a 5',
             ],
             'comentario' => [

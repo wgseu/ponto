@@ -96,6 +96,10 @@ class PedidoInput extends InputType
                     ' pagar. Concluído: O pedido foi pago e concluído, Cancelado: O pedido foi' .
                     ' cancelado com os itens e pagamentos',
             ],
+            'descontos' => [
+                'type' => Type::float(),
+                'description' => 'Total de descontos nesse pedido',
+            ],
             'pessoas' => [
                 'type' => Type::int(),
                 'description' => 'Informa quantas pessoas estão na mesa',

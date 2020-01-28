@@ -39,17 +39,13 @@ class IntegracaoTest extends TestCase
         $this->graphfl('update_integracao', [
             'id' => $integracao->id,
             'input' => [
-                'nome' => 'Atualizou',
-                'opcoes' => '{
-                    "token" : "abc123"
-                }',
                 'associacoes' => '{
                     "teste": "123"
                 }'
             ]
         ], $headers);
         $integracao->refresh();
-        $this->assertEquals('Atualizou', $integracao->nome);
+        $this->assertEquals('{"teste":"123"}', $integracao->associacoes);
     }
 
     public function testFindIntegracao()

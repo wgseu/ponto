@@ -1283,27 +1283,6 @@ class PermissaoSeeder extends Seeder
         ]))->save();
 
         (new Permissao([
-            'funcionalidade_id' => 28,
-            'nome' => 'endereco:view',
-            'descricao' => __('messages.endereco_view_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 28,
-            'nome' => 'endereco:create',
-            'descricao' => __('messages.endereco_create_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 28,
-            'nome' => 'endereco:update',
-            'descricao' => __('messages.endereco_update_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 28,
-            'nome' => 'endereco:delete',
-            'descricao' => __('messages.endereco_delete_permition'),
-        ]))->save();
-
-        (new Permissao([
             'funcionalidade_id' => 38,
             'nome' => 'horario:view',
             'descricao' => __('messages.horario_view_permition'),
@@ -1322,27 +1301,6 @@ class PermissaoSeeder extends Seeder
             'funcionalidade_id' => 38,
             'nome' => 'horario:delete',
             'descricao' => __('messages.horario_delete_permition'),
-        ]))->save();
-
-        (new Permissao([
-            'funcionalidade_id' => 58,
-            'nome' => 'patrimonio:view',
-            'descricao' => __('messages.patrimonio_view_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 58,
-            'nome' => 'patrimonio:create',
-            'descricao' => __('messages.patrimonio_create_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 58,
-            'nome' => 'patrimonio:update',
-            'descricao' => __('messages.patrimonio_update_permition'),
-        ]))->save();
-        (new Permissao([
-            'funcionalidade_id' => 58,
-            'nome' => 'patrimonio:delete',
-            'descricao' => __('messages.patrimonio_delete_permition'),
         ]))->save();
 
         (new Permissao([

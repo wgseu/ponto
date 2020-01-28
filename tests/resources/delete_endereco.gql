@@ -1,5 +1,0 @@
-mutation ($id: ID!) {
-  DeleteEndereco(id: $id) {
-    id
-  }
-}

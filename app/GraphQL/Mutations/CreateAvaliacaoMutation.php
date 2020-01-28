@@ -28,11 +28,13 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Exceptions\Exception;
 use App\Models\Pedido;
 use App\Models\Avaliacao;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateAvaliacaoMutation extends Mutation
@@ -59,13 +61,49 @@ class CreateAvaliacaoMutation extends Mutation
         ];
     }
 
+    /**
+     * Salva a lista de avaliação
+     *
+     * @param array $subavaliacoes
+     * @param Avaliacao $resumo
+     * @return void
+     */
+    public static function saveAll($subavaliacoes, $resumo)
+    {
+        $canPublish = auth()->user()->can('avaliacao:update');
+        foreach ($subavaliacoes as $data) {
+            $avaliacao = new Avaliacao();
+            if (!$canPublish) {
+                unset($data['publico']);
+            }
+            if (isset($data['id'])) {
+                $avaliacao = Avaliacao::where('pedido_id', $resumo->pedido_id)
+                    ->findOrFail($data['id']);
+            }
+            $avaliacao->pedido_id = $resumo->pedido_id;
+            $avaliacao->cliente_id = $resumo->cliente_id;
+            $avaliacao->fill($data);
+            $avaliacao->save();
+        }
+    }
+
     public function resolve($root, $args)
     {
-        $avaliacao = new Avaliacao();
-        $avaliacao->fill($args['input']);
-        $avaliacao->cliente_id = auth()->user()->id;
-        $avaliacao->save();
-        $avaliacao->metrics();
-        return $avaliacao;
+        $input = $args['input'];
+        $resumo = new Avaliacao();
+        if (!auth()->user()->can('avaliacao:update')) {
+            unset($input['publico']);
+        }
+        $resumo->fill($input);
+        $resumo->cliente_id = auth()->user()->id;
+        $subavaliacoes = $input['subavaliacoes'] ?? [];
+        if (count($subavaliacoes) == 0) {
+            throw new Exception(__('messages.no_evaluation_given'));
+        }
+        DB::transaction(function () use ($resumo, $subavaliacoes) {
+            self::saveAll($subavaliacoes, $resumo);
+            $resumo->save();
+        });
+        return $resumo;
     }
 }

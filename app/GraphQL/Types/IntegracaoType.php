@@ -48,13 +48,13 @@ class IntegracaoType extends GraphQLType
                 'type' => Type::id(),
                 'description' => 'Identificador da integração',
             ],
-            'nome' => [
-                'type' => Type::string(),
-                'description' => 'Nome do módulo de integração',
-            ],
             'codigo' => [
                 'type' => Type::string(),
                 'description' => 'Identicador da integração nome unix_case',
+            ],
+            'nome' => [
+                'type' => Type::string(),
+                'description' => 'Nome do módulo de integração',
             ],
             'descricao' => [
                 'type' => Type::string(),
@@ -71,10 +71,6 @@ class IntegracaoType extends GraphQLType
             'secret' => [
                 'type' => Type::string(),
                 'description' => 'Chave secreta para acesso à API',
-            ],
-            'opcoes' => [
-                'type' => Type::string(),
-                'description' => 'Opções da integração, estados e tokens da loja',
             ],
             'associacoes' => [
                 'type' => Type::string(),

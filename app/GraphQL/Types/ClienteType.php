@@ -54,6 +54,10 @@ class ClienteType extends GraphQLType
                 'type' => GraphQL::type('ClienteTipo'),
                 'description' => 'Informa o tipo de pessoa, que pode ser física ou jurídica',
             ],
+            'fornecedor' => [
+                'type' => Type::boolean(),
+                'description' => 'Informe se o registro é de um fornecedor',
+            ],
             'empresa_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa se esse cliente faz parte da empresa informada',

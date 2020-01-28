@@ -89,6 +89,7 @@ class Cliente extends User implements
      */
     protected $fillable = [
         'tipo',
+        'fornecedor',
         'empresa_id',
         'login',
         'senha',
@@ -125,6 +126,7 @@ class Cliente extends User implements
      */
     protected $attributes = [
         'tipo' => self::TIPO_FISICA,
+        'fornecedor' => false,
         'status' => self::STATUS_INATIVO,
     ];
 

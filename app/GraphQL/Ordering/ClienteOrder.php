@@ -48,6 +48,9 @@ class ClienteOrder extends InputType
             'tipo' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'fornecedor' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'empresa_id' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],

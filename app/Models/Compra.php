@@ -77,7 +77,7 @@ class Compra extends Model
      */
     public function fornecedor()
     {
-        return $this->belongsTo(Fornecedor::class, 'fornecedor_id');
+        return $this->belongsTo(Cliente::class, 'fornecedor_id');
     }
 
     /**

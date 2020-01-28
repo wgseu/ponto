@@ -316,13 +316,14 @@ class Item extends Model implements
     public function validate($old)
     {
         $errors = [];
-        if (is_null($this->produto_id) && is_null($this->servico_id) && $this->preco >= 0) {
-            $errors['preco'] = __('messages.invalid_discount_value');
-        } elseif ((!is_null($this->produto_id) || !is_null($this->servico_id)) && $this->preco < 0) {
+        if ($this->preco < 0) {
             $errors['preco'] = __('messages.item_invalid_price');
         }
         if (!is_null($this->produto_id) && !is_null($this->servico_id)) {
             $errors['produto_id'] = __('messages.item_product_service_same_time');
+        }
+        if (is_null($this->produto_id) && is_null($this->servico_id)) {
+            $errors['produto_id'] = __('messages.item_no_product_or_service');
         }
         if ($this->quantidade <= 0) {
             $errors['quantidade'] = __('messages.item_invalid_quantity');

@@ -1,7 +1,0 @@
-mutation updatePatrimonio($id: ID!, $input: PatrimonioUpdateInput!) {
-  UpdatePatrimonio(id: $id, input: $input) {
-    numero
-    descricao
-    quantidade
-  }
-}

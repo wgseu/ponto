@@ -26,32 +26,46 @@
 
 declare(strict_types=1);
 
-namespace App\GraphQL\Ordering;
+namespace App\GraphQL\Inputs;
 
+use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InputType;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class FornecedorOrder extends InputType
+class SubAvaliacaoInput extends InputType
 {
     protected $attributes = [
-        'name' => 'FornecedorOrder',
-        'description' => 'Fornecedores de produtos',
+        'name' => 'SubAvaliacaoInput',
+        'description' => 'Avaliação de atendimento e outros serviços do estabelecimento',
     ];
 
     public function fields(): array
     {
         return [
             'id' => [
-                'type' => GraphQL::type('OrderByEnum'),
+                'type' => Type::id(),
+                'description' => 'Identificador da avaliação para atualização',
             ],
-            'empresa_id' => [
-                'type' => GraphQL::type('OrderByEnum'),
+            'metrica_id' => [
+                'type' => Type::nonNull(Type::id()),
+                'description' => 'Métrica de avaliação',
             ],
-            'prazo_pagamento' => [
-                'type' => GraphQL::type('OrderByEnum'),
+            'produto_id' => [
+                'type' => Type::id(),
+                'description' => 'Produto que foi avaliado',
             ],
-            'data_cadastro' => [
-                'type' => GraphQL::type('OrderByEnum'),
+            'estrelas' => [
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'Quantidade de estrelas de 1 a 5',
+                'rules' => ['min:1', 'max:5'],
+            ],
+            'comentario' => [
+                'type' => Type::string(),
+                'description' => 'Comentário da avaliação',
+                'rules' => ['max:255'],
+            ],
+            'publico' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o comentário está público para visualização',
             ],
         ];
     }

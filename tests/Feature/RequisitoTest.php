@@ -28,7 +28,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\ValidationException;
 use App\Models\Compra;
-use App\Models\Fornecedor;
+use App\Models\Cliente;
 use App\Models\Lista;
 use App\Models\Produto;
 use Tests\TestCase;
@@ -96,7 +96,7 @@ class RequisitoTest extends TestCase
     public function testValidateRequisitoFornecedorDiferenteCompra()
     {
         $compra = factory(Compra::class)->create();
-        $fornecedor = factory(Fornecedor::class)->create();
+        $fornecedor = factory(Cliente::class)->create();
         $this->expectException(ValidationException::class);
         factory(Requisito::class)->create([
             'compra_id' => $compra->id,
@@ -136,9 +136,9 @@ class RequisitoTest extends TestCase
 
     public function testRequisitoBelongToFornecedor()
     {
-        $fornecedor = factory(Fornecedor::class)->create();
+        $fornecedor = factory(Cliente::class)->create();
         $requisito = factory(Requisito::class)->create(['fornecedor_id' => $fornecedor->id]);
-        $expective = Fornecedor::find($requisito->fornecedor_id);
+        $expective = Cliente::find($requisito->fornecedor_id);
         $result = $requisito->fornecedor;
         $this->assertEquals($expective, $result);
     }

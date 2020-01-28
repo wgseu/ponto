@@ -34,9 +34,10 @@ use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\ValidationException;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class UpdateAvaliacaoMutation extends Mutation
+class UpdateAvaliacaoMutation extends CreateAvaliacaoMutation
 {
     protected $attributes = [
         'name' => 'UpdateAvaliacao',
@@ -44,9 +45,11 @@ class UpdateAvaliacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        $avaliacao = Avaliacao::findOrFail($args['id']);
-        $pedido = Pedido::findOrFail($avaliacao->pedido_id);
-        return Auth::check() && $pedido->cliente_id == auth()->user()->id;
+        $pedido = Avaliacao::findOrFail($args['id'])->pedido;
+        return Auth::check() && (
+            $pedido->cliente_id == auth()->user()->id ||
+            auth()->user()->can('avaliacao:update')
+        );
     }
 
     public function type(): Type
@@ -67,14 +70,13 @@ class UpdateAvaliacaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $avaliacao = Avaliacao::findOrFail($args['id']);
-        $pedido = Pedido::findOrFail($avaliacao->pedido_id);
-        if ($pedido->cliente_id != auth()->user()->id) {
-            throw new ValidationException(['update_evaluation' => __('messages.no_permission_update_evaluation')]);
-        }
-        $avaliacao->fill($args['input']);
-        $avaliacao->save();
-        $avaliacao->metrics();
-        return $avaliacao;
+        $resumo = Avaliacao::whereNull('metrica_id')->findOrFail($args['id']);
+        DB::transaction(function () use ($resumo, $args) {
+            $resumo->fill($args['input']);
+            $subavaliacoes = $args['input']['subavaliacoes'] ?? [];
+            self::saveAll($subavaliacoes, $resumo);
+            $resumo->save();
+        });
+        return $resumo;
     }
 }

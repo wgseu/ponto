@@ -100,6 +100,7 @@ class Pedido extends Model implements
         'associacao_id',
         'tipo',
         'estado',
+        'descontos',
         'pessoas',
         'cpf',
         'email',
@@ -272,6 +273,26 @@ class Pedido extends Model implements
     }
 
     /**
+     * Informa se o pedido está fechado para adições de itens
+     *
+     * @return bool
+     */
+    public function closed()
+    {
+        return in_array($this->estado, [self::ESTADO_CONCLUIDO, self::ESTADO_FECHADO]);
+    }
+
+    /**
+     * Informa se o pedido está cancelado
+     *
+     * @return bool
+     */
+    public function cancelled()
+    {
+        return $this->estado == self::ESTADO_CANCELADO;
+    }
+
+    /**
      * Informa a permissão necessária para criar ou adicionar itens no pedido
      *
      * @param string $tipo tipo de pedido
@@ -306,7 +327,9 @@ class Pedido extends Model implements
         $this->produtos = (float)$this->itens()->whereNotNull('produto_id')->sum('subtotal');
         $this->comissao = (float)$this->itens()->sum('comissao');
         $this->subtotal = $this->servicos + $this->produtos + $this->comissao;
-        $this->descontos = (float)$this->itens()->where('subtotal', '<', 0)->sum('subtotal');
+        if ($this->exists && -$this->descontos > $this->subtotal) {
+            $this->descontos = -$this->subtotal;
+        }
         $this->total = $this->subtotal + $this->descontos;
         $this->pago = (float)$this->pagos()->sum('lancado');
         $this->troco = (float)$this->trocos()->sum('lancado');
@@ -385,32 +408,35 @@ class Pedido extends Model implements
 
     public function validate($old)
     {
-        $errors = [];
+        if ($this->descontos > 0) {
+            return ['descontos' => __('messages.discount_cannot_be_positive')];
+        }
         if (
             !Validator::checkCNPJ($this->cpf) &&
             !Validator::checkCPF($this->cpf, true)
         ) {
-            $errors['cpf'] = __('messages.cpf_invalid', 'CPF');
-        } elseif (
+            return ['cpf' => __('messages.cpf_invalid', 'CPF')];
+        }
+        if (
             !Validator::checkCPF($this->cpf) &&
             !Validator::checkCNPJ($this->cpf, true)
         ) {
-            $errors['cpf'] = __('messages.cpf_invalid', 'CNPJ');
+            return ['cpf' => __('messages.cpf_invalid', 'CNPJ')];
         }
         if (!Validator::checkEmail($this->email, true)) {
-            $errors['email'] = __('messages.invalid_email');
+            return ['email' => __('messages.invalid_email')];
         }
         // não pode entregar sem um cliente
         if ($this->tipo == self::TIPO_ENTREGA && is_null($this->cliente_id)) {
-            $errors['cliente_id'] = __('messages.delivery_without_customer');
+            return ['cliente_id' => __('messages.delivery_without_customer')];
         }
         // só entrega pode ter endereço no pedido
         if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->localizacao_id)) {
-            $errors['localizacao_id'] = __('messages.non_delivery_with_address');
+            return ['localizacao_id' => __('messages.non_delivery_with_address')];
         }
         // só pedido para entrega pode ser entregue
         if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->entrega_id)) {
-            $errors['entrega_id'] = __('messages.non_delivery_delivering');
+            return ['entrega_id' => __('messages.non_delivery_delivering')];
         }
         // não pode sair para entrega sem o entregador
         if (
@@ -418,20 +444,20 @@ class Pedido extends Model implements
             !is_null($this->localizacao_id) &&
             is_null($this->entrega_id)
         ) {
-            $errors['entrega_id'] = __('messages.delivering_without_deliveryman');
+            return ['entrega_id' => __('messages.delivering_without_deliveryman')];
         }
         // só entrega se tiver endereço
         if (is_null($this->localizacao_id) && !is_null($this->entrega_id)) {
-            $errors['entrega_id'] = __('messages.cannot_delivery_togo');
+            return ['entrega_id' => __('messages.cannot_delivery_togo')];
         }
         if ($this->tipo == self::TIPO_MESA && is_null($this->mesa_id)) {
-            $errors['mesa_id'] = __('messages.table_without_local');
+            return ['mesa_id' => __('messages.table_without_local')];
         }
         if ($this->tipo != self::TIPO_COMANDA && !is_null($this->comanda_id)) {
-            $errors['comanda_id'] = __('messages.other_order_as_card');
+            return ['comanda_id' => __('messages.other_order_as_card')];
         }
         if (!in_array($this->tipo, [self::TIPO_COMANDA, self::TIPO_MESA]) && !is_null($this->mesa_id)) {
-            $errors['mesa_id'] = __('messages.other_order_as_table');
+            return ['mesa_id' => __('messages.other_order_as_table')];
         }
         // só um pedido por mesa
         if (!is_null($this->mesa_id)) {
@@ -446,7 +472,7 @@ class Pedido extends Model implements
                 $other->where('id', '<>', $this->id);
             }
             if ($other->exists()) {
-                $errors['mesa_id'] = __('messages.table_already_open');
+                return ['mesa_id' => __('messages.table_already_open')];
             }
         }
         // só um pedido por comanda
@@ -458,21 +484,19 @@ class Pedido extends Model implements
                 $other->where('id', '<>', $this->id);
             }
             if ($other->exists()) {
-                $errors['comanda_id'] = __('messages.card_already_open');
+                return ['comanda_id' => __('messages.card_already_open')];
             }
         }
-        return $errors;
     }
 
     public function onInsert()
     {
-        $errors = [];
         if (is_null($this->prestador_id) && $this->estado != self::ESTADO_AGENDADO) {
-            $errors['estado'] = __('messages.order_mustbe_scheduled');
+            return ['estado' => __('messages.order_mustbe_scheduled')];
         }
         // um pedido deve ser criado aberto ou agendado
         if (!in_array($this->estado, [self::ESTADO_ABERTO, self::ESTADO_AGENDADO])) {
-            $errors['estado'] = __('messages.order_mustbe_open_scheduled');
+            return ['estado' => __('messages.order_mustbe_open_scheduled')];
         }
         if (
             $this->tipo == self::TIPO_MESA &&
@@ -482,7 +506,6 @@ class Pedido extends Model implements
         ) {
             return ['mesa_id' => __('messages.table_in_use_unified')];
         }
-        return $errors;
     }
 
     public function onUpdate($old)

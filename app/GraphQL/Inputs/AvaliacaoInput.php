@@ -42,31 +42,22 @@ class AvaliacaoInput extends InputType
     public function fields(): array
     {
         return [
-            'metrica_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Métrica de avaliação',
-            ],
             'pedido_id' => [
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Pedido que foi avaliado, quando nulo o produto deve ser informado',
             ],
-            'produto_id' => [
-                'type' => Type::id(),
-                'description' => 'Produto que foi avaliado',
-            ],
-            'estrelas' => [
-                'type' => Type::nonNull(Type::int()),
+            'subavaliacoes' => [
+                'type' => Type::listOf(GraphQL::type('SubAvaliacaoUpdateInput')),
                 'description' => 'Quantidade de estrelas de 1 a 5',
-                'rules' => ['min:1', 'max:5'],
             ],
             'comentario' => [
                 'type' => Type::string(),
                 'description' => 'Comentário da avaliação',
                 'rules' => ['max:255'],
             ],
-            'data_avaliacao' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data da avaliação',
+            'publico' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o comentário está público para visualização',
             ],
         ];
     }

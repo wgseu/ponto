@@ -138,6 +138,7 @@ $[table.end]
             (new ModuloSeeder())->run();
             (new FuncionalidadeSeeder())->run();
             (new PermissaoSeeder())->run();
+            (new ServicoSeeder())->run();
         } elseif (env('APP_ENV') != 'testing') {
             (new DatabaseSeeder())->run();
         }

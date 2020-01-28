@@ -1,6 +1,0 @@
-mutation updateEndereco($id: ID!, $input: EnderecoUpdateInput!) {
-  UpdateEndereco(id: $id, input: $input) {
-    logradouro
-    cep
-  }
-}

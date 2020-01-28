@@ -12,6 +12,6 @@ class SyncLicenseController extends Controller
         if (getenv('TRIGGER_LICENSE_TOKEN') == $token) {
             return \Artisan::call('sync:license');
         }
-        return Log::error('Erro ao sincronizar licença, token inválido');
+        throw new Exception('Erro ao sincronizar licença, token inválido', 1);
     }
 }

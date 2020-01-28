@@ -79,9 +79,12 @@ class Sistema extends Model implements ValidateInterface
         $this->options = new Settings([
             'license' => [
                 'delivery' => false,
+                'fiscal' => false,
+                'prefix' => null,
                 'expires' => null,
+                'blocked' => null,
                 'totem' => false,
-                'reservation' => false
+                'reservation' => false,
             ],
             'auto_sair' => false,
             'padrao_imprimir' => true,

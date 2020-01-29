@@ -144,12 +144,10 @@ class Sistema extends Model implements ValidateInterface
             'comanda' => [
                 'observacao_nome' => true,
                 'fila_pesagem' => false,
+                'pre_paga' => false,
             ],
             'estoque' => [
                 'controlar' => true,
-            ],
-            'comanda' => [
-                'pre_paga' => false
             ],
         ]);
         parent::__construct($attributes);

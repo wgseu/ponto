@@ -38,7 +38,7 @@ class SyncLicense extends Command
         $prefix = getenv('DOMAIN_PREFIX');
         $token = getenv('TRIGGER_LICENSE_TOKEN');
         $options = app('settings');
-        $install = $options->getEntry('license', 'expires');
+        $install = is_null($options->getEntry('license', 'expires'));
         $request = $client->get("$uri/api/licenca?prefixo=$prefix&token=$token&install=$install");
         $response = json_decode($request->getBody()->getContents());
         try {
@@ -48,8 +48,8 @@ class SyncLicense extends Command
                 'prefix' => $prefix,
                 'expires' => $response->validade,
                 'blocked' => $response->blocked,
-                'totem' => false,
-                'reservation' => false,
+                'totem' => $response->totem,
+                'reservation' => $response->reservas,
             ];
             $license = [
                 'delivery' => $options->getEntry('license', 'delivery'),
@@ -64,7 +64,7 @@ class SyncLicense extends Command
             if (count($diff) == 0) {
                 return;
             }
-            if (is_null($install)) {
+            if ($install) {
                 $this->syncInfo($response);
             }
             $options->addEntry('license', 'prefix', $prefix);
@@ -72,6 +72,8 @@ class SyncLicense extends Command
             $options->addEntry('license', 'expires', $response->validade);
             $options->addEntry('license', 'delivery', $response->delivery);
             $options->addEntry('license', 'blocked', $response->blocked);
+            $options->addEntry('license', 'totem', $response->totem);
+            $options->addEntry('license', 'reservation', $response->reservas);
             app('system')->opcoes = json_encode($options->getValues());
             app('system')->save();
         } catch (\Throwable $th) {
@@ -79,27 +81,27 @@ class SyncLicense extends Command
         }
     }
 
-    public function syncData($response)
+    public function syncInfo($response)
     {
         DB::transaction(function () use ($response) {
             $user = Cliente::findOrFail('1');
             $user->update([
-                'email' => $response->itens->user->email,
-                'nome' => $response->itens->user->nome,
-                'sobrenome' => $response->itens->user->sobrenome,
-                'genero' => $response->itens->user->sexo == 'M' ? 'masculino' : 'feminino',
-                'login' => $response->itens->user->usuario,
+                'email' => $response->user->email,
+                'nome' => $response->user->nome,
+                'sobrenome' => $response->user->sobrenome,
+                'genero' => $response->user->sexo == 'M' ? 'masculino' : 'feminino',
+                'login' => $response->user->usuario,
                 'tipo' => 'fisica',
-                'cpf' => Filter::digits($response->itens->user->cpf),
-                'status' => $response->itens->user->status,
+                'cpf' => Filter::digits($response->user->cpf),
+                'status' => $response->user->status,
                 'senha' => 'Teste123'
             ]);
             $new_company = new Cliente();
             $new_company->fill([
-                'nome' => $response->itens->company->fantasia,
-                'sobrenome' => $response->itens->company->razao_social,
-                'email' => $response->itens->company->email,
-                'cpf' => Filter::digits($response->itens->company->cnpj),
+                'nome' => $response->company->fantasia,
+                'sobrenome' => $response->company->razao_social,
+                'email' => $response->company->email,
+                'cpf' => Filter::digits($response->company->cnpj),
                 'tipo' => 'juridica',
             ]);
             $new_company->save();
@@ -110,21 +112,21 @@ class SyncLicense extends Command
             ]);
             $country = app('country');
             $telephone = new Telefone();
-            if (!is_null($response->itens->company->fone1)) {
+            if (!is_null($response->company->fone1)) {
                 $telephone->fill([
                     'cliente_id' => $new_company->id,
                     'pais_id' => $country->id,
-                    'numero' => Filter::digits($response->itens->company->fone1),
+                    'numero' => Filter::digits($response->company->fone1),
                     'principal' => 1,
                 ]);
                 $telephone->save();
             }
-            if (!is_null($response->itens->company->fone2)) {
+            if (!is_null($response->company->fone2)) {
                 $phone2 = $telephone->replicate();
                 $phone2->fill([
                     'cliente_id' => $new_company->id,
                     'pais_id' => $country->id,
-                    'numero' => Filter::digits($response->itens->company->fone2),
+                    'numero' => Filter::digits($response->company->fone2),
                     'principal' => 0,
                 ]);
                 $phone2->save();

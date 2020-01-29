@@ -29,9 +29,12 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Produto;
+use App\Models\Cardapio;
+use App\Models\Tributacao;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateProdutoMutation extends Mutation
@@ -57,12 +60,76 @@ class CreateProdutoMutation extends Mutation
         ];
     }
 
+    /**
+     * Salva os cardápios enviados junto com os produtos
+     *
+     * @param array $cardapios_data
+     * @param Produto $produto
+     * @return void
+     */
+    protected static function saveCardapios($cardapios_data, $produto)
+    {
+        foreach ($cardapios_data as $cardapio_data) {
+            $cardapio = new Cardapio();
+            if (isset($cardapio_data['id'])) {
+                $cardapio = Cardapio::findOrFail($cardapio_data['id']);
+            }
+            $cardapio->fill($cardapio_data);
+            $cardapio->produto_id = $produto->id;
+            $cardapio->save();
+        }
+    }
+
+    /**
+     * Salva a tributação do produto
+     *
+     * @param array $tributacao_data
+     * @param Produto $produto
+     * @return Tributacao
+     */
+    protected static function saveTributacao($tributacao_data, $produto)
+    {
+        $tributacao = new Tributacao();
+        $tributacao_id = $produto->exists ? $produto->tributacao_id : ($tributacao_data['id'] ?? []);
+        if (isset($tributacao_id)) {
+            $tributacao = Tributacao::findOrFail($tributacao_id);
+        }
+        $tributacao->fill($tributacao_data);
+        $tributacao->save();
+    }
+
+    /**
+     * Salva o produto e suas informações
+     *
+     * @param Produto $produto
+     * @param array $input
+     * @return void
+     */
+    protected static function saveProduct($produto, $input)
+    {
+        DB::transaction(function () use ($produto, $input) {
+            $produto->fill($input);
+            $tributacao_data = $input['tributacao'] ?? [];
+            if (!empty($tributacao_data) && app('settings')->get('fiscal', 'mostrar_campos')) {
+                $tributacao = self::saveTributacao($tributacao_data, $produto);
+                $produto->tributacao_id = $tributacao->id;
+            }
+            if ($produto->exists) {
+                $produto->restore();
+            } else {
+                $produto->save();
+            }
+            $cardapios_data = $input['cardapios'] ?? [];
+            self::saveCardapios($cardapios_data, $produto);
+        });
+    }
+
     public function resolve($root, $args)
     {
         $produto = new Produto();
         $produto->fillNextCode();
         try {
-            UpdateProdutoMutation::saveProduct($produto, $args['input']);
+            self::saveProduct($produto, $args['input']);
         } catch (\Throwable $th) {
             $produto->clean(new Produto());
             throw $th;

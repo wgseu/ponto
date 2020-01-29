@@ -57,13 +57,21 @@ class DeleteCarteiraMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código local da carteira',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção da carteira no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $carteira = Carteira::findOrFail($args['id']);
-        $carteira->delete();
+        $carteira = Carteira::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $carteira->forceDelete();
+        } else {
+            $carteira->delete();
+        }
         return $carteira;
     }
 }

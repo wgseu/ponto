@@ -57,13 +57,21 @@ class DeleteCategoriaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da categoria',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção da categoria no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
         $categoria = Categoria::findOrFail($args['id']);
-        $categoria->delete();
+        if ($args['force'] ?? false) {
+            $categoria->forceDelete();
+        } else {
+            $categoria->delete();
+        }
         return $categoria;
     }
 }

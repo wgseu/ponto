@@ -42,7 +42,11 @@ class DeleteLocalizacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('localizacao:delete');
+        $localizacao = Localizacao::withTrashed()->findOrFail($args['id']);
+        return Auth::check() && (
+            Auth::user()->can('cliente:update') ||
+            $localizacao->cliente_id === Auth::user()->id
+        );
     }
 
     public function type(): Type
@@ -57,13 +61,21 @@ class DeleteLocalizacaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do endereço',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do caixa no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $localizacao = Localizacao::findOrFail($args['id']);
-        $localizacao->delete();
+        $localizacao = Localizacao::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $localizacao->forceDelete();
+        } else {
+            $localizacao->delete();
+        }
         return $localizacao;
     }
 }

@@ -57,13 +57,21 @@ class DeleteMetricaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da métrica',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção da métrica no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $metrica = Metrica::findOrFail($args['id']);
-        $metrica->delete();
+        $metrica = Metrica::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $metrica->forceDelete();
+        } else {
+            $metrica->delete();
+        }
         return $metrica;
     }
 }

@@ -63,9 +63,9 @@ class UpdatePrestadorMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $prestador = Prestador::findOrFail($args['id']);
+        $prestador = Prestador::withTrashed()->findOrFail($args['id']);
         $prestador->fill($args['input']);
-        $prestador->save();
+        $prestador->restore();
         return $prestador;
     }
 }

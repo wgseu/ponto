@@ -57,13 +57,21 @@ class DeleteGrupoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do grupo',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do grupo no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $grupo = Grupo::findOrFail($args['id']);
-        $grupo->delete();
+        $grupo = Grupo::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $grupo->forceDelete();
+        } else {
+            $grupo->delete();
+        }
         return $grupo;
     }
 }

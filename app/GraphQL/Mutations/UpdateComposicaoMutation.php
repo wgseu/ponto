@@ -63,9 +63,9 @@ class UpdateComposicaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $composicao = Composicao::findOrFail($args['id']);
+        $composicao = Composicao::withTrashed()->findOrFail($args['id']);
         $composicao->fill($args['input']);
-        $composicao->save();
+        $composicao->restore();
         return $composicao;
     }
 }

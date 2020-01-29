@@ -57,13 +57,21 @@ class DeletePromocaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da promoção',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção da promoção no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $promocao = Promocao::findOrFail($args['id']);
-        $promocao->delete();
+        $promocao = Promocao::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $promocao->forceDelete();
+        } else {
+            $promocao->delete();
+        }
         return $promocao;
     }
 }

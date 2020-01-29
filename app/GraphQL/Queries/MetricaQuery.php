@@ -59,6 +59,7 @@ class MetricaQuery extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('MetricaFilter')],
+            'archived' => ['name' => 'archived', 'type' => Type::boolean()],
             'order' => ['name' => 'order', 'type' => GraphQL::type('MetricaOrder')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -69,13 +70,11 @@ class MetricaQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Metrica::with($fields->getRelations())->select($fields->getSelect())
-        );
-        if ($args['filter']['data_arquivado'] ?? null) {
+        $query = Metrica::with($fields->getRelations())->select($fields->getSelect());
+        if ($args['archived'] ?? false) {
             $query->withTrashed();
         }
+        Filter::apply($args['filter'] ?? [], $query);
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

@@ -42,7 +42,11 @@ class UpdateLocalizacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('localizacao:update');
+        $localizacao = Localizacao::withTrashed()->findOrFail($args['id']);
+        return Auth::check() && (
+            Auth::user()->can('cliente:update') ||
+            $localizacao->cliente_id == Auth::user()->id
+        );
     }
 
     public function type(): Type

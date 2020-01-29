@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\ValidateUpdateInterface;
 use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,7 +36,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Endereço detalhado de um cliente
  */
-class Localizacao extends Model implements ValidateInterface
+class Localizacao extends Model implements
+    ValidateInterface,
+    ValidateUpdateInterface
 {
     use ModelEvents;
     use SoftDeletes;
@@ -120,6 +123,16 @@ class Localizacao extends Model implements ValidateInterface
     }
 
     /**
+     * Informe se o endereço está em uso num pedido
+     *
+     * @return boolean
+     */
+    public function inUse()
+    {
+        return Pedido::where('localizacao_id', $this->id)->exists();
+    }
+
+    /**
      * Regras:
      * Se o tipo de Localização for apartamento o atributo apartamento é obrigatório;
      * Se o tipo de Localização for condominio o atributo condominio é obrigatório;
@@ -137,5 +150,24 @@ class Localizacao extends Model implements ValidateInterface
             $errors['condominio'] = __('messages.localizacao_tipo_required_condominio');
         }
         return $errors;
+    }
+
+    /**
+     * Regras:
+     *  Não deixa alterar o cliente
+     *  Não deixa alterar o endereço se já fez pedido (Só se for o endereço da empresa)
+     */
+    public function onUpdate($old)
+    {
+        if ($this->cliente_id != $this->cliente_id) {
+            return ['cliente_id' => __('messages.localization_cannot_change_customer')];
+        }
+        if (
+            !$this->isChangeAllowed([]) &&
+            $this->inUse() &&
+            $this->cliente_id != app('company')->id
+        ) {
+            return ['cliente_id' => __('messages.localization_cannot_change')];
+        }
     }
 }

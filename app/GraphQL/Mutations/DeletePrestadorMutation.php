@@ -57,13 +57,21 @@ class DeletePrestadorMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do prestador',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do prestador no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $prestador = Prestador::findOrFail($args['id']);
-        $prestador->delete();
+        $prestador = Prestador::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $prestador->forceDelete();
+        } else {
+            $prestador->delete();
+        }
         return $prestador;
     }
 }

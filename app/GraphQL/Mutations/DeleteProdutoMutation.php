@@ -57,13 +57,21 @@ class DeleteProdutoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Código do produto',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do produto no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $produto = Produto::findOrFail($args['id']);
-        $produto->delete();
+        $produto = Produto::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $produto->forceDelete();
+        } else {
+            $produto->delete();
+        }
         return $produto;
     }
 }

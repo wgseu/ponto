@@ -57,13 +57,21 @@ class DeleteComposicaoMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador da composição',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção da composição no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $composicao = Composicao::findOrFail($args['id']);
-        $composicao->delete();
+        $composicao = Composicao::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $composicao->forceDelete();
+        } else {
+            $composicao->delete();
+        }
         return $composicao;
     }
 }

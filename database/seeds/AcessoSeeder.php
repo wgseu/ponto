@@ -169,9 +169,6 @@ class AcessoSeeder extends Seeder
             'lista:delete',
             'lista:update',
             'lista:view',
-            'localizacao:create',
-            'localizacao:delete',
-            'localizacao:update',
             'mesa:create',
             'mesa:delete',
             'mesa:update',
@@ -293,7 +290,6 @@ class AcessoSeeder extends Seeder
             'estado:view',
             'forma:create',
             'forma:view',
-            'localizacao:create',
             'mesa:create',
             'mesa:delete',
             'mesa:view',
@@ -315,13 +311,11 @@ class AcessoSeeder extends Seeder
         ]);
         $cooker = Funcao::where('descricao', __('messages.cooker'))->first();
         $this->apply($cooker, [
-            'localizacao:create',
             'setor:view',
         ]);
         $deliveryman = Funcao::where('descricao', __('messages.deliveryman'))->first();
         $this->apply($deliveryman, [
             'categoria:update',
-            'localizacao:update',
             'moeda:view',
             'prestador:create',
             'setor:view',
@@ -334,7 +328,6 @@ class AcessoSeeder extends Seeder
             'categoria:delete',
             'forma:delete',
             'integracao:view',
-            'localizacao:delete',
             'setor:view',
             'viagem:delete',
             'zona:create',

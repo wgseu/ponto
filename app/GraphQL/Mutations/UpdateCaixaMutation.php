@@ -63,9 +63,9 @@ class UpdateCaixaMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $caixa = Caixa::findOrFail($args['id']);
+        $caixa = Caixa::withTrashed()->findOrFail($args['id']);
         $caixa->fill($args['input']);
-        $caixa->save();
+        $caixa->restore();
         return $caixa;
     }
 }

@@ -965,4 +965,6 @@ return [
     'cannot_evaluate_non_buy_product' => 'Você não pode avaliar um produto que não comprou',
     'cannot_evaluate_cancelled_order' => 'O pedido foi cancelado e não mais ser avaliado',
     'cannot_evaluate_open_order' => 'O pedido está aberto e não pode ser avaliado ainda',
+    'localization_cannot_change_customer' => 'Não é possível transferir o endereço entre clientes',
+    'localization_cannot_change' => 'Esse endereço não pode ser alterado, cadastre outro',
 ];

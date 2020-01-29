@@ -63,11 +63,11 @@ class UpdateCarteiraMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        $carteira = Carteira::findOrFail($args['id']);
+        $carteira = Carteira::withTrashed()->findOrFail($args['id']);
         $old = $carteira->replicate();
         try {
             $carteira->fill($args['input']);
-            $carteira->save();
+            $carteira->restore();
             $old->clean($carteira);
         } catch (\Throwable $th) {
             $carteira->clean($old);

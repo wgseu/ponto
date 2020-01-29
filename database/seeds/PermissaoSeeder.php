@@ -248,11 +248,6 @@ class PermissaoSeeder extends Seeder
             ['lista:update', 'lista_update_permition'],
             ['lista:delete', 'lista_delete_permition'],
         ]);
-        $this->group(45, [
-            ['localizacao:create', 'localizacao_create_permition'],
-            ['localizacao:update', 'localizacao_update_permition'],
-            ['localizacao:delete', 'localizacao_delete_permition'],
-        ]);
         $this->group(46, [
             ['mesa:view', 'mesa_view_permition'],
             ['mesa:create', 'mesa_create_permition'],

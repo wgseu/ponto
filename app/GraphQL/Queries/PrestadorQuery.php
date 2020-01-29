@@ -59,7 +59,7 @@ class PrestadorQuery extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('PrestadorFilter')],
-            'filed' => ['name' => 'filed', 'type' => Type::boolean()],
+            'archived' => ['name' => 'archived', 'type' => Type::boolean()],
             'order' => ['name' => 'order', 'type' => GraphQL::type('PrestadorOrder')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -70,13 +70,11 @@ class PrestadorQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Prestador::with($fields->getRelations())->select($fields->getSelect())
-        );
-        if ($args['filed'] ?? false) {
+        $query = Prestador::with($fields->getRelations())->select($fields->getSelect());
+        if ($args['archived'] ?? false) {
             $query->withTrashed();
         }
+        Filter::apply($args['filter'] ?? [], $query);
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
     }

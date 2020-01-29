@@ -57,13 +57,21 @@ class DeletePacoteMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do pacote',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do pacote no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $pacote = Pacote::findOrFail($args['id']);
-        $pacote->delete();
+        $pacote = Pacote::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $pacote->forceDelete();
+        } else {
+            $pacote->delete();
+        }
         return $pacote;
     }
 }

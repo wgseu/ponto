@@ -54,6 +54,7 @@ class ComposicaoQuery extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('ComposicaoFilter')],
+            'archived' => ['name' => 'archived', 'type' => Type::boolean()],
             'order' => ['name' => 'order', 'type' => GraphQL::type('ComposicaoOrder')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -64,10 +65,15 @@ class ComposicaoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Composicao::with($fields->getRelations())->select($fields->getSelect())
-        );
+        $query = Composicao::with($fields->getRelations())->select($fields->getSelect());
+        if (
+            ($args['archived'] ?? false) &&
+            auth()->check() &&
+            auth()->user()->can('produto:view')
+        ) {
+            $query->withTrashed();
+        }
+        Filter::apply($args['filter'] ?? [], $query);
         $limit = $args['limit'] ?? 10;
         if (!isset($args['limit'])) {
             $limit = (clone $query)->count();

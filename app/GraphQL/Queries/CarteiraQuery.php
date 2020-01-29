@@ -59,6 +59,7 @@ class CarteiraQuery extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('CarteiraFilter')],
+            'archived' => ['name' => 'archived', 'type' => Type::boolean()],
             'order' => ['name' => 'order', 'type' => GraphQL::type('CarteiraOrder')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -69,10 +70,11 @@ class CarteiraQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Carteira::with($fields->getRelations())->select($fields->getSelect())
-        );
+        $query = Carteira::with($fields->getRelations())->select($fields->getSelect());
+        if ($args['archived'] ?? false) {
+            $query->withTrashed();
+        }
+        Filter::apply($args['filter'] ?? [], $query);
         $limit = $args['limit'] ?? 10;
         if (!isset($args['limit'])) {
             $limit = (clone $query)->count();

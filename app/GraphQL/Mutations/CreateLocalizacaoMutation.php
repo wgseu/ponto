@@ -42,7 +42,10 @@ class CreateLocalizacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('localizacao:create');
+        return Auth::check() && (
+            Auth::user()->can('cliente:update') ||
+            ($args['input']['cliente_id'] ?? null) == Auth::user()->id
+        );
     }
 
     public function type(): Type

@@ -53,6 +53,7 @@ class GrupoQuery extends Query
     {
         return [
             'filter' => ['name' => 'filter', 'type' => GraphQL::type('GrupoFilter')],
+            'archived' => ['name' => 'archived', 'type' => Type::boolean()],
             'order' => ['name' => 'order', 'type' => GraphQL::type('GrupoOrder')],
             'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
             'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
@@ -63,16 +64,18 @@ class GrupoQuery extends Query
     {
         /** @var SelectFields $fields */
         $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Grupo::with($fields->getRelations())->select($fields->getSelect())
-        );
+        $query = Grupo::with($fields->getRelations())->select($fields->getSelect());
+        if (
+            ($args['archived'] ?? false) &&
+            auth()->check() &&
+            auth()->user()->can('produto:view')
+        ) {
+            $query->withTrashed();
+        }
+        Filter::apply($args['filter'] ?? [], $query);
         $limit = $args['limit'] ?? 10;
         if (!isset($args['limit'])) {
             $limit = (clone $query)->count();
-        }
-        if ($args['filter']['data_arquivado'] ?? null) {
-            $query->withTrashed();
         }
         return Ordering::apply($args['order'] ?? [], $query)
             ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);

@@ -57,13 +57,21 @@ class DeleteCaixaMutation extends Mutation
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Identificador do caixa',
             ],
+            'force' => [
+                'type' => Type::boolean(),
+                'description' => 'Força a remoção do caixa no banco',
+            ],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $caixa = Caixa::findOrFail($args['id']);
-        $caixa->delete();
+        $caixa = Caixa::withTrashed()->findOrFail($args['id']);
+        if ($args['force'] ?? false) {
+            $caixa->forceDelete();
+        } else {
+            $caixa->delete();
+        }
         return $caixa;
     }
 }

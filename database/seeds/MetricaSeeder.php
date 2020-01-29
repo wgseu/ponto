@@ -13,14 +13,14 @@ class MetricaSeeder extends Seeder
     public function run()
     {
         (new Metrica([
+            'nome' => __('messages.food'),
+            'descricao' => __('messages.metrica_description_food'),
+            'tipo' => Metrica::TIPO_PRODUCAO,
+        ]))->save();
+        (new Metrica([
             'nome' => __('messages.delivery'),
             'descricao' => __('messages.metrica_description_delivery'),
             'tipo' => Metrica::TIPO_ENTREGA,
-        ]))->save();
-        (new Metrica([
-            'nome' => __('messages.presentation'),
-            'descricao' => __('messages.metrica_description_presentation'),
-            'tipo' => Metrica::TIPO_APRESENTACAO,
         ]))->save();
         (new Metrica([
             'nome' => __('messages.attendance'),
@@ -28,9 +28,9 @@ class MetricaSeeder extends Seeder
             'tipo' => Metrica::TIPO_ATENDIMENTO,
         ]))->save();
         (new Metrica([
-            'nome' => __('messages.production'),
-            'descricao' => __('messages.metrica_description_production'),
-            'tipo' => Metrica::TIPO_PRODUCAO,
+            'nome' => __('messages.presentation'),
+            'descricao' => __('messages.metrica_description_presentation'),
+            'tipo' => Metrica::TIPO_APRESENTACAO,
         ]))->save();
     }
 }

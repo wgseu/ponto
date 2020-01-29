@@ -28,40 +28,40 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
-use App\Models\Telefone;
+use App\Models\Credito;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class CreateTelefoneMutation extends Mutation
+class CreateCreditoMutation extends Mutation
 {
     protected $attributes = [
-        'name' => 'CreateTelefone',
+        'name' => 'CreateCredito',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('cliente:update');
+        return Auth::check() && Auth::user()->can('credito:create');
     }
 
     public function type(): Type
     {
-        return GraphQL::type('Telefone');
+        return GraphQL::type('Credito');
     }
 
     public function args(): array
     {
         return [
-            'input' => ['type' => Type::nonNull(GraphQL::type('TelefoneInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CreditoInput'))],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $telefone = new Telefone();
-        $telefone->fill($args['input']);
-        $telefone->save();
-        return $telefone;
+        $credito = new Credito();
+        $credito->fill($args['input']);
+        $credito->save();
+        return $credito;
     }
 }

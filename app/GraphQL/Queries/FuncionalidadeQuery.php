@@ -45,11 +45,6 @@ class FuncionalidadeQuery extends Query
         'name' => 'funcionalidades',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('funcionalidade:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Funcionalidade');

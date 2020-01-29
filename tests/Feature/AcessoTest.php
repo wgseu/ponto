@@ -50,21 +50,6 @@ class AcessoTest extends TestCase
         $this->assertEquals($permissao->id, $found_acesso->permissao_id);
     }
 
-    public function testUpdateAcesso()
-    {
-        $headers = PrestadorTest::authOwner();
-        $funcao =  factory(Funcao::class)->create();
-        $acesso = factory(Acesso::class)->create();
-        $this->graphfl('update_acesso', [
-            'id' => $acesso->id,
-            'input' => [
-                'funcao_id' => $funcao->id,
-            ]
-        ], $headers);
-        $acesso->refresh();
-        $this->assertEquals($funcao->id, $acesso->funcao_id);
-    }
-
     public function testDeleteAcesso()
     {
         $headers = PrestadorTest::authOwner();

@@ -49,7 +49,7 @@ class TelefoneQuery extends Query
     {
         return Auth::check() && (
             ($args['filter']['cliente_id']['eq'] ?? null) == Auth::user()->id
-            || Auth::user()->can('telefone:view')
+            || Auth::user()->can('cliente:view')
         );
     }
 

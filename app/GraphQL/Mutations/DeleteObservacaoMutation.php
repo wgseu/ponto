@@ -42,7 +42,7 @@ class DeleteObservacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('observacao:delete');
+        return Auth::check() && Auth::user()->can('produto:update');
     }
 
     public function type(): Type

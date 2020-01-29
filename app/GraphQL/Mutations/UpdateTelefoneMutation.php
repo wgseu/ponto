@@ -42,7 +42,7 @@ class UpdateTelefoneMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('telefone:update');
+        return Auth::check() && Auth::user()->can('cliente:update');
     }
 
     public function type(): Type

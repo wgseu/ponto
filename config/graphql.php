@@ -302,6 +302,9 @@ return [
                 'CreateMovimentacao' => 'App\GraphQL\Mutations\CreateMovimentacaoMutation',
                 'UpdateMovimentacao' => 'App\GraphQL\Mutations\UpdateMovimentacaoMutation',
 
+                'CreateCredito' => 'App\GraphQL\Mutations\CreateCreditoMutation',
+                'UpdateCredito' => 'App\GraphQL\Mutations\UpdateCreditoMutation',
+
                 'UpdateCheque' => 'App\GraphQL\Mutations\UpdateChequeMutation',
                 'UpdatePagamento' => 'App\GraphQL\Mutations\UpdatePagamentoMutation',
                 'UpdateModulo' => 'App\GraphQL\Mutations\UpdateModuloMutation',
@@ -350,7 +353,6 @@ return [
                 'DeletePromocao' => 'App\GraphQL\Mutations\DeletePromocaoMutation',
 
                 'CreateAcesso' => 'App\GraphQL\Mutations\CreateAcessoMutation',
-                'UpdateAcesso' => 'App\GraphQL\Mutations\UpdateAcessoMutation',
                 'DeleteAcesso' => 'App\GraphQL\Mutations\DeleteAcessoMutation',
 
                 'CreateCatalogo' => 'App\GraphQL\Mutations\CreateCatalogoMutation',

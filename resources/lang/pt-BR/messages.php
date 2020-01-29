@@ -139,7 +139,7 @@ return [
     'pedido_type_counter_permition' => 'Faz vendas no balcão',
     'pedido_type_delivery_permition' => 'Faz vendas para entrega',
     'pedido_update_permition' => 'Atualiza os pedidos',
-    'pedido_delete_permition' => 'Exclui ou arquiva os pedidos',
+    'pedido_delete_permition' => 'Cancela pedidos',
     'categoria_view_permition' => 'Lista e visualiza as categorias',
     'categoria_create_permition' => 'Cadastra as categorias',
     'categoria_update_permition' => 'Atualiza as categorias',

@@ -45,11 +45,6 @@ class PermissaoQuery extends Query
         'name' => 'permissoes',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('permissao:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Permissao');

@@ -1,5 +1,0 @@
-mutation updateAcesso($id: ID!, $input: AcessoUpdateInput!) {
-  UpdateAcesso(id: $id, input: $input) {
-    id
-  }
-}

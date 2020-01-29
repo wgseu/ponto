@@ -42,7 +42,7 @@ class UpdateObservacaoMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('observacao:update');
+        return Auth::check() && Auth::user()->can('produto:update');
     }
 
     public function type(): Type

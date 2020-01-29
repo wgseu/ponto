@@ -28,26 +28,26 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
-use App\Models\Acesso;
+use App\Models\Credito;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class UpdateAcessoMutation extends Mutation
+class UpdateCreditoMutation extends Mutation
 {
     protected $attributes = [
-        'name' => 'UpdateAcesso',
+        'name' => 'UpdateCredito',
     ];
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && Auth::user()->can('acesso:update');
+        return Auth::check() && Auth::user()->can('credito:update');
     }
 
     public function type(): Type
     {
-        return GraphQL::type('Acesso');
+        return GraphQL::type('Credito');
     }
 
     public function args(): array
@@ -55,17 +55,17 @@ class UpdateAcessoMutation extends Mutation
         return [
             'id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'Identificador do acesso',
+                'description' => 'Identificador do crédito',
             ],
-            'input' => ['type' => Type::nonNull(GraphQL::type('AcessoUpdateInput'))],
+            'input' => ['type' => Type::nonNull(GraphQL::type('CreditoUpdateInput'))],
         ];
     }
 
     public function resolve($root, $args)
     {
-        $acesso = Acesso::findOrFail($args['id']);
-        $acesso->fill($args['input']);
-        $acesso->save();
-        return $acesso;
+        $credito = Credito::findOrFail($args['id']);
+        $credito->fill($args['input']);
+        $credito->save();
+        return $credito;
     }
 }

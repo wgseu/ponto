@@ -49,7 +49,7 @@ class LocalizacaoQuery extends Query
     {
         return Auth::check() && (
             ($args['filter']['cliente_id']['eq'] ?? null) == Auth::user()->id
-            || Auth::user()->can('localizacao:view')
+            || Auth::user()->can('cliente:view')
         );
     }
 

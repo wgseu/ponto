@@ -45,11 +45,6 @@ class ObservacaoQuery extends Query
         'name' => 'observacoes',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('observacao:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Observacao');

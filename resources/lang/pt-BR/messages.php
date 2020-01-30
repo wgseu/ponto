@@ -883,7 +883,7 @@ return [
     'data_fechamento_mustbe_empty' => 'Data de fechamento deve ser vazia',
     'data_fechamento_cannot_empty' => 'Data de fechamento não deve ser vazia',
     'session_not_kitchen_or_not_exists' => 'Cozinha não configurada no horário ou não existe',
-    'movement_open' => 'Sessão não pode ser fechada por ha movimentação aberta',
+    'movement_open' => 'Sessão não pode ser fechada porque há movimentação em aberto',
     'salary' => 'Salários',
     'provider' => 'Fornecedores',
     'tax' => 'Impostos',
@@ -976,4 +976,7 @@ return [
     'device_without_till' => 'Esse dispositivo não está associado a nenhum caixa',
     'open_till_transfer' => 'Abertura de caixa, movimentação :value',
     'open_till_base' => 'Fundo de caixa',
+    'banking' => 'Carteira Bancária',
+    'bleeding_closing_till' => 'Sangria do fechamento da movimentação :value',
+    'closing_till' => 'Fechamento de caixa, movimentação :value',
 ];

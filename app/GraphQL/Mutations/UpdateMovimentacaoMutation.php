@@ -29,11 +29,15 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Auditoria;
+use App\Models\Forma;
 use App\Models\Movimentacao;
+use App\Models\Pagamento;
+use App\Models\Resumo;
 use Illuminate\Support\Carbon;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class UpdateMovimentacaoMutation extends Mutation
@@ -71,14 +75,15 @@ class UpdateMovimentacaoMutation extends Mutation
 
     public function resolve($root, $args)
     {
+        $input = $args['input'];
         $movimentacao = Movimentacao::findOrFail($args['id']);
+        $prestador = auth()->user()->prestador;
         $reabrindo = $movimentacao->aberta == false
             && $movimentacao->aberta != ($args['input']['aberta'] ?? $movimentacao->aberta);
         $movimentacao->fill($args['input']);
-
-        $prestador = auth()->user()->prestador;
-        $caixa = $movimentacao->caixa;
+        
         if ($reabrindo) {
+            $caixa = $movimentacao->caixa;
             (new Auditoria([
                 'prestador_id' => $prestador->id,
                 'autorizador_id' => $prestador->id,
@@ -89,8 +94,55 @@ class UpdateMovimentacaoMutation extends Mutation
             ]))->save();
             $movimentacao->fechador_id = null;
             $movimentacao->data_fechamento = null;
+        } else {
+            DB::transaction(function () use ($movimentacao, $input, $prestador) {
+                $caixa = $movimentacao->caixa;
+                $gaveta = $caixa->carteira;
+                $forma = Forma::where('tipo', Forma::TIPO_DINHEIRO)
+                    ->where('ativa', true)->firstOrFail();
+                $saldo = Pagamento::where('carteira_id', $gaveta->id)
+                    ->where('movimentacao_id', $movimentacao->id)
+                    ->where('estado', Pagamento::ESTADO_PAGO)->sum('valor');
+                $resumos = $input['resumos'];
+                foreach ($resumos as $item) {
+                    if ($item['valor'] > 0) {
+                        $resumo = new Resumo([
+                            'movimentacao_id' => $movimentacao->id,
+                            'forma_id' => $item['forma_id'],
+                            'valor' => $item['valor'],
+                            'cartao_id' => $item['cartao_id'],
+                        ]);
+                        $resumo->save();
+                    }
+                }
+                if ($saldo > 0) {
+                    $origem = new Pagamento([
+                        'carteira_id' => $gaveta->id,
+                        'moeda_id' => app('currency')->id,
+                        'forma_id' => $forma->id,
+                        'valor' => $saldo * -1,
+                        'estado' => Pagamento::ESTADO_PAGO,
+                        'lancado' => $saldo * -1,
+                        'detalhes' => __('messages.bleeding_closing_till', ['value' => $movimentacao->id]),
+                    ]);
+                    $origem->funcionario_id = $prestador->id;
+                    $origem->save();
+                    $destino = new Pagamento([
+                        'carteira_id' => $forma->carteira_id,
+                        'moeda_id' => app('currency')->id,
+                        'forma_id' => $forma->id,
+                        'valor' => $saldo,
+                        'estado' => Pagamento::ESTADO_PAGO,
+                        'lancado' => $saldo,
+                        'detalhes' => __('messages.closing_till', ['value' => $movimentacao->id]),
+                    ]);
+                    $destino->funcionario_id = $prestador->id;
+                    $destino->save();
+                }
+                $movimentacao->aberta = false;
+                $movimentacao->closeOrSave($prestador);
+                return $movimentacao;
+            });
         }
-        $movimentacao->closeOrSave($prestador);
-        return $movimentacao;
     }
 }

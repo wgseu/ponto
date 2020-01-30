@@ -33,6 +33,12 @@ class CarteiraSeeder extends Seeder
         ]))->save();
 
         (new Carteira([
+            'tipo' => Carteira::TIPO_FINANCEIRA,
+            'descricao' => __('messages.banking'),
+            'ativa' => true,
+        ]))->save();
+
+        (new Carteira([
             'tipo' => Carteira::TIPO_BANCARIA,
             'descricao' => 'Banco do brasil',
             'ativa' => false,

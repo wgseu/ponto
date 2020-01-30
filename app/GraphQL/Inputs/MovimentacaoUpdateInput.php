@@ -28,15 +28,28 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Inputs;
 
-use App\Concerns\OptionalFields;
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class MovimentacaoUpdateInput extends MovimentacaoInput
 {
-    use OptionalFields;
-
     protected $attributes = [
         'name' => 'MovimentacaoUpdateInput',
         'description' => 'Movimentação do caixa, permite abrir diversos caixas na conta de' .
             ' operadores',
     ];
+
+    public function fields(): array
+    {
+        return [
+            'aberta' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o caixa está aberto',
+            ],
+            'resumos' => [
+                'type' => Type::listOf(GraphQL::type('ResumoInput')),
+                'description' => 'Lista de totais das formas de pagamento',
+            ],
+        ];
+    }
 }

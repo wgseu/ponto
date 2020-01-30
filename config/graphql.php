@@ -366,7 +366,6 @@ return [
 
                 'UpdateSistema' => 'App\GraphQL\Mutations\UpdateSistemaMutation',
 
-                'CreateResumo' => 'App\GraphQL\Mutations\CreateResumoMutation',
                 'UpdateResumo' => 'App\GraphQL\Mutations\UpdateResumoMutation',
 
                 'CreateEndereco' => 'App\GraphQL\Mutations\CreateEnderecoMutation',

@@ -101,8 +101,8 @@ class CreateMovimentacaoMutation extends Mutation
                     'estado' => Pagamento::ESTADO_PAGO,
                     'lancado' => $valor_inicial * -1,
                     'detalhes' => __('messages.open_till_transfer', ['value' => $movimentacao->id]),
-                    'prestador_id' => $movimentacao->iniciador->id,
                 ]);
+                $origem->funcionario_id = $prestador->id;
                 $origem->save();
                 $destino = new Pagamento([
                     'moeda_id' => app('currency')->id,
@@ -113,8 +113,8 @@ class CreateMovimentacaoMutation extends Mutation
                     'estado' => Pagamento::ESTADO_PAGO,
                     'lancado' => $valor_inicial,
                     'detalhes' => __('messages.open_till_base'),
-                    'prestador_id' => $movimentacao->iniciador->id,
                 ]);
+                $destino->funcionario_id = $prestador->id;
                 $destino->save();
                 return $movimentacao;
             }

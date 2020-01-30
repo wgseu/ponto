@@ -42,10 +42,6 @@ class ResumoInput extends InputType
     public function fields(): array
     {
         return [
-            'movimentacao_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Movimentação do caixa referente ao resumo',
-            ],
             'forma_id' => [
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'Tipo de pagamento do resumo',

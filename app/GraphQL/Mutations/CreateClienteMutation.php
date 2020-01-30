@@ -30,15 +30,12 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Cliente;
 use App\Mail\MailContact;
-use App\Models\Empresa;
 use App\Models\Telefone;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Rebing\GraphQL\Support\Mutation;
 use Rebing\GraphQL\Support\Facades\GraphQL;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CreateClienteMutation extends Mutation
@@ -88,7 +85,7 @@ class CreateClienteMutation extends Mutation
                     !auth()->check() ||
                     !auth()->user()->can('cliente:create')
                 ) {
-                    $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
+                    $cliente->ip = app('request')->server->get('REMOTE_ADDR');
                 }
                 $cliente->save();
                 $telefones = $args['input']['telefones'] ?? [];

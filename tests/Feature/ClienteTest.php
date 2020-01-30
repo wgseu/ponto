@@ -26,9 +26,13 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\Exception;
 use Tests\TestCase;
 use App\Models\Cliente;
 use App\Models\Telefone;
+use App\Exceptions\ValidationException;
+use App\Models\Prestador;
+use Illuminate\Support\Carbon;
 
 class ClienteTest extends TestCase
 {
@@ -49,7 +53,7 @@ class ClienteTest extends TestCase
         ];
     }
 
-    public function testCreateCliente()
+    public function testCreate()
     {
         $headers = PrestadorTest::authOwner();
         $cliente_data =  factory(Cliente::class)->make(['nome' => 'Teste']);
@@ -65,6 +69,60 @@ class ClienteTest extends TestCase
     {
         $cliente_data = factory(Cliente::class)->make(['email' => 'contato@grandchef.com.br']);
         $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $this->assertNotNull($response->json('data.CreateCliente.refresh_token'));
+    }
+
+    public function testTryCreateOwnerAccount()
+    {
+        $cliente = EmpresaTest::createOwner();
+        $cliente_data = factory(Cliente::class)->make([
+            'email' => 'contato@grandchef.com.br',
+            'empresa_id' => $cliente->empresa_id,
+        ]);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $cliente = Cliente::findOrFail($response->json('data.CreateCliente.id'));
+        $this->assertNull($cliente->empresa_id);
+    }
+
+    public function testOwnerCreateOwnerAccount()
+    {
+        $owner = EmpresaTest::createOwner();
+        $headers = PrestadorTest::auth(['cliente:create'], $owner->prestador);
+        $cliente_data = factory(Cliente::class)->make([
+            'email' => 'contato@grandchef.com.br',
+            'empresa_id' => $owner->empresa_id,
+        ]);
+        $cliente_data = array_merge($cliente_data->toArray(), ['senha' => 'Teste123']);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data], $headers);
+        $newOwner = Cliente::findOrFail($response->json('data.CreateCliente.id'));
+        $this->assertEquals($owner->empresa_id, $newOwner->empresa_id);
+        $this->assertFalse($newOwner->isOwner());
+        factory(Prestador::class)->create(['cliente_id' => $newOwner->id]);
+        $newOwner->refresh();
+        $this->assertTrue($newOwner->isOwner());
+    }
+
+    public function testFloodCreateAccount()
+    {
+        $cliente_data = factory(Cliente::class)->make(['email' => 'contato@grandchef.com.br']);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $this->assertNotNull($response->json('data.CreateCliente.refresh_token'));
+
+        $cliente_data = factory(Cliente::class)->make(['email' => 'contato2@grandchef.com.br']);
+        $this->expectException(ValidationException::class);
+        $this->graphfl('create_cliente', ['input' => $cliente_data]);
+    }
+
+    public function testCreateMultiple()
+    {
+        $headers = PrestadorTest::auth(['cliente:create']);
+
+        $cliente_data = factory(Cliente::class)->make(['email' => 'contato@grandchef.com.br']);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data], $headers);
+        $this->assertNotNull($response->json('data.CreateCliente.refresh_token'));
+
+        $cliente_data = factory(Cliente::class)->make(['email' => 'contato2@grandchef.com.br']);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data], $headers);
         $this->assertNotNull($response->json('data.CreateCliente.refresh_token'));
     }
 
@@ -100,7 +158,7 @@ class ClienteTest extends TestCase
         $this->graphfl('create_cliente', ['input' => $cliente_data]);
     }
 
-    public function testUpdateCliente()
+    public function testUpdate()
     {
         $headers = PrestadorTest::authOwner();
         $cliente = factory(Cliente::class)->create();
@@ -114,7 +172,150 @@ class ClienteTest extends TestCase
         $this->assertEquals('Atualizou', $cliente->nome);
     }
 
-    public function testDeleteCliente()
+    public function testUpdateEmail()
+    {
+        $headers = PrestadorTest::authOwner();
+        $cliente = factory(Cliente::class)->create();
+        $cliente->status = Cliente::STATUS_ATIVO;
+        $cliente->save();
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => [
+                'email' => 'other@email.com',
+            ]
+        ], $headers);
+        $cliente->refresh();
+        $this->assertEquals('other@email.com', $cliente->email);
+        $this->assertEquals(Cliente::STATUS_INATIVO, $cliente->status);
+    }
+
+    public function testUpdatePhone()
+    {
+        $cliente_data = factory(Cliente::class)->raw(['nome' => 'Teste']);
+        $cliente_data = array_merge($cliente_data, [
+            'telefones' => [
+                ['numero' => '44987654321'],
+            ],
+        ]);
+        $response = $this->graphfl('create_cliente', ['input' => $cliente_data]);
+        $cliente = Cliente::findOrFail($response->json('data.CreateCliente.id'));
+        $fone1 = Telefone::where('cliente_id', $cliente->id)
+            ->where('numero', '44987654321')->first();
+        $fone1->data_validacao = Carbon::now();
+        $fone1->save();
+        $headers = PrestadorTest::auth(['cliente:update']);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => [
+                'nome' => 'Atualizou',
+                'telefones' => [
+                    [
+                        'id' => $fone1->id,
+                        'numero' => '44981234567',
+                    ],
+                    ['numero' => '44981236541'],
+                ],
+            ]
+        ], $headers);
+        $fone1->refresh();
+        Telefone::where('cliente_id', $cliente->id)
+            ->where('numero', '44981236541')->firstOrFail();
+        $this->assertEquals('44981234567', $fone1->numero);
+        $this->assertNull($fone1->data_validacao);
+    }
+
+    public function testElevateSelfToOwner()
+    {
+        $owner = EmpresaTest::createOwner();
+        $cliente = factory(Cliente::class)->create();
+        $headers = self::auth($cliente);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => [
+                'nome' => 'Admin',
+                'empresa_id' => $owner->empresa_id,
+            ],
+        ], $headers);
+        $cliente->refresh();
+        $this->assertNull($cliente->empresa_id);
+        $this->assertEquals('Admin', $cliente->nome);
+    }
+
+    public function testCustomerElevateToProvider()
+    {
+        $cliente = factory(Cliente::class)->create();
+        $headers = self::auth($cliente);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => [
+                'nome' => 'Admin',
+                'fornecedor' => !$cliente->fornecedor,
+            ],
+        ], $headers);
+        $updated = $cliente->fresh();
+        $this->assertFalse($cliente->fornecedor, $updated->fornecedor);
+        $this->assertEquals('Admin', $updated->nome);
+    }
+
+    public function testEmployeeTryToUpdateOwner()
+    {
+        $cliente = EmpresaTest::createOwner();
+        $headers = PrestadorTest::auth(['cliente:create']);
+        $this->expectException(Exception::class);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => ['nome' => 'Admin']
+        ], $headers);
+    }
+
+    public function testOwnerUpdateSelf()
+    {
+        $cliente = EmpresaTest::createOwner();
+        $headers = PrestadorTest::auth(['cliente:create'], $cliente->prestador);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => ['nome' => 'Admin']
+        ], $headers);
+        $cliente->refresh();
+        $this->assertEquals('Admin', $cliente->nome);
+    }
+
+    public function testOwnerUpdateOtherOwner()
+    {
+        $cliente = EmpresaTest::createOwner();
+        $headers = PrestadorTest::authOwner();
+        $this->expectException(Exception::class);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => ['nome' => 'Other']
+        ], $headers);
+    }
+
+    public function testUniqueOwnerLeave()
+    {
+        $cliente = EmpresaTest::createOwner();
+        $headers = PrestadorTest::auth(['cliente:create'], $cliente->prestador);
+        $this->expectException(ValidationException::class);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => ['empresa_id' => null]
+        ], $headers);
+    }
+
+    public function testOwnerLeave()
+    {
+        EmpresaTest::createOwner();
+        $cliente = EmpresaTest::createOwner();
+        $headers = PrestadorTest::auth(['cliente:create'], $cliente->prestador);
+        $this->graphfl('update_cliente', [
+            'id' => $cliente->id,
+            'input' => ['empresa_id' => null]
+        ], $headers);
+        $cliente->refresh();
+        $this->assertNull($cliente->empresa_id);
+    }
+
+    public function testDelete()
     {
         $headers = PrestadorTest::authOwner();
         $cliente_to_delete = factory(Cliente::class)->create();
@@ -123,7 +324,7 @@ class ClienteTest extends TestCase
         $this->assertNull($cliente);
     }
 
-    public function testFindCliente()
+    public function testFind()
     {
         $headers = PrestadorTest::authOwner();
         $cliente = factory(Cliente::class)->create();

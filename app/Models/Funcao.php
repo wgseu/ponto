@@ -105,7 +105,7 @@ class Funcao extends Model implements ValidateInterface
     public function hasPermissionTo(string $permissao)
     {
         if (is_null($this->permissoesCache)) {
-            $this->permissoesCache = array_flip($this->permissoes);
+            $this->permissoesCache = array_flip($this->permissoes->toArray());
         }
         return array_key_exists($permissao, $this->permissoesCache);
     }

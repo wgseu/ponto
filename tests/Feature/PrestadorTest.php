@@ -26,8 +26,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Acesso;
 use Tests\TestCase;
+use App\Models\Acesso;
 use App\Models\Funcao;
 use App\Models\Cliente;
 use App\Models\Permissao;
@@ -42,7 +42,7 @@ class PrestadorTest extends TestCase
      * @param string[] $permissoes lista de permissões
      * @return array
      */
-    public static function auth($prestador = null, $permissoes = [])
+    public static function auth($permissoes = [], $prestador = null)
     {
         $prestador = $prestador ?: factory(Prestador::class)->create();
         $funcao = $prestador->funcao;
@@ -66,7 +66,7 @@ class PrestadorTest extends TestCase
     public static function authOwner($cliente = null)
     {
         $prestador = EmpresaTest::createOwner($cliente)->prestador;
-        return self::auth($prestador);
+        return self::auth([], $prestador);
     }
 
     public function testCreatePrestador()

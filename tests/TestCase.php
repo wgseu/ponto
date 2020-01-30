@@ -2,9 +2,11 @@
 
 namespace Tests;
 
-use Exception;
-use App\Models\Sistema;
+use App\Exceptions\Exception;
+use App\Exceptions\ValidationException;
 use Illuminate\Contracts\Console\Kernel;
+use App\Exceptions\AuthorizationException;
+use App\Exceptions\AuthenticationException;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -62,14 +64,25 @@ abstract class TestCase extends BaseTestCase
         if ($this->app) {
             $this->callBeforeApplicationDestroyedCallbacks();
         }
+        // limpa as autorizações
         auth()->check() && auth()->logout();
         auth()->guard()->unsetToken();
         auth('authorizer')->check() && auth('authorizer')->logout();
         auth('authorizer')->unsetToken();
         auth('device')->check() && auth('device')->logout();
         auth('device')->unsetToken();
+
         // limpa os unique do faker
         app('Faker\Generator')->unique(true);
+
+        // limpa as instâncias
+        $this->app->forgetInstance('system');
+        $this->app->forgetInstance('settings');
+        $this->app->forgetInstance('business');
+        $this->app->forgetInstance('company');
+        $this->app->forgetInstance('country');
+        $this->app->forgetInstance('currency');
+
         $this->app = null;
         parent::tearDown();
     }
@@ -127,7 +140,7 @@ abstract class TestCase extends BaseTestCase
      * @param  string $query
      * @param  array  $variables
      * @param  array  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
+     * @return TestResponse
      */
     protected function graphql(string $query, array $variables = [], array $headers = []): TestResponse
     {
@@ -138,9 +151,32 @@ abstract class TestCase extends BaseTestCase
 
         $response = $this->post('/graphql', $data, $headers);
         if (is_array($response->json('errors'))) {
-            throw new Exception($response->json('errors.0.message'));
+            throw $this->toException($response);
         }
         return $response;
+    }
+
+    /**
+     * Transforma uma resposta em exceção
+     *
+     * @param TestResponse $response
+     * @return \Exception
+     */
+    protected function toException($response)
+    {
+        if ($response->json('errors.0.extensions.category') == 'businessLogic') {
+            $messages = array_map(function ($item) {
+                return $item['message'];
+            }, $response->json('errors'));
+            return new ValidationException($messages);
+        }
+        if ($response->json('errors.0.extensions.category') == 'authentication') {
+            return new AuthenticationException($response->json('errors.0.message'));
+        }
+        if ($response->json('errors.0.extensions.category') == 'authorization') {
+            return new AuthorizationException($response->json('errors.0.message'));
+        }
+        return new Exception($response->json('errors.0.message'));
     }
 
     /**

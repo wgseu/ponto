@@ -40,13 +40,13 @@ class EmpresaTest extends TestCase
      */
     public static function createOwner($cliente = null)
     {
-        $cliente_empresa = factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA]);
         /** @var Empresa $empresa */
         $empresa = app('business');
-        $empresa->empresa_id = $cliente_empresa->id;
+        $empresa->empresa_id = $empresa->empresa_id ?:
+            factory(Cliente::class)->create(['tipo' => Cliente::TIPO_JURIDICA])->id;
         $empresa->save();
         $cliente = $cliente ?? factory(Cliente::class)->create();
-        $cliente->update(['empresa_id' => $cliente_empresa->id]);
+        $cliente->update(['empresa_id' => $empresa->empresa_id]);
         factory(Prestador::class)->create(['cliente_id' => $cliente->id]);
         return $cliente;
     }

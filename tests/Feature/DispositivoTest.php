@@ -48,7 +48,7 @@ class DispositivoTest extends TestCase
 
     public function testCreateWithoutValidationAccess()
     {
-        $headers = PrestadorTest::auth(null, ['dispositivo:create']);
+        $headers = PrestadorTest::auth(['dispositivo:create']);
         $this->expectException(\Exception::class);
         $this->graphfl('create_dispositivo', [
             'input' => [

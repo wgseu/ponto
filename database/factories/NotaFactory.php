@@ -17,6 +17,6 @@ $factory->define(Nota::class, function (Faker $faker) {
         'numero_final' => $faker->numberBetween(1, 70),
         'sequencia' => $faker->numberBetween(1, 70),
         'contingencia' => false,
-        'data_emissao' => Carbon::now(),
+        'data_emissao' => Carbon::now()->format('c'),
     ];
 });

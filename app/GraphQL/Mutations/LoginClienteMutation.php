@@ -31,7 +31,6 @@ namespace App\GraphQL\Mutations;
 use App\Models\Cliente;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
-use App\GraphQL\Queries\UsuarioQuery;
 use App\Exceptions\AuthorizationException;
 use App\Exceptions\AuthenticationException;
 use Rebing\GraphQL\Support\Facades\GraphQL;

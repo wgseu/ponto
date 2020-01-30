@@ -1,5 +1,0 @@
-mutation ($id: ID!) {
-  DeleteNota(id: $id) {
-    id
-  }
-}

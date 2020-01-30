@@ -39,6 +39,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use App\Interfaces\AuthorizableInterface;
 use App\Interfaces\ValidateInsertInterface;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Informações de cliente físico ou jurídico. Clientes, empresas,
@@ -48,7 +49,8 @@ class Cliente extends User implements
     ValidateInterface,
     JWTSubject,
     AuthorizableInterface,
-    ValidateInsertInterface
+    ValidateInsertInterface,
+    ValidateUpdateInterface
 {
     use Notifiable;
     use ModelEvents;
@@ -293,6 +295,58 @@ class Cliente extends User implements
             ->orderBy('id', 'DESC');
     }
 
+    /**
+     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     */
+    public function getNomeCompleto()
+    {
+        if ($this->tipo == self::TIPO_JURIDICA) {
+            return $this->nome;
+        }
+        return trim($this->nome . ' ' . $this->sobrenome);
+    }
+
+    /**
+     * Informa se esse cliente é dono da empresa
+     *
+     * @return boolean
+     */
+    public function isOwner()
+    {
+        return !is_null(app('business')->empresa_id) &&
+            app('business')->empresa_id == $this->empresa_id &&
+            !is_null($this->prestador);
+    }
+
+    /**
+     * Verifica se o cliente tem acesso para a permissão informada
+     *
+     * @param string $permissao
+     * @return boolean
+     */
+    public function hasPermissionTo(string $permissao)
+    {
+        $prestador = $this->prestador;
+        if (is_null($prestador)) {
+            return false;
+        }
+        if ($this->isOwner()) {
+            return true;
+        }
+        return $prestador->funcao->hasPermissionTo($permissao);
+    }
+
+    /**
+     * Informa se esse cliente é o único proprietário
+     *
+     * @return boolean
+     */
+    public function isUniqueOwner()
+    {
+        return !self::where('id', '<>', $this->id)
+            ->where('empresa_id', app('company')->id)->exists();
+    }
+
     public function validate($old)
     {
         $errors = [];
@@ -328,41 +382,18 @@ class Cliente extends User implements
     }
 
     /**
-     * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
+     * Regras:
+     * Não deixa o site ficar sem pelo menos um proprietário
      */
-    public function getNomeCompleto()
+    public function onUpdate($old)
     {
-        if ($this->tipo == self::TIPO_JURIDICA) {
-            return $this->nome;
+        if (
+            !is_null(app('business')->empresa_id) &&
+            $old->empresa_id == app('company')->id &&
+            $this->empresa_id != app('company')->id &&
+            $this->isUniqueOwner()
+        ) {
+            return ['empresa_id' => __('messages.cannot_leave_unique_owner')];
         }
-        return trim($this->nome . ' ' . $this->sobrenome);
-    }
-
-    /**
-     * Informa se esse cliente é dono da empresa
-     *
-     * @return boolean
-     */
-    public function isOwner()
-    {
-        return !is_null(app('business')->empresa_id) && app('business')->empresa_id == $this->empresa_id;
-    }
-
-    /**
-     * Verifica se o cliente tem acesso para a permissão informada
-     *
-     * @param string $permissao
-     * @return boolean
-     */
-    public function hasPermissionTo(string $permissao)
-    {
-        if ($this->isOwner()) {
-            return true;
-        }
-        $prestador = $this->prestador;
-        if (is_null($prestador)) {
-            return false;
-        }
-        return $prestador->funcao->hasPermissionTo($permissao);
     }
 }

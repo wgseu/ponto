@@ -62,6 +62,13 @@ class Funcao extends Model implements ValidateInterface
         'remuneracao',
     ];
 
+    /**
+     * Mapa com permissões
+     *
+     * @var int[]
+     */
+    private $permissoesCache = null;
+
 
     public function acessos()
     {
@@ -97,8 +104,10 @@ class Funcao extends Model implements ValidateInterface
      */
     public function hasPermissionTo(string $permissao)
     {
-        $permissao = Permissao::where('nome', $permissao)->firstOrFail();
-        return $this->acessos()->where('permissao_id', $permissao->id)->exists();
+        if (is_null($this->permissoesCache)) {
+            $this->permissoesCache = array_flip($this->permissoes);
+        }
+        return array_key_exists($permissao, $this->permissoesCache);
     }
 
     /**

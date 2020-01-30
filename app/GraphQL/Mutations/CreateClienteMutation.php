@@ -64,8 +64,32 @@ class CreateClienteMutation extends Mutation
         $cliente = new Cliente();
         try {
             DB::transaction(function () use ($cliente, $args) {
+                if (
+                    array_key_exists('fornecedor', $args['input']) && (
+                        !auth()->check() ||
+                        !auth()->user()->can('cliente:create')
+                    )
+                ) {
+                    unset($args['input']['fornecedor']);
+                }
+                if (
+                    array_key_exists('empresa_id', $args['input']) && (
+                        !auth()->check() ||
+                        !auth()->user()->can('cliente:create') || (
+                            $args['input']['empresa_id'] == app('company')->id &&
+                            !auth()->user()->isOwner()
+                        )
+                    )
+                ) {
+                    unset($args['input']['empresa_id']);
+                }
                 $cliente->fill($args['input']);
-                $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
+                if (
+                    !auth()->check() ||
+                    !auth()->user()->can('cliente:create')
+                ) {
+                    $cliente->ip = $_SERVER['REMOTE_ADDR'] ?? null;
+                }
                 $cliente->save();
                 $telefones = $args['input']['telefones'] ?? [];
                 foreach ($telefones as $fone) {

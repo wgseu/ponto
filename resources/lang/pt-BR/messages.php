@@ -967,4 +967,5 @@ return [
     'cannot_evaluate_open_order' => 'O pedido está aberto e não pode ser avaliado ainda',
     'localization_cannot_change_customer' => 'Não é possível transferir o endereço entre clientes',
     'localization_cannot_change' => 'Esse endereço não pode ser alterado, cadastre outro',
+    'cannot_leave_unique_owner' => 'O site não pode ficar sem proprietário',
 ];

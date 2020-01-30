@@ -47,8 +47,12 @@ class UpdateClienteMutation extends Mutation
 
     public function authorize(array $args): bool
     {
-        return (Auth::check() && Auth::user()->can('cliente:update')) ||
-            (Auth::check() && Auth::user()->id == $args['id']);
+        $cliente = Cliente::findOrFail($args['id']);
+        // só deixa o próprio proprietário alterar seu usuário
+        return (Auth::check() && Auth::user()->can('cliente:update') && (
+                !$cliente->isOwner() ||
+                auth()->user()->id == $cliente->id
+            )) || (Auth::check() && Auth::user()->id == $args['id']);
     }
 
     public function type(): Type
@@ -73,6 +77,26 @@ class UpdateClienteMutation extends Mutation
         $old = $cliente->replicate();
         try {
             DB::transaction(function () use ($old, $args, $cliente) {
+                if (
+                    array_key_exists('fornecedor', $args['input']) &&
+                    !auth()->user()->can('cliente:update')
+                ) {
+                    unset($args['input']['fornecedor']);
+                }
+                if (
+                    array_key_exists('empresa_id', $args['input']) && (
+                        !auth()->user()->can('cliente:update') || (
+                            (
+                                $args['input']['empresa_id'] == app('company')->id ||
+                                $old->empresa_id == app('company')->id
+                            ) && (
+                                !auth()->user()->isOwner()
+                            )
+                        )
+                    )
+                ) {
+                    unset($args['input']['empresa_id']);
+                }
                 $cliente->fill($args['input']);
                 $revalidar = $old->status == Cliente::STATUS_ATIVO &&
                     $old->email != $cliente->email &&

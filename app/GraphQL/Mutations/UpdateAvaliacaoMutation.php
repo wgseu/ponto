@@ -71,9 +71,18 @@ class UpdateAvaliacaoMutation extends CreateAvaliacaoMutation
     public function resolve($root, $args)
     {
         $resumo = Avaliacao::whereNull('metrica_id')->findOrFail($args['id']);
-        DB::transaction(function () use ($resumo, $args) {
-            $resumo->fill($args['input']);
-            $subavaliacoes = $args['input']['subavaliacoes'] ?? [];
+        $input = $args['input'];
+        DB::transaction(function () use ($resumo, $input) {
+            if (!auth()->user()->can('avaliacao:update')) {
+                unset($input['publico']);
+            }
+            $pedido = $resumo->pedido;
+            if ($pedido->cliente_id != auth()->user()->id) {
+                // outra pessoa só pode alterar a visibilidade
+                $input = array_intersect_key($input, array_flip(['publico', 'subavaliacoes']));
+            }
+            $resumo->fill($input);
+            $subavaliacoes = $input['subavaliacoes'] ?? [];
             self::saveAll($subavaliacoes, $resumo);
             $resumo->save();
         });

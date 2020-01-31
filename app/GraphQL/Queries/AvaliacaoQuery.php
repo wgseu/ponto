@@ -28,13 +28,12 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
+use Closure;
 use App\Models\Avaliacao;
 use App\GraphQL\Utils\Filter;
 use App\GraphQL\Utils\Ordering;
-use Closure;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
-use Illuminate\Support\Facades\Auth;
 use GraphQL\Type\Definition\ResolveInfo;
 use Rebing\GraphQL\Support\SelectFields;
 use Rebing\GraphQL\Support\Facades\GraphQL;
@@ -44,14 +43,6 @@ class AvaliacaoQuery extends Query
     protected $attributes = [
         'name' => 'avaliacoes',
     ];
-
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && (
-            ($args['filter']['cliente_id']['eq'] ?? null) == Auth::user()->id
-            || Auth::user()->can('avaliacao:view')
-        );
-    }
 
     public function type(): Type
     {

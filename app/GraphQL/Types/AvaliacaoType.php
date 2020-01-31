@@ -50,16 +50,21 @@ class AvaliacaoType extends GraphQLType
             ],
             'metrica_id' => [
                 'type' => Type::id(),
-                'description' => 'Métrica de avaliação',
+                'description' => 'Métrica de avaliação ou nulo para resumo da avaliação do pedido',
             ],
             'cliente_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando' .
                     ' for avaliação de produto',
             ],
+            'cliente' => [
+                'type' => GraphQL::type('Cliente'),
+                'description' => 'Informa o cliente que avaliou esse pedido ou produto, obrigatório quando' .
+                    ' for avaliação de produto',
+            ],
             'pedido_id' => [
                 'type' => Type::id(),
-                'description' => 'Pedido que foi avaliado, quando nulo o produto deve ser informado',
+                'description' => 'Pedido que foi avaliado',
             ],
             'produto_id' => [
                 'type' => Type::id(),
@@ -72,6 +77,10 @@ class AvaliacaoType extends GraphQLType
             'comentario' => [
                 'type' => Type::string(),
                 'description' => 'Comentário da avaliação',
+            ],
+            'publico' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o comentário está público para visualização',
             ],
             'data_avaliacao' => [
                 'type' => GraphQL::type('DateTime'),

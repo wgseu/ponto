@@ -71,6 +71,8 @@ class CreateAvaliacaoMutation extends Mutation
     public static function saveAll($subavaliacoes, $resumo)
     {
         $canPublish = auth()->user()->can('avaliacao:update');
+        $pedido = $resumo->pedido;
+        $outraPessoa = $pedido->cliente_id != auth()->user()->id;
         foreach ($subavaliacoes as $data) {
             $avaliacao = new Avaliacao();
             if (!$canPublish) {
@@ -82,6 +84,10 @@ class CreateAvaliacaoMutation extends Mutation
             }
             $avaliacao->pedido_id = $resumo->pedido_id;
             $avaliacao->cliente_id = $resumo->cliente_id;
+            if ($outraPessoa) {
+                // outra pessoa só pode alterar a visibilidade
+                $data = array_intersect_key($data, array_flip(['publico']));
+            }
             $avaliacao->fill($data);
             $avaliacao->save();
         }

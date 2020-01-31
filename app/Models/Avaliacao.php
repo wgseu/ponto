@@ -180,7 +180,7 @@ class Avaliacao extends Model implements
         if ($query->exists()) {
             return ['pedido_id' => __('messages.order_have_evaluation')];
         }
-        if (!is_null($old) && !$this->isChangeAllowed(['publico', 'estrelas'])) {
+        if (!is_null($old) && !$this->isChangeAllowed(['comentario', 'publico', 'estrelas'])) {
             return ['id' => __('messages.evaluation_change_not_allowed')];
         }
         $pedido = $this->pedido;

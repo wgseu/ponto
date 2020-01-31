@@ -44,7 +44,6 @@ class PermissaoSeeder extends Seeder
             ['auditoria:view', 'auditoria_view_permition'],
         ]);
         $this->group(4, [
-            ['avaliacao:view', 'avaliacao_view_permition'],
             ['avaliacao:update', 'avaliacao_update_permition'],
         ]);
         $this->group(5, [
@@ -255,7 +254,6 @@ class PermissaoSeeder extends Seeder
             ['mesa:delete', 'mesa_delete_permition'],
         ]);
         $this->group(47, [
-            ['metrica:view', 'metrica_view_permition'],
             ['metrica:create', 'metrica_create_permition'],
             ['metrica:update', 'metrica_update_permition'],
             ['metrica:delete', 'metrica_delete_permition'],

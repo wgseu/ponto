@@ -62,6 +62,9 @@ class AvaliacaoFilter extends InputType
             'comentario' => [
                 'type' => GraphQL::type('StringFilter'),
             ],
+            'publico' => [
+                'type' => Type::boolean(),
+            ],
             'data_avaliacao' => [
                 'type' => GraphQL::type('DateFilter'),
             ],

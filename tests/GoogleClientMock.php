@@ -4,7 +4,7 @@ namespace Tests;
 
 use Google_Client;
 
-class Google_Client_Mock extends Google_Client
+class GoogleClientMock extends Google_Client
 {
     public $token = 'fake_token';
 

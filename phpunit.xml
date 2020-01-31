@@ -24,7 +24,7 @@
         <ini name="date.timezone" value="UTC"/>
         <server name="APP_KEY" value="das3615d6sa58d14ds6a51asd654dsad"/>
         <server name="APP_ENV" value="testing"/>
-        <server name="GOOGLE_LOGIN_CLASS" value="\Tests\Google_Client_Mock"/>
+        <server name="GOOGLE_LOGIN_CLASS" value="\Tests\GoogleClientMock"/>
         <server name="FACEBOOK_LOGIN_CLASS" value="\Tests\FacebookMock"/>
         <server name="FACEBOOK_IMG_FORMAT" value="%s"/>
         <server name="JWT_SECRET" value="skjadkuwb32d486ads48ac1da"/>

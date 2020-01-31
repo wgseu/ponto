@@ -172,7 +172,17 @@ class Sistema extends Model implements ValidateInterface
     {
         $this->options->includeDefaults = app('settings')->includeDefaults;
         $this->loadOptions();
-        return json_encode(Filter::emptyObject($this->options->getValues()));
+        $integracoes = Integracao::where('ativo', true)->get();
+        $integrations = [];
+        foreach ($integracoes as $integracao) {
+            $data = ['ativo' => $integracao->ativo];
+            if ($integracao->isLoginExposed()) {
+                $data['login'] = $integracao->login;
+            }
+            $integrations[$integracao->codigo] = $data;
+        }
+        $options = array_merge($this->options->getValues(), $integrations);
+        return json_encode(Filter::emptyObject($options));
     }
 
     public function setOpcoesAttribute($value)

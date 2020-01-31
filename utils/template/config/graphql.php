@@ -101,6 +101,9 @@ $[table.end]
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
+                'LoginGoogle' => 'App\GraphQL\Mutations\LoginGoogleMutation',
+                'LoginFacebook' => 'App\GraphQL\Mutations\LoginFacebookMutation',
+                'RefreshToken' => 'App\GraphQL\Mutations\RefreshTokenMutation',
 $[table.each]
 
                 'Create$[Table.norm]' => 'App\GraphQL\Mutations\Create$[Table.norm]Mutation',

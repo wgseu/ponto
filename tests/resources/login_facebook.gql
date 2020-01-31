@@ -1,0 +1,22 @@
+mutation ($token: String!) {
+  LoginFacebook (token: $token) {
+    access_token
+    refresh_token
+    token_type
+    expires_in
+    user {
+      id
+      nome
+      sobrenome
+      email
+      genero
+      imagem_url
+      proprietario
+      prestador {
+        funcao {
+          permissoes
+        }
+      }
+    }
+  }
+}

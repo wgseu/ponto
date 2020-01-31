@@ -29,6 +29,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use IntegracaoSeeder;
 use App\Models\Integracao;
+use App\Exceptions\AuthorizationException;
 
 class LoginFacebookTest extends TestCase
 {
@@ -51,7 +52,7 @@ class LoginFacebookTest extends TestCase
     public function testLoginInvalidToken()
     {
         $token = 'invalid_token';
-        $this->expectException(\Exception::class);
+        $this->expectException(AuthorizationException::class);
         $response = $this->graphfl('login_facebook', ['token' => $token]);
     }
 }

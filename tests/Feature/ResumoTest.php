@@ -26,29 +26,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Movimentacao;
 use Tests\TestCase;
 use App\Models\Resumo;
 
 class ResumoTest extends TestCase
 {
-    public function testCreateResumo()
-    {
-        $headers = PrestadorTest::authOwner();
-        $seed_resumo =  factory(Resumo::class)->create();
-        $response = $this->graphfl('create_resumo', [
-            'input' => [
-                'movimentacao_id' => $seed_resumo->movimentacao_id,
-                'forma_id' => $seed_resumo->forma_id,
-                'valor' => 1.50,
-            ]
-        ], $headers);
-
-        $found_resumo = Resumo::findOrFail($response->json('data.CreateResumo.id'));
-        $this->assertEquals($seed_resumo->movimentacao_id, $found_resumo->movimentacao_id);
-        $this->assertEquals($seed_resumo->forma_id, $found_resumo->forma_id);
-        $this->assertEquals(1.50, $found_resumo->valor);
-    }
-
     public function testUpdateResumo()
     {
         $headers = PrestadorTest::authOwner();

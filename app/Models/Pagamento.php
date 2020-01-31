@@ -75,6 +75,7 @@ class Pagamento extends Model implements
      */
     protected $fillable = [
         'moeda_id',
+        'carteira_id',
         'pagamento_id',
         'movimentacao_id',
         'forma_id',
@@ -242,7 +243,6 @@ class Pagamento extends Model implements
     protected function calculate()
     {
         $cartao = $this->cartao;
-        $this->carteira_id = null;
         if (!is_null($cartao)) {
             $this->carteira_id = $cartao->carteira_id;
         }

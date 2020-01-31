@@ -22,7 +22,19 @@ class CarteiraSeeder extends Seeder
 
         (new Carteira([
             'tipo' => Carteira::TIPO_LOCAL,
+            'descricao' => __('messages.treasury'),
+            'ativa' => true,
+        ]))->save();
+
+        (new Carteira([
+            'tipo' => Carteira::TIPO_LOCAL,
             'descricao' => __('messages.cash_drawer_number', ['number' => 1]),
+            'ativa' => true,
+        ]))->save();
+
+        (new Carteira([
+            'tipo' => Carteira::TIPO_FINANCEIRA,
+            'descricao' => __('messages.banking'),
             'ativa' => true,
         ]))->save();
 

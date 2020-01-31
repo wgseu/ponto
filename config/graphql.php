@@ -363,7 +363,6 @@ return [
 
                 'UpdateSistema' => 'App\GraphQL\Mutations\UpdateSistemaMutation',
 
-                'CreateResumo' => 'App\GraphQL\Mutations\CreateResumoMutation',
                 'UpdateResumo' => 'App\GraphQL\Mutations\UpdateResumoMutation',
 
                 'CreateHorario' => 'App\GraphQL\Mutations\CreateHorarioMutation',

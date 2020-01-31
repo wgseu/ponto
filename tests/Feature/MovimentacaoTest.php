@@ -37,40 +37,72 @@ use App\Models\Pagamento;
 use App\Models\Movimentacao;
 use Illuminate\Support\Carbon;
 use App\Exceptions\ValidationException;
+use App\Models\Cartao;
+use App\Models\Dispositivo;
+use App\Models\Forma;
+use App\Models\Resumo;
+use App\Models\Saldo;
 
 class MovimentacaoTest extends TestCase
 {
     public function testCreateMovimentacao()
     {
-        $headers = PrestadorTest::authOwner();
+        $prestador = PrestadorTest::authOwner();
+        $dispositivo = DispositivoTest::auth();
+        $headers = ClienteTest::mergeAuth($prestador, $dispositivo);
         $cozinha = factory(Cozinha::class)->create();
+        $forma = factory(Forma::class)->create();
+        factory(Sessao::class)->create();
+        factory(Saldo::class)->create([
+            'moeda_id' => app('currency')->id,
+            'carteira_id' => $forma->carteira_id,
+            'valor' => 1500,
+        ]);
         factory(Horario::class)->create([
             'cozinha_id' => $cozinha->id
         ]);
-        $caixa = factory(Caixa::class)->create();
-        $response = $this->graphfl('create_movimentacao', [
+        $this->graphfl('create_movimentacao', [
             'input' => [
-                'caixa_id' => $caixa->id,
+                'aberta' => true,
+                'valor_inicial' => 100,
             ]
         ], $headers);
-
-        $found_movimentacao = Movimentacao::findOrFail($response->json('data.CreateMovimentacao.id'));
+        $found_movimentacao = Movimentacao::where('aberta', true)->firstOrFail();
+        $pagamento = Pagamento::where('movimentacao_id', $found_movimentacao->id)->firstOrFail();
         $this->assertEquals(true, $found_movimentacao->aberta);
-        $this->assertEquals($caixa->id, $found_movimentacao->caixa_id);
+        $this->assertEquals(100, $pagamento->valor);
     }
 
     public function testUpdateMovimentacao()
     {
         $movimentacao = factory(Movimentacao::class)->create();
         $headers = PrestadorTest::authOwner();
+        $forma = factory(Forma::class)->create();
+        $cartao = factory(Cartao::class)->create();
         $this->graphfl('update_movimentacao', [
             'id' => $movimentacao->id,
             'input' => [
                 'aberta' => false,
+                'resumos' => [
+                    [
+                        'forma_id' => $cartao->forma_id,
+                        'cartao_id' => $cartao->id,
+                        'valor' => 100
+                    ],
+                    [
+                        'forma_id' => $forma->id,
+                        'cartao_id' => null,
+                        'valor' => 24.5
+                    ]
+                ],
             ]
         ], $headers);
         $movimentacao->refresh();
+        $resumoCartao = Resumo::where('forma_id', $cartao->forma_id)->firstOrFail();
+        $resumoDinheiro = Resumo::where('forma_id', $forma->id)->firstOrFail();
         $this->assertNotTrue($movimentacao->aberta);
+        $this->assertEquals(100, $resumoCartao->valor);
+        $this->assertEquals(24.5, $resumoDinheiro->valor);
     }
 
     public function testFindMovimentacao()
@@ -214,22 +246,23 @@ class MovimentacaoTest extends TestCase
     public function testCriarMovimentacaoSessaoNull()
     {
         $prestador = factory(Prestador::class)->create();
-        $caixa = factory(Caixa::class)->create();
         $cozinha = factory(Cozinha::class)->create();
         factory(Horario::class)->create([
             'cozinha_id' => $cozinha->id,
         ]);
-        $headers = PrestadorTest::authOwner();
-        $response = $this->graphfl('create_movimentacao', [
+        $authPrestador = PrestadorTest::authOwner();
+        $dispositivo = DispositivoTest::auth();
+        $headers = ClienteTest::mergeAuth($authPrestador, $dispositivo);
+        $this->graphfl('create_movimentacao', [
             'input' => [
-                'caixa_id' => $caixa->id,
+                'aberta' => true,
+                'valor_inicial' => 0,
             ]
         ], $headers);
-        $movimentacao = Movimentacao::findOrFail($response->json('data.CreateMovimentacao.id'));
+        $movimentacao = Movimentacao::where('aberta', true)->firstOrFail();
         $sessao = Sessao::where('id', $movimentacao->sessao_id)->first();
 
         $this->assertEquals($sessao->id, $movimentacao->sessao_id);
-        $this->assertEquals($caixa->id, $movimentacao->caixa_id);
     }
 
     public function testCriarMovimentacaoHorarioNull()
@@ -245,5 +278,83 @@ class MovimentacaoTest extends TestCase
                 'data_abertura' => '2016-12-25T12:15:00Z',
             ]
         ], $headers);
+    }
+
+    public function testCreateMovimentacaoSemSaldo()
+    {
+        $prestador = PrestadorTest::authOwner();
+        $dispositivo = DispositivoTest::auth();
+        $headers = ClienteTest::mergeAuth($prestador, $dispositivo);
+        $cozinha = factory(Cozinha::class)->create();
+        factory(Horario::class)->create([
+            'cozinha_id' => $cozinha->id,
+        ]);
+        factory(Forma::class)->create();
+        factory(Sessao::class)->create();
+        $this->expectException('Exception');
+        $this->graphfl('create_movimentacao', [
+            'input' => [
+                'aberta' => true,
+                'valor_inicial' => 100,
+            ]
+        ], $headers);
+    }
+
+    public function testCreateMovimentacaoDispositivoNaoConfigurado()
+    {
+        $dispositivoSemCaixa = factory(Dispositivo::class)->create(['caixa_id' => null]);
+        $dispositivo = DispositivoTest::auth($dispositivoSemCaixa);
+        $prestador = PrestadorTest::authOwner();
+        $headers = ClienteTest::mergeAuth($prestador, $dispositivo);
+        $cozinha = factory(Cozinha::class)->create();
+        factory(Horario::class)->create([
+            'cozinha_id' => $cozinha->id,
+        ]);
+        factory(Forma::class)->create();
+        factory(Sessao::class)->create();
+        $this->expectException('Exception');
+        $this->graphfl('create_movimentacao', [
+            'input' => [
+                'aberta' => true,
+                'valor_inicial' => 0,
+            ]
+        ], $headers);
+    }
+
+    public function testFechamentoSemResumo()
+    {
+        $prestador = PrestadorTest::authOwner();
+        $dispositivo = DispositivoTest::auth();
+        $headers = ClienteTest::mergeAuth($prestador, $dispositivo);
+        $cozinha = factory(Cozinha::class)->create();
+        $forma = factory(Forma::class)->create();
+        factory(Sessao::class)->create();
+        factory(Saldo::class)->create([
+            'moeda_id' => app('currency')->id,
+            'carteira_id' => $forma->carteira_id,
+            'valor' => 1500,
+        ]);
+        factory(Horario::class)->create([
+            'cozinha_id' => $cozinha->id
+        ]);
+        $this->graphfl('create_movimentacao', [
+            'input' => [
+                'aberta' => true,
+                'valor_inicial' => 100,
+            ]
+        ], $headers);
+        $movimentacao = Movimentacao::where('aberta', true)->firstOrFail();
+        $this->graphfl('update_movimentacao', [
+            'id' => $movimentacao->id,
+            'input' => [
+                'aberta' => false,
+                'resumos' => [],
+            ]
+        ], $prestador);
+        $movimentacao->refresh();
+        $pagamento = Pagamento::where('carteira_id', $forma->carteira_id)
+            ->where('valor', 100)->first();
+        $this->assertNotTrue($movimentacao->aberta);
+        $this->assertNotNull($pagamento);
     }
 }

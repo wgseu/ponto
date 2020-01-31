@@ -52,6 +52,15 @@ class ClienteTest extends TestCase
             'Authorization' => "Bearer $token",
         ];
     }
+    
+    public static function mergeAuth($auth1, $auth2)
+    {
+        $token1 = $auth1['Authorization'];
+        $token2 = $auth2['Authorization'];
+        return [
+            'Authorization' => "$token1, $token2"
+        ];
+    }
 
     public function testCreate()
     {

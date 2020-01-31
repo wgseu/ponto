@@ -26,11 +26,22 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cliente;
 use Tests\TestCase;
 use App\Models\Dispositivo;
+use App\Models\Prestador;
 
 class DispositivoTest extends TestCase
 {
+    public static function auth($device = null)
+    {
+        $device = $device ?: factory(Dispositivo::class)->create();
+        $token = auth('device')->fromUser($device);
+        return [
+            'Authorization' => "Device $token",
+        ];
+    }
+
     public function testCreateDispositivo()
     {
         $headers = PrestadorTest::authOwner();

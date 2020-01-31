@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Integracao;
-use App\Util\Upload;
 use Illuminate\Database\Seeder;
 
 class IntegracaoSeeder extends Seeder

@@ -165,6 +165,16 @@ class Integracao extends Model implements ValidateInterface
     }
 
     /**
+     * Informa se deve expor o login para o frontend
+     *
+     * @return boolean
+     */
+    public function isLoginExposed()
+    {
+        return in_array($this->codigo, ['google', 'facebook']);
+    }
+
+    /**
      * Regras:
      * Se a Intregração estiver ativa Login e senha não podem ser nulos
      */

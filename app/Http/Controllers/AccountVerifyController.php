@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
-use Tymon\JWTAuth\Payload;
 use Tymon\JWTAuth\Token;
+use Tymon\JWTAuth\Payload;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AccountVerifyController extends Controller
 {

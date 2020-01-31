@@ -903,7 +903,7 @@ return [
     'join_must_be_associated' => 'A junção deve ser cadastrada como associada',
     'mesa_associated_ordem' => 'Já existe um pedido associado a está mesa',
     'user_acess_invalid_facebook' => "É necessário autorizar o acesso Facebook",
-    'acess_invalid' => 'Acesso negado',
+    'access_denied' => 'Acesso negado',
     'integration_active_login_cannot_null' => 'Para ativar a integração é necessário login e senha',
     'integration_module' => 'Módulo de integração com :name',
     'order_have_evaluation' => 'A avaliação do produto ou métrica está repetido para esse pedido',

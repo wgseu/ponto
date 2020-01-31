@@ -178,6 +178,8 @@ return [
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
+                'LoginGoogle' => 'App\GraphQL\Mutations\LoginGoogleMutation',
+                'LoginFacebook' => 'App\GraphQL\Mutations\LoginFacebookMutation',
                 'RefreshToken' => 'App\GraphQL\Mutations\RefreshTokenMutation',
 
                 'CreateSetor' => 'App\GraphQL\Mutations\CreateSetorMutation',

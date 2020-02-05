@@ -176,7 +176,6 @@ abstract class TestCase extends BaseTestCase
         if ($response->json('errors.0.extensions.category') == 'authorization') {
             return new AuthorizationException($response->json('errors.0.message'));
         }
-        error_log(print_r($response->json('errors.0'), true));
         return new Exception($response->json('errors.0.message'));
     }
 

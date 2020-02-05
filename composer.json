@@ -73,7 +73,7 @@
             "phpcbf --standard=PSR12 app"
         ],
         "test": [
-            "phpunit"
+            "phpunit --configuration ."
         ],
         "check-style": [
             "phpcs --standard=PSR12 app tests"

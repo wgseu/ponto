@@ -56,49 +56,48 @@ class LoginFacebookMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        try {
-            $integration = Integracao::where('codigo', 'facebook')
-                ->where('ativo', true)->firstOrFail();
-            $class_name = env('FACEBOOK_LOGIN_CLASS', Facebook::class);
-            $facebook = new $class_name([
-                'app_id' => $integration->login,
-                'app_secret' => $integration->secret,
-                'default_graph_version' => 'v5.0',
-            ]);
-            $fb_response = $facebook->get('/me?fields=id,name,email', $args['token']);
-            $payload = $fb_response->getGraphUser();
-            if (!$payload) {
-                throw new AuthorizationException(__('messages.access_denied'));
-            }
-            $cliente = Cliente::where('email', $payload['email'])->first();
-            if (is_null($cliente)) {
-                $imagem_url = sprintf(
-                    env('FACEBOOK_IMG_FORMAT', 'https://graph.facebook.com/%s/picture?type=large'),
-                    $payload['id']
-                );
-                $data = file_get_contents($imagem_url);
-                $cliente = new Cliente();
-                $cliente->nome = $payload['name'];
-                $cliente->email = $payload['email'];
-                if ($data !== false) {
-                    $cliente->imagem = base64_encode($data);
-                }
-            }
-            if ($cliente->status == Cliente::STATUS_INATIVO) {
-                $cliente->status = Cliente::STATUS_ATIVO;
-                $cliente->save();
-            }
-            $token = auth()->fromUser($cliente);
-            return [
-                'refresh_token' => $cliente->createRefreshToken(),
-                'access_token'  => $token,
-                'token_type'    => 'bearer',
-                'expires_in'    => auth()->factory()->getTTL() * 60,
-                'user'          => $cliente,
-            ];
-        } catch (\Throwable $th) {
-            var_dump($th);
-            throw $th;
+        $integration = Integracao::where('codigo', 'facebook')
+            ->where('ativo', true)->firstOrFail();
+        $class_name = env('FACEBOOK_LOGIN_CLASS', Facebook::class);
+        var_dump($class_name);
+        var_dump(env('APP_ENV'));
+        var_dump(env('DB_DATABASE'));
+        var_dump(env('DB_CONNECTION'));
+        $facebook = new $class_name([
+            'app_id' => $integration->login,
+            'app_secret' => $integration->secret,
+            'default_graph_version' => 'v5.0',
+        ]);
+        $fb_response = $facebook->get('/me?fields=id,name,email', $args['token']);
+        $payload = $fb_response->getGraphUser();
+        if (!$payload) {
+            throw new AuthorizationException(__('messages.access_denied'));
         }
+        $cliente = Cliente::where('email', $payload['email'])->first();
+        if (is_null($cliente)) {
+            $imagem_url = sprintf(
+                env('FACEBOOK_IMG_FORMAT', 'https://graph.facebook.com/%s/picture?type=large'),
+                $payload['id']
+            );
+            $data = file_get_contents($imagem_url);
+            $cliente = new Cliente();
+            $cliente->nome = $payload['name'];
+            $cliente->email = $payload['email'];
+            if ($data !== false) {
+                $cliente->imagem = base64_encode($data);
+            }
+        }
+        if ($cliente->status == Cliente::STATUS_INATIVO) {
+            $cliente->status = Cliente::STATUS_ATIVO;
+            $cliente->save();
+        }
+        $token = auth()->fromUser($cliente);
+        return [
+            'refresh_token' => $cliente->createRefreshToken(),
+            'access_token'  => $token,
+            'token_type'    => 'bearer',
+            'expires_in'    => auth()->factory()->getTTL() * 60,
+            'user'          => $cliente,
+        ];
     }
 }

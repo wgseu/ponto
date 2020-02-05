@@ -59,10 +59,6 @@ class LoginFacebookMutation extends Mutation
         $integration = Integracao::where('codigo', 'facebook')
             ->where('ativo', true)->firstOrFail();
         $class_name = env('FACEBOOK_LOGIN_CLASS', Facebook::class);
-        var_dump($class_name);
-        var_dump(env('APP_ENV'));
-        var_dump(env('DB_DATABASE'));
-        var_dump(env('DB_CONNECTION'));
         $facebook = new $class_name([
             'app_id' => $integration->login,
             'app_secret' => $integration->secret,

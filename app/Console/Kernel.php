@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('automatic:payment')->everyThirtyMinutes();
         $schedule->command('calculate:interest')->everyThirtyMinutes();
+        $schedule->command('sync:license')->dailyAt('04:00');
     }
 
     /**

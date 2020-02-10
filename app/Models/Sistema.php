@@ -77,6 +77,17 @@ class Sistema extends Model implements ValidateInterface
     public function __construct(array $attributes = [])
     {
         $this->options = new Settings([
+            'license' => [
+                'delivery' => false,
+                'fiscal' => false,
+                'prefix' => null,
+                'expires' => null,
+                'blocked' => null,
+                'totem' => false,
+                'reservation' => false,
+                'fantasia' => null,
+                'filial' => null,
+            ],
             'auto_sair' => false,
             'padrao_imprimir' => true,
             'motivo_cancelamento' => false,

@@ -50,6 +50,8 @@ class SyncLicense extends Command
                 'blocked' => $response->blocked,
                 'totem' => $response->totem,
                 'reservation' => $response->reservas,
+                'fantasia' => $response->fantasia,
+                'filial' => $response->filial,
             ];
             $license = [
                 'delivery' => $options->getEntry('license', 'delivery'),
@@ -59,6 +61,8 @@ class SyncLicense extends Command
                 'blocked' => $options->getEntry('license', 'blocked'),
                 'totem' => $options->getEntry('license', 'totem'),
                 'reservation' => $options->getEntry('license', 'reservation'),
+                'fantasia' => $options->getEntry('license', 'fantasia'),
+                'filial' => $options->getEntry('license', 'filial'),
             ];
             $diff = array_diff($result, $license);
             if (count($diff) == 0) {
@@ -74,6 +78,8 @@ class SyncLicense extends Command
             $options->addEntry('license', 'blocked', $response->blocked);
             $options->addEntry('license', 'totem', $response->totem);
             $options->addEntry('license', 'reservation', $response->reservas);
+            $options->addEntry('license', 'fantasia', $response->fantasia);
+            $options->addEntry('license', 'filial', $response->filial);
             app('system')->opcoes = json_encode($options->getValues());
             app('system')->save();
         } catch (\Throwable $th) {
@@ -84,7 +90,7 @@ class SyncLicense extends Command
     public function syncInfo($response)
     {
         DB::transaction(function () use ($response) {
-            $user = Cliente::findOrFail('1');
+            $user = Cliente::where('empresa_id', app('company')->id)->firstOrFail();
             $user->update([
                 'email' => $response->user->email,
                 'nome' => $response->user->nome,
@@ -96,19 +102,13 @@ class SyncLicense extends Command
                 'status' => $response->user->status,
                 'senha' => 'Teste123'
             ]);
-            $new_company = new Cliente();
-            $new_company->fill([
+            $new_company = app('company');
+            $new_company->update([
                 'nome' => $response->company->fantasia,
                 'sobrenome' => $response->company->razao_social,
                 'email' => $response->company->email,
                 'cpf' => Filter::digits($response->company->cnpj),
                 'tipo' => 'juridica',
-            ]);
-            $new_company->save();
-            $user->update(['empresa_id' => $new_company->id]);
-            $company = Empresa::findOrFail('1');
-            $company->update([
-                'empresa_id' => $new_company->id,
             ]);
             $country = app('country');
             $telephone = new Telefone();

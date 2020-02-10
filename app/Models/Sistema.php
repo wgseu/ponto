@@ -85,6 +85,8 @@ class Sistema extends Model implements ValidateInterface
                 'blocked' => null,
                 'totem' => false,
                 'reservation' => false,
+                'fantasia' => null,
+                'filial' => null,
             ],
             'auto_sair' => false,
             'padrao_imprimir' => true,

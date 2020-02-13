@@ -30,6 +30,7 @@ namespace App\GraphQL\Types;
 
 use App\Models\Cidade;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class CidadeType extends GraphQLType
@@ -49,6 +50,10 @@ class CidadeType extends GraphQLType
             ],
             'estado_id' => [
                 'type' => Type::id(),
+                'description' => 'Informa a qual estado a cidade pertence',
+            ],
+            'estado' => [
+                'type' => GraphQL::type('Estado'),
                 'description' => 'Informa a qual estado a cidade pertence',
             ],
             'nome' => [

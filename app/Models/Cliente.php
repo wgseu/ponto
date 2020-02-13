@@ -296,6 +296,15 @@ class Cliente extends User implements
     }
 
     /**
+     * Retorna o endereço principal do cliente
+     */
+    public function endereco()
+    {
+        return $this->hasOne(Localizacao::class, 'cliente_id')
+            ->orderBy('id', 'DESC');
+    }
+
+    /**
      * Obtém o nome completo da pessoa física ou o nome fantasia da empresa
      */
     public function getNomeCompleto()

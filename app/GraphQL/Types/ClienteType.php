@@ -174,6 +174,13 @@ class ClienteType extends GraphQLType
                     return Auth::check() && Auth::user()->can('cliente:view');
                 },
             ],
+            'endereco' => [
+                'type' => GraphQL::type('Localizacao'),
+                'description' => 'Último endereço cadastrado do cliente',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cliente:view');
+                },
+            ],
             'data_envio' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Data do envio do e-mail de validação ou recuperação de conta',

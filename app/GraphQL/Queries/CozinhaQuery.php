@@ -45,11 +45,6 @@ class CozinhaQuery extends Query
         'name' => 'cozinhas',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('cozinha:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Cozinha');

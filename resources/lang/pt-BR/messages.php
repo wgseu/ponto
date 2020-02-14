@@ -41,7 +41,7 @@ return [
     'pub' => 'Bar',
     'toilets' => 'Banheiros',
 
-    'authentication_failed' => 'Falha na autenticação',
+    'authentication_failed' => 'Senha ou usuário incorretos',
 
     'setor_view_permition' => 'Lista e visualiza os setores',
     'setor_create_permition' => 'Cadastra os setores',

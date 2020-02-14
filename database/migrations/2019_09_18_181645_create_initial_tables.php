@@ -750,7 +750,6 @@ class CreateInitialTables extends Migration
             $table->boolean('individual')->default(false);
             $table->string('imagem_url', 100)->nullable();
             $table->boolean('ativo')->default(true);
-
         });
 
         Schema::create('classificacoes', function (Blueprint $table) {
@@ -1365,9 +1364,9 @@ class CreateInitialTables extends Migration
             $table->string('serial', 45);
             $table->string('validacao', 40)->nullable();
 
-            $table->unique(['caixa_id']);
             $table->unique(['serial']);
             $table->index(['setor_id']);
+            $table->index(['caixa_id']);
             $table->foreign('setor_id')
                 ->references('id')->on('setores')
                 ->onUpdate('cascade')

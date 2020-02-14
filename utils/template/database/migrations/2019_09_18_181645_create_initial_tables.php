@@ -79,8 +79,16 @@ $[field.else.if(string)]
             $table->string('$[field]', $[field.length])$[field.if(null)]->nullable()$[field.end]$[field.if(info)]->default($[Field.info])$[field.end];
 $[field.end]
 $[field.end]
-$[table.if(reference)]
+$[table.exists(index|constraint)]
 
+$[table.else]
+$[field.each(all)]
+$[field.if(primary)]
+$[field.if(enum)]
+
+$[field.end]
+$[field.end]
+$[field.end]
 $[table.end]
 $[field.each(all)]
 $[field.if(primary)]

@@ -143,7 +143,6 @@ class Movimentacao extends Model implements ValidateInterface
             }
             $movimentacao = self::where('sessao_id', $this->sessao_id)
                 ->where('aberta', true)
-                ->where('caixa_id', $this->caixa_id)
                 ->count();
             $this->save();
             if ($movimentacao == 1) {

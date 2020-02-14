@@ -1,0 +1,5 @@
+mutation ($input: TransferenciaInput!) {
+  CreateTransferencia (input: $input) {
+    id
+  }
+}

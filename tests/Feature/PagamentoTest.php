@@ -26,11 +26,44 @@
 
 namespace Tests\Feature;
 
+use App\Models\Caixa;
+use App\Models\Carteira;
+use App\Models\Dispositivo;
+use App\Models\Forma;
+use App\Models\Movimentacao;
 use Tests\TestCase;
 use App\Models\Pagamento;
+use App\Models\Prestador;
+use App\Models\Saldo;
+use App\Models\Sessao;
 
 class PagamentoTest extends TestCase
 {
+    public function testCreateTransferencia()
+    {
+        $headers = PrestadorTest::authOwner();
+        $origem =  factory(Carteira::class)->create(['tipo' => Carteira::TIPO_LOCAL]);
+        $destino =  factory(Carteira::class)->create();
+        factory(Caixa::class)->create(['carteira_id' => $origem->id]);
+        factory(Forma::class)->create();
+        factory(Saldo::class)->create([
+            'carteira_id' => $origem->id,
+            'valor' => 500,
+            'moeda_id' =>  app('currency')->id
+        ]);
+        $response = $this->graphfl('create_transferencia', [
+            'input' => [
+                'origem_id' => $origem->id,
+                'destino_id' => $destino->id,
+                'valor' => 100,
+            ]
+        ], $headers);
+
+        $pagamento = Pagamento::findOrFail($response->json('data.CreateTransferencia.id'));
+        $this->assertEquals(100, $pagamento->valor);
+        $this->assertEquals($destino->id, $pagamento->carteira_id);
+    }
+    
     public function testUpdatePagamento()
     {
         $headers = PrestadorTest::authOwner();

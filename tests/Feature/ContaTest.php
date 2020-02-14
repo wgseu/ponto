@@ -37,10 +37,15 @@ use App\Models\Classificacao;
 use Illuminate\Support\Carbon;
 use App\Exceptions\ValidationException;
 use App\Models\Carteira;
+use App\Models\Dispositivo;
+use App\Models\Forma;
+use App\Models\Movimentacao;
+use App\Models\Saldo;
 
 class ContaTest extends TestCase
 {
-    public function testCreateConta()
+    // falta vereficar o saldo na criação da despesa
+    public function testCreateContaReceita()
     {
         $headers = PrestadorTest::authOwner();
         $classificacao = factory(Classificacao::class)->create();
@@ -50,8 +55,10 @@ class ContaTest extends TestCase
                 'descricao' => 'Teste',
                 'valor' => 40,
                 'vencimento' => '2020-12-25T12:15:00-02:00',
-                'data_emissao' => '2019-10-25T12:15:00+03:00',
+                'data_emissao' => '2020-12-25T12:15:00-02:00',
                 'frequencia' => 1,
+                'estado' => Conta::ESTADO_ATIVA,
+                'tipo' => Conta::TIPO_RECEITA,
             ]
         ], $headers);
 
@@ -60,9 +67,73 @@ class ContaTest extends TestCase
         $this->assertEquals('Teste', $found_conta->descricao);
         $this->assertEquals(40, $found_conta->valor);
         $this->assertEquals(1, $found_conta->frequencia);
-        $this->assertEquals('2020-12-25 14:15:00', $found_conta->vencimento);
-        $this->assertEquals('2019-10-25 09:15:00', $found_conta->data_emissao);
     }
+
+    public function testCreateContaDespesaPaga()
+    {
+        $dispositivoAuth = DispositivoTest::auth();
+        $prestadorAuth = PrestadorTest::authOwner();
+        $prestador = Prestador::first();
+        $dispositivo = Dispositivo::first();
+        $movimentacao = factory(Movimentacao::class)->create([
+            'iniciador_id' => $prestador->id,
+            'caixa_id' => $dispositivo->caixa_id,
+            'aberta' => true
+        ]);
+        factory(Pagamento::class)->create([
+            'movimentacao_id' => $movimentacao->id,
+            'carteira_id' => $dispositivo->caixa->carteira_id,
+            'estado' => Pagamento::ESTADO_PAGO,
+            'valor' => 500,
+            'lancado' => 500,
+        ]);
+        $headers = ClienteTest::mergeAuth($prestadorAuth, $dispositivoAuth);
+        $classificacao = factory(Classificacao::class)->create();
+        factory(Forma::class)->create();
+        $response = $this->graphfl('create_despesa', [
+            'input' => [
+                'descricao' => 'Teste',
+                'valor' => -40,
+                'carteira_id' => $dispositivo->caixa->carteira_id,
+            ]
+        ], $headers);
+
+        $found_conta = Conta::findOrFail($response->json('data.CreateDespesa.id'));
+        $this->assertEquals('Teste', $found_conta->descricao);
+        $this->assertEquals(-40, $found_conta->valor);
+    }
+
+    public function testCreateContaSemSaldo()
+    {
+        $dispositivoAuth = DispositivoTest::auth();
+        $prestadorAuth = PrestadorTest::authOwner();
+        $prestador = Prestador::first();
+        $dispositivo = Dispositivo::first();
+        $movimentacao = factory(Movimentacao::class)->create([
+            'iniciador_id' => $prestador->id,
+            'caixa_id' => $dispositivo->caixa_id,
+            'aberta' => true
+        ]);
+        factory(Pagamento::class)->create([
+            'movimentacao_id' => $movimentacao->id,
+            'carteira_id' => $dispositivo->caixa->carteira_id,
+            'estado' => Pagamento::ESTADO_PAGO,
+            'valor' => 30,
+            'lancado' => 30,
+        ]);
+        $headers = ClienteTest::mergeAuth($prestadorAuth, $dispositivoAuth);
+        $classificacao = factory(Classificacao::class)->create();
+        factory(Forma::class)->create();
+        $this->expectException('Exception');
+        $response = $this->graphfl('create_despesa', [
+            'input' => [
+                'descricao' => 'Teste',
+                'valor' => 40 * -1,
+                'carteira_id' => $dispositivo->caixa->carteira_id,
+            ]
+        ], $headers);
+    }
+
 
     public function testUpdateConta()
     {
@@ -74,14 +145,12 @@ class ContaTest extends TestCase
                 'descricao' => 'Atualizou',
                 'valor' => 50,
                 'vencimento' => '2020-12-28T12:30:00Z',
-                'data_emissao' => '2019-12-28T12:30:00Z',
             ]
         ], $headers);
         $conta->refresh();
         $this->assertEquals('Atualizou', $conta->descricao);
         $this->assertEquals(50, $conta->valor);
         $this->assertEquals('2020-12-28 12:30:00', $conta->vencimento);
-        $this->assertEquals('2019-12-28 12:30:00', $conta->data_emissao);
     }
 
     public function testDeleteConta()
@@ -342,6 +411,15 @@ class ContaTest extends TestCase
             'agrupamento_id' => $conta_pai->id,
             'carteira_id' => $carteira->id,
         ]);
+        $pagamento_pai = factory(Pagamento::class)->create([
+            'carteira_id' => $conta_pai->carteira_id,
+            'moeda_id' => $pais->moeda_id,
+            'valor' => $conta_pai->valor,
+            'lancado' => $conta_pai->valor,
+            'estado' => Pagamento::ESTADO_PAGO,
+            'conta_id' => $conta_pai->id,
+            'data_pagamento' => Carbon::now(),
+        ]);
         $pagamento1 = factory(Pagamento::class)->create([
             'carteira_id' => $conta1->carteira_id,
             'moeda_id' => $pais->moeda_id,
@@ -370,9 +448,11 @@ class ContaTest extends TestCase
         $conta_pai->refresh();
         $conta1->refresh();
         $conta2->refresh();
+        $pagamento_pai->refresh();
         $pagamento1->refresh();
         $pagamento2->refresh();
         $this->assertEquals($conta_pai->estado, Conta::ESTADO_CANCELADA);
+        $this->assertEquals($pagamento_pai->estado, Pagamento::ESTADO_CANCELADO);
         $this->assertEquals($conta1->agrupamento_id, null);
         $this->assertEquals($conta2->agrupamento_id, null);
     }

@@ -300,6 +300,7 @@ return [
                 'CreateConta' => 'App\GraphQL\Mutations\CreateContaMutation',
                 'UpdateConta' => 'App\GraphQL\Mutations\UpdateContaMutation',
                 'DeleteConta' => 'App\GraphQL\Mutations\DeleteContaMutation',
+                'CreateDespesa' => 'App\GraphQL\Mutations\CreateDespesaMutation',
 
                 'CreateMovimentacao' => 'App\GraphQL\Mutations\CreateMovimentacaoMutation',
                 'UpdateMovimentacao' => 'App\GraphQL\Mutations\UpdateMovimentacaoMutation',
@@ -309,6 +310,7 @@ return [
 
                 'UpdateCheque' => 'App\GraphQL\Mutations\UpdateChequeMutation',
                 'UpdatePagamento' => 'App\GraphQL\Mutations\UpdatePagamentoMutation',
+                'CreateTransferencia' => 'App\GraphQL\Mutations\CreateTransferenciaMutation',
                 'UpdateModulo' => 'App\GraphQL\Mutations\UpdateModuloMutation',
 
                 'CreateComposicao' => 'App\GraphQL\Mutations\CreateComposicaoMutation',
@@ -663,11 +665,13 @@ return [
         'ServicoInput' => 'App\GraphQL\Inputs\ServicoInput',
         'ClassificacaoInput' => 'App\GraphQL\Inputs\ClassificacaoInput',
         'ContaInput' => 'App\GraphQL\Inputs\ContaInput',
+        'DespesaInput' => 'App\GraphQL\Inputs\DespesaInput',
         'MovimentacaoInput' => 'App\GraphQL\Inputs\MovimentacaoInput',
         'CreditoInput' => 'App\GraphQL\Inputs\CreditoInput',
         'ChequeInput' => 'App\GraphQL\Inputs\ChequeInput',
         'PagamentoInput' => 'App\GraphQL\Inputs\PagamentoInput',
         'SubPagamentoInput' => 'App\GraphQL\Inputs\SubPagamentoInput',
+        'TransferenciaInput' => 'App\GraphQL\Inputs\TransferenciaInput',
         'ItemInput' => 'App\GraphQL\Inputs\ItemInput',
         'SubitemInput' => 'App\GraphQL\Inputs\SubitemInput',
         'ModuloInput' => 'App\GraphQL\Inputs\ModuloInput',

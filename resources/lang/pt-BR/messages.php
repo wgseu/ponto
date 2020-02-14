@@ -976,4 +976,5 @@ return [
     'banking' => 'Carteira Bancária',
     'bleeding_closing_till' => 'Sangria do fechamento da movimentação :value',
     'closing_till' => 'Fechamento de caixa, movimentação :value',
+    'register_expense' => 'Pagamento de despesa, Conta :value',
 ];

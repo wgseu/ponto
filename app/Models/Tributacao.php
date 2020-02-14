@@ -92,7 +92,7 @@ class Tributacao extends Model implements ValidateInterface
     public function validate($old)
     {
         $errors = [];
-        if (!Validator::checkNCM($this->ncm)) {
+        if (!Validator::ncm($this->ncm)) {
             $errors['ncm'] = __('messages.ncm_invalid');
         }
         return $errors;

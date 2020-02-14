@@ -19,8 +19,24 @@ class PaisSeeder extends Seeder
             'moeda_id' => 1,
             'idioma' => 'pt-BR',
             'prefixo' => null,
-            'entradas' => null,
-            'unitario' => 0
+            'unitario' => 0,
+            'entradas' => json_encode([
+                'phone' => [
+                    'mask' => '(##) ####-####|(##) #####-####',
+                ],
+                'zipcode' => [
+                    'mask' => '#####-###',
+                ],
+                'cpf' => [
+                    'mask' => '###.###.###-##',
+                ],
+                'cnpj' => [
+                    'mask' => '##.###.###/####-##',
+                ],
+                'ncm' => [
+                    'mask' => '####.##.##',
+                ],
+            ]),
         ]))->save();
         (new Pais([
             'nome' => __('messages.united_states'),

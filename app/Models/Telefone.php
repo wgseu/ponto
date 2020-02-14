@@ -96,10 +96,9 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
     public function validate($old)
     {
         $errors = [];
-        $query = self::where('cliente_id', $this->cliente_id)->where(function ($query) {
-            $query->where('numero', Filter::include9thDigit($this->numero))
-                ->orWhere('numero', Filter::remove9thDigit($this->numero));
-        });
+        $this->pais->loadEntries();
+        $query = self::where('cliente_id', $this->cliente_id)
+            ->whereIn('numero', Filter::makePhoneNumbers($this->numero, $this->pais));
         if ($this->exists) {
             $query->where('id', '<>', $this->id);
         }

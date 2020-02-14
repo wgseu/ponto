@@ -17,7 +17,7 @@ class AccountVerifyController extends Controller
             $user = Cliente::findOrFail($payload['uid'] ?? null);
             $user->status = Cliente::STATUS_ATIVO;
             $user->save();
-            return redirect(url('/authenticate'));
+            return redirect(url('/login'));
         }
         return response()->json(['error' => __('messages.token_or_user_invalid')], 401);
     }

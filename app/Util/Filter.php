@@ -26,6 +26,8 @@
 
 namespace App\Util;
 
+use App\Models\Pais;
+
 /**
  * Filter values to secure save on database
  */
@@ -43,6 +45,128 @@ class Filter
             return new \stdClass();
         }
         return $array;
+    }
+
+    /**
+     * Remove a máscara do telefone retornando só os dígitos
+     *
+     * @param string $input
+     * @param Pais $country pais do telefone
+     *
+     * @return string
+     */
+    public static function phone($input, $country)
+    {
+        $masks = explode('|', $country->entries->get('phone', 'mask'));
+        foreach ($masks as $mask) {
+            $unmasked = self::unmask($input, $mask);
+            $digits = self::digits($input);
+            if ($unmasked == $digits) {
+                return $unmasked;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remove a máscara do CEP retornando só os dígitos
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function zipcode($input)
+    {
+        $mask = app('country')->entries->get('zipcode', 'mask');
+        $unmasked = self::unmask($input, $mask);
+        $digits = self::digits($input);
+        if ($unmasked != $digits) {
+            return null;
+        }
+        return $unmasked;
+    }
+
+    /**
+     * Remove a máscara do CPF retornando só os dígitos
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function cpf($input)
+    {
+        $mask = app('country')->entries->get('cpf', 'mask');
+        $unmasked = self::unmask($input, $mask);
+        $digits = self::digits($input);
+        if ($unmasked != $digits) {
+            return null;
+        }
+        return $unmasked;
+    }
+
+    /**
+     * Remove a máscara do CNPJ retornando só os dígitos
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function cnpj($input)
+    {
+        $mask = app('country')->entries->get('cnpj', 'mask');
+        $unmasked = self::unmask($input, $mask);
+        $digits = self::digits($input);
+        if ($unmasked != $digits) {
+            return null;
+        }
+        return $unmasked;
+    }
+
+    /**
+     * Remove a máscara do NCM retornando só os dígitos
+     *
+     * @param string $input
+     *
+     * @return string
+     */
+    public static function ncm($input)
+    {
+        $mask = app('country')->entries->get('ncm', 'mask');
+        $unmasked = self::unmask($input, $mask);
+        $digits = self::digits($input);
+        if ($unmasked != $digits) {
+            return null;
+        }
+        return $unmasked;
+    }
+
+    /**
+     * Retorna os possíveis números de telefones válidos
+     *
+     * @param string $number
+     * @param Pais $country pais do telefone
+     *
+     * @return string[]
+     */
+    public static function makePhoneNumbers($number, $country)
+    {
+        $result = [];
+        $masks = explode('|', $country->entries->get('phone', 'mask'));
+        foreach ($masks as $mask) {
+            $phone_len = strlen(self::digits($number));
+            $slots_len = strlen(preg_replace('/[^#]/', '', $mask));
+            if ($phone_len == $slots_len) {
+                $result[] = $number;
+            } elseif ($country->codigo != Pais::CODE_BRAZIL) {
+                continue;
+            }
+            if ($phone_len < $slots_len) {
+                $result[] = self::include9thDigit($number);
+            } elseif ($phone_len > $slots_len) {
+                $result[] = self::remove9thDigit($number);
+            }
+        }
+        return $result;
     }
 
     /**
@@ -126,26 +250,29 @@ class Filter
      * @param  string $mask mask to apply
      * @return string new text unmasked or null if empty
      */
-    public static function unmask($str, $mask)
+    public static function unmask($input, $mask)
     {
-        $res = '';
-        $j = 0;
-        $opt = false;
-        for ($i = 0; $i < strlen($mask); $i++) {
-            if ($j >= strlen($str)) {
-                break;
+        $result = '';
+        $input_index = 0;
+        for ($mask_index = 0; $mask_index < strlen($mask); $mask_index++) {
+            $mask_char = $mask[$mask_index];
+            if ($input_index >= strlen($input)) {
+                if ($mask_char == '#') {
+                    return null;
+                }
+                continue;
             }
-            if (($mask[$i] == '9' || $mask[$i] == '0') && preg_match('/[0-9]/', $str[$j])) {
-                $res .= $str[$j++];
-            } elseif ($mask[$i] == '?') {
-                $opt = true;
-            } elseif ($mask[$i] == $str[$j]) {
-                $j++;
+            $input_char = $input[$input_index];
+            if ($mask_char == '#' && preg_match('/\d/', $input_char)) {
+                $result .= $input_char;
+                $input_index++;
+            } elseif ($mask_char == $input_char) {
+                $input_index++;
             }
         }
-        if (trim($res) == '') {
+        if (trim($result) == '') {
             return null;
         }
-        return $res;
+        return $result;
     }
 }

@@ -33,6 +33,9 @@ use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use App\Exceptions\AuthorizationException;
 use App\Exceptions\AuthenticationException;
+use App\Models\Telefone;
+use App\Util\Filter;
+use App\Util\Validator;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class LoginClienteMutation extends Mutation
@@ -57,9 +60,21 @@ class LoginClienteMutation extends Mutation
     public function resolve($root, $args)
     {
         $credentials = [
-            'email' => $args['username'],
             'password' => $args['password'],
         ];
+        if (Validator::email($args['username'])) {
+            $credentials['email'] = $args['username'];
+        } elseif (Validator::cpf($args['username'])) {
+            $credentials['cpf'] = Filter::cpf($args['username']);
+        } elseif (Validator::cnpj($args['username'])) {
+            $credentials['cpf'] = Filter::cnpj($args['username']);
+        } elseif (Validator::phone($args['username'], app('country'))) {
+            $numbers = Filter::makePhoneNumbers($args['username'], app('country'));
+            $phone = Telefone::whereIn('numero', $numbers)->orderBy('data_validacao', 'DESC')->first();
+            $credentials['id'] = is_null($phone) ? null : $phone->cliente_id;
+        } else {
+            $credentials['login'] = $args['username'];
+        }
         // attempt to verify the credentials and create a token for the user
         if (! $token = auth()->attempt($credentials)) {
             throw new AuthenticationException(__('messages.authentication_failed'));

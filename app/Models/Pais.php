@@ -39,6 +39,8 @@ class Pais extends Model implements ValidateUpdateInterface
 {
     use ModelEvents;
 
+    public const CODE_BRAZIL = 'BR';
+
     /**
      * The table associated with the model.
      *

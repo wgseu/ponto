@@ -412,18 +412,18 @@ class Pedido extends Model implements
             return ['descontos' => __('messages.discount_cannot_be_positive')];
         }
         if (
-            !Validator::checkCNPJ($this->cpf) &&
-            !Validator::checkCPF($this->cpf, true)
+            !Validator::cnpj($this->cpf) &&
+            !Validator::cpf($this->cpf, true)
         ) {
             return ['cpf' => __('messages.cpf_invalid', 'CPF')];
         }
         if (
-            !Validator::checkCPF($this->cpf) &&
-            !Validator::checkCNPJ($this->cpf, true)
+            !Validator::cpf($this->cpf) &&
+            !Validator::cnpj($this->cpf, true)
         ) {
             return ['cpf' => __('messages.cpf_invalid', 'CNPJ')];
         }
-        if (!Validator::checkEmail($this->email, true)) {
+        if (!Validator::email($this->email, true)) {
             return ['email' => __('messages.invalid_email')];
         }
         // não pode entregar sem um cliente

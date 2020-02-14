@@ -140,7 +140,7 @@ class Localizacao extends Model implements
     public function validate($old)
     {
         $errors = [];
-        if (!Validator::checkCEP($this->cep, true)) {
+        if (!Validator::zipcode($this->cep, true)) {
             $errors['cep'] = __('messages.cep_invalid');
         }
         if ($this->tipo == Localizacao::TIPO_APARTAMENTO && is_null($this->apartamento)) {

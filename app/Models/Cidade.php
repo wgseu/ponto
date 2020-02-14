@@ -74,7 +74,7 @@ class Cidade extends Model implements ValidateInterface
     public function validate($old)
     {
         $errors = [];
-        if (!Validator::checkCEP($this->cep, true)) {
+        if (!Validator::zipcode($this->cep, true)) {
             $errors['cep'] = __('messages.cep_invalid');
         }
         return $errors;

@@ -360,11 +360,11 @@ class Cliente extends User implements
     {
         $errors = [];
         if ($this->tipo == self::TIPO_FISICA) {
-            if (!Validator::checkCPF($this->cpf, true)) {
+            if (!Validator::cpf($this->cpf, true)) {
                 $errors['cpf'] = __('messages.cpf_invalid');
             }
         } else {
-            if (!Validator::checkCNPJ($this->cpf, true)) {
+            if (!Validator::cnpj($this->cpf, true)) {
                 $errors['cnpj'] = __('messages.cnpj_invalid');
             }
         }

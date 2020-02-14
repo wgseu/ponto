@@ -45,11 +45,6 @@ class CartaoQuery extends Query
         'name' => 'cartoes',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('cartao:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Cartao');

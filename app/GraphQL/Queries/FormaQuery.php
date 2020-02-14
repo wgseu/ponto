@@ -45,11 +45,6 @@ class FormaQuery extends Query
         'name' => 'formas',
     ];
 
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && Auth::user()->can('forma:view');
-    }
-
     public function type(): Type
     {
         return GraphQL::paginate('Forma');

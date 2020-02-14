@@ -47,10 +47,8 @@ class HorarioQuery extends Query
 
     public function authorize(array $args): bool
     {
-        return Auth::check() && (
-            ($args['filter']['modo']['eq'] ?? null) == Horario::MODO_FUNCIONAMENTO
-            || Auth::user()->can('horario:view')
-        );
+        return (($args['filter']['modo']['eq'] ?? null) == Horario::MODO_FUNCIONAMENTO) ||
+            (Auth::check() && Auth::user()->can('horario:view'));
     }
 
     public function type(): Type

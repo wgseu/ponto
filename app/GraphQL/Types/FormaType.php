@@ -31,6 +31,7 @@ namespace App\GraphQL\Types;
 use App\Models\Forma;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class FormaType extends GraphQLType
@@ -55,6 +56,9 @@ class FormaType extends GraphQLType
             'carteira_id' => [
                 'type' => Type::id(),
                 'description' => 'Carteira que será usada para entrada de valores no caixa',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('forma:view');
+                },
             ],
             'descricao' => [
                 'type' => Type::string(),

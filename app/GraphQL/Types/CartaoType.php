@@ -30,6 +30,7 @@ namespace App\GraphQL\Types;
 
 use App\Models\Cartao;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Facades\Auth;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
 class CartaoType extends GraphQLType
@@ -54,6 +55,9 @@ class CartaoType extends GraphQLType
             'carteira_id' => [
                 'type' => Type::id(),
                 'description' => 'Carteira de entrada de valores no caixa',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cartao:view');
+                },
             ],
             'bandeira' => [
                 'type' => Type::string(),
@@ -63,14 +67,23 @@ class CartaoType extends GraphQLType
                 'type' => Type::float(),
                 'description' => 'Taxa em porcentagem cobrado sobre o total do pagamento, valores de 0 a' .
                     ' 100',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cartao:view');
+                },
             ],
             'dias_repasse' => [
                 'type' => Type::int(),
                 'description' => 'Quantidade de dias para repasse do valor',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cartao:view');
+                },
             ],
             'taxa_antecipacao' => [
                 'type' => Type::float(),
                 'description' => 'Taxa em porcentagem para antecipação de recebimento de parcelas',
+                'privacy' => function (array $args): bool {
+                    return Auth::check() && Auth::user()->can('cartao:view');
+                },
             ],
             'imagem_url' => [
                 'type' => Type::string(),

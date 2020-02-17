@@ -13,4 +13,5 @@
 
 Route::get('/account/verify/{token}', 'AccountVerifyController@activateByToken');
 Route::get('/sync/license/{token}', 'SyncLicenseController@callCommand');
+Route::get('/docs/bills/{name}', 'DownloadController@bills');
 Route::get('/{page}', 'IndexController@any')->where('page', '.*');

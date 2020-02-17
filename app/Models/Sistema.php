@@ -175,6 +175,17 @@ class Sistema extends Model implements ValidateInterface
     }
 
     /**
+     * Versão atual da aplicação
+     *
+     * @var string
+     */
+    public function getVersaoAttribute()
+    {
+        $info = json_decode(file_get_contents(base_path('package.json')));
+        return $info->version;
+    }
+
+    /**
      * Retorna as opções do sistema
      *
      * @return string

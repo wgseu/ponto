@@ -74,7 +74,12 @@ class HorarioQuery extends Query
             $args['filter'] ?? [],
             Horario::with($fields->getRelations())->select($fields->getSelect())
         );
+
+        $limit = $args['limit'] ?? 10;
+        if (($args['filter']['modo']['eq'] ?? null) == Horario::MODO_FUNCIONAMENTO) {
+            $limit = (clone $query)->count();
+        }
         return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+            ->paginate($limit, ['*'], 'page', $args['page'] ?? 1);
     }
 }

@@ -1900,6 +1900,7 @@ class CreateInitialTables extends Migration
             $table->unsignedInteger('cliente_id')->nullable();
             $table->string('codigo', 20);
             $table->integer('quantidade');
+            $table->integer('disponivel')->default(0);
             $table->enum('tipo_desconto', ['valor', 'porcentagem']);
             $table->decimal('valor', 19, 4)->default(0);
             $table->double('porcentagem')->default(0);
@@ -1911,6 +1912,7 @@ class CreateInitialTables extends Migration
             $table->enum('funcao_valor', ['menor', 'igual', 'maior'])->default('maior');
             $table->decimal('valor_limite', 19, 4)->default(0);
             $table->dateTime('validade');
+            $table->boolean('cancelado')->default(false);
             $table->dateTime('data_registro');
 
             $table->index(['cupom_id']);

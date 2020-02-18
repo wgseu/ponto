@@ -42,14 +42,6 @@ class CupomInput extends InputType
     public function fields(): array
     {
         return [
-            'cupom_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa de qual cupom foi usado',
-            ],
-            'pedido_id' => [
-                'type' => Type::id(),
-                'description' => 'Informa qual pedido usou este cupom',
-            ],
             'cliente_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa o cliente que possui e pode usar esse cupom',
@@ -110,9 +102,9 @@ class CupomInput extends InputType
                 'type' => Type::nonNull(GraphQL::type('DateTime')),
                 'description' => 'Validade do cupom',
             ],
-            'data_registro' => [
-                'type' => Type::nonNull(GraphQL::type('DateTime')),
-                'description' => 'Data de registro do cupom ou do uso',
+            'cancelado' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o cupom foi cancelado',
             ],
         ];
     }

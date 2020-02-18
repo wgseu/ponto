@@ -66,7 +66,11 @@ class CupomType extends GraphQLType
             ],
             'quantidade' => [
                 'type' => Type::int(),
-                'description' => 'Quantidade de cupons disponíveis ou usados',
+                'description' => 'Quantidade de cupons fornecidos ou usados',
+            ],
+            'disponivel' => [
+                'type' => Type::int(),
+                'description' => 'Quantidade de cupons disponíveis para uso',
             ],
             'tipo_desconto' => [
                 'type' => GraphQL::type('CupomTipoDesconto'),
@@ -114,6 +118,10 @@ class CupomType extends GraphQLType
             'validade' => [
                 'type' => GraphQL::type('DateTime'),
                 'description' => 'Validade do cupom',
+            ],
+            'cancelado' => [
+                'type' => Type::boolean(),
+                'description' => 'Informa se o cupom foi cancelado',
             ],
             'data_registro' => [
                 'type' => GraphQL::type('DateTime'),

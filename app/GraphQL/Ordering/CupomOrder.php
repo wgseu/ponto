@@ -59,6 +59,9 @@ class CupomOrder extends InputType
             'quantidade' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
+            'disponivel' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
             'tipo_desconto' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
@@ -90,6 +93,9 @@ class CupomOrder extends InputType
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'validade' => [
+                'type' => GraphQL::type('OrderByEnum'),
+            ],
+            'cancelado' => [
                 'type' => GraphQL::type('OrderByEnum'),
             ],
             'data_registro' => [

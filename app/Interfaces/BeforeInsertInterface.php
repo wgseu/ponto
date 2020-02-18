@@ -32,7 +32,7 @@ namespace App\Interfaces;
 interface BeforeInsertInterface
 {
     /**
-     * Evento chamado após inserir um model no banco de dados
+     * Evento chamado antes inserir um model no banco de dados
      * Não pode validar mais, apenas lançar exceções,
      * Mas só dentro de transações as alterações serão desfeitas
      *

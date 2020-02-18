@@ -212,11 +212,23 @@ class Pedido extends Model implements
     }
 
     /**
-     * Informa quem fechou o pedido e imprimiu a conta
+     * Returna a relação de itens do pedido
      */
     public function itens()
     {
         $relation = $this->hasMany(Item::class, 'pedido_id');
+        if ($this->estado != self::ESTADO_CANCELADO) {
+            $relation->where('cancelado', false);
+        }
+        return $relation;
+    }
+
+    /**
+     * Retorna a relação de cupons usados nesse pedido
+     */
+    public function cupons()
+    {
+        $relation = $this->hasMany(Cupom::class, 'pedido_id');
         if ($this->estado != self::ESTADO_CANCELADO) {
             $relation->where('cancelado', false);
         }
@@ -349,6 +361,11 @@ class Pedido extends Model implements
             ->whereNull('pagamento_id')->get();
         foreach ($pagamentos as $pagamento) {
             $pagamento->update(['estado' => Pagamento::ESTADO_CANCELADO]);
+        }
+        // cancela os cupons usados no pedido
+        $cupons = $this->cupons()->where('cancelado', false)->get();
+        foreach ($cupons as $cupom) {
+            $cupom->update(['cancelado' => true]);
         }
         // só cancela os itens do nível zero, pois os subitens são cancelados automaticamente
         $itens = $this->itens()->where('cancelado', false)->whereNull('item_id')->get();

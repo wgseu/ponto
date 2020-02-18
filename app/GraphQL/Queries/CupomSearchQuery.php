@@ -28,55 +28,46 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
-use Closure;
 use App\Models\Cupom;
-use App\GraphQL\Utils\Filter;
-use App\GraphQL\Utils\Ordering;
+use Illuminate\Support\Carbon;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Query;
-use Illuminate\Support\Facades\Auth;
-use GraphQL\Type\Definition\ResolveInfo;
-use Rebing\GraphQL\Support\SelectFields;
+use App\Exceptions\ValidationException;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class CupomQuery extends Query
+class CupomSearchQuery extends Query
 {
     protected $attributes = [
-        'name' => 'cupons',
+        'name' => 'cupom',
     ];
-
-    public function authorize(array $args): bool
-    {
-        return Auth::check() && (
-            ($args['filter']['cliente_id']['eq'] ?? null) == Auth::user()->id
-            || Auth::user()->can('cupom:view')
-        );
-    }
 
     public function type(): Type
     {
-        return GraphQL::paginate('Cupom');
+        return GraphQL::type('Cupom');
     }
 
     public function args(): array
     {
         return [
-            'filter' => ['name' => 'filter', 'type' => GraphQL::type('CupomFilter')],
-            'order' => ['name' => 'order', 'type' => GraphQL::type('CupomOrder')],
-            'limit' => ['name' => 'limit', 'type' => Type::int(), 'rules' => ['min:1', 'max:100']],
-            'page' => ['name' => 'page', 'type' => Type::int(), 'rules' => ['min:1']],
+            'codigo' => ['name' => 'codigo', 'type' => Type::nonNull(Type::string()), 'rules' => ['min:2']],
         ];
     }
 
-    public function resolve($root, $args, $context, ResolveInfo $resolveInfo, Closure $getSelectFields)
+    public function resolve($root, $args)
     {
-        /** @var SelectFields $fields */
-        $fields = $getSelectFields();
-        $query = Filter::apply(
-            $args['filter'] ?? [],
-            Cupom::with($fields->getRelations())->select($fields->getSelect())
-        );
-        return Ordering::apply($args['order'] ?? [], $query)
-            ->paginate($args['limit'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        $query = Cupom::where('codigo', $args['codigo'])
+            ->whereNull('cliente_id')
+            ->where('disponivel', '>', 0)
+            ->where('validade', '>=', Carbon::now())
+            ->where('cancelado', false);
+        $cupom = $query->firstOrFail();
+        if (auth()->check()) {
+            $test = $cupom->replicate();
+            $test->cliente_id = auth()->user()->id;
+            if (!empty($error = $test->checkOrder())) {
+                throw new ValidationException($error);
+            }
+        }
+        return $cupom;
     }
 }

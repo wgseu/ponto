@@ -59,6 +59,9 @@ class CupomFilter extends InputType
             'quantidade' => [
                 'type' => GraphQL::type('NumberFilter'),
             ],
+            'disponivel' => [
+                'type' => GraphQL::type('NumberFilter'),
+            ],
             'tipo_desconto' => [
                 'type' => GraphQL::type('CupomTipoDescontoFilter'),
             ],
@@ -91,6 +94,9 @@ class CupomFilter extends InputType
             ],
             'validade' => [
                 'type' => GraphQL::type('DateFilter'),
+            ],
+            'cancelado' => [
+                'type' => Type::boolean(),
             ],
             'data_registro' => [
                 'type' => GraphQL::type('DateFilter'),

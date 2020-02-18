@@ -1,0 +1,5 @@
+query ($codigo: String!) {
+  cupom (codigo: $codigo) {
+    id
+  }
+}

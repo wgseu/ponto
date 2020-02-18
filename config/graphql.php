@@ -175,6 +175,7 @@ return [
                 'pedido' => 'App\GraphQL\Queries\PedidoSummaryQuery',
                 'usuario' => 'App\GraphQL\Queries\UsuarioQuery',
                 'dispositivo' => 'App\GraphQL\Queries\DispositivoInfoQuery',
+                'cupom' => 'App\GraphQL\Queries\CupomSearchQuery',
             ],
             'mutation' => [
                 'LoginCliente' => 'App\GraphQL\Mutations\LoginClienteMutation',
@@ -706,6 +707,7 @@ return [
         'CozinhaInput' => 'App\GraphQL\Inputs\CozinhaInput',
         'CardapioInput' => 'App\GraphQL\Inputs\CardapioInput',
         'ConferenciaInput' => 'App\GraphQL\Inputs\ConferenciaInput',
+        'CupomPedidoInput' => 'App\GraphQL\Inputs\CupomPedidoInput',
 
         'SetorUpdateInput' => 'App\GraphQL\Inputs\SetorUpdateInput',
         'MesaUpdateInput' => 'App\GraphQL\Inputs\MesaUpdateInput',

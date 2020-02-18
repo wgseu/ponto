@@ -24,40 +24,32 @@
  * @author Equipe GrandChef <desenvolvimento@grandchef.com.br>
  */
 
-namespace App\Util;
+declare(strict_types=1);
 
-/**
- * Common function type float
- */
-class Number
+namespace App\GraphQL\Inputs;
+
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\InputType;
+
+class CupomPedidoInput extends InputType
 {
-    /**
-     * Compare if value is iqual zero
-     *
-     * @return bool
-     */
-    public static function isEqual($value, $compare, $delta = 0.005)
-    {
-        return $compare < ($value + $delta) && ($value - $delta) < $compare;
-    }
+    protected $attributes = [
+        'name' => 'CupomPedidoInput',
+        'description' => 'Informa o cupom que será usado no pedido',
+    ];
 
-    /**
-     * Verify if value is bigger then given
-     *
-     * @return bool
-     */
-    public static function isGreater($value, $compare, $delta = 0.005)
+    public function fields(): array
     {
-        return $value > ($compare + $delta);
-    }
-
-    /**
-     * Verify if value is less then given
-     *
-     * @return bool
-     */
-    public static function isLess($value, $compare, $delta = 0.005)
-    {
-        return $value < ($compare - $delta);
+        return [
+            'id' => [
+                'type' => Type::id(),
+                'description' => 'Identificador do cupom do cliente',
+            ],
+            'codigo' => [
+                'type' => Type::string(),
+                'description' => 'Código para uso do cupom',
+                'rules' => ['max:20'],
+            ],
+        ];
     }
 }

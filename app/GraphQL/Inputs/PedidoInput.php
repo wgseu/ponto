@@ -50,6 +50,10 @@ class PedidoInput extends InputType
                 'type' => Type::listOf(GraphQL::type('PagamentoUpdateInput')),
                 'description' => 'Pagamentos do pedido a serem adicionados ou alterados',
             ],
+            'cupons' => [
+                'type' => Type::listOf(GraphQL::type('CupomPedidoInput')),
+                'description' => 'Cupons que serão usados no pedido',
+            ],
             'pedido_id' => [
                 'type' => Type::id(),
                 'description' => 'Informa o pedido da mesa / comanda principal quando as mesas / comandas' .

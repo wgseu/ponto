@@ -26,60 +26,64 @@
 
 namespace Tests\Feature;
 
+use App\Exceptions\ValidationException;
 use Tests\TestCase;
 use App\Models\Cupom;
+use App\Models\Item;
+use App\Models\Localizacao;
+use App\Models\Pagamento;
+use App\Models\Pedido;
+use Illuminate\Support\Carbon;
 
 class CupomTest extends TestCase
 {
-    public function testCreateCupom()
+    public function testCreate()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_cupom =  factory(Cupom::class)->create();
+        $validade = Carbon::now()->addDays(1);
         $response = $this->graphfl('create_cupom', [
             'input' => [
-                'codigo' => 'Teste',
+                'codigo' => 'CODE123',
                 'quantidade' => 1,
                 'tipo_desconto' => Cupom::TIPO_DESCONTO_VALOR,
+                'valor' => 3.50,
                 'incluir_servicos' => true,
-                'validade' => '2016-12-25T12:15:00Z',
-                'data_registro' => '2016-12-25T12:15:00Z',
+                'validade' => $validade->format('c'),
             ]
         ], $headers);
 
         $found_cupom = Cupom::findOrFail($response->json('data.CreateCupom.id'));
-        $this->assertEquals('Teste', $found_cupom->codigo);
+        $this->assertEquals('CODE123', $found_cupom->codigo);
         $this->assertEquals(1, $found_cupom->quantidade);
         $this->assertEquals(Cupom::TIPO_DESCONTO_VALOR, $found_cupom->tipo_desconto);
         $this->assertEquals(true, $found_cupom->incluir_servicos);
-        $this->assertEquals('2016-12-25 12:15:00', $found_cupom->validade);
-        $this->assertEquals('2016-12-25 12:15:00', $found_cupom->data_registro);
+        $this->assertEquals(3.50, $found_cupom->valor);
+        $this->assertEquals($validade, $found_cupom->validade);
     }
 
-    public function testUpdateCupom()
+    public function testUpdate()
     {
         $headers = PrestadorTest::authOwner();
         $cupom = factory(Cupom::class)->create();
+        $validade = Carbon::now()->addDays(3);
+        $quantidade = $cupom->quantidade + 5;
         $this->graphfl('update_cupom', [
             'id' => $cupom->id,
             'input' => [
-                'codigo' => 'Atualizou',
-                'quantidade' => 1,
-                'tipo_desconto' => Cupom::TIPO_DESCONTO_VALOR,
+                'codigo' => 'CODE321',
+                'quantidade' => $quantidade,
                 'incluir_servicos' => true,
-                'validade' => '2016-12-28T12:30:00Z',
-                'data_registro' => '2016-12-28T12:30:00Z',
+                'validade' => $validade->format('c'),
             ]
         ], $headers);
         $cupom->refresh();
-        $this->assertEquals('Atualizou', $cupom->codigo);
-        $this->assertEquals(1, $cupom->quantidade);
-        $this->assertEquals(Cupom::TIPO_DESCONTO_VALOR, $cupom->tipo_desconto);
+        $this->assertEquals('CODE321', $cupom->codigo);
+        $this->assertEquals($quantidade, $cupom->quantidade);
         $this->assertEquals(true, $cupom->incluir_servicos);
-        $this->assertEquals('2016-12-28 12:30:00', $cupom->validade);
-        $this->assertEquals('2016-12-28 12:30:00', $cupom->data_registro);
+        $this->assertEquals($validade, $cupom->validade);
     }
 
-    public function testDeleteCupom()
+    public function testDelete()
     {
         $headers = PrestadorTest::authOwner();
         $cupom_to_delete = factory(Cupom::class)->create();
@@ -88,11 +92,63 @@ class CupomTest extends TestCase
         $this->assertNull($cupom);
     }
 
-    public function testFindCupom()
+    public function testFindMultiple()
     {
         $headers = PrestadorTest::authOwner();
         $cupom = factory(Cupom::class)->create();
         $response = $this->graphfl('query_cupom', [ 'id' => $cupom->id ], $headers);
         $this->assertEquals($cupom->id, $response->json('data.cupons.data.0.id'));
+    }
+
+    public function testsSearchByCode()
+    {
+        $headers = PrestadorTest::authOwner();
+        $cupom = factory(Cupom::class)->create();
+        $response = $this->graphfl('query_cupom_search', [ 'codigo' => $cupom->codigo ], $headers);
+        $this->assertEquals($cupom->id, $response->json('data.cupom.id'));
+    }
+
+    public function testSearchUnreachable()
+    {
+        $headers = PrestadorTest::authOwner();
+        $cupom = factory(Cupom::class)->create([
+            'limitar_pedidos' => true,
+            'funcao_pedidos' => Cupom::FUNCAO_PEDIDOS_MAIOR,
+            'pedidos_limite' => 0,
+        ]);
+        $this->expectException(ValidationException::class);
+        $this->graphfl('query_cupom_search', [ 'codigo' => $cupom->codigo ], $headers);
+    }
+
+    public function testUseCouponDelivery()
+    {
+        $localizacao = factory(Localizacao::class)->create();
+        $cliente = $localizacao->cliente;
+        $headers = ClienteTest::auth($cliente);
+        $itens = [
+            factory(Item::class)->raw(),
+            factory(Item::class)->raw(),
+        ];
+        $total = array_reduce($itens, function ($prev, $item) {
+            return $prev + $item['preco'] * $item['quantidade'];
+        }, 0);
+        $cupom = factory(Cupom::class)->create([
+            'valor' => $total,
+        ]);
+        $cupons = [
+            ['id' => $cupom->id],
+        ];
+        $this->graphfl('create_pedido', [
+            'input' => [
+                'tipo' => Pedido::TIPO_ENTREGA,
+                'estado' => Pedido::ESTADO_AGENDADO,
+                'cliente_id' => $cliente->id,
+                'localizacao_id' => $localizacao->id,
+                'itens' => $itens,
+                'cupons' => $cupons,
+            ]
+        ], $headers);
+        $cupom->refresh();
+        $this->assertEquals($cupom->quantidade - 1, $cupom->disponivel);
     }
 }

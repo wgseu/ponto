@@ -32,6 +32,7 @@ use App\Exceptions\Exception;
 use App\Models\Cheque;
 use App\Models\Conta;
 use App\Models\Credito;
+use App\Models\Cupom;
 use App\Models\Formacao;
 use App\Models\Item;
 use App\Models\Pagamento;
@@ -236,6 +237,48 @@ class CreatePedidoMutation extends Mutation
         return $itens;
     }
 
+    /**
+     * Salva um cupom
+     *
+     * @param array $data
+     * @param Pedido $pedido
+     */
+    protected function saveCoupon($data, $pedido)
+    {
+        if (isset($data['id'])) {
+            $cupom = Cupom::where('id', $data['id'])->firstOrFail();
+        } else {
+            $cupom = Cupom::where('codigo', $data['codigo'] ?? '')->firstOrFail();
+        }
+        if ($cupom->quantidade < 0) {
+            // informou o cupom usado, não faz nada
+            return $cupom;
+        }
+        $cupom_id = $cupom->id;
+        $cupom = $cupom->replicate();
+        $cupom->cupom_id = $cupom_id;
+        $cupom->pedido_id = $pedido->id;
+        $cupom->cliente_id = $pedido->cliente_id;
+        $cupom->quantidade = -1;
+        $cupom->save();
+        // mantém os descontos de outros cupons e aplica o desse
+        $pedido->descontos -= $cupom->valor;
+        return $cupom;
+    }
+
+    /**
+     * Salva uma lista de cupons
+     *
+     * @param array $list
+     * @param Pedido $pedido
+     */
+    protected function saveCoupons($list, $pedido)
+    {
+        foreach ($list as $data) {
+            $this->saveCoupon($data, $pedido);
+        }
+    }
+
     private function payWithBalance($pagamento, $data, $pedido, $funcionario_id)
     {
         $credito = new Credito($data);
@@ -368,6 +411,8 @@ class CreatePedidoMutation extends Mutation
             $pedido->save();
             $itens = $input['itens'] ?? [];
             $this->saveItems($itens, $pedido, $prestador, $funcionario_id);
+            $cupons = $input['cupons'] ?? [];
+            $this->saveCoupons($cupons, $pedido);
             $pagamentos = $input['pagamentos'] ?? [];
             $this->savePayments($pagamentos, $pedido, $funcionario_id);
             if ($pedido->tipo == Pedido::TIPO_BALCAO) {

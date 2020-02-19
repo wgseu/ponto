@@ -4,10 +4,13 @@ class Syncronizer {
     this.data = data
   }
 
+  other (client) {
+    return client.id !== this.sender.id
+  }
+
   allow (client) {
-    return client.type == 'user' && client.employee_id && this.sender.employee_id
+    return (client.type == 'user' && client.employee_id) || (client.type == 'device')
   }
 }
-
 
 module.exports = Syncronizer

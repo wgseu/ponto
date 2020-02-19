@@ -27,8 +27,11 @@ class Server {
 
   sync (sender, info) {
     const syncronizer = new Syncronizer(sender, info)
+    if (info.source === 'printer') {
+      this.refreshPrinters()
+    }
     this.broadcast('sync', info, client => {
-      return syncronizer.allow(client)
+      return syncronizer.other(client) && syncronizer.allow(client)
     })
   }
 
@@ -84,6 +87,13 @@ class Server {
         client.socket.emit(event, data)
       }
     })
+  }
+
+  async refreshPrinters () {
+    const { data: { impressoras: { data } } } = await Service.Printer.fetch(this.deviceToken)
+    this.allPrinters = data
+    this.assignPrinters()
+    console.log(`Printer reloaded, using ${this.printers.length} printers`)
   }
 
   assignPrinters () {

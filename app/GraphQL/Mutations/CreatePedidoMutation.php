@@ -415,6 +415,9 @@ class CreatePedidoMutation extends Mutation
             ) {
                 throw new Exception(__('messages.no_item_added'));
             }
+            if ($pedido->estado == Pedido::ESTADO_AGENDADO && is_null($pedido->data_agendamento)) {
+                $pedido->data_agendamento = Carbon::now();
+            }
             $pedido->prestador_id = $funcionario_id;
             $pedido->save();
             $itens = $input['itens'] ?? [];

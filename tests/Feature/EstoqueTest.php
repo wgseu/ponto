@@ -35,6 +35,7 @@ use App\Models\Produto;
 use App\Models\Compra;
 use App\Models\Setor;
 use App\Exceptions\ValidationException;
+use App\Models\Pedido;
 
 class EstoqueTest extends TestCase
 {
@@ -78,9 +79,11 @@ class EstoqueTest extends TestCase
         $this->assertEquals($estoque->id, $response->json('data.estoques.data.0.id'));
     }
 
-    public function testValidateDoisAtributosEstoque()
+    public function testRejeitarEntradaAoVender()
     {
-        $transacao = factory(Item::class)->make();
+        $transacao = factory(Item::class)->make([
+            'pedido_id' => factory(Pedido::class)->create()->id
+        ]);
         $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create(['transacao_id' => $transacao->id]);
@@ -107,7 +110,9 @@ class EstoqueTest extends TestCase
 
     public function testValidateSaidaProdutoPositiva()
     {
-        $transacao = factory(Item::class)->make();
+        $transacao = factory(Item::class)->make([
+            'pedido_id' => factory(Pedido::class)->create()->id
+        ]);
         $transacao->save();
         $this->expectException(ValidationException::class);
         factory(Estoque::class)->create([
@@ -147,7 +152,9 @@ class EstoqueTest extends TestCase
 
     public function testBelongToTransacao()
     {
-        $transacao = factory(Item::class)->make();
+        $transacao = factory(Item::class)->make([
+            'pedido_id' => factory(Pedido::class)->create()->id
+        ]);
         $transacao->save();
         $estoque = factory(Estoque::class)->make([
             'compra_id' => null,

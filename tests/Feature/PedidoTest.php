@@ -110,7 +110,9 @@ class PedidoTest extends TestCase
     public function testMarkItemPaidWithChange()
     {
         $headers = PrestadorTest::authOwner();
-        $item = factory(Item::class)->create();
+        $item = factory(Item::class)->create([
+            'pedido_id' => factory(Pedido::class)->create()->id
+        ]);
         $pedido = $item->pedido;
         // atualiza os totais
         $pedido->save();

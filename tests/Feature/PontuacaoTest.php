@@ -30,6 +30,7 @@ use App\Models\Item;
 use Tests\TestCase;
 use App\Models\Pontuacao;
 use App\Exceptions\ValidationException;
+use App\Models\Pedido;
 
 class PontuacaoTest extends TestCase
 {
@@ -61,7 +62,9 @@ class PontuacaoTest extends TestCase
 
     public function testPontuacaoItemPedidoNull()
     {
-        $item = factory(Item::class)->make();
+        $item = factory(Item::class)->make([
+            'pedido_id' => factory(Pedido::class)->create()->id
+        ]);
         $item->save();
         $this->expectException(ValidationException::class);
         factory(Pontuacao::class)->create([

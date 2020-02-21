@@ -468,6 +468,10 @@ class Pedido extends Model implements
         if ($this->tipo == self::TIPO_ENTREGA && is_null($this->cliente_id)) {
             return ['cliente_id' => __('messages.delivery_without_customer')];
         }
+        // não pode entregar sem um cliente
+        if ($this->estado == self::ESTADO_AGENDADO && is_null($this->data_agendamento)) {
+            return ['cliente_id' => __('messages.order_no_scheduled_date')];
+        }
         // só entrega pode ter endereço no pedido
         if ($this->tipo != self::TIPO_ENTREGA && !is_null($this->localizacao_id)) {
             return ['localizacao_id' => __('messages.non_delivery_with_address')];

@@ -6,14 +6,22 @@ use Illuminate\Support\Facades\Storage;
 
 class DownloadController extends Controller
 {
-    public function bills($name)
+    public function process($path)
+    {
+        if (!Storage::exists($path)) {
+            return abort(404);
+        }
+        if (preg_match('/^docs\/bills\//', $path)) {
+            return $this->bills($path);
+        }
+        return abort(404);
+    }
+
+    private function bills($path)
     {
         if (!auth()->check() || !auth()->user()->can('conta:view')) {
             return redirect('/login');
         }
-        if (!Storage::exists("/docs/accounts/$name")) {
-            return abort(404);
-        }
-        return Storage::download("/docs/accounts/$name");
+        return Storage::download($path);
     }
 }

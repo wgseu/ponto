@@ -50,10 +50,6 @@ class SubitemInput extends InputType
                 'type' => Type::id(),
                 'description' => 'Identificador do item no banco',
             ],
-            'pedido_id' => [
-                'type' => Type::nonNull(Type::id()),
-                'description' => 'Pedido a qual pertence esse item',
-            ],
             'prestador_id' => [
                 'type' => Type::id(),
                 'description' => 'Prestador que lançou esse item no pedido',
@@ -65,10 +61,6 @@ class SubitemInput extends InputType
             'servico_id' => [
                 'type' => Type::id(),
                 'description' => 'Serviço cobrado ou taxa',
-            ],
-            'item_id' => [
-                'type' => Type::id(),
-                'description' => 'Pacote em que esse item faz parte',
             ],
             'pagamento_id' => [
                 'type' => Type::id(),

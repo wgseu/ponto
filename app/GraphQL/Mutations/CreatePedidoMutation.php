@@ -142,8 +142,9 @@ class CreatePedidoMutation extends Mutation
     protected function saveItem($data, $pedido, $prestador, $funcionario_id, $level, &$pedidos_afetados)
     {
         $item = new Item();
+        $atualizando = isset($data['id']);
         $cancelamento = $data['cancelado'] ?? false;
-        if (isset($data['id'])) {
+        if ($atualizando) {
             // permite mover um item de uma mesa para outra
             $query = Item::where('cancelado', false);
             if ($cancelamento) {
@@ -152,6 +153,7 @@ class CreatePedidoMutation extends Mutation
             }
             $item = $query->findOrFail($data['id']);
             if ($item->pedido_id != $pedido->id && !isset($pedidos_afetados[$item->pedido_id])) {
+                // movendo o item de outro pedido para esse
                 $pedidos_afetados[$item->pedido_id] = Pedido::findOrFail($item->pedido_id);
             }
         }
@@ -164,7 +166,9 @@ class CreatePedidoMutation extends Mutation
             return $item;
         }
         $item->pedido_id = $pedido->id;
-        $item->prestador_id = $funcionario_id;
+        if (is_null($item->prestador_id)) {
+            $item->prestador_id = $funcionario_id;
+        }
         // muda a data de processamento em caso de alteração de estado
         if ($item->exists && $item->estado != $item->fresh()->estado) {
             $item->data_processamento = Carbon::now();
@@ -198,11 +202,15 @@ class CreatePedidoMutation extends Mutation
             $subformations = self::makeFormations($subdata['formacoes'] ?? []);
             $montagem->addItem($subitem, $subformations);
         }
-        $montagem->verify();
+        if (!$atualizando) {
+            $montagem->verify();
+        }
         foreach ($montagem->itens as $info) {
             /** @var Item $subitem */
             $subitem = $info['item'];
-            $subitem->item_id = $item->id;
+            if (!$atualizando) {
+                $subitem->item_id = $item->id;
+            }
             /** @var Formacao[] $subformations */
             $subformations = $info['formacoes'];
             self::saveItemFormation($subitem, $subformations, $pedido);

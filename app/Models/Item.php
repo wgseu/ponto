@@ -34,6 +34,7 @@ use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\ValidationException;
 use App\Interfaces\AfterSaveInterface;
+use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
@@ -49,7 +50,8 @@ class Item extends Model implements
     ValidateUpdateInterface,
     ValidateInsertInterface,
     BeforeSaveInterface,
-    AfterSaveInterface
+    AfterSaveInterface,
+    AfterUpdateInterface
 {
     use ModelEvents;
 
@@ -79,6 +81,8 @@ class Item extends Model implements
      * @var array
      */
     protected $fillable = [
+        'pedido_id',
+        'prestador_id',
         'produto_id',
         'servico_id',
         'item_id',
@@ -143,7 +147,7 @@ class Item extends Model implements
      */
     public function item()
     {
-        return $this->belongsTo(Item::class, 'item_id');
+        return $this->belongsTo(self::class, 'item_id');
     }
 
     /**
@@ -182,7 +186,7 @@ class Item extends Model implements
      */
     public function itens()
     {
-        return $this->hasMany(Item::class, 'item_id')->where('cancelado', false);
+        return $this->hasMany(self::class, 'item_id')->where('cancelado', false);
     }
 
     /**
@@ -201,6 +205,9 @@ class Item extends Model implements
         $servico = $this->servico;
         if (!is_null($servico)) {
             $this->preco_venda = $servico->valor;
+        }
+        if (!$this->exists && !is_null($produto) && $produto->tipo == Produto::TIPO_PRODUTO) {
+            $this->estado = self::ESTADO_DISPONIVEL;
         }
         $this->subtotal = $this->preco * $this->quantidade;
         $this->total = $this->subtotal + $this->comissao;
@@ -304,13 +311,75 @@ class Item extends Model implements
         $this->save();
     }
 
+    /**
+     * Cancela os subitens
+     */
     protected function cancelDependencies()
     {
-        // cancela os sub itens
         $itens = $this->itens;
         foreach ($itens as $item) {
             $item->update(['cancelado' => true]);
         }
+    }
+
+    /**
+     * Move os subitens para o pedido desse item
+     */
+    protected function moveSubitens()
+    {
+        $itens = $this->itens;
+        foreach ($itens as $item) {
+            $item->update(['pedido_id' => $this->pedido_id]);
+        }
+    }
+
+    /**
+     * Altera o estado do item principal como produzido ou não
+     */
+    protected function checkParentDone()
+    {
+        $item = $this->item;
+
+        // verifica se voltou um item de fazendo para aguardando
+        $waiting_status = [
+            self::ESTADO_ADICIONADO,
+            self::ESTADO_ENVIADO,
+        ];
+        $waiting = $item->itens()->whereIn('estado', $waiting_status)->count() > 0;
+        if ($waiting && !in_array($item->estado, $waiting_status)) {
+            $item->update(['estado' => self::ESTADO_ENVIADO]);
+        }
+        if ($waiting) {
+            return;
+        }
+
+        // verifica se voltou um item de pronto para fazendo
+        $open_status = [
+            self::ESTADO_PROCESSADO,
+        ];
+        $cooking = $item->itens()->whereIn('estado', $open_status)->count() > 0;
+        if ($cooking && !in_array($item->estado, $open_status)) {
+            $item->update(['estado' => self::ESTADO_PROCESSADO]);
+        }
+        if ($cooking) {
+            return;
+        }
+
+        // verifica se voltou um item de entregue para fazendo
+        $done_status = [
+            self::ESTADO_PRONTO,
+            self::ESTADO_DISPONIVEL,
+        ];
+        $available = $item->itens()->whereIn('estado', $done_status)->count() > 0;
+        if ($available && !in_array($item->estado, $done_status)) {
+            $item->update(['estado' => self::ESTADO_PRONTO]);
+        }
+        if ($available) {
+            return;
+        }
+
+        // aqui entregou todos os itens
+        $item->update(['estado' => $this->estado]);
     }
 
     public function validate($old)
@@ -385,6 +454,16 @@ class Item extends Model implements
     {
         if ($this->cancelado) {
             $this->cancelDependencies();
+        }
+    }
+
+    public function afterUpdate($old)
+    {
+        if ($old->pedido_id != $this->pedido_id) {
+            $this->moveSubitens();
+        }
+        if ($old->estado != $this->estado && !is_null($this->item_id)) {
+            $this->checkParentDone();
         }
     }
 }

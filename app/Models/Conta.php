@@ -246,7 +246,7 @@ class Conta extends Model implements
     public function getAnexoUrlAttribute($value)
     {
         if ($value) {
-            return Storage::url($value);
+            return url('download/' . $value);
         }
         return null;
     }
@@ -262,7 +262,7 @@ class Conta extends Model implements
     public function setAnexoAttribute($value)
     {
         if (isset($value)) {
-            $this->attributes['anexo_url'] = Upload::send($value, 'docs/accounts', 'private');
+            $this->attributes['anexo_url'] = Upload::send($value, 'docs/bills', 'private');
         }
     }
 

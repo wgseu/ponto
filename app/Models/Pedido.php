@@ -275,6 +275,15 @@ class Pedido extends Model implements
     }
 
     /**
+     * Returna a relação de junções ativas do pedido
+     */
+    public function juncoes()
+    {
+        return $this->hasMany(Juncao::class, 'pedido_id')
+            ->where('estado', Juncao::ESTADO_ASSOCIADO);
+    }
+
+    /**
      * Informa se o pedido está finalizado por conclusão ou cancelamento
      *
      * @return bool
@@ -384,6 +393,18 @@ class Pedido extends Model implements
         $itens = $this->itens()->where('estado', '<>', Item::ESTADO_ENTREGUE)->get();
         foreach ($itens as $item) {
             $item->update(['estado' => Item::ESTADO_ENTREGUE]);
+        }
+    }
+
+    /**
+     * Desassocia as mesas pois está fechando ou cancelando o pedido
+     */
+    protected function unlinkTables()
+    {
+        $estado = $this->cancelled() ? Juncao::ESTADO_CANCELADO : Juncao::ESTADO_LIBERADO;
+        $juncoes = $this->juncoes;
+        foreach ($juncoes as $juncao) {
+            $juncao->update(['estado' => $estado]);
         }
     }
 
@@ -582,6 +603,9 @@ class Pedido extends Model implements
 
     public function beforeUpdate($old)
     {
+        if ($this->tipo == self::TIPO_MESA && $this->finished()) {
+            $this->unlinkTables();
+        }
         if ($this->estado == self::ESTADO_CANCELADO) {
             return;
         }
@@ -599,7 +623,9 @@ class Pedido extends Model implements
     {
         if ($this->estado == self::ESTADO_CANCELADO) {
             $this->cancel();
-        } elseif (
+            return;
+        }
+        if (
             $old->estado == self::ESTADO_AGENDADO &&
             !in_array($this->estado, [self::ESTADO_CANCELADO, self::ESTADO_AGENDADO])
         ) {

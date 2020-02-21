@@ -31,6 +31,7 @@ use Tests\TestCase;
 use App\Models\Juncao;
 use App\Models\Mesa;
 use App\Models\Pedido;
+use Illuminate\Support\Carbon;
 
 class JuncaoTest extends TestCase
 {
@@ -92,7 +93,10 @@ class JuncaoTest extends TestCase
 
     public function testJuntarMesaComPedidoNaoAberto()
     {
-        $pedido = factory(Pedido::class)->create(['estado' => Pedido::ESTADO_AGENDADO]);
+        $pedido = factory(Pedido::class)->create([
+            'estado' => Pedido::ESTADO_AGENDADO,
+            'data_agendamento' => Carbon::now(),
+        ]);
         $this->expectException(ValidationException::class);
         factory(Juncao::class)->create(['pedido_id' => $pedido->id]);
     }

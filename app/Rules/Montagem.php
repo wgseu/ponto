@@ -32,6 +32,7 @@ use App\Models\Grupo;
 use App\Models\Pacote;
 use App\Models\Composicao;
 use App\Models\Produto;
+use App\Util\Currency;
 use App\Util\Mask;
 use App\Util\Number;
 
@@ -416,7 +417,7 @@ class Montagem extends Item
                 ]
             ));
         }
-        if (!Number::isEqual($item->preco, $preco)) {
+        if (!Currency::isEqual($item->preco, $preco)) {
             $produto = $item->produto;
             throw new Exception(__(
                 'messages.item_incorrect_price',

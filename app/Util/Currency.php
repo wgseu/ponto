@@ -27,18 +27,48 @@
 namespace App\Util;
 
 /**
- * Common function type float
+ * Currency common operations
  */
-class Number
+class Currency
 {
     /**
-     * Compare if value is iqual zero
+     * Number of decimal places
+     *
+     * @return int
+     */
+    public static function places()
+    {
+        return log10(app('currency')->divisao ?: 100);
+    }
+
+    /**
+     * Delta value for comparison
+     *
+     * @return float
+     */
+    public static function delta()
+    {
+        return 0.5 / (app('currency')->divisao ?: 100);
+    }
+
+    /**
+     * Round currency using configured decimal places
+     *
+     * @return float
+     */
+    public static function round($value)
+    {
+        return \round($value, self::places());
+    }
+
+    /**
+     * Compare two values are equals using delta based on currency decimal places
      *
      * @return bool
      */
-    public static function isEqual($value, $compare, $delta = 0.0005)
+    public static function isEqual($value, $compare)
     {
-        return $compare < ($value + $delta) && ($value - $delta) < $compare;
+        return Number::isEqual($value, $compare, self::delta());
     }
 
     /**
@@ -46,9 +76,9 @@ class Number
      *
      * @return bool
      */
-    public static function isGreater($value, $compare, $delta = 0.0005)
+    public static function isGreater($value, $compare)
     {
-        return $value > ($compare + $delta);
+        return Number::isGreater($value, $compare, self::delta());
     }
 
     /**
@@ -56,8 +86,8 @@ class Number
      *
      * @return bool
      */
-    public static function isLess($value, $compare, $delta = 0.0005)
+    public static function isLess($value, $compare)
     {
-        return $value < ($compare - $delta);
+        return Number::isLess($value, $compare, self::delta());
     }
 }

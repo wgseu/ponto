@@ -34,7 +34,7 @@ use App\Models\Movimentacao;
 use App\Models\Pagamento;
 use App\Models\Saldo;
 use App\Models\Sessao;
-use App\Util\Number;
+use App\Util\Currency;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Mutation;
 use Illuminate\Support\Facades\Auth;
@@ -82,7 +82,7 @@ class CreateMovimentacaoMutation extends Mutation
             $movimentacao->caixa_id = $caixa->id;
             $movimentacao->createSessaoOrSave();
             $valor_inicial = $input['valor_inicial'];
-            if (!Number::isGreater($valor_inicial, 0)) {
+            if (!Currency::isGreater($valor_inicial, 0)) {
                 return;
             }
             $forma = Forma::where('tipo', Forma::TIPO_DINHEIRO)

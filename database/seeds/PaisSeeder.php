@@ -29,9 +29,11 @@ class PaisSeeder extends Seeder
                 ],
                 'cpf' => [
                     'mask' => '###.###.###-##',
+                    'title' => 'CPF',
                 ],
                 'cnpj' => [
                     'mask' => '##.###.###/####-##',
+                    'title' => 'CNPJ',
                 ],
                 'ncm' => [
                     'mask' => '####.##.##',

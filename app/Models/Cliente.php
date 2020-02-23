@@ -29,6 +29,7 @@ namespace App\Models;
 use App\Util\Image;
 use App\Util\Validator;
 use App\Concerns\ModelEvents;
+use App\Exceptions\Exception;
 use Illuminate\Support\Carbon;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Foundation\Auth\User;
@@ -356,6 +357,34 @@ class Cliente extends User implements
             ->where('empresa_id', app('company')->id)->exists();
     }
 
+    /**
+     * Obriga possuir um email, cpf ou telefone
+     *
+     * @param bool $hasPhone
+     */
+    public function requireIdentifier($hasPhone)
+    {
+        if ($hasPhone) {
+            return;
+        }
+        if (Validator::email($this->email)) {
+            return;
+        }
+        $business = $this->tipo == self::TIPO_JURIDICA;
+        if ($business) {
+            if (Validator::cnpj($this->cpf)) {
+                return;
+            }
+        } else {
+            if (Validator::cpf($this->cpf)) {
+                return;
+            }
+        }
+        throw new Exception(__('messages.customer_no_identifier', [
+            'cpf' => app('country')->entries->get($business ? 'cnpj' : 'cpf', 'title')
+        ]));
+    }
+
     public function validate($old)
     {
         $errors = [];
@@ -367,6 +396,9 @@ class Cliente extends User implements
             if (!Validator::cnpj($this->cpf, true)) {
                 $errors['cnpj'] = __('messages.cnpj_invalid');
             }
+        }
+        if (!Validator::email($this->email, true)) {
+            $errors['email'] = __('messages.email_invalid');
         }
         $empresa = $this->empresa;
         if (!is_null($empresa) && $empresa->tipo != self::TIPO_JURIDICA) {

@@ -27,14 +27,14 @@
 namespace App\Models;
 
 use App\Util\Mask;
-use App\Util\Number;
-use App\Concerns\ModelEvents;
-use App\Interfaces\AfterSaveInterface;
-use App\Interfaces\ValidateInterface;
-use Illuminate\Database\Eloquent\Model;
-use App\Interfaces\ValidateUpdateInterface;
 use App\Util\Upload;
+use App\Util\Currency;
+use App\Concerns\ModelEvents;
+use App\Interfaces\ValidateInterface;
+use App\Interfaces\AfterSaveInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Interfaces\ValidateUpdateInterface;
 
 /**
  * Contas a pagar e ou receber
@@ -305,7 +305,7 @@ class Conta extends Model implements
         ) {
             $errors['agrupamento_id'] = __('messages.grouping_already_canceled');
         }
-        if (Number::isEqual($this->valor, 0)) {
+        if (Currency::isEqual($this->valor, 0)) {
             $errors['valor'] = __('messages.valor_cannot_zero');
         } elseif ($this->valor < 0 && $this->tipo == self::TIPO_RECEITA) {
             $errors['valor'] = __('messages.receita_negativa');
@@ -329,12 +329,12 @@ class Conta extends Model implements
         if (!is_null($conta) && !is_null($conta->conta_id)) {
             $errors['conta_id'] = __('messages.account_have_conta_id');
         }
-        if ($this->tipo == self::TIPO_RECEITA && Number::isGreater($this->consolidado, $this->total())) {
+        if ($this->tipo == self::TIPO_RECEITA && Currency::isGreater($this->consolidado, $this->total())) {
             $errors['valor'] = __('messages.total_received_greater_account');
         }
         if (
             $this->tipo == self::TIPO_DESPESA
-            && Number::isGreater(-$this->consolidado, (-$this->valor - $this->acrescimo))
+            && Currency::isGreater(-$this->consolidado, (-$this->valor - $this->acrescimo))
         ) {
             $errors['valor'] = __('messages.total_paid_greater_account');
         }
@@ -373,9 +373,9 @@ class Conta extends Model implements
         }
         if (
             ($this->estado == self::ESTADO_PAGA
-                && !Number::isEqual($this->consolidado, $this->total()))
+                && !Currency::isEqual($this->consolidado, $this->total()))
             || ($old->estado == self::ESTADO_PAGA
-                && !Number::isEqual($old->consolidado, $this->total()))
+                && !Currency::isEqual($old->consolidado, $this->total()))
         ) {
             $errors['id'] = __('messages.account_cannot_changed_total');
         }

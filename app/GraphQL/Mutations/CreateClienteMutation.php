@@ -31,6 +31,7 @@ namespace App\GraphQL\Mutations;
 use App\Models\Cliente;
 use App\Mail\MailContact;
 use App\Models\Telefone;
+use App\Util\Filter;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -87,12 +88,15 @@ class CreateClienteMutation extends Mutation
                 ) {
                     $cliente->ip = app('request')->server->get('REMOTE_ADDR');
                 }
-                $cliente->save();
                 $telefones = $args['input']['telefones'] ?? [];
+                $cliente->requireIdentifier(count($telefones) > 0);
+                $cliente->save();
                 foreach ($telefones as $fone) {
                     $telefone = new Telefone($fone);
                     $telefone->pais_id = $fone['pais_id'] ?? app('country')->id;
                     $telefone->cliente_id = $cliente->id;
+                    $telefone->pais->loadEntries();
+                    $telefone->numero = Filter::phone($telefone->numero, $telefone->pais);
                     $telefone->save();
                 }
                 if ($cliente->email) {

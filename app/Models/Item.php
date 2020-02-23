@@ -27,19 +27,19 @@
 namespace App\Models;
 
 use App\Util\Mask;
-use App\Util\Number;
+use App\Util\Currency;
 use App\Concerns\ModelEvents;
 use App\Exceptions\Exception;
+use Illuminate\Support\Facades\DB;
 use App\Interfaces\ValidateInterface;
+use App\Interfaces\AfterSaveInterface;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
 use App\Exceptions\ValidationException;
-use App\Interfaces\AfterSaveInterface;
-use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\BeforeSaveInterface;
+use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
 use App\Interfaces\ValidateUpdateInterface;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Produtos, taxas e serviços do pedido, a alteração do estado permite o
@@ -209,7 +209,8 @@ class Item extends Model implements
         if (!$this->exists && !is_null($produto) && $produto->tipo == Produto::TIPO_PRODUTO) {
             $this->estado = self::ESTADO_DISPONIVEL;
         }
-        $this->subtotal = $this->preco * $this->quantidade;
+        $this->comissao = Currency::round($this->comissao);
+        $this->subtotal = Currency::round($this->preco * $this->quantidade);
         $this->total = $this->subtotal + $this->comissao;
         return $this;
     }
@@ -251,7 +252,7 @@ class Item extends Model implements
             }
             $preco += $operacao * $composicao->valor * $formacao->quantidade;
         }
-        if (!Number::isEqual($this->preco, $preco)) {
+        if (!Currency::isEqual($this->preco, $preco)) {
             throw new Exception(
                 __('messages.item_incorrect_price', [
                     'name' => $produto->descricao,

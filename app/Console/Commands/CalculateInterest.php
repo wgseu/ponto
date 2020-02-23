@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\Conta;
+use App\Util\Currency;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\ValidationException;
 
 class CalculateInterest extends Command
 {
@@ -48,7 +48,7 @@ class CalculateInterest extends Command
                     $modo = $conta->formula == Conta::FORMULA_SIMPLES
                         ? $conta->valor : $conta->acrescimo + $conta->valor;
                     $acrecismo = ($modo - $conta->consolidado) * $conta->juros * $dias;
-                    $conta->acrescimo += $acrecismo;
+                    $conta->acrescimo += Currency::round($acrecismo);
                     $conta->data_calculo = Carbon::yesterday();
                     $conta->save();
                 });

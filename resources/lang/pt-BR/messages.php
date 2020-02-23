@@ -977,4 +977,6 @@ return [
     'bleeding_closing_till' => 'Sangria do fechamento da movimentação :value',
     'closing_till' => 'Fechamento de caixa, movimentação :value',
     'register_expense' => 'Pagamento de despesa, Conta :value',
+
+    'customer_no_identifier' => 'Informe um telefone, email ou :cpf'
 ];

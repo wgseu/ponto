@@ -27,7 +27,7 @@
 namespace App\Models;
 
 use App\Util\Image;
-use App\Util\Number;
+use App\Util\Currency;
 use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -142,7 +142,7 @@ class Servico extends Model implements ValidateInterface
         $errors = [];
         if ($this->valor < 0) {
             $errors['valor'] = __('messages.value_negative');
-        } elseif (Number::isEqual($this->valor, 0)) {
+        } elseif (Currency::isEqual($this->valor, 0)) {
             $errors['valor'] = __('messages.valor_cannot_zero');
         }
         if ($this->tipo == self::TIPO_EVENTO) {

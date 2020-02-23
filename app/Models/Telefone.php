@@ -30,6 +30,7 @@ use App\Concerns\ModelEvents;
 use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
 use App\Util\Filter;
+use App\Util\Validator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -97,6 +98,9 @@ class Telefone extends Model implements ValidateInterface, ValidateUpdateInterfa
     {
         $errors = [];
         $this->pais->loadEntries();
+        if (!Validator::phone($this->numero, $this->pais)) {
+            return ['numero' => __('messages.phone_invalid_number')];
+        }
         $query = self::where('cliente_id', $this->cliente_id)
             ->whereIn('numero', Filter::makePhoneNumbers($this->numero, $this->pais));
         if ($this->exists) {

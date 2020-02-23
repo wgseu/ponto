@@ -34,33 +34,34 @@ class TelefoneTest extends TestCase
     public function testCreateTelefone()
     {
         $headers = PrestadorTest::authOwner();
-        $seed_telefone =  factory(Telefone::class)->create();
+        $input =  factory(Telefone::class)->make();
         $response = $this->graphfl('create_telefone', [
             'input' => [
-                'cliente_id' => $seed_telefone->cliente_id,
-                'pais_id' => $seed_telefone->pais_id,
-                'numero' => 'Teste',
+                'cliente_id' => $input->cliente_id,
+                'pais_id' => $input->pais_id,
+                'numero' => $input->numero,
             ]
         ], $headers);
 
-        $found_telefone = Telefone::findOrFail($response->json('data.CreateTelefone.id'));
-        $this->assertEquals($seed_telefone->cliente_id, $found_telefone->cliente_id);
-        $this->assertEquals($seed_telefone->pais_id, $found_telefone->pais_id);
-        $this->assertEquals('Teste', $found_telefone->numero);
+        $phone = Telefone::findOrFail($response->json('data.CreateTelefone.id'));
+        $this->assertEquals($input->cliente_id, $phone->cliente_id);
+        $this->assertEquals($input->pais_id, $phone->pais_id);
+        $this->assertEquals($input->numero, $phone->numero);
     }
 
     public function testUpdateTelefone()
     {
         $headers = PrestadorTest::authOwner();
         $telefone = factory(Telefone::class)->create();
+        $input =  factory(Telefone::class)->make();
         $this->graphfl('update_telefone', [
             'id' => $telefone->id,
             'input' => [
-                'numero' => 'Atualizou',
+                'numero' => $input->numero,
             ]
         ], $headers);
         $telefone->refresh();
-        $this->assertEquals('Atualizou', $telefone->numero);
+        $this->assertEquals($input->numero, $telefone->numero);
     }
 
     public function testDeleteTelefone()

@@ -31,6 +31,7 @@ namespace App\GraphQL\Mutations;
 use App\Mail\MailContact;
 use App\Models\Cliente;
 use App\Models\Telefone;
+use App\Util\Filter;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Carbon;
 use Rebing\GraphQL\Support\Mutation;
@@ -104,8 +105,9 @@ class UpdateClienteMutation extends Mutation
                 if ($revalidar) {
                     $cliente->status = Cliente::STATUS_INATIVO;
                 }
-                $cliente->save();
                 $telefones = $args['input']['telefones'] ?? [];
+                $cliente->requireIdentifier(count($telefones) > 0);
+                $cliente->save();
                 foreach ($telefones as $fone) {
                     $telefone = new Telefone();
                     if (isset($fone['id'])) {
@@ -115,6 +117,8 @@ class UpdateClienteMutation extends Mutation
                     $old_phone = $telefone->replicate();
                     $telefone->fill($fone);
                     $telefone->pais_id = $fone['pais_id'] ?? app('country')->id;
+                    $telefone->pais->loadEntries();
+                    $telefone->numero = Filter::phone($telefone->numero, $telefone->pais);
                     $telefone->cliente_id = $cliente->id;
                     if (
                         $telefone->exists &&

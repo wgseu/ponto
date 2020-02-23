@@ -43,12 +43,12 @@ class Mask
      */
     public static function money($value, $format = false, $currency = null)
     {
-        $value = round($value, 2);
+        $value = Currency::round($value);
         /** @var Pais $pais */
         $pais = app('country');
         $sep = $pais->entries->getEntry('currency', 'separator', '.');
         $dec = $pais->entries->getEntry('currency', 'decimal', ',');
-        $number =  number_format($value, 2, $dec, $sep);
+        $number =  number_format($value, Currency::places(), $dec, $sep);
         if ($format) {
             $currency = $currency ?: app('currency');
             return __($currency->formato, ['value' => $number]);

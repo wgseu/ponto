@@ -9,6 +9,7 @@ $factory->define(Cliente::class, function (Faker $faker) {
     return [
         'nome' => $faker->name,
         'login' => $faker->unique()->name,
+        'email' => $faker->unique()->email,
         'senha' => 'Teste123',
     ];
 });

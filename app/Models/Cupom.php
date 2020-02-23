@@ -26,18 +26,18 @@
 
 namespace App\Models;
 
+use App\Util\Mask;
+use App\Util\Currency;
 use App\Concerns\ModelEvents;
+use Illuminate\Support\Carbon;
+use App\Interfaces\ValidateInterface;
+use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\AfterInsertInterface;
 use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\BeforeInsertInterface;
-use App\Interfaces\BeforeSaveInterface;
 use App\Interfaces\ValidateInsertInterface;
-use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
-use App\Util\Mask;
-use App\Util\Number;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
 /**
  * Informa os cupons de descontos e seus usos
@@ -216,7 +216,7 @@ class Cupom extends Model implements
             $value += $this->pedido->servicos;
         }
         if ($this->funcao_valor == self::FUNCAO_VALOR_MENOR) {
-            return Number::isLess($value, $this->valor_limite) ? [] : [
+            return Currency::isLess($value, $this->valor_limite) ? [] : [
                 'funcao_valor' => __('messages.cannot_use_coupon_high_order', [
                     'value' => Mask::money($value, true),
                     'limit' => Mask::money($this->valor_limite, true),
@@ -224,7 +224,7 @@ class Cupom extends Model implements
             ];
         }
         if ($this->funcao_valor == self::FUNCAO_VALOR_IGUAL) {
-            return Number::isEqual($value, $this->valor_limite) ? [] : [
+            return Currency::isEqual($value, $this->valor_limite) ? [] : [
                 'funcao_valor' => __('messages.cannot_use_coupon_order_products', [
                     'value' => Mask::money($value, true),
                     'limit' => Mask::money($this->valor_limite, true),
@@ -232,7 +232,7 @@ class Cupom extends Model implements
             ];
         }
         // FUNCAO_VALOR_MAIOR
-        return Number::isGreater($value, $this->valor_limite) ? [] : [
+        return Currency::isGreater($value, $this->valor_limite) ? [] : [
             'funcao_valor' => __('messages.cannot_use_coupon_low_order', [
                 'value' => Mask::money($value, true),
                 'limit' => Mask::money($this->valor_limite, true),
@@ -388,7 +388,7 @@ class Cupom extends Model implements
         if ($this->incluir_servicos) {
             $value += $this->pedido->servicos;
         }
-        $this->valor = $value * $this->cupom->porcentagem / 100;
+        $this->valor = Currency::round($value * $this->cupom->porcentagem / 100);
     }
 
     public function afterInsert()

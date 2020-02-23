@@ -26,17 +26,17 @@
 
 namespace App\Models;
 
+use App\Util\Currency;
+use App\Util\Validator;
 use App\Concerns\ModelEvents;
-use App\Interfaces\AfterUpdateInterface;
+use Illuminate\Support\Carbon;
+use App\Interfaces\ValidateInterface;
 use App\Interfaces\BeforeSaveInterface;
+use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\AfterUpdateInterface;
 use App\Interfaces\BeforeUpdateInterface;
 use App\Interfaces\ValidateInsertInterface;
-use App\Interfaces\ValidateInterface;
 use App\Interfaces\ValidateUpdateInterface;
-use App\Util\Number;
-use App\Util\Validator;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
 /**
  * Informações do pedido de venda
@@ -442,6 +442,9 @@ class Pedido extends Model implements
     public function beforeSave($old)
     {
         $this->totalize();
+        if ($this->finished()) {
+            $this->data_conclusao = Carbon::now();
+        }
     }
 
     public function validate($old)
@@ -576,7 +579,7 @@ class Pedido extends Model implements
             // entrega precisa estar pago ou com promessa de pagamento
             if (
                 !is_null($this->localizacao_id) &&
-                !Number::isEqual($this->total, $this->pago + $this->lancado)
+                !Currency::isEqual($this->total, $this->pago + $this->lancado)
             ) {
                 $errors['pago'] = __('messages.order_incomplete_payment');
             }
@@ -595,11 +598,11 @@ class Pedido extends Model implements
             $errors['estado'] = __('messages.only_pause_local_order');
         }
         // ao fechar o pedido, não pode ter pagamento pendente
-        if ($this->estado == self::ESTADO_CONCLUIDO && !Number::isEqual($this->lancado, 0)) {
+        if ($this->estado == self::ESTADO_CONCLUIDO && !Currency::isEqual($this->lancado, 0)) {
             $errors['lancado'] = __('messages.order_payment_pending');
         }
         // ao fechar o pedido, tudo precisa estar pago, inclusive o troco entregue
-        if ($this->estado == self::ESTADO_CONCLUIDO && !Number::isEqual($this->total, $this->pago)) {
+        if ($this->estado == self::ESTADO_CONCLUIDO && !Currency::isEqual($this->total, $this->pago)) {
             $errors['pago'] = __('messages.order_unpaid');
         }
         return $errors;

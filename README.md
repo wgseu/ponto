@@ -1,5 +1,5 @@
 # Ponto - API
-API restFull para ponto web e mobile
+API para ponto web e mobile
 
 ## Tecnologias
 

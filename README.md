@@ -30,8 +30,6 @@ cp .env.example .env
 yarn
 make start
 make update
-make link
-make migrate
 ```
 
 Antes de fazer commit, rodar os comandos abaixo com sucesso

@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Bairro de uma cidade
  */
-class Colaborador extends Model implements ValidateInterface
+class Colaborador extends Model
 {
     use ModelEvents;
 
     public const STATUS_TRABALHO = 'trabalho';
     public const STATUS_FERIAS = 'ferias';
     public const STATUS_ENCOSTADO = 'encostado';
+
+    public const SENHA_TEMPORARIA = '1q2w3e4r5t6y@';
 
     /**
      * The table associated with the model.
@@ -48,19 +50,37 @@ class Colaborador extends Model implements ValidateInterface
         'ativo'
     ];
 
-    /**
-     * The model's default values for attributes.
-     *
-     * @var array
-     */
     protected $attributes = [
-        'ativo' => false,
+        'senha' => self::SENHA_TEMPORARIA
     ];
 
-    /**
-     * Cidade a qual o bairro pertence
+        /**
+     * Sempre que alterar a senha, roda a encriptação
+     *
+     * @param string $senha
+     * @return void
      */
-    public function cidade()
+    public function setSenhaAttribute($senha)
+    {
+        if (!empty($senha)) {
+            $this->attributes['senha'] = bcrypt($senha);
+        }
+    }
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->senha;
+    }
+
+    /**
+     * Empresa em que o coladorador pertence
+     */
+    public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'empresa_id');
     }

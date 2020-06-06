@@ -20,7 +20,7 @@ class CreateInitialTables extends Migration
             $table->string('fantasia', 70);
             $table->string('razao_social', 70)->nullable();
             $table->string('email', 90);
-            $table->string('senha', 30);
+            $table->string('senha', 90);
             $table->dateTime('data_criacao');
             $table->string('cnpj', 20)->nullable();
             $table->string('fone1', 12);
@@ -35,7 +35,7 @@ class CreateInitialTables extends Migration
             $table->string('nome', 20);
             $table->string('sobrenome', 30);
             $table->string('email', 90);
-            $table->string('senha', 255);
+            $table->string('senha', 90)->nullable();
             $table->double('carga_horaria');
             $table->enum('status', ['Trabalho', 'Ferias', 'Encostado'])->default('Trabalho');
             $table->double('acumulado')->nullable();

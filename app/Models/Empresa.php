@@ -19,6 +19,8 @@ class Empresa extends Model
      */
     protected $table = 'empresas';
 
+    public $timestamps = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -34,15 +36,6 @@ class Empresa extends Model
         'fone1',
         'fone2',
         'imagem_url',
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'senha',
     ];
 
     /**

@@ -39,7 +39,10 @@ class LoginController extends Controller
                 'exp' => Carbon::now('UTC')->addMinutes(30 * 24 * 60)->getTimestamp(),
             ];
             $payload = JWTFactory::claims($customClaims)->make(true);
-            return JWTAuth::encode($payload)->get();
+            return response()->json([
+                'token' => JWTAuth::encode($payload)->get(),
+                'user' => $colaborador,
+            ]);
         }
         return ['login' => 'Email ou senha incorretos'];
     }

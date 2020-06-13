@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Empresa;
-use App\Models\Pais;
 use Illuminate\Database\Seeder;
+use App\Models\Empresa;
+use Carbon\Carbon;
 
 class EmpresaSeeder extends Seeder
 {
@@ -14,7 +14,12 @@ class EmpresaSeeder extends Seeder
     public function run()
     {
         (new Empresa([
-            'pais_id' => Pais::where('codigo', env('APP_COUNTRY', 'BR'))->first()->id,
+            'fantasia' => 'Empresa teste',
+            'email' => 'empresa@teste.com.br',
+            'senha' => 'Teste123',
+            'data_criacao' => Carbon::now(),
+            'cnpj' => '06794744000101',
+            'fone1' => '44999719966'
         ]))->save();
     }
 }

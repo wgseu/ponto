@@ -40,6 +40,8 @@ class CreateInitialTables extends Migration
             $table->enum('status', ['Trabalho', 'Ferias', 'Encostado'])->default('Trabalho');
             $table->double('acumulado')->nullable();
             $table->boolean('ativo')->default(false);
+            $table->string('latitude', 255)->nullable();
+            $table->string('longitude', 255)->nullable();
             $table->unique(['email']);
 
             $table->index(['empresa_id']);
@@ -66,9 +68,21 @@ class CreateInitialTables extends Migration
                 ->onDelete('restrict');
         });
 
+        Schema::create('horarios', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('empresa_id');
+            $table->dateTime('hora_minima');
+            $table->dateTime('hora_maxima');
+
+            $table->index(['empresa_id']);
+            $table->foreign('empresa_id')
+                ->references('id')->on('empresas')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+        });
   
         Schema::enableForeignKeyConstraints();
-        //(new DatabaseSeeder())->run();
+        (new DatabaseSeeder())->run();
     }
 
     /**
@@ -82,6 +96,7 @@ class CreateInitialTables extends Migration
         Schema::dropIfExists('empresas');
         Schema::dropIfExists('colaboradores');
         Schema::dropIfExists('pontos');
+        Schema::dropIfExists('horarios');
         Schema::enableForeignKeyConstraints();
     }
 }

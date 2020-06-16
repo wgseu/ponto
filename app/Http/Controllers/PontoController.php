@@ -29,4 +29,12 @@ class PontoController extends Controller
             'descricao' => $request->descricao ?? null,
         ]);
     }
+
+    public function visualizar()
+    {
+        $pontos = Ponto::orderBy('id', 'desc')->get();
+        return response()->json([
+            'pontos' => $pontos
+        ]);
+    }
 }
